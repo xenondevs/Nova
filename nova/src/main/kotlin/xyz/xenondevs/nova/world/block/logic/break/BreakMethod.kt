@@ -8,15 +8,13 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.packetentity.packetItemDisplay
-import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.util.broadcastDestructionStage
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
-import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 
 internal interface BreakMethod {
@@ -42,9 +40,9 @@ internal interface BreakMethod {
             predictionPlayer: Player?,
             entityId: Int = predictionPlayer?.entityId ?: Random.nextInt()
         ): BreakMethod {
-            return if (type.getBehavior<Breakable>().showBreakAnimation)
-                if (block.type == Material.BARRIER) DisplayEntityBreakMethod(block.pos)
-                else PacketBreakMethod(block.pos, entityId, predictionPlayer)
+            return if (type.getBehaviorOrThrow<Breakable>().showBreakAnimation)
+                if (block.type == Material.BARRIER) DisplayEntityBreakMethod(block)
+                else PacketBreakMethod(block, entityId, predictionPlayer)
             else INVISIBLE
         }
         
@@ -52,14 +50,11 @@ internal interface BreakMethod {
     
 }
 
-internal abstract class VisibleBreakMethod(val pos: BlockPos, val predictionPlayer: Player? = null) : BreakMethod {
+internal abstract class VisibleBreakMethod(val block: Block, val predictionPlayer: Player? = null) : BreakMethod {
     override val hasClientsidePrediction = predictionPlayer != null
-    val block = pos.block
 }
 
-internal class PacketBreakMethod(pos: BlockPos, private val entityId: Int = Random.nextInt(), predictionPlayer: Player? = null) : VisibleBreakMethod(pos, predictionPlayer) {
-    
-    constructor(pos: BlockPos, predictionPlayer: Player) : this(pos, predictionPlayer.entityId, predictionPlayer)
+internal class PacketBreakMethod(block: Block, private val entityId: Int = Random.nextInt(), predictionPlayer: Player? = null) : VisibleBreakMethod(block, predictionPlayer) {
     
     override var breakStage: Int = -1
         set(stage) {
@@ -76,21 +71,21 @@ internal class PacketBreakMethod(pos: BlockPos, private val entityId: Int = Rand
     
     private fun sendBreakStage(stage: Int) {
         if (predictionPlayer != null) {
-            block.broadcastDestructionStage(predictionPlayer, stage)
+            this@PacketBreakMethod.block.broadcastDestructionStage(predictionPlayer, stage)
         } else {
-            block.broadcastDestructionStage(entityId, stage)
+            this@PacketBreakMethod.block.broadcastDestructionStage(entityId, stage)
         }
     }
     
 }
 
-internal class DisplayEntityBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos) {
+internal class DisplayEntityBreakMethod(block: Block) : VisibleBreakMethod(block) {
     
     private val _breakStage = mutableProvider(-1)
     override var breakStage by _breakStage
     
     private val itemDisplay = packetItemDisplay {
-        location by pos.location.add(.5, .5, .5)
+        location by block.location.add(.5, .5, .5)
         metadata { itemStack by _breakStage.flatMap { items.getOrNull(it) ?: provider(ItemStack.empty()) }}
     }
     

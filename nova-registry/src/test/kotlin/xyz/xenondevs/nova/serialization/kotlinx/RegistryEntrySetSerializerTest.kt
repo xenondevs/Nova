@@ -1,3 +1,4 @@
+
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import io.papermc.paper.registry.RegistryKey
@@ -34,7 +35,6 @@ class RegistryEntrySetSerializerTest {
         private lateinit var tag: RegistryEntrySet.Nova.Tag<TestElement>
         private lateinit var novaSerializer: KSerializer<RegistryEntrySet.Nova<TestElement>>
         private lateinit var paperSerializer: KSerializer<RegistryEntrySet.Paper<ItemType>>
-        private lateinit var mixedSerializer: KSerializer<RegistryEntrySet.Mixed<TestElement, ItemType>>
         
         @JvmStatic
         @BeforeAll
@@ -63,7 +63,6 @@ class RegistryEntrySetSerializerTest {
             
             novaSerializer = NovaRegistryEntrySetSerializer(registry)
             paperSerializer = PaperRegistryEntrySetSerializer(RegistryKey.ITEM)
-            mixedSerializer = MixedRegistryEntrySetSerializer(registry, RegistryKey.ITEM)
         }
         
         private fun registerElement(name: String): RegistryEntry.Nova<TestElement> {
@@ -208,126 +207,6 @@ class RegistryEntrySetSerializerTest {
         assertEquals(registryEntrySetOf(RegistryKey.ITEM), set)
     }
     
-    // --- Mixed ---
-    
-    @Test
-    fun `serialize RegistryEntrySet Mixed Direct (single nova)`() {
-        val mixed = registryEntrySetOf(
-            registryEntrySetOf(el1),
-            emptyRegistryEntrySet(RegistryKey.ITEM)
-        )
-        val json = Json.encodeToString(mixedSerializer, mixed)
-        assertEquals(""""nova:element1"""", json)
-    }
-    
-    @Test
-    fun `serialize RegistryEntrySet Mixed Direct (single paper)`() {
-        val mixed = registryEntrySetOf(
-            emptyRegistryEntrySet(registry),
-            registryEntrySetOf(ItemTypeEntries.DIAMOND)
-        )
-        val json = Json.encodeToString(mixedSerializer, mixed)
-        assertEquals(""""minecraft:diamond"""", json)
-    }
-    
-    @Test
-    fun `serialize RegistryEntrySet Mixed Direct (one nova, one paper)`() {
-        val mixed = registryEntrySetOf(
-            registryEntrySetOf(el1),
-            registryEntrySetOf(ItemTypeEntries.DIAMOND)
-        )
-        val json = Json.encodeToString(mixedSerializer, mixed)
-        assertEquals("""["nova:element1","minecraft:diamond"]""", json)
-    }
-    
-    @Test
-    fun `serialize RegistryEntrySet Mixed Direct (multi nova)`() {
-        val mixed = registryEntrySetOf(
-            registryEntrySetOf(el1, el2),
-            emptyRegistryEntrySet(RegistryKey.ITEM)
-        )
-        val json = Json.encodeToString(mixedSerializer, mixed)
-        assertEquals("""["nova:element1","nova:element2"]""", json)
-    }
-    
-    @Test
-    fun `serialize RegistryEntrySet Mixed Direct (multi paper)`() {
-        val mixed = registryEntrySetOf(
-            emptyRegistryEntrySet(registry),
-            registryEntrySetOf(ItemTypeEntries.DIAMOND, ItemTypeEntries.EMERALD)
-        )
-        val json = Json.encodeToString(mixedSerializer, mixed)
-        assertEquals("""["minecraft:diamond","minecraft:emerald"]""", json)
-    }
-    
-    @Test
-    fun `deserialize RegistryEntrySet Mixed Direct (single nova)`() {
-        val json = """"nova:element1""""
-        val mixed = Json.decodeFromString(mixedSerializer, json)
-        
-        assertEquals(
-            registryEntrySetOf(
-                registryEntrySetOf(el1),
-                emptyRegistryEntrySet(RegistryKey.ITEM)
-            ),
-            mixed
-        )
-    }
-    
-    @Test
-    fun `deserialize RegistryEntrySet Mixed Direct (single paper)`() {
-        val json = """"minecraft:diamond""""
-        val mixed = Json.decodeFromString(mixedSerializer, json)
-        
-        assertEquals(
-            registryEntrySetOf(
-                emptyRegistryEntrySet(registry),
-                registryEntrySetOf(ItemTypeEntries.DIAMOND)
-            ),
-            mixed
-        )
-    }
-    
-    @Test
-    fun `deserialize RegistryEntrySet Mixed Direct (one nova, one paper)`() {
-        val json = """["nova:element1","minecraft:diamond"]"""
-        val mixed = Json.decodeFromString(mixedSerializer, json)
-        
-        assertEquals(
-            registryEntrySetOf(
-                registryEntrySetOf(el1),
-                registryEntrySetOf(ItemTypeEntries.DIAMOND)
-            ),
-            mixed
-        )
-    }
-    
-    @Test
-    fun `deserialize RegistryEntrySet Mixed Direct (multi nova)`() {
-        val json = """["nova:element1","nova:element2"]"""
-        val mixed = Json.decodeFromString(mixedSerializer, json)
-        
-        assertEquals(
-            registryEntrySetOf(
-                registryEntrySetOf(el1, el2),
-                emptyRegistryEntrySet(RegistryKey.ITEM)
-            ),
-            mixed
-        )
-    }
-    
-    @Test
-    fun `deserialize RegistryEntrySet Mixed Direct (multi paper)`() {
-        val json = """["minecraft:diamond","minecraft:emerald"]"""
-        val mixed = Json.decodeFromString(mixedSerializer, json)
-        
-        assertEquals(
-            registryEntrySetOf(
-                emptyRegistryEntrySet(registry),
-                registryEntrySetOf(ItemTypeEntries.DIAMOND, ItemTypeEntries.EMERALD)
-            ),
-            mixed
-        )
-    }
     
 }
+

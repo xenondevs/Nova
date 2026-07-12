@@ -14,11 +14,12 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.provider.NULL_PROVIDER
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.util.component.adventure.toNmsStyle
 import xyz.xenondevs.nova.util.item.update
 import xyz.xenondevs.nova.util.nmsEntity
@@ -35,18 +36,16 @@ import net.minecraft.network.chat.Component as MojangComponent
 
 internal class DefaultBehavior(
     id: Key,
-    name: Provider<Component?>,
-    style: Provider<Style>,
-    lore: Provider<List<Component>>,
-    tooltipStyle: Provider<TooltipStyle?>,
-    maxStackSize: Provider<Int>
+    name: Component?,
+    style: Style,
+    lore: List<Component>,
+    tooltipStyle: RegistryEntry.Nova<TooltipStyle>?,
+    maxStackSize: Int
 ) : ItemBehavior {
     
-    private val style by style.map { it.toNmsStyle() }
+    private val style = style.toNmsStyle()
     
-    override val baseDataComponents: Provider<DataComponentMap> = combinedProvider(
-        name, style, lore, tooltipStyle, maxStackSize
-    ) { name, style, lore, tooltipStyle, maxStackSize ->
+    override val baseDataComponents: Provider<DataComponentMap> = (tooltipStyle ?: NULL_PROVIDER).map { tooltipStyle ->
         buildDataComponentMap {
             if (name != null) {
                 this[DataComponentTypes.ITEM_NAME] = name.style(style)

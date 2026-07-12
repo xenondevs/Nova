@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.resources.builder.layout.block
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
 import xyz.xenondevs.commons.provider.Provider

@@ -81,7 +81,7 @@ internal object AutoUploadManager {
     }
     
     fun getPackUuid(id: Key): UUID =
-        UUID.nameUUIDFromBytes(id.toString().encodeToByteArray())
+        UUID.nameUUIDFromBytes(id.asString().encodeToByteArray())
     
     fun getPackInfo(id: Key): ResourcePackInfo? {
         val pack = uploadedPacks[id] ?: return null

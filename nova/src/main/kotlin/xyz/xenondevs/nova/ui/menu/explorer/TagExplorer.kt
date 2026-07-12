@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.ui.menu.explorer
 
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.TooltipDisplay
-import io.papermc.paper.registry.RegistryKey
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Registry
@@ -27,11 +26,9 @@ import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.invui.dsl.window
 import xyz.xenondevs.invui.gui.Markers
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.entries.ItemTypeTags
-import xyz.xenondevs.nova.registry.registryEntrySetOf
 import xyz.xenondevs.nova.ui.menu.item.installItemScrollSupport
 import xyz.xenondevs.nova.ui.menu.item.scrollBar
 import xyz.xenondevs.nova.ui.menu.item.scrollableItemProvider
@@ -39,26 +36,17 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
-import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.clientsideProvider
 import xyz.xenondevs.nova.world.item.createItemStack
+import xyz.xenondevs.nova.world.item.itemProvider
 
 private val windows = PlayerMapManager.createMap<Window>()
 internal fun itemTagExplorer(player: Player) = windows.computeIfAbsent(player, ::createItemTagExplorer)
 private fun createItemTagExplorer(player: Player) = window(player) {
     val tab = mutableProvider(0)
-    val tags = combinedProvider(
-        NovaRegistries.ITEM.tags,
-        ItemTypeTags.ALL_TAGS
-    ) { novaTags, paperTags ->
-        buildSet {
-            addAll(novaTags.map { it.tagKey })
-            addAll(paperTags.map { it.tagKey.key() })
-        }.sortedBy { it.asString() }.map { registryEntrySetOf(it, NovaRegistries.ITEM, RegistryKey.ITEM) }
-    }
+    val tags = ItemTypeTags.ALL_TAGS.map { tags -> tags.sortedBy { tag -> tag.tagKey.key().asString() } }
     
     title by combinedProvider(DefaultGuiTextures.TAGS, tags, tab) { texture, tags, tab -> 
-        texture.getTitle(Component.text("#" + tags[tab].tagKey.asString())) 
+        texture.getTitle(Component.text("#" + tags[tab].tagKey.key().asString())) 
     }.flatten()
     upperGui by gui(
         "k k k k . v v v v",
@@ -101,7 +89,7 @@ private fun createItemTagExplorer(player: Player) = window(player) {
                 ) {
                     '-' by scrollBar(offset = 2)
                     content by tag.entries.mapEach { itemTypeItem(it) }
-                    background by DefaultGuiItems.DISABLED_SLOT.clientsideProvider
+                    background by DefaultGuiItems.DISABLED_SLOT.itemProvider
                 }
             }
             this.tab by tab
@@ -111,13 +99,13 @@ private fun createItemTagExplorer(player: Player) = window(player) {
 }
 
 context(windowDsl: WindowDsl, guiDsl: ScrollGuiDsl<*>)
-private fun showTagButton(tag: RegistryEntrySet.Mixed.Tag<NovaItem, ItemType>, tab: Int, activeTab: MutableProvider<Int>) = item {
+private fun showTagButton(tag: RegistryEntrySet.Paper.Tag<ItemType>, tab: Int, activeTab: MutableProvider<Int>) = item {
     itemProvider by itemProvider {
         base by tag.entries
-            .flatMap { it.firstOrNull()?.clientsideProvider ?: NULL_PROVIDER }
+            .flatMap { it.firstOrNull()?.itemProvider ?: NULL_PROVIDER }
             .map { it?.get() ?: ItemStack.empty() }
             .map { scrollableItemProvider(it).get() }
-        name by Component.text("#" + tag.tagKey.asString(), NamedTextColor.GRAY)
+        name by Component.text("#" + tag.tagKey.key().asString(), NamedTextColor.GRAY)
         lore by emptyList()
         data[DataComponentTypes.TOOLTIP_DISPLAY] by TooltipDisplay
             .tooltipDisplay()
@@ -135,8 +123,8 @@ private fun showTagButton(tag: RegistryEntrySet.Mixed.Tag<NovaItem, ItemType>, t
 }
 
 context(windowDsl: WindowDsl, guiDsl: ScrollGuiDsl<*>)
-private fun itemTypeItem(type: RegistryEntry.Either<NovaItem, ItemType>) = item {
-    itemProvider by type.clientsideProvider.map { scrollableItemProvider(it) }
+private fun itemTypeItem(type: RegistryEntry.Paper<ItemType>) = item {
+    itemProvider by type.itemProvider.map { scrollableItemProvider(it) }
     onClick {
         val itemStack = type.createItemStack()
         when (clickType) {

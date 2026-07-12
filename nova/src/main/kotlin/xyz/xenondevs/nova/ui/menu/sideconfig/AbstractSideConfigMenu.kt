@@ -10,9 +10,9 @@ import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.invui.dsl.item
+import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.nova.registry.RegistryEntry
-import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.playClickSound
@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 
@@ -48,7 +49,7 @@ abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal construct
     }
     
     private fun queueCycleConnectionType(face: BlockFace, move: Int) {
-        NetworkManager.queueWrite(endPoint.pos.chunkPos) { state ->
+        NetworkManager.queueWrite(endPoint.block.chunkPos) { state ->
             // cycle connection type
             val allowedTypes = getAllowedConnectionType(face).supertypes
             val currentType = getConnectionType(face)
@@ -109,7 +110,10 @@ abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal construct
     }
     
     protected fun getFaceFromSide(blockSide: BlockSide): Pair<BlockSide?, BlockFace> {
-        val facing = (endPoint as? TileEntity)?.blockState?.get(DefaultBlockStateProperties.FACING)
+        val blockState = (endPoint as? TileEntity)?.blockState
+        val facing = blockState?.let { state ->
+            DefaultBlockStateProperties.FACING_PROPERTIES.firstNotNullOfOrNull { state[it] }
+        }
         return if (facing != null)
             blockSide to blockSide.getBlockFace(facing)
         else null to blockSide.getBlockFace(0f)

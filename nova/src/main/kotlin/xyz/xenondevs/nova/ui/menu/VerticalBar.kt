@@ -2,16 +2,17 @@ package xyz.xenondevs.nova.ui.menu
 
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.CustomModelData.customModelData
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.dsl.ClickDsl
 import xyz.xenondevs.invui.dsl.ItemProviderDsl
 import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.dsl.item
+import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.gui.SlotElement
 import xyz.xenondevs.invui.gui.SlotElementSupplier
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
-import xyz.xenondevs.nova.world.item.NovaItem
 import java.util.function.Supplier
 import kotlin.math.max
 import kotlin.math.min
@@ -27,7 +28,7 @@ import kotlin.math.min
  */
 fun verticalBar(
     percentage: Provider<Double>,
-    barType: Provider<NovaItem>,
+    barType: Provider<ItemType>,
     modifyItemProvider: ItemProviderDsl.() -> Unit = {},
     onClick: ClickDsl.() -> Unit = {}
 ) = SlotElementSupplier { slots ->
@@ -73,10 +74,10 @@ abstract class VerticalBar(
     
     protected abstract fun createBarItem(section: Int): Item
     
-    protected fun createItemBuilder(item: NovaItem, section: Int, percentage: Double): ItemBuilder {
+    protected fun createItemBuilder(item: ItemType, section: Int, percentage: Double): ItemBuilder {
         val displayPercentageStart = (1.0 / height) * section
         val displayPercentage = max(min((percentage - displayPercentageStart) * height, 1.0), 0.0)
-        return item.createClientsideItemBuilder().setCustomModelData(customModelDataIndex, displayPercentage)
+        return ItemBuilder(item).setCustomModelData(customModelDataIndex, displayPercentage)
     }
     
 }

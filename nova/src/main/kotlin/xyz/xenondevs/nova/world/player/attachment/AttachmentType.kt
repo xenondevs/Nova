@@ -11,5 +11,5 @@ class AttachmentType<T : Attachment> internal constructor(
     override val entry: RegistryEntry.Nova<AttachmentType<T>>,
     val constructor: (Player) -> T
 ) : NovaRegistryElement<AttachmentType<T>> {
-    override fun toString(): String = key.toString()
+    override fun toString(): String = this@AttachmentType.key.asString()
 }

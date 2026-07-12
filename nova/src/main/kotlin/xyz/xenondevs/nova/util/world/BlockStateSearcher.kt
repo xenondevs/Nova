@@ -2,24 +2,21 @@
 
 package xyz.xenondevs.nova.util.world
 
+import xyz.xenondevs.nova.world.*
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
-import net.minecraft.util.BitStorage
-import net.minecraft.util.ZeroBitStorage
-import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.GlobalPalette
 import net.minecraft.world.level.chunk.HashMapPalette
 import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.Palette
 import net.minecraft.world.level.chunk.SingleValuePalette
-import xyz.xenondevs.commons.collections.getOrSet
-import xyz.xenondevs.nova.util.serverLevel
-import xyz.xenondevs.nova.world.BlockPos
+import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.bottomBlockY
 import kotlin.reflect.jvm.jvmName
+import net.minecraft.world.level.block.Block as MojangBlock
 
 private typealias ChunkSearchQuery = (BlockState) -> Boolean
 
@@ -27,51 +24,52 @@ object BlockStateSearcher {
     
     private val globalPaletteCache = HashMap<ChunkSearchQuery, Int2ObjectMap<BlockState>>()
     
-    fun searchChunk(pos: ChunkPos, queries: List<ChunkSearchQuery>): Array<ArrayList<Pair<BlockPos, BlockState>>?> {
-        val world = pos.world
-        require(world != null) { "World does not exist" }
-        
-        val result: Array<ArrayList<Pair<BlockPos, BlockState>>?> = arrayOfNulls(queries.size)
-        for (section in world.serverLevel.getChunk(pos.x, pos.z).sections) {
-            val container = section.states
-            container.acquire()
-            
-            try {
-                val bottomY = section.bottomBlockY
-                val data = container.data
-                val palette = data.palette()
-                var storage: BitStorage? = null
-                
-                for ([queryIdx, query] in queries.withIndex()) {
-                    val ids = palette.findIds(query)
-                    if (ids.isEmpty())
-                        continue
-                    
-                    if (storage == null)
-                        storage = data.storage()
-                    
-                    if (storage is ZeroBitStorage)
-                        break
-                    
-                    val resultList = result.getOrSet(queryIdx, ::ArrayList)
-                    for (encodedPos in 0..<storage.size) {
-                        val id = storage.get(encodedPos)
-                        if (!ids.keys.contains(id))
-                            continue
-                        
-                        val x = encodedPos and 0xF
-                        val z = (encodedPos shr 4) and 0xF
-                        val y = encodedPos shr 8
-                        
-                        resultList += BlockPos(world, (pos.x shl 4) + x, y + bottomY, (pos.z shl 4) + z) to ids.get(id)
-                    }
-                }
-            } finally {
-                container.release()
-            }
-        }
-        
-        return result
+    fun searchChunk(pos: ChunkPos, queries: List<ChunkSearchQuery>): Array<ArrayList<Pair<Block, BlockState>>?> {
+        return emptyArray<ArrayList<Pair<Block, BlockState>>?>() // TODO
+//        val world = pos.world
+//        require(world != null) { "World does not exist" }
+//        
+//        val result: Array<ArrayList<Pair<Block, BlockState>>?> = arrayOfNulls(queries.size)
+//        for (section in world.serverLevel.getChunk(pos.x, pos.z).sections) {
+//            val container = section.states
+//            container.acquire()
+//            
+//            try {
+//                val bottomY = section.bottomBlockY
+//                val data = container.data
+//                val palette = data.palette()
+//                var storage: BitStorage? = null
+//                
+//                for ([queryIdx, query] in queries.withIndex()) {
+//                    val ids = palette.findIds(query)
+//                    if (ids.isEmpty())
+//                        continue
+//                    
+//                    if (storage == null)
+//                        storage = data.storage()
+//                    
+//                    if (storage is ZeroBitStorage)
+//                        break
+//                    
+//                    val resultList = result.getOrSet(queryIdx, ::ArrayList)
+//                    for (encodedPos in 0..<storage.size) {
+//                        val id = storage.get(encodedPos)
+//                        if (!ids.keys.contains(id))
+//                            continue
+//                        
+//                        val x = encodedPos and 0xF
+//                        val z = (encodedPos shr 4) and 0xF
+//                        val y = encodedPos shr 8
+//                        
+//                        resultList += Block(world, (pos.x shl 4) + x, y + bottomY, (pos.z shl 4) + z) to ids.get(id)
+//                    }
+//                }
+//            } finally {
+//                container.release()
+//            }
+//        }
+//        
+//        return result
     }
     
     private fun Palette<BlockState>.findIds(query: ChunkSearchQuery): Int2ObjectMap<BlockState> {
@@ -126,7 +124,7 @@ object BlockStateSearcher {
         return globalPaletteCache.getOrPut(query) {
             val result = Int2ObjectOpenHashMap<BlockState>()
             
-            for ([idx, value] in Block.BLOCK_STATE_REGISTRY.withIndex()) {
+            for ([idx, value] in MojangBlock.BLOCK_STATE_REGISTRY.withIndex()) {
                 if (query(value)) {
                     result.put(idx, value)
                 }

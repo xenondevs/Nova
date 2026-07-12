@@ -1,3 +1,4 @@
+
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import io.papermc.paper.registry.RegistryAccess
@@ -161,81 +162,3 @@ private class BackingPaperRegistryElementSerializer<T : Keyed>(
     
 }
 
-/**
- * Open base class for specialized [RegistryEntrySet.Mixed] serializers.
- * Serializes [RegistryEntrySet.Mixed.Tag] to `#namespace:value` and [RegistryEntrySet.Mixed.Direct]
- * to `["namespace:value1", "namespace:value2"]` (or just `"namespace:value"` if there's only one entry).
- * 
- * Nova registries will be prioritized for direct entries.
- * Tags will be merged from both registries.
- * 
- * This is a [JsonTransformingSerializer] as it needs to support both arrays and primitive values,
- * so it can only be used for JSON.
- */
-open class MixedRegistryEntrySetSerializer<N : NovaRegistryElement<N>, P : Keyed>(
-    /**
-     * The Nova registry this serializer is for.
-     */
-    val novaRegistry: NovaRegistry<N>,
-    /**
-     * The Paper registry this serializer is for.
-     */
-    val paperRegistryKey: RegistryKey<P>,
-    /**
-     * The registry access to retrieve the Paper registry from.
-     */
-    val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
-) : JsonTransformingSerializer<RegistryEntrySet.Mixed<N, P>>(
-    BackingMixedRegistryEntrySetSerializer(novaRegistry, paperRegistryKey, registryAccess)
-) {
-    
-    final override fun transformDeserialize(element: JsonElement): JsonElement {
-        return when (element) {
-            is JsonArray -> element
-            is JsonPrimitive -> JsonArray(listOf(element))
-            else -> throw SerializationException("Expected JsonArray or JsonPrimitive, but got ${element::class}")
-        }
-    }
-    
-    final override fun transformSerialize(element: JsonElement): JsonElement {
-        if (element !is JsonArray)
-            throw SerializationException("Expected JsonArray, but got ${element::class}")
-        return if (element.size == 1) element[0] else element
-    }
-    
-}
-
-private class BackingMixedRegistryEntrySetSerializer<N : NovaRegistryElement<N>, P : Keyed>(
-    private val novaRegistry: NovaRegistry<N>,
-    private val paperRegistry: RegistryKey<P>,
-    private val registryAccess: RegistryAccess
-) : KSerializer<RegistryEntrySet.Mixed<N, P>> {
-    
-    private val delegate = ListSerializer(String.serializer())
-    override val descriptor = SerialDescriptor("xyz.xenondevs.nova.BackingMixedRegistryEntrySetSerializer", delegate.descriptor)
-    
-    override fun serialize(encoder: Encoder, value: RegistryEntrySet.Mixed<N, P>) {
-        when (value) {
-            is RegistryEntrySet.Mixed.Direct<N, P> -> delegate.serialize(encoder, value.entries.map { it.key.asString() })
-            is RegistryEntrySet.Mixed.Tag<N, P> -> delegate.serialize(encoder, listOf("#${value.tagKey.key().asString()}"))
-        }
-    }
-    
-    override fun deserialize(decoder: Decoder): RegistryEntrySet.Mixed<N, P> {
-        val elements = delegate.deserialize(decoder)
-        try {
-            if (elements.size == 1 && elements[0].startsWith("#")) {
-                val tagKey = KeySerializer.parseKey(elements[0].substring(1))
-                return registryEntrySetOf(tagKey, novaRegistry, paperRegistry, registryAccess)
-            } else {
-                if (elements.any { it.startsWith("#") })
-                    throw SerializationException("Cannot have multiple tags or values mixed with tags (got $elements)")
-                val entries = elements.map { RegistryEntry.either(KeySerializer.parseKey(it), novaRegistry, paperRegistry, registryAccess) }
-                return registryEntrySetOf(entries, novaRegistry, paperRegistry)
-            }
-        } catch (e: NoSuchElementException) {
-            throw SerializationException(e.message, e)
-        }
-    }
-    
-}

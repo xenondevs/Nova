@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.integration.customitems
 
+import xyz.xenondevs.nova.world.*
+
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.Location

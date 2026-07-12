@@ -4,6 +4,7 @@ import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers.itemAttributes
 import io.papermc.paper.datacomponent.item.attribute.AttributeModifierDisplay
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attribute
@@ -24,6 +25,7 @@ import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.toNamespacedKey
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 
+@SerialName("attribute_modifier")
 @Serializable
 private class AttributesSurrogate(
     @Serializable(KeySerializer::class)

@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.node
 
 import org.bukkit.OfflinePlayer
-import xyz.xenondevs.nova.world.BlockPos
+import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.format.NetworkState
@@ -15,9 +15,9 @@ import xyz.xenondevs.nova.world.format.NetworkState
 sealed interface NetworkNode {
     
     /**
-     * The [BlockPos] of this [NetworkNode]
+     * The [Block] of this [NetworkNode]
      */
-    val pos: BlockPos
+    val block: Block
     
     /**
      * The owner of this [NetworkNode] or null if it doesn't have one.

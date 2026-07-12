@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world
 
+import xyz.xenondevs.nova.world.*
+
 import kotlinx.serialization.Serializable
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
@@ -69,10 +71,10 @@ data class ChunkPos(
     }
     
     /**
-     * Gets the [BlockPos] at the specified chunk coordinates [x], [y], [z].
+     * Gets the [Block] at the specified chunk coordinates [x], [y], [z].
      */
-    fun blockPos(x: Int, y: Int, z: Int): BlockPos =
-        BlockPos(world!!, (this.x shl 4) + x, y, (this.z shl 4) + z)
+    fun blockPos(x: Int, y: Int, z: Int): Block =
+        world!!.getBlockAt((this.x shl 4) + x, y, (this.z shl 4) + z)
     
     /**
      * Checks whether the chunk at this position is loaded.

@@ -10,7 +10,6 @@ import xyz.xenondevs.nova.util.Location
 import xyz.xenondevs.nova.util.LocationUtils
 import xyz.xenondevs.nova.util.add
 import xyz.xenondevs.nova.util.advance
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 
@@ -90,12 +89,12 @@ class Region(min: Location, max: Location) {
         }
         
         /**
-         * Creates a [Region] surrounding [pos] using the given cubic [radius].
+         * Creates a [Region] surrounding [block] using the given cubic [radius].
          */
-        fun surrounding(pos: BlockPos, radius: Int): Region =
+        fun surrounding(block: Block, radius: Int): Region =
             Region(
-                Location(pos.world, pos.x - radius, pos.y - radius, pos.z - radius),
-                Location(pos.world, pos.x + radius + 1, pos.y + radius + 1, pos.z + radius + 1)
+                Location(block.world, block.x - radius, block.y - radius, block.z - radius),
+                Location(block.world, block.x + radius + 1, block.y + radius + 1, block.z + radius + 1)
             )
         
         /**
@@ -103,15 +102,16 @@ class Region(min: Location, max: Location) {
          */
         fun inFrontOf(tileEntity: TileEntity, depth: Number, width: Number, height: Number, translateY: Number): Region {
             val blockState = tileEntity.blockState
-            val facing = blockState.getOrThrow(DefaultBlockStateProperties.FACING)
-            return inFrontOf(tileEntity.pos, facing, depth, width, height, translateY)
+            val facing = DefaultBlockStateProperties.FACING_PROPERTIES.firstNotNullOfOrNull { blockState[it] }
+                ?: throw NoSuchElementException("No facing property present")
+            return inFrontOf(tileEntity.block, facing, depth, width, height, translateY)
         }
         
         /**
-         * Creates a region in front of [pos] with the given [depth], [width], [height] and [translateY].
+         * Creates a region in front of [block] with the given [depth], [width], [height] and [translateY].
          */
-        fun inFrontOf(pos: BlockPos, facing: BlockFace, depth: Number, width: Number, height: Number, translateY: Number): Region {
-            val location = pos.location
+        fun inFrontOf(block: Block, facing: BlockFace, depth: Number, width: Number, height: Number, translateY: Number): Region {
+            val location = block.location
                 .add(0.5, 0.0, 0.5)
                 .advance(facing, 0.5)
             val direction = facing.direction.toVector3d()

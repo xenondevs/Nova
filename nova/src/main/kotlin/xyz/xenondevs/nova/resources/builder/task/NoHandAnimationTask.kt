@@ -1,10 +1,11 @@
 package xyz.xenondevs.nova.resources.builder.task
 
-import xyz.xenondevs.nova.registry.NovaRegistries
+import org.bukkit.Registry
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.world.item.behavior.NoHandAnimationWhileHolding
+import xyz.xenondevs.nova.world.item.hasBehavior
 
 /**
  * Generates extra item model definitions for items with the [NoHandAnimationWhileHolding] behavior.
@@ -18,7 +19,7 @@ class NoHandAnimationTask(builder: ResourcePackBuilder) : PackTask {
     private val itemModelContent by builder.getBuildDataLazily<ItemModelContent>()
     
     override suspend fun run() {
-        for (item in NovaRegistries.ITEM.entrySet.get()) {
+        for (item in Registry.ITEM) {
             if (!item.hasBehavior<NoHandAnimationWhileHolding>())
                 continue
             

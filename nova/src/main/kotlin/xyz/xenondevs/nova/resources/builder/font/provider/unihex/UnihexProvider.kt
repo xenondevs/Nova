@@ -207,7 +207,7 @@ abstract class UnihexProvider internal constructor(
     }
     
     override fun toJson() = super.toJson().apply {
-        addProperty("hex_file", hexFile.toString())
+        addProperty("hex_file", hexFile.asString())
         addSerialized("size_overrides", sizeOverrides)
     }
     

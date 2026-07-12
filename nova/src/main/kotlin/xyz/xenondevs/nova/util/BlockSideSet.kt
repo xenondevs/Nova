@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.util
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.BlockFace
 
 /**

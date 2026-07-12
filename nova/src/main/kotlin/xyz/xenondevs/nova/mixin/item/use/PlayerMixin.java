@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xyz.xenondevs.nova.util.MixinContext;
-import xyz.xenondevs.nova.util.item.ItemUtilsKt;
+import xyz.xenondevs.nova.world.item.NovaItem;
 
 @Mixin(Player.class)
 abstract class PlayerMixin {
@@ -59,7 +59,7 @@ abstract class PlayerMixin {
         Vec3 location
     ) {
         // skip entity interaction for sneak-clicking with nova items to align with the behavior of clicking blocks
-        if (MixinContext.IS_USING_SECONDARY_ACTION.orElse(false) && ItemUtilsKt.getNovaItem(player.getItemInHand(hand)) != null)
+        if (MixinContext.IS_USING_SECONDARY_ACTION.orElse(false) && player.getItemInHand(hand).getItem() instanceof NovaItem)
             return InteractionResult.PASS;
         return entity.interact(player, hand, location);
     }
@@ -76,10 +76,9 @@ abstract class PlayerMixin {
         Player player,
         LivingEntity target,
         InteractionHand hand,
-        @Local(argsOnly = true) Vec3 location
+        @Local(argsOnly = true, name = "location") Vec3 location
     ) {
-        var novaItem = ItemUtilsKt.getNovaItem(stack);
-        if (novaItem == null)
+        if (!(stack.getItem() instanceof NovaItem novaItem))
             return stack.interactLivingEntity(player, target, hand);
         return novaItem.useOnEntityNms$nova(player, stack, target, hand, location);
     }
@@ -93,16 +92,15 @@ abstract class PlayerMixin {
     )
     private InteractionResult useNovaItemOnNonLivingEntity(
         InteractionResult original,
-        @Local(argsOnly = true) Entity entity,
-        @Local(argsOnly = true) InteractionHand hand,
-        @Local(argsOnly = true) Vec3 location
+        @Local(argsOnly = true, name = "entity") Entity entity,
+        @Local(argsOnly = true, name = "hand") InteractionHand hand,
+        @Local(argsOnly = true, name = "location") Vec3 location
     ) {
         var player = (Player) (Object) this;
         if (player.isSpectator() || entity instanceof LivingEntity)
             return original;
         var itemInHand = player.getItemInHand(hand);
-        var novaItem = ItemUtilsKt.getNovaItem(itemInHand);
-        if (novaItem == null)
+        if (!(itemInHand.getItem() instanceof NovaItem novaItem))
             return original;
         
         return novaItem.useOnEntityNms$nova(player, itemInHand, entity, hand, location);

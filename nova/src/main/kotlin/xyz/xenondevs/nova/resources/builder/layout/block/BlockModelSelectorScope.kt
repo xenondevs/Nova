@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.resources.builder.layout.block
 
 import org.bukkit.Axis
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.registry.ProtoBlockState
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -10,39 +11,38 @@ import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.ModelContent
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 
 @RegistryElementBuilderDsl
 open class BlockSelectorScope internal constructor(
-    private val blockState: NovaBlockState
+    private val blockState: ProtoBlockState
 ) {
     
     /**
      * Checks whether the current block state has the given [property].
      */
-    fun <T : Any> hasProperty(property: BlockStateProperty<T>): Boolean =
-        property in blockState.properties
+    fun hasProperty(property: BlockStateProperty<*>): Boolean =
+        property.name in blockState.properties
     
     /**
      * Gets the value of the given [property] of the current block state or
      * null if the current block state does not have the given [property].
      */
-    fun <T : Any> getPropertyValueOrNull(property: BlockStateProperty<T>): T? =
+    fun <T : Comparable<T>> getPropertyValueOrNull(property: BlockStateProperty<T>): T? =
         blockState[property]
     
     /**
      * Gets the value of the given [property] of the current block state or
      * throws an exception if the current block state does not have the given [property].
      */
-    fun <T : Any> getPropertyValueOrThrow(property: BlockStateProperty<T>): T =
+    fun <T : Comparable<T>> getPropertyValueOrThrow(property: BlockStateProperty<T>): T =
         getPropertyValueOrNull(property) ?: throw IllegalArgumentException("$blockState does not have property $property")
     
 }
 
 class BlockModelSelectorScope internal constructor(
-    blockState: NovaBlockState,
+    blockState: ProtoBlockState,
     val resourcePackBuilder: ResourcePackBuilder,
     val modelContent: ModelContent
 ) : BlockSelectorScope(blockState), ModelSelectorScope {
@@ -50,7 +50,7 @@ class BlockModelSelectorScope internal constructor(
     /**
      * The ID of the block.
      */
-    val id = blockState.blockEntry.key
+    val id = blockState.entry.key
     
     /**
      * The default model for this block under `namespace:block/name` or a new model
@@ -77,13 +77,11 @@ class BlockModelSelectorScope internal constructor(
         getModel(ResourcePath.of(ResourceType.Model, path, id.namespace()))
     
     /**
-     * Rotates the builder based on the built-in facing [BlockStateProperties][BlockStateProperty]:
-     * [DefaultBlockStateProperties.FACING] (assuming that the model is facing [BlockFace.NORTH]),
-     * [DefaultBlockStateProperties.AXIS] (assuming that the model is aligned with the [Axis.Y] axis).
+     * Rotates the builder based on the built-in facing and axis [BlockStateProperties][BlockStateProperty].
      */
     fun ModelBuilder.rotated(uvLock: Boolean = false): ModelBuilder =
-        when (getPropertyValueOrNull(DefaultBlockStateProperties.FACING)
-            ?: getPropertyValueOrNull(DefaultBlockStateProperties.AXIS)
+        when (DefaultBlockStateProperties.FACING_PROPERTIES.firstNotNullOfOrNull { getPropertyValueOrNull(it) }
+            ?: DefaultBlockStateProperties.AXIS_PROPERTIES.firstNotNullOfOrNull { getPropertyValueOrNull(it) }
         ) {
             BlockFace.NORTH -> this
             BlockFace.NORTH_NORTH_WEST -> rotateY(22.5, uvLock)
@@ -117,7 +115,7 @@ class BlockModelSelectorScope internal constructor(
     fun createCubeModel(all: ResourcePath<ResourceType.Texture>): ModelBuilder = ModelBuilder(
         Model(
             parent = ResourcePath(ResourceType.Model, "minecraft", "block/cube_all"),
-            textures = mapOf("all" to Model.Texture(all.toString()))
+            textures = mapOf("all" to Model.Texture(all.asString()))
         )
     )
     

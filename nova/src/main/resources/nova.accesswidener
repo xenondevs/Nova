@@ -50,6 +50,7 @@ accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/Ge
 accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask chunkX I
 accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask chunkZ I
 accessible method net/minecraft/world/item/BlockItem placeBlock (Lnet/minecraft/world/item/context/BlockPlaceContext;Lnet/minecraft/world/level/block/state/BlockState;)Z
+accessible method net/minecraft/world/level/block/FireBlock setFlammable (Lnet/minecraft/world/level/block/Block;II)V
 accessible class net/minecraft/resources/RegistryDataLoader$LoadingFunction
 accessible class net/minecraft/resources/RegistryDataLoader$Loader
 accessible field net/minecraft/world/level/levelgen/structure/templatesystem/ProcessorRule inputPredicate Lnet/minecraft/world/level/levelgen/structure/templatesystem/RuleTest;
@@ -65,6 +66,11 @@ accessible method net/minecraft/core/Holder$Reference bindValue (Ljava/lang/Obje
 accessible field org/bukkit/event/inventory/PrepareItemCraftEvent matrix Lorg/bukkit/inventory/CraftingInventory;
 mutable field org/bukkit/event/inventory/PrepareItemCraftEvent matrix Lorg/bukkit/inventory/CraftingInventory;
 accessible field net/minecraft/world/level/block/Block defaultBlockState Lnet/minecraft/world/level/block/state/BlockState;
+accessible class net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData$BlockEntityInfo
+accessible field net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData$BlockEntityInfo packedXZ I
+accessible field net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData$BlockEntityInfo y I
+accessible field net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData$BlockEntityInfo type Lnet/minecraft/world/level/block/entity/BlockEntityType;
+accessible field net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData$BlockEntityInfo tag Lnet/minecraft/nbt/CompoundTag;
 accessible field net/minecraft/world/entity/Entity ENTITY_COUNTER Ljava/util/concurrent/atomic/AtomicInteger;
 accessible field net/minecraft/server/ServerAdvancementManager tree Lnet/minecraft/advancements/AdvancementTree;
 accessible method net/minecraft/world/item/CrossbowItem getChargingSounds (Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/CrossbowItem$ChargingSounds;
@@ -80,3 +86,13 @@ accessible field net/minecraft/resources/RegistryLoadTask registry Lnet/minecraf
 accessible class io/papermc/paper/world/migration/WorldMigrationSupport
 accessible field io/papermc/paper/world/migration/WorldMigrationSupport DIMENSION_DIRECTORIES Ljava/util/List;
 accessible method net/minecraft/tags/TagNetworkSerialization$NetworkPayload <init> (Ljava/util/Map;)V
+accessible field net/minecraft/commands/arguments/ResourceArgument registryKey Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/commands/arguments/ResourceKeyArgument registryKey Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/commands/arguments/ResourceOrTagArgument registryKey Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/commands/arguments/ResourceOrTagKeyArgument registryKey Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/commands/arguments/ResourceSelectorArgument registryKey Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/commands/Commands COMMAND_NODE_INSPECTOR Lnet/minecraft/network/protocol/game/ClientboundCommandsPacket$NodeInspector;
+extendable method net/minecraft/world/item/Item getCraftingRemainder ()Lnet/minecraft/world/item/ItemStackTemplate;
+accessible field org/bukkit/craftbukkit/block/CraftBlockState block Lnet/minecraft/world/level/block/state/BlockState;
+accessible field net/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase lightEmission I
+mutable field net/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase lightEmission I

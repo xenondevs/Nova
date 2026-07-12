@@ -1,3 +1,4 @@
+
 @file:OptIn(UnstableProviderApi::class)
 
 package xyz.xenondevs.nova.registry
@@ -41,13 +42,6 @@ fun <T : Keyed> emptyRegistryEntrySet(
     registry: RegistryKey<T>
 ): RegistryEntrySet.Paper.Direct<T> = PaperDirectRegistryEntrySet(registry, emptySet())
 
-/**
- * Returns an empty [RegistryEntrySet.Mixed.Direct] for the given [novaRegistry] and [paperRegistry].
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> emptyRegistryEntrySet(
-    novaRegistry: NovaRegistry<N>,
-    paperRegistry: RegistryKey<P>
-): RegistryEntrySet.Mixed.Direct<N, P> = registryEntrySetOf(emptyRegistryEntrySet(novaRegistry), emptyRegistryEntrySet(paperRegistry))
 //</editor-fold>
 
 //<editor-fold desc="registryEntrySetOf Nova direct">
@@ -189,189 +183,13 @@ fun <T : Keyed> registryEntrySetOf(
 )
 //</editor-fold>
 
-//<editor-fold desc="registryEntrySetOf mixed direct">
-/**
- * Returns a [RegistryEntrySet.Mixed.Direct] that contains all entries of both the [nova] and [paper] sets.
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
-    nova: RegistryEntrySet.Nova.Direct<N>,
-    paper: RegistryEntrySet.Paper.Direct<P>
-): RegistryEntrySet.Mixed.Direct<N, P> = MixedDirectRegistryEntrySet(
-    nova.registry,
-    paper.registry,
-    combineToEither(nova.entries, paper.entries, nova.registry, paper.registry),
-    nova + paper
-)
-
-/**
- * Returns a [RegistryEntrySet.Mixed.Direct] of [novaRegistry] and [paperRegistry] that contains all [entries].
- * 
- * @throws IllegalArgumentException If any entry is from registries other than [novaRegistry] and [paperRegistry].
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
-    entries: Iterable<RegistryEntry.Either<N, P>>,
-    novaRegistry: NovaRegistry<N>,
-    paperRegistry: RegistryKey<P>
-): RegistryEntrySet.Mixed.Direct<N, P> = MixedDirectRegistryEntrySet(
-    novaRegistry,
-    paperRegistry,
-    entries.toSet(),
-    combinedProvider(entries.toList()).map { it.toSet() }
-)
-
-/**
- * Returns a [RegistryEntrySet.Mixed.Direct] that contains all of ([element], [elements]).
- * 
- * @throws IllegalArgumentException If not all entries are from the same Nova and Paper registries.
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
-    element: RegistryEntry.Either<N, P>,
-    vararg elements: RegistryEntry.Either<N, P>
-): RegistryEntrySet.Mixed.Direct<N, P> = registryEntrySetOf(listOf(element, *elements))
-
-/**
- * Returns a [RegistryEntrySet.Mixed.Direct] that contains all [elements].
- * 
- * @throws IllegalArgumentException If [elements] is empty.
- * @throws IllegalArgumentException If not all entries in [elements] are from the same Nova and Paper registries.
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
-    elements: Iterable<RegistryEntry.Either<N, P>>
-): RegistryEntrySet.Mixed.Direct<N, P> {
-    val elements = elements.toSet()
-    require(elements.isNotEmpty()) { "Elements cannot be empty" }
-    val element: RegistryEntry.Either<N, P> = elements.first()
-    require(elements.all {
-        it.novaRegistry == element.novaRegistry
-            && it.paperRegistry == element.paperRegistry
-    }) { "All entries must belong to the same registries" }
-    
-    return MixedDirectRegistryEntrySet(
-        element.novaRegistry,
-        element.paperRegistry,
-        elements,
-        combinedProvider(elements.toList()) { it.toSet() }
-    )
-}
-
-/**
- * Returns a [RegistryEntrySet.Mixed.Direct] by wrapping this [RegistryEntrySet.Nova.Direct] with an empty [paperRegistry] part.
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> RegistryEntrySet.Nova.Direct<N>.asMixed(
-    paperRegistry: RegistryKey<P>
-): RegistryEntrySet.Mixed.Direct<N, P> = registryEntrySetOf(this, emptyRegistryEntrySet(paperRegistry))
-
-/**
- * Returns a [RegistryEntrySet.Mixed.Direct] by wrapping this [RegistryEntrySet.Paper.Direct] with an empty [novaRegistry] part.
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> RegistryEntrySet.Paper.Direct<P>.asMixed(
-    novaRegistry: NovaRegistry<N>,
-): RegistryEntrySet.Mixed.Direct<N, P> = registryEntrySetOf(emptyRegistryEntrySet(novaRegistry), this)
-//</editor-fold>
-
-//<editor-fold desc="registryEntrySetOf mixed tag">
-/**
- * Returns a [RegistryEntrySet.Mixed.Tag] that contains all entries of both the [nova] and [paper] sets.
- * 
- * @throws IllegalArgumentException If the sets don't use the same tag key.
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
-    nova: RegistryEntrySet.Nova.Tag<N>,
-    paper: RegistryEntrySet.Paper.Tag<P>
-): RegistryEntrySet.Mixed.Tag<N, P> {
-    require(nova.tagKey == paper.tagKey) { "Tag keys must be the same for both Nova and Paper entry sets" }
-    return MixedTagRegistryEntrySet(nova.tagKey, nova, paper)
-}
-
-/**
- * Returns a [RegistryEntrySet.Mixed.Tag] for [tagKey], resolved and merged together from both
- * [novaRegistry] and [paperRegistry] (using [registryAccess]).
- *
- * * If this function is called during bootstrap and no matching tag is found in either registry,
- *   an empty [RegistryEntrySet.Mixed.Tag] is returned.
- *   Additionally, server startup will fail.
- * * If this function is called after bootstrap and no matching tag is found in either registry,
- *   a [NoSuchElementException] is thrown immediately.
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
-    tagKey: Key,
-    novaRegistry: NovaRegistry<N>,
-    paperRegistry: RegistryKey<P>,
-    registryAccess: RegistryAccess = RegistryAccess.registryAccess()
-): RegistryEntrySet.Mixed.Tag<N, P> {
-    val paperTagKey = TagKey.create(paperRegistry, tagKey)
-    if (RegistryContext.isInBootstrapPhase) {
-        val entrySet = MixedTagRegistryEntrySet(tagKey, novaRegistry, paperRegistry, registryAccess)
-        RegistryContext.trackUnresolvedTag(paperTagKey, novaRegistry, registryAccess)
-        return entrySet
-    } else {
-        val hasNovaTag = novaRegistry.getOptionalTag(tagKey).get() != null
-        val hasPaperTag = registryAccess.getRegistry(paperRegistry).hasTag(paperTagKey)
-        
-        if (!hasNovaTag && !hasPaperTag)
-            throw NoSuchElementException("Tag $tagKey not found in either ${novaRegistry.key.asString()} or ${paperRegistry.key().asString()}")
-        
-        return MixedTagRegistryEntrySet(tagKey, novaRegistry, paperRegistry, registryAccess)
-    }
-}
-
-/**
- * Returns a [RegistryEntrySet.Mixed.Tag] by wrapping this [RegistryEntrySet.Nova.Tag] with an empty [paperRegistry] part.
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> RegistryEntrySet.Nova.Tag<N>.asMixed(
-    paperRegistry: RegistryKey<P>
-): RegistryEntrySet.Mixed.Tag<N, P> = MixedTagRegistryEntrySet(
-    tagKey.key(),
-    this,
-    emptyRegistryEntrySet(paperRegistry)
-)
-
-/**
- * Returns a [RegistryEntrySet.Mixed.Tag] by wrapping this [RegistryEntrySet.Paper.Tag] with an empty [novaRegistry] part.
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> RegistryEntrySet.Paper.Tag<P>.asMixed(
-    novaRegistry: NovaRegistry<N>,
-): RegistryEntrySet.Mixed.Tag<N, P> = MixedTagRegistryEntrySet(
-    tagKey.key(),
-    emptyRegistryEntrySet(novaRegistry),
-    this
-)
-//</editor-fold>
-
-//<editor-fold desc="reactive transformations">
-/**
- * Maps each element of this [RegistryEntrySet.Mixed] using [transformNova] for Nova entries
- * and [transformPaper] for Paper entries.
- */
-inline fun <reified N : NovaRegistryElement<N>, reified P : Keyed, R> RegistryEntrySet.Mixed<N, P>.mapEach(
-    crossinline transformNova: (N) -> R,
-    crossinline transformPaper: (P) -> R
-): Provider<List<R>> = mapEach {
-    when (it) {
-        is N -> transformNova(it)
-        is P -> transformPaper(it)
-        else -> throw AssertionError("Value $value is neither ${N::class.java} nor ${P::class.java}")
-    }
-}
-
-/**
- * Maps each element of this [RegistryEntrySet.Mixed] using [transformNova] for Nova entries
- * and [transformPaper] for Paper entries, then flattens the resulting [Providers][Provider] into a single [Provider].
- */
-inline fun <reified N : NovaRegistryElement<N>, reified P : Keyed, R> RegistryEntrySet.Mixed<N, P>.flatMapEach(
-    crossinline transformNova: (N) -> Provider<R>,
-    crossinline transformPaper: (P) -> Provider<R>
-): Provider<List<R>> = mapEach(transformNova, transformPaper).map(::combinedProvider).flatten()
-//</editor-fold>
-
 /**
  * A set of [RegistryEntries][RegistryEntry].
  * [RegistryEntrySets][RegistryEntrySet] can be either:
  * - direct references to individual [RegistryEntries][RegistryEntry] ([RegistryEntrySet.Paper] / [RegistryEntrySet.Nova])
  * - a tag ([RegistryEntrySet.Paper.Tag] / [RegistryEntrySet.Nova.Tag]), which in turn can be composed of other tags and/or direct entries
- * - a [RegistryEntrySet.Mixed] which either combines two entry sets of corresponding Paper- and Nova registries (e.g. `NovaItem` and `ItemType`)
  * 
- * Two [RegistryEntrySets][RegistryEntrySet] are considered equal (`==`) if they are of the same type (e.g. `Nova.Direct`, `Mixed.Tag`),
+ * Two [RegistryEntrySets][RegistryEntrySet] are considered equal (`==`) if they are of the same type (e.g. `Nova.Direct`, `Paper.Tag`),
  * reference the same registries, and have the same content. Direct and tag sets are never equal, even if they resolve to the same entries.
  * 
  * @see emptyRegistryEntrySet
@@ -413,13 +231,6 @@ sealed interface RegistryEntrySet<out T : Keyed> : Provider<Set<T>> {
         operator fun contains(entry: RegistryEntry.Paper<@UnsafeVariance T>?): Boolean
         
         /**
-         * Checks whether [entry] is part of this set.
-         * Depending on whether this is a [Direct] or [Tag] set, 
-         * this may involve resolving this set and as such this function may not be called before registry freeze.
-         */
-        operator fun contains(entry: RegistryEntry.Either<*, @UnsafeVariance T>?): Boolean
-        
-        /**
          * A [RegistryEntrySet.Paper] backed by a constant set of entries.
          */
         sealed interface Direct<out T : Keyed> : Paper<T> {
@@ -436,12 +247,6 @@ sealed interface RegistryEntrySet<out T : Keyed> : Provider<Set<T>> {
              * Does not resolve anything and is safe to call before registry freeze.
              */
             override operator fun contains(entry: RegistryEntry.Paper<@UnsafeVariance T>?): Boolean
-            
-            /**
-             * Checks whether [entry] is a part of this set.
-             * Does not resolve anything and is safe to call before registry freeze.
-             */
-            override operator fun contains(entry: RegistryEntry.Either<*, @UnsafeVariance T>?): Boolean
             
         }
         
@@ -461,13 +266,6 @@ sealed interface RegistryEntrySet<out T : Keyed> : Provider<Set<T>> {
             val entries: Provider<Set<RegistryEntry.Paper<T>>>
             
             override fun toRegistryKeySet(registryAccess: RegistryAccess): RegistryTagSet<@UnsafeVariance T>
-            
-            /**
-             * Checks whether [entry] is a part of this set.
-             * Requires resolving the corresponding tag and cannot be called before registry freeze.
-             * Also note that tag contents can change at any time.
-             */
-            override fun contains(entry: RegistryEntry.Either<*, @UnsafeVariance T>?): Boolean
             
             /**
              * Checks whether [entry] is a part of this set.
@@ -498,13 +296,6 @@ sealed interface RegistryEntrySet<out T : Keyed> : Provider<Set<T>> {
         operator fun contains(entry: RegistryEntry.Nova<@UnsafeVariance T>?): Boolean
         
         /**
-         * Checks whether [entry] is part of this set.
-         * Depending on whether this is a [Direct] or [Tag] set,
-         * this may involve resolving this set and as such this function may not be called before registry freeze.
-         */
-        operator fun contains(entry: RegistryEntry.Either<@UnsafeVariance T, *>?): Boolean
-        
-        /**
          * A [RegistryEntrySet.Nova] backed by a constant set of entries.
          */
         sealed interface Direct<out T : NovaRegistryElement<T>> : Nova<T> {
@@ -519,12 +310,6 @@ sealed interface RegistryEntrySet<out T : Keyed> : Provider<Set<T>> {
              * Does not resolve anything and is safe to call before registry freeze.
              */
             override operator fun contains(entry: RegistryEntry.Nova<@UnsafeVariance T>?): Boolean
-            
-            /**
-             * Checks whether [entry] is part of this set.
-             * Does not resolve anything and is safe to call before registry freeze.
-             */
-            override operator fun contains(entry: RegistryEntry.Either<@UnsafeVariance T, *>?): Boolean
             
         }
         
@@ -550,126 +335,10 @@ sealed interface RegistryEntrySet<out T : Keyed> : Provider<Set<T>> {
              */
             override operator fun contains(entry: RegistryEntry.Nova<@UnsafeVariance T>?): Boolean
             
-            /**
-             * Checks whether [entry] is part of this set.
-             * Requires resolving the corresponding tag and cannot be called before registry freeze.
-             * Also note that tag contents can change at any time.
-             */
-            override operator fun contains(entry: RegistryEntry.Either<@UnsafeVariance T, *>?): Boolean
-            
         }
         
     }
     
-    /**
-     * A [RegistryEntrySet] that contains entries which can be either from a Nova registry ([N]) or a Paper registry ([P]).
-     * [N] and [P] should be corresponding concepts like `NovaItem` and `ItemType`.
-     */
-    sealed interface Mixed<out N : NovaRegistryElement<N>, out P : Keyed> : RegistryEntrySet<Keyed> {
-        
-        /**
-         * The Nova registry some entries of this [RegistryEntrySet.Mixed] may belong to.
-         */
-        val novaRegistry: NovaRegistry<N>
-        
-        /**
-         * A key to the Paper registry some entries of this [RegistryEntrySet.Mixed] may belong to.
-         */
-        val paperRegistry: RegistryKey<@UnsafeVariance P>
-        
-        /**
-         * Checks whether [entry] is part of this set.
-         * Depending on whether this is a [Direct] or [Tag] set,
-         * this may involve resolving this set and as such this function may not be called before registry freeze.
-         */
-        operator fun contains(entry: RegistryEntry.Either<@UnsafeVariance N, @UnsafeVariance P>?): Boolean
-        
-        /**
-         * Checks whether [entry] is part of this set.
-         * Depending on whether this is a [Direct] or [Tag] set,
-         * this may involve resolving this set and as such this function may not be called before registry freeze.
-         */
-        operator fun contains(entry: RegistryEntry.Nova<@UnsafeVariance N>?): Boolean
-        
-        /**
-         * Checks whether [entry] is part of this set.
-         * Depending on whether this is a [Direct] or [Tag] set,
-         * this may involve resolving this set and as such this function may not be called before registry freeze.
-         */
-        operator fun contains(entry: RegistryEntry.Paper<@UnsafeVariance P>?): Boolean
-        
-        /**
-         * A [RegistryEntrySet.Mixed] backed by constant sets of entries in both the Nova and Paper part.
-         */
-        sealed interface Direct<N : NovaRegistryElement<N>, P : Keyed> : Mixed<N, P> {
-            
-            /**
-             * The constant set of entries contained in this [RegistryEntrySet.Mixed.Direct],
-             * combining the entries from both the Nova and Paper part.
-             */
-            val entries: Set<RegistryEntry.Either<N, P>>
-            
-            /**
-             * Checks whether [entry] is part of this set.
-             * Does not resolve anything and is safe to call before registry freeze.
-             */
-            override operator fun contains(entry: RegistryEntry.Either<@UnsafeVariance N, @UnsafeVariance P>?): Boolean
-            
-            /**
-             * Checks whether [entry] is part of this set.
-             * Does not resolve anything and is safe to call before registry freeze.
-             */
-            override operator fun contains(entry: RegistryEntry.Nova<@UnsafeVariance N>?): Boolean
-            
-            /**
-             * Checks whether [entry] is part of this set.
-             * Does not resolve anything and is safe to call before registry freeze.
-             */
-            override operator fun contains(entry: RegistryEntry.Paper<@UnsafeVariance P>?): Boolean
-            
-        }
-        
-        /**
-         * A [RegistryEntrySet.Mixed] backed by tags in both the Nova and Paper part, using the
-         * same tag key in both parts.
-         */
-        sealed interface Tag<N : NovaRegistryElement<N>, P : Keyed> : Mixed<N, P> {
-            
-            /**
-             * The key of the tag this [RegistryEntrySet.Mixed.Tag] is backed by.
-             */
-            val tagKey: Key
-            
-            /**
-             * The entries contained in this [RegistryEntrySet.Mixed.Tag],
-             * combining the entries from both the Nova and Paper part.
-             */
-            val entries: Provider<Set<RegistryEntry.Either<N, P>>>
-            
-            /**
-             * Checks whether [entry] is part of this set.
-             * Requires resolving the corresponding tags and cannot be called before registry freeze.
-             * Also note that tag contents can change at any time.
-             */
-            override operator fun contains(entry: RegistryEntry.Either<@UnsafeVariance N, @UnsafeVariance P>?): Boolean
-            
-            /**
-             * Checks whether [entry] is part of this set.
-             * Requires resolving the corresponding tags and cannot be called before registry freeze.
-             * Also note that tag contents can change at any time.
-             */
-            override operator fun contains(entry: RegistryEntry.Nova<@UnsafeVariance N>?): Boolean
-            
-            /**
-             * Checks whether [entry] is part of this set.
-             * Requires resolving the corresponding tags and cannot be called before registry freeze.
-             * Also note that tag contents can change at any time.
-             */
-            override operator fun contains(entry: RegistryEntry.Paper<@UnsafeVariance P>?): Boolean
-            
-        }
-        
-    }
     
 }
 
@@ -691,9 +360,6 @@ private class PaperDirectRegistryEntrySet<T : Keyed>(
     override fun contains(entry: RegistryEntry.Paper<T>?): Boolean =
         entry != null && entry in entries
     
-    @Suppress("UNCHECKED_CAST")
-    override fun contains(entry: RegistryEntry.Either<*, T>?): Boolean =
-        entry != null && entry in (entries as Set<RegistryEntry.Either<*, T>>)
     
     override fun equals(other: Any?): Boolean {
         return this === other ||
@@ -727,9 +393,6 @@ private class PaperTagRegistryEntrySet<T : Keyed>(
     override fun contains(entry: RegistryEntry.Paper<T>?): Boolean =
         entry != null && entry in entries.get()
     
-    @Suppress("UNCHECKED_CAST")
-    override fun contains(entry: RegistryEntry.Either<*, T>?): Boolean =
-        entry != null && entry in (entries.get() as Set<RegistryEntry.Either<*, T>>)
     
     override fun equals(other: Any?): Boolean {
         return this === other ||
@@ -754,9 +417,6 @@ private class NovaDirectRegistryEntrySet<T : NovaRegistryElement<T>>(
     values: Provider<Set<T>> = combinedProvider(entries.toList(), List<T>::toSet)
 ) : RegistryEntrySet.Nova.Direct<T>, Provider<Set<T>> by values {
     
-    @Suppress("UNCHECKED_CAST")
-    override fun contains(entry: RegistryEntry.Either<T, *>?): Boolean =
-        entry != null && entry in (entries as Set<RegistryEntry.Either<T, *>>)
     
     override fun contains(entry: RegistryEntry.Nova<T>?): Boolean =
         entry != null && entry in entries
@@ -788,9 +448,6 @@ internal class NovaTagRegistryEntrySet<T : NovaRegistryElement<T>>(
     override fun contains(entry: RegistryEntry.Nova<T>?): Boolean =
         entry != null && entry in entries.get()
     
-    @Suppress("UNCHECKED_CAST")
-    override fun contains(entry: RegistryEntry.Either<T, *>?): Boolean =
-        entry != null && entry in (entries.get() as Set<RegistryEntry.Either<T, *>>)
     
     override fun equals(other: Any?): Boolean {
         return this === other ||
@@ -809,135 +466,3 @@ internal class NovaTagRegistryEntrySet<T : NovaRegistryElement<T>>(
     
 }
 
-private fun <N : NovaRegistryElement<N>, P : Keyed> combineToEither(
-    novaEntries: Set<RegistryEntry.Nova<N>>,
-    paperEntries: Set<RegistryEntry.Paper<P>>,
-    novaRegistry: NovaRegistry<N>,
-    paperRegistry: RegistryKey<P>
-): Set<RegistryEntry.Either<N, P>> {
-    val novaEithers = novaEntries.asSequence().map { RegistryEntry.either(it, paperRegistry) }
-    val paperEithers = paperEntries.asSequence().map { RegistryEntry.either(novaRegistry, it) }
-    return (novaEithers + paperEithers).toSet()
-}
-
-private val <T : NovaRegistryElement<T>> RegistryEntrySet.Nova<T>.entries: Provider<Set<RegistryEntry.Nova<T>>>
-    get() = when (this) {
-        is RegistryEntrySet.Nova.Direct -> provider(entries)
-        is RegistryEntrySet.Nova.Tag -> entries
-    }
-
-private val <T : Keyed> RegistryEntrySet.Paper<T>.entries: Provider<Set<RegistryEntry.Paper<T>>>
-    get() = when (this) {
-        is RegistryEntrySet.Paper.Direct -> provider(entries)
-        is RegistryEntrySet.Paper.Tag -> entries
-    }
-
-private fun <N : NovaRegistryElement<N>, P : Keyed> Iterable<RegistryEntry.Nova<N>>.toEither(
-    paperRegistry: RegistryKey<P>
-): Set<RegistryEntry.Either<N, P>> = asSequence().map { RegistryEntry.either(it, paperRegistry) }.toSet()
-
-private fun <N : NovaRegistryElement<N>, P : Keyed> Iterable<RegistryEntry.Paper<P>>.toEither(
-    novaRegistry: NovaRegistry<N>
-): Set<RegistryEntry.Either<N, P>> = asSequence().map { RegistryEntry.either(novaRegistry, it) }.toSet()
-
-private class MixedTagRegistryEntrySet<N : NovaRegistryElement<N>, P : Keyed>(
-    override val novaRegistry: NovaRegistry<N>,
-    override val paperRegistry: RegistryKey<P>,
-    override val tagKey: Key,
-    override val entries: Provider<Set<RegistryEntry.Either<N, P>>>,
-    values: Provider<Set<Keyed>> = entries.flatMap { combinedProvider(it.toList(), List<Keyed>::toSet) }
-) : RegistryEntrySet.Mixed.Tag<N, P>, Provider<Set<Keyed>> by values {
-    
-    constructor(tagKey: Key, nova: RegistryEntrySet.Nova<N>, paper: RegistryEntrySet.Paper<P>) : this(
-        nova.registry,
-        paper.registry,
-        tagKey,
-        combinedProvider(nova.entries, paper.entries) { n, p -> combineToEither(n, p, nova.registry, paper.registry) },
-        nova + paper
-    )
-    
-    constructor(tagKey: Key, novaRegistry: NovaRegistry<N>, paperRegistry: RegistryKey<P>, registryAccess: RegistryAccess) : this(
-        novaRegistry,
-        paperRegistry,
-        tagKey,
-        combinedProvider(
-            novaRegistry.getOptionalTag(tagKey),
-            optionalRegistryEntrySetOf(TagKey.create(paperRegistry, tagKey), registryAccess)
-        ) { n, p ->
-            combinedProvider(
-                p?.entries?.map { it.toEither(novaRegistry) } ?: provider(emptySet()),
-                n?.entries?.map { it.toEither(paperRegistry) } ?: provider(emptySet())
-            ) { nEithers, pEithers -> nEithers + pEithers }
-        }.flatten()
-    )
-    
-    override fun contains(entry: RegistryEntry.Either<N, P>?): Boolean =
-        entry != null && entry in entries.get()
-    
-    @Suppress("UNCHECKED_CAST")
-    override fun contains(entry: RegistryEntry.Nova<N>?): Boolean =
-        entry != null && entry in (entries.get() as Set<RegistryEntry.Nova<N>>)
-    
-    @Suppress("UNCHECKED_CAST")
-    override fun contains(entry: RegistryEntry.Paper<P>?): Boolean =
-        entry != null && entry in (entries.get() as Set<RegistryEntry.Paper<P>>)
-    
-    override fun equals(other: Any?): Boolean {
-        return this === other ||
-            (other is RegistryEntrySet.Mixed.Tag<*, *>
-                && other.novaRegistry == novaRegistry
-                && other.paperRegistry == paperRegistry
-                && other.tagKey == tagKey)
-    }
-    
-    override fun hashCode(): Int {
-        var result = novaRegistry.hashCode()
-        result = 31 * result + paperRegistry.hashCode()
-        result = 31 * result + tagKey.hashCode()
-        return result
-    }
-    
-    override fun toString() = "${novaRegistry.key.asString()}|${paperRegistry.key().asString()}/#${tagKey.asString()}"
-    
-}
-
-private class MixedDirectRegistryEntrySet<N : NovaRegistryElement<N>, P : Keyed>(
-    override val novaRegistry: NovaRegistry<N>,
-    override val paperRegistry: RegistryKey<P>,
-    override val entries: Set<RegistryEntry.Either<N, P>>,
-    values: Provider<Set<Keyed>>
-) : RegistryEntrySet.Mixed.Direct<N, P>, Provider<Set<Keyed>> by values {
-    
-    init {
-        require(entries.all { it.novaRegistry == novaRegistry && it.paperRegistry == paperRegistry }) { "All entries must belong to the specified registries" }
-    }
-    
-    override fun contains(entry: RegistryEntry.Either<N, P>?): Boolean =
-        entry != null && entry in entries
-    
-    @Suppress("UNCHECKED_CAST")
-    override fun contains(entry: RegistryEntry.Nova<N>?): Boolean =
-        entry != null && entry in (entries as Set<RegistryEntry.Nova<N>>)
-    
-    @Suppress("UNCHECKED_CAST")
-    override fun contains(entry: RegistryEntry.Paper<P>?): Boolean =
-        entry != null && entry in (entries as Set<RegistryEntry.Paper<P>>)
-    
-    override fun equals(other: Any?): Boolean {
-        return this === other ||
-            (other is RegistryEntrySet.Mixed.Direct<*, *>
-                && other.novaRegistry == novaRegistry
-                && other.paperRegistry == paperRegistry
-                && other.entries == entries)
-    }
-    
-    override fun hashCode(): Int {
-        var result = novaRegistry.hashCode()
-        result = 31 * result + paperRegistry.hashCode()
-        result = 31 * result + entries.hashCode()
-        return result
-    }
-    
-    override fun toString() = "${novaRegistry.key.asString()}|${paperRegistry.key().asString()}/[${entries.joinToString { it.key.asString() }}]"
-    
-}

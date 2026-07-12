@@ -8,3 +8,5 @@ transitive-accessible field net/minecraft/network/protocol/game/ClientboundBossE
 transitive-accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket operation Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;
 transitive-accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation
 transitive-accessible class net/minecraft/network/protocol/game/ClientboundTrackedWaypointPacket$Operation
+
+accessible class net/minecraft/network/PacketProcessor$ListenerAndPacket

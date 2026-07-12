@@ -118,7 +118,7 @@ class GuiTextureTask(
             val dim = builder.resolve(texture).readImageDimensions()
             val offset = layout.alignment.getOffset(dim.width, dim.height)
             
-            val fontChar = addEntry(guiTexture.key.toString(), texture, dim.height, -offset.y())
+            val fontChar = addEntry(guiTexture.key.asString(), texture, dim.height, -offset.y())
             guiTextures[guiTexture] = GuiTextureData(
                 fontChar.font,
                 fontChar.codePoint, 

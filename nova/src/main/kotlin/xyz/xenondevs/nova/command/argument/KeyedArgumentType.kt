@@ -21,10 +21,10 @@ internal abstract class KeyedArgumentType<T : Any> : CustomArgumentType.Converte
     override fun convert(nativeType: Key): T {
         val arg = if (nativeType.namespace() == "minecraft")
             nativeType.value()
-        else nativeType.toString()
+        else nativeType.asString()
         
         val exact = getEntries()
-            .firstOrNull { toId(it).toString() == arg }
+            .firstOrNull { toId(it).asString() == arg }
         if (exact != null)
             return exact
         
@@ -50,10 +50,10 @@ internal abstract class KeyedArgumentType<T : Any> : CustomArgumentType.Converte
     override fun <S : Any> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
         val arg = context.input.split(" ").last()
         val items = getEntries()
-            .filter { toId(it).toString().contains(arg) }
+            .filter { toId(it).asString().contains(arg) }
             .toList()
-        FuzzySearch.extractSorted(arg, items) { toId(it).toString() }
-            .forEach { builder.suggest(toId(it.referent).toString()) }
+        FuzzySearch.extractSorted(arg, items) { toId(it).asString() }
+            .forEach { builder.suggest(toId(it.referent).asString()) }
         
         return builder.buildFuture()
     }

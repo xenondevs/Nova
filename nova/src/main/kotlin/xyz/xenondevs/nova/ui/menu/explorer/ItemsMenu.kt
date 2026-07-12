@@ -4,12 +4,12 @@ import io.papermc.paper.datacomponent.DataComponentTypes
 import me.xdrop.fuzzywuzzy.FuzzySearch
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.SoundCategory
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
@@ -24,23 +24,24 @@ import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.dsl.ScrollGuiDsl
 import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.invui.dsl.anvilWindow
+import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.dsl.gui
 import xyz.xenondevs.invui.dsl.item
+import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.dsl.mergedWindow
 import xyz.xenondevs.invui.dsl.pagedItemsGui
 import xyz.xenondevs.invui.dsl.scrollItemsGui
 import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.invui.dsl.window
+import xyz.xenondevs.invui.gui.InventoryLink
 import xyz.xenondevs.invui.gui.Markers
 import xyz.xenondevs.invui.inventory.Inventory
 import xyz.xenondevs.invui.inventory.ReferencingInventory
 import xyz.xenondevs.invui.inventory.event.PlayerUpdateReason
 import xyz.xenondevs.invui.inventory.get
-import xyz.xenondevs.invui.item.ItemBuilder
-import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.nova.ui.menu.InventoryLink
-import xyz.xenondevs.nova.ui.menu.by
+import xyz.xenondevs.nova.registry.entries.ItemTypeEntries
+import xyz.xenondevs.nova.ui.menu.advancedTooltips
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.RecipesMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.handleRecipeChoiceClick
 import xyz.xenondevs.nova.ui.menu.item.NoSlotItem
@@ -48,20 +49,19 @@ import xyz.xenondevs.nova.ui.menu.item.backItem
 import xyz.xenondevs.nova.ui.menu.item.installBackgroundScrollSupport
 import xyz.xenondevs.nova.ui.menu.item.installItemScrollSupport
 import xyz.xenondevs.nova.ui.menu.item.scrollBar
-import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.ui.menu.locale
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.ui.overlay.guitexture.component
 import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.addItemCorrectly
-import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.CategorizedItem
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.ItemCategories
 import xyz.xenondevs.nova.world.item.ItemCategory
-import xyz.xenondevs.nova.world.item.clientsideProvider
+import xyz.xenondevs.nova.world.item.itemProvider
+import xyz.xenondevs.nova.world.item.itemType
 
 private const val CATEGORY_TAB_COUNT = 8
 private val TAB_BUTTON_TEXTURES = arrayOf(
@@ -228,7 +228,7 @@ internal class ItemsMenu private constructor(val player: Player) {
                     "x x x x x x x x |",
                     "x x x x x x x x |"
                 ) {
-                    '<' by backItem(searchWindow, DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.clientsideProvider)
+                    '<' by backItem(searchWindow, DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.itemProvider)
                     'c' by cheatModeButton(cheatMode)
                     '|' by scrollBar(offset = 2)
                     content by filteredItems.mapEach { categorizedItemButton(it, cheatMode) }
@@ -286,12 +286,12 @@ private fun categorizedItemButton(item: CategorizedItem, cheatMode: Provider<Boo
     onClick {
         if (player.hasPermission(GIVE_PERMISSION) && cheatMode.get()) {
             when {
-                clickType == ClickType.MIDDLE -> player.setItemOnCursor(itemStack.clone().apply { amount = novaItem?.maxStackSize ?: type.maxStackSize })
+                clickType == ClickType.MIDDLE -> player.setItemOnCursor(itemStack.clone().apply { amount = itemType.maxStackSize })
                 clickType == ClickType.NUMBER_KEY -> player.inventory.setItem(hotbarButton, itemStack)
                 clickType.isShiftClick -> player.inventory.addItemCorrectly(itemStack)
                 clickType.isMouseClick -> {
                     if (player.itemOnCursor.isSimilar(itemStack)) {
-                        player.setItemOnCursor(player.itemOnCursor.apply { amount = (amount + 1).coerceAtMost(novaItem?.maxStackSize ?: maxStackSize) })
+                        player.setItemOnCursor(player.itemOnCursor.apply { amount = (amount + 1).coerceAtMost(itemType.maxStackSize) })
                     } else {
                         player.setItemOnCursor(itemStack)
                     }
@@ -332,8 +332,8 @@ private fun searchButton(search: Provider<Window>) = item {
 private fun cheatModeButton(cheatMode: MutableProvider<Boolean>) = item {
     itemProvider by cheatMode.flatMap { cheatMode ->
         if (cheatMode)
-            DefaultGuiItems.TP_CHEATING_ON.clientsideProvider
-        else DefaultGuiItems.TP_CHEATING_OFF.clientsideProvider
+            DefaultGuiItems.TP_CHEATING_ON
+        else DefaultGuiItems.TP_CHEATING_OFF
     }
     onClick {
         if (clickType.isLeftClick && player.hasPermission(GIVE_PERMISSION)) {
@@ -354,7 +354,10 @@ private fun itemCategoryTabButton(tab: Int, category: ItemCategory, activeTab: M
 }
 
 private fun playerInventoryTabButton(tab: Provider<Int>, activeTab: MutableProvider<Int>) = item {
-    itemProvider by ItemBuilder(Material.CHEST).setName(Component.translatable("menu.nova.items.player_inventory"))
+    itemProvider by itemProvider(ItemType.CHEST) {
+        name by Component.translatable("menu.nova.items.player_inventory")
+        advancedTooltips by false
+    }
     onClick {
         if (clickType.isLeftClick && activeTab.get() != tab.get()) {
             player.playClickSound()
@@ -366,11 +369,12 @@ private fun playerInventoryTabButton(tab: Provider<Int>, activeTab: MutableProvi
 private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            provider(ItemProvider.EMPTY)
+            ItemTypeEntries.AIR
         else if (page > 0)
-            DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.clientsideProvider
-        else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF.clientsideProvider
+            DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON
+        else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF
     }.flatten()
+    
     onClick {
         if (clickType.isLeftClick && page.get() > 0) {
             page.set(page.get() - 1)
@@ -382,10 +386,10 @@ private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>
 private fun tabPageForwardItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            provider(ItemProvider.EMPTY)
+            ItemTypeEntries.AIR
         else if (page + 1 < pageCount)
-            DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON.clientsideProvider
-        else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF.clientsideProvider
+            DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON
+        else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF   
     }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() < pageCount.get() - 1) {
@@ -407,6 +411,6 @@ private fun Inventory.allowOnlyEquippable(slot: EquipmentSlot) {
             ?: return@addPostUpdateHandler
         val sound = event.newItem?.getData(DataComponentTypes.EQUIPPABLE)?.equipSound()
             ?: return@addPostUpdateHandler
-        player.world.playSound(player.location, sound.toString(), SoundCategory.PLAYERS, 1f, 1f)
+        player.world.playSound(player.location, sound.asString(), SoundCategory.PLAYERS, 1f, 1f)
     }
 }

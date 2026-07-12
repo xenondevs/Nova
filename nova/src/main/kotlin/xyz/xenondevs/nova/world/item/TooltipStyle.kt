@@ -25,5 +25,5 @@ typealias NovaTooltipStyleEntrySet = @Serializable(with = TooltipStyleEntrySetSe
 class TooltipStyle internal constructor(
     override val entry: RegistryEntry.Nova<TooltipStyle>,
 ) : NovaRegistryElement<TooltipStyle> {
-    override fun toString(): String = key.toString()
+    override fun toString(): String = this@TooltipStyle.key.asString()
 }

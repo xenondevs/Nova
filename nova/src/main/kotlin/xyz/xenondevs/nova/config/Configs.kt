@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.packetentity.refreshPacketEntities
 import xyz.xenondevs.nova.serialization.kotlinx.NOVA_SERIALIZERS_MODULE
 import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.BukkitDispatcher
@@ -126,6 +127,7 @@ internal object NovaConfigBackend : ConfigBackend {
     override fun postReload() {
         for (player in Bukkit.getOnlinePlayers()) {
             player.updateInventory()
+            player.refreshPacketEntities()
         }
         
         for (window in WindowManager.getInstance().windows) {

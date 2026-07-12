@@ -4,6 +4,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import org.bukkit.Bukkit
 import org.bukkit.World
+import org.bukkit.block.Block
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -19,7 +20,6 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
@@ -47,7 +47,7 @@ import java.util.concurrent.ConcurrentHashMap
 )
 object NetworkManager : Listener {
     
-    private val nodeProviders = mutableListOf(NovaNetworkNodeProvider, VanillaNetworkNodeProvider)
+    private val nodeProviders = mutableListOf<NetworkNodeProvider>(NovaNetworkNodeProvider)
     private val configurators = ConcurrentHashMap<World, NetworkConfigurator>()
     private val ticker = NetworkTicker.create()
     
@@ -173,7 +173,7 @@ object NetworkManager : Listener {
         if (node is NetworkBridge && node is NetworkEndPoint)
             throw IllegalArgumentException("Types that inherit from both NetworkBridge and NetworkEndPoint are not allowed")
         
-        queueTask(node.pos.world, makeTask)
+        queueTask(node.block.world, makeTask)
     }
     
     /**
@@ -205,7 +205,7 @@ object NetworkManager : Listener {
      * Gets the [NetworkNode] at the specified block [pos] using the registered
      * [NetworkNodeProviders][NetworkNodeProvider] or null if there is none.
      */
-    suspend fun getNode(pos: BlockPos): NetworkNode? {
+    suspend fun getNode(pos: Block): NetworkNode? {
         for (nodeProvider in nodeProviders) {
             val node = nodeProvider.getNode(pos)
             if (node != null)
@@ -219,7 +219,7 @@ object NetworkManager : Listener {
      * Checks whether it is [unknown][NetworkNodeProvider.isUnknown] if the block at [pos] is a [NetworkNode]
      * using the registered [NetworkNodeProviders][NetworkNodeProvider].
      */
-    suspend fun isUnknown(pos: BlockPos): Boolean {
+    suspend fun isUnknown(pos: Block): Boolean {
         return nodeProviders.any { it.isUnknown(pos) }
     }
     

@@ -9,9 +9,9 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
-import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
+import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
 
@@ -26,7 +26,7 @@ object ToolLine {
             player,
             ToolCategory.ofBlock(block),
             ToolTier.ofBlock(block),
-            block.hardness,
+            block.blockType.hardness.toDouble(),
             ToolUtils.isCorrectToolForDrops(block, tool)
         )
     }

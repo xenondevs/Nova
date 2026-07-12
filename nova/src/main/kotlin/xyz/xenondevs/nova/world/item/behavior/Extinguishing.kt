@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.network.sendTo
 import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.nmsEntity
+import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.particle.particle
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.InteractionResult
@@ -28,9 +29,9 @@ private const val EXTINGUISH_CAMPFIRE_LEVEL_EVENT = 1009
 object Extinguishing : ItemBehavior {
     
     override fun useOnBlock(itemStack: ItemStack, block: Block, ctx: Context<BlockInteract>): InteractionResult {
-        val pos = ctx[BlockInteract.BLOCK_POS]
+        val pos = ctx[BlockInteract.BLOCK]
         val entity = ctx[BlockInteract.SOURCE_LIVING_ENTITY] ?: return InteractionResult.Pass
-        val state = ctx[BlockInteract.BLOCK_STATE_VANILLA]?.nmsBlockState ?: return InteractionResult.Pass
+        val state = ctx[BlockInteract.BLOCK_STATE]?.nmsBlockState ?: return InteractionResult.Pass
         
         if (state.block != Blocks.CAMPFIRE || !state.getValue(CampfireBlock.LIT))
             return InteractionResult.Pass

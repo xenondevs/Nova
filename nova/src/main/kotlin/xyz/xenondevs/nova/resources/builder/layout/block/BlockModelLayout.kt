@@ -6,19 +6,15 @@ import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuild
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
 
-internal typealias BlockStateSelector = BlockSelectorScope.() -> BlockData
-internal typealias BlockModelSelector = BlockModelSelectorScope.() -> ModelBuilder
-internal typealias ItemDefinitionConfigurator = ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit
-
-internal val DEFAULT_BLOCK_STATE_SELECTOR: BlockStateSelector = { BlockType.BARRIER.createBlockData() }
-internal val DEFAULT_BLOCK_MODEL_SELECTOR: BlockModelSelector = { defaultModel }
+internal val DEFAULT_BLOCK_STATE_SELECTOR: BlockSelectorScope.() -> BlockData = { BlockType.BARRIER.createBlockData() }
+internal val DEFAULT_BLOCK_MODEL_SELECTOR: BlockModelSelectorScope.() -> ModelBuilder = { defaultModel }
 
 internal sealed interface BlockModelLayout {
     
     class StateBacked(
         val priority: Int,
         val configTypes: List<BackingStateConfigType<*>>,
-        val modelSelector: BlockModelSelector
+        val modelSelector: BlockModelSelectorScope.() -> ModelBuilder
     ) : BlockModelLayout {
         
         override fun toString(): String =
@@ -27,21 +23,21 @@ internal sealed interface BlockModelLayout {
     }
     
     sealed interface EntityBacked : BlockModelLayout {
-        val stateSelector: BlockStateSelector
+        val stateSelector: BlockSelectorScope.() -> BlockData
     }
     
     class SimpleEntityBacked(
-        override val stateSelector: BlockStateSelector,
-        val modelSelector: BlockModelSelector
+        override val stateSelector: BlockSelectorScope.() -> BlockData,
+        val modelSelector: BlockModelSelectorScope.() -> ModelBuilder
     ) : EntityBacked
     
     class ItemEntityBacked(
-        override val stateSelector: BlockStateSelector,
-        val definitionConfigurator: ItemDefinitionConfigurator
+        override val stateSelector: BlockSelectorScope.() -> BlockData,
+        val definitionConfigurator: ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit
     ) : EntityBacked
     
     class ModelLess(
-        val stateSelector: BlockStateSelector
+        val stateSelector: BlockSelectorScope.() -> BlockData
     ) : BlockModelLayout
     
     companion object {

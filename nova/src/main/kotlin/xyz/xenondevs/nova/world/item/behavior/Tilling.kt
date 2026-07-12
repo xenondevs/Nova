@@ -11,11 +11,11 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.nmsDirection
+import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.ItemAction
-import xyz.xenondevs.nova.world.pos
 
 private val TILLABLES: Map<Material, Triple<(Context<BlockInteract>) -> Boolean, Material, List<Material>>> = mapOf(
     Material.GRASS_BLOCK to Triple(::onlyIfAirAbove, Material.FARMLAND, emptyList()),
@@ -27,7 +27,7 @@ private val TILLABLES: Map<Material, Triple<(Context<BlockInteract>) -> Boolean,
 
 private fun onlyIfAirAbove(ctx: Context<BlockInteract>): Boolean {
     return ctx[BlockInteract.CLICKED_BLOCK_FACE] != BlockFace.DOWN
-        && ctx[BlockInteract.BLOCK_POS].add(0, 1, 0).block.type.isAir
+        && ctx[BlockInteract.BLOCK].getRelative(BlockFace.UP).type.isAir
 }
 
 /**
@@ -52,7 +52,7 @@ object Tilling : ItemBehavior {
         // drop items
         val dropDirection = ctx[BlockInteract.CLICKED_BLOCK_FACE]?.nmsDirection ?: Direction.NORTH
         for (drop in drops) {
-            Block.popResourceFromFace(block.world.serverLevel, block.pos.nmsPos, dropDirection, ItemStack.of(drop).unwrap())
+            Block.popResourceFromFace(block.world.serverLevel, block.nmsPos, dropDirection, ItemStack.of(drop).unwrap())
         }
         
         return InteractionResult.Success(swing = true, action = ItemAction.Damage())

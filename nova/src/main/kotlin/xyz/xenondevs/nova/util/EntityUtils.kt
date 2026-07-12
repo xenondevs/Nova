@@ -27,8 +27,8 @@ import org.joml.primitives.AABBdc
 import org.joml.primitives.Rayd
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.nova.util.data.NBTUtils
-import xyz.xenondevs.nova.util.item.novaItem
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.item.novaItem
+import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.item.behavior.Damageable
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
@@ -158,15 +158,15 @@ object EntityUtils {
     }
     
     /**
-     * Creates not-spawned [item entities][ItemEntity] based on the specified [items] and [pos].
+     * Creates not-spawned [item entities][ItemEntity] based on the specified [items] and [block].
      */
-    fun createBlockDropItemEntities(pos: BlockPos, items: Iterable<ItemStack>): List<ItemEntity> =
+    fun createBlockDropItemEntities(block: Block, items: Iterable<ItemStack>): List<ItemEntity> =
         items.map {
             ItemEntity(
-                pos.world.serverLevel,
-                pos.x + 0.5 + Random.nextDouble(-0.25, 0.25),
-                pos.y + 0.5 + Random.nextDouble(-0.25, 0.25),
-                pos.z + 0.5 + Random.nextDouble(-0.25, 0.25),
+                block.world.serverLevel,
+                block.x + 0.5 + Random.nextDouble(-0.25, 0.25),
+                block.y + 0.5 + Random.nextDouble(-0.25, 0.25),
+                block.z + 0.5 + Random.nextDouble(-0.25, 0.25),
                 it.unwrap().copy()
             ).apply(ItemEntity::setDefaultPickUpDelay)
         }

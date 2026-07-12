@@ -23,13 +23,8 @@ import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.overlay.WailaOverlayCompound
 import xyz.xenondevs.nova.util.data.WildcardUtils
-import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.serverTick
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.world.format.WorldDataManager
-import xyz.xenondevs.nova.world.pos
+import xyz.xenondevs.nova.world.block.blockType
 import kotlin.math.roundToInt
 
 private val POS_UPDATE_INTERVAL by MAIN_CONFIG.entry<Int>("waila", "pos_update_interval")
@@ -42,9 +37,6 @@ private val BLACKLISTED_BLOCKS by MAIN_CONFIG.entry<List<String>>("waila", "blac
         WildcardUtils.toRegex(parts[0]) to WildcardUtils.toRegex(parts[1])
     }
 }
-
-private val NOVA_WAILA_INFO_PROVIDERS: Map<NovaBlock, WailaInfoProvider<NovaBlock, NovaBlockState>>
-    by flattenInfoProviders()
 
 private val VANILLA_WAILA_INFO_PROVIDERS: Map<BlockType, WailaInfoProvider<BlockType, BlockData>>
     by flattenInfoProviders()
@@ -75,7 +67,7 @@ internal class Waila(val player: Player) {
     
     private var lastPosUpdate: Int = 0
     private var lastDataUpdate: Int = 0
-    private var lookingAt: BlockPos? = null
+    private var lookingAt: Block? = null
     
     private var active = false
     private val overlay = WailaOverlayCompound(player)
@@ -99,7 +91,7 @@ internal class Waila(val player: Player) {
         val serverTick = serverTick
         if (serverTick - lastPosUpdate >= POS_UPDATE_INTERVAL) {
             lastPosUpdate = serverTick
-            val pos = player.getTargetBlockExact(player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE)!!.value.roundToInt())?.pos
+            val pos = player.getTargetBlockExact(player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE)!!.value.roundToInt())
             if (pos != lookingAt) {
                 lastDataUpdate = serverTick
                 update(pos)
@@ -111,18 +103,17 @@ internal class Waila(val player: Player) {
         }
     }
     
-    private fun update(pos: BlockPos?) {
-        lookingAt = pos
-        setActive(tryUpdate(pos))
+    private fun update(block: Block?) {
+        lookingAt = block
+        setActive(tryUpdate(block))
     }
     
-    private fun tryUpdate(pos: BlockPos?): Boolean {
-        if (pos != null) {
-            val blockId = pos.block.id
-            if (isBlacklisted(blockId))
+    private fun tryUpdate(block: Block?): Boolean {
+        if (block != null) {
+            if (isBlacklisted(block.blockType.key))
                 return false
             
-            val info = getInfo(player, pos)
+            val info = getInfo(player, block)
                 ?: return false
             
             if (info != prevInfo) {
@@ -136,18 +127,11 @@ internal class Waila(val player: Player) {
         return false
     }
     
-    private fun getInfo(player: Player, pos: BlockPos): WailaInfo? {
-        val novaState = WorldDataManager.getBlockState(pos)
-        if (novaState != null) {
-            return NOVA_WAILA_INFO_PROVIDERS[novaState.block]
-                ?.getInfo(player, pos, novaState)
-        } else {
-            val block = pos.block
-            val type = block.type.asBlockType()!!
-            
-            return getCustomItemServiceInfo(player, block)
-                ?: VANILLA_WAILA_INFO_PROVIDERS[type]?.getInfo(player, pos, block.blockData)
-        }
+    private fun getInfo(player: Player, block: Block): WailaInfo? {
+        val type = block.blockType
+        
+        return getCustomItemServiceInfo(player, block)
+            ?: VANILLA_WAILA_INFO_PROVIDERS[type]?.getInfo(player, block, block.blockData)
     }
     
     private fun getCustomItemServiceInfo(player: Player, block: Block): WailaInfo? {
@@ -156,7 +140,7 @@ internal class Waila(val player: Player) {
         
         val lines = ArrayList<WailaLine>()
         lines += WailaLine(blockName, WailaLine.Alignment.CENTERED)
-        lines += WailaLine(Component.text(blockId.toString(), NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(Component.text(blockId.asString(), NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
         lines += ToolLine.getCustomItemServiceToolLine(player, block)
         
         return WailaInfo(blockId, lines)

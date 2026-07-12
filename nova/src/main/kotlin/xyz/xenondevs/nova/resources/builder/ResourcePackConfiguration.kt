@@ -244,7 +244,7 @@ class ResourcePackConfiguration internal constructor(
     }
     
     private fun dumpGraph(graph: Graph<PackTask, DefaultEdge>) {
-        val sanitizedId = id.toString().replace(Regex("[:/]"), "_")
+        val sanitizedId = id.asString().replace(Regex("[:/]"), "_")
         
         val file = File("debug/nova/resource_pack_$sanitizedId.dot")
         file.parentFile.mkdirs()

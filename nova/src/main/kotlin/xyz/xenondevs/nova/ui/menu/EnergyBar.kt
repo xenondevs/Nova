@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.ui.menu
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.invui.dsl.ClickDsl
@@ -22,7 +23,7 @@ import xyz.xenondevs.nova.world.item.NovaItem
  */
 fun energyBar(
     energyHolder: DefaultEnergyHolder,
-    barType: Provider<NovaItem> = DefaultGuiItems.TP_BAR_RED,
+    barType: Provider<ItemType> = DefaultGuiItems.TP_BAR_RED,
     onClick: ClickDsl.() -> Unit = {}
 ): SlotElementSupplier = energyBar(
     energyHolder.energyProvider,
@@ -44,7 +45,7 @@ fun energyBar(
     maxEnergy: Provider<Long>,
     energyPlus: Provider<Long>,
     energyMinus: Provider<Long>,
-    barType: Provider<NovaItem> = DefaultGuiItems.TP_BAR_RED,
+    barType: Provider<ItemType> = DefaultGuiItems.TP_BAR_RED,
     onClick: ClickDsl.() -> Unit = {}
 ): SlotElementSupplier = verticalBar(
     percentage = combinedProvider(energy, maxEnergy) { energy, maxEnergy -> energy.toDouble() / maxEnergy.toDouble() },
@@ -90,10 +91,10 @@ class EnergyBar(
     private val maxEnergy: Provider<Long>,
     private val getEnergyPlus: () -> Long,
     private val getEnergyMinus: () -> Long,
-    private val item: Provider<NovaItem> = DefaultGuiItems.BAR_RED
+    private val item: Provider<ItemType> = DefaultGuiItems.BAR_RED
 ) : VerticalBar(height) {
     
-    constructor(height: Int, energyHolder: DefaultEnergyHolder, item: Provider<NovaItem> = DefaultGuiItems.BAR_RED) : this(
+    constructor(height: Int, energyHolder: DefaultEnergyHolder, item: Provider<ItemType> = DefaultGuiItems.BAR_RED) : this(
         height,
         energyHolder.energyProvider, energyHolder.maxEnergyProvider,
         { energyHolder.energyPlus }, { energyHolder.energyMinus },

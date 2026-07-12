@@ -2,11 +2,13 @@
 
 package xyz.xenondevs.nova.resources.builder.task
 
+import org.bukkit.block.BlockType
 import org.joml.Matrix4f
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.registry.ProtoBlockState
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -20,13 +22,10 @@ import xyz.xenondevs.nova.resources.builder.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_STATE_SELECTOR
-import xyz.xenondevs.nova.resources.builder.layout.block.ItemDefinitionConfigurator
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
@@ -111,14 +110,14 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
      * Assigns models to all custom block states.
      */
     private fun assignBlockModels() {
-        val lookup = HashMap<NovaBlockState, BlockModelProvider>()
+        val lookup = HashMap<ProtoBlockState, BlockModelProvider>()
         
         // state-backed blocks, sort by:
         // 1. state backed priority (descending)
         // 2. amount of available states (ascending)
         // 3. id
         assignBlockModels<BlockModelLayout.StateBacked>(
-            compareByDescending<Pair<RegistryEntry.Nova<NovaBlock>, BlockModelLayout.StateBacked>> { [_, layout] -> layout.priority }
+            compareByDescending<Pair<RegistryEntry.Paper<BlockType>, BlockModelLayout.StateBacked>> { [_, layout] -> layout.priority }
                 .thenBy { [_, layout] -> layout.configTypes.sumOf { it.maxId - it.blockedIds.size } }
                 .thenBy { [block, _] -> block.key }
         ) { blockState, layout, scope ->
@@ -165,8 +164,8 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
     }
     
     private inline fun <reified L : BlockModelLayout> assignBlockModels(
-        comparator: Comparator<Pair<RegistryEntry.Nova<NovaBlock>, L>> = compareBy { [block, _] -> block.key },
-        assigner: (blockState: NovaBlockState, layout: L, scope: BlockModelSelectorScope) -> Unit
+        comparator: Comparator<Pair<RegistryEntry.Paper<BlockType>, L>> = compareBy { [block, _] -> block.key },
+        assigner: (blockState: ProtoBlockState, layout: L, scope: BlockModelSelectorScope) -> Unit
     ) {
         requests.entries
             .mapNotNull { [block, pair] ->
@@ -244,7 +243,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
      * Generates the item model definition using [scope] and [configureDefinition] and returns
      * the display entity configuration used to display it.
      */
-    private fun assignModelToItem(scope: BlockModelSelectorScope, configureDefinition: ItemDefinitionConfigurator): DisplayEntityBlockModelData.Model {
+    private fun assignModelToItem(scope: BlockModelSelectorScope, configureDefinition: ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit): DisplayEntityBlockModelData.Model {
         val itemDefinition = ItemModelDefinitionBuilder(builder) { modelSelector ->
             val builder = modelSelector(scope)
             val id = modelContent.getOrPutGenerated(builder.build(modelContent))
@@ -300,7 +299,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
     
     internal companion object {
         
-        val requests: Map<RegistryEntry.Nova<NovaBlock>, Pair<BlockModelLayout, List<NovaBlockState>>>
+        val requests: Map<RegistryEntry.Paper<BlockType>, Pair<BlockModelLayout, List<ProtoBlockState>>>
             field = HashMap()
         
         /**
@@ -308,9 +307,9 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
          * Results will be written to [ResourceLookups.blockModel].
          */
         fun request(
-            entry: RegistryEntry.Nova<NovaBlock>,
+            entry: RegistryEntry.Paper<BlockType>,
             layout: BlockModelLayout,
-            states: List<NovaBlockState>,
+            states: List<ProtoBlockState>,
         ) {
             requests[entry] = layout to states
         }

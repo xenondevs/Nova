@@ -1,200 +1,307 @@
-@file:Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
-
 package xyz.xenondevs.nova.world.block
 
 import io.papermc.paper.registry.RegistryKey
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.serialization.Serializable
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.InsideBlockEffectApplier
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.ScheduledTickAccess
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.FireBlock
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.level.redstone.Orientation
 import net.minecraft.world.phys.BlockHitResult
-import org.bukkit.Material
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.VoxelShape
+import org.bukkit.Chunk
 import org.bukkit.block.BlockType
-import org.bukkit.entity.Entity
+import org.bukkit.block.data.BlockData
+import org.bukkit.craftbukkit.block.CraftBlock
+import org.bukkit.craftbukkit.block.CraftBlockType
+import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
+import xyz.xenondevs.nova.context.intention.ImplicitIntentions
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.registry.Configurable
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.network.currentPacketSourcePlayer
+import xyz.xenondevs.nova.registry.FlammableSettings
+import xyz.xenondevs.nova.registry.ProtoBlockState
 import xyz.xenondevs.nova.registry.RegistryEntry
-import xyz.xenondevs.nova.registry.RegistryEntrySet
-import xyz.xenondevs.nova.serialization.kotlinx.BlockTypeEitherEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.BlockTypeMixedEntrySetSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockEntrySetSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockSerializer
+import xyz.xenondevs.nova.registry.bootstrapFlatMap
+import xyz.xenondevs.nova.resources.builder.layout.block.BlockSelectorScope
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.blockFace
+import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.util.getOrNull
+import xyz.xenondevs.nova.util.levelChunk
+import xyz.xenondevs.nova.util.nmsBlock
+import xyz.xenondevs.nova.util.nmsBlockEntity
+import xyz.xenondevs.nova.util.nmsBlockState
+import xyz.xenondevs.nova.util.toBlock
+import xyz.xenondevs.nova.util.toPropertyStringMap
+import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
-import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorFactory
-import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
-import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
-import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
+import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.item.createItemStack
+import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.world.toNms
+import java.lang.invoke.MethodHandles
+import java.lang.invoke.VarHandle
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
+import net.minecraft.core.BlockPos as NmsBlockPos
 import net.minecraft.world.InteractionResult as NmsInteractionResult
+import net.minecraft.world.entity.Entity as NmsEntity
 import net.minecraft.world.entity.player.Player as NmsPlayer
 import net.minecraft.world.item.ItemStack as NmsItemStack
+import net.minecraft.world.level.block.state.BlockState as NmsBlockState
+import org.bukkit.block.Block as BukkitBlock
+import org.bukkit.block.BlockState as CapturedBlockState
+import org.bukkit.craftbukkit.block.CraftBlockState as CraftCapturedBlockState
+
+private val BLOCK_STATE_CACHED_TYPE: VarHandle = MethodHandles
+    .privateLookupIn(NmsBlockState::class.java, MethodHandles.lookup())
+    .findVarHandle(NmsBlockState::class.java, $$"nova$cachedType", BlockType::class.java)
+
+private val BLOCK_STATE_CACHED_TYPE_ENTRY: VarHandle = MethodHandles
+    .privateLookupIn(NmsBlockState::class.java, MethodHandles.lookup())
+    .findVarHandle(NmsBlockState::class.java, $$"nova$cachedTypeEntry", Any::class.java)
+
+private val NmsBlockState.blockType: BlockType
+    get() {
+        val cached = BLOCK_STATE_CACHED_TYPE.get(this)
+        if (cached != null)
+            return cached as BlockType
+        val blockType = CraftBlockType.minecraftToBukkitNew(block)
+        BLOCK_STATE_CACHED_TYPE.set(this, blockType)
+        return blockType
+    }
+
+@Suppress("UNCHECKED_CAST")
+private val NmsBlockState.blockTypeEntry: RegistryEntry.Paper<BlockType>
+    get() {
+        val cached = BLOCK_STATE_CACHED_TYPE.get(this)
+        if (cached != null)
+            return BLOCK_STATE_CACHED_TYPE_ENTRY.get(this) as RegistryEntry.Paper<BlockType>
+        val entry = RegistryEntry.paper(RegistryKey.BLOCK, blockType)
+        BLOCK_STATE_CACHED_TYPE_ENTRY.set(this, entry)
+        return entry
+    }
+
+internal val BlockData.clientsideBlockState: BlockData
+    get() = (this as? NovaBlockState)
+        ?.novaBlock
+        ?.clientsideBlockStates
+        ?.get(nmsBlockState)
+        ?.bukkitBlockData
+        ?: this
+
+@PublishedApi
+internal val BlockType.novaBlock: NovaBlock?
+    get() = (this as CraftBlockType<*>).handle as? NovaBlock
+
+@PublishedApi
+internal fun <T : Any> BlockType.hasBehavior(type: KClass<T>): Boolean =
+    novaBlock?.behaviors?.any { type.isSuperclassOf(it::class) } == true
+
+@PublishedApi
+@Suppress("UNCHECKED_CAST")
+internal fun <T : Any> BlockType.getBehaviorOrNull(type: KClass<T>): T? =
+    novaBlock?.behaviors?.firstOrNull { type.isSuperclassOf(it::class) } as T?
+
+@PublishedApi
+internal fun <T : Any> BlockType.getBehaviorOrThrow(type: KClass<T>): T =
+    getBehaviorOrNull(type) ?: throw NoSuchElementException("${key.asString()} has no behavior of type ${type.simpleName}")
+
+var BukkitBlock.blockType: BlockType
+    get() = (this as CraftBlock).blockState.blockType
+    set(value) {
+        blockData = value.createBlockData()
+    }
+
+val BukkitBlock.blockTypeEntry: RegistryEntry.Paper<BlockType>
+    get() = (this as CraftBlock).blockState.blockTypeEntry
+
+var BukkitBlock.novaBlockState: NovaBlockState?
+    get() = blockData as? NovaBlockState
+    set(value) {
+        blockData = value ?: BlockType.AIR.createBlockData()
+    }
+
+val CapturedBlockState.blockType: BlockType
+    get() = (this as CraftCapturedBlockState).block.blockType
+
+val BlockType.isNova: Boolean
+    get() = novaBlock != null
+
+val BlockType.isNovaTileEntity: Boolean
+    get() = novaBlock is NovaTileEntityBlock
+
+val BlockType.name: Component
+    get() = novaBlock?.name ?: Component.translatable(nmsBlock.descriptionId)
+
+inline fun <reified T : Any> BlockType.hasBehavior(): Boolean =
+    hasBehavior(T::class)
+
+inline fun <reified T : Any> BlockType.getBehaviorOrNull(): T? =
+    getBehaviorOrNull(T::class)
+
+inline fun <reified T : Any> BlockType.getBehaviorOrThrow(): T =
+    getBehaviorOrThrow(T::class)
+
+val BlockData.blockType: BlockType
+    get() = (this as CraftBlockData).state.blockType
+
+val BukkitBlock.novaTileEntity: TileEntity?
+    get() = (nmsBlockEntity as? NovaTileEntityProxy)?.tileEntity
+
+val BlockType.itemTypeOrNull: ItemType?
+    get() = if (hasItemType()) itemType else null
+
+val ItemType.blockTypeOrNull: BlockType?
+    get() = if (hasBlockType()) blockType else null
+
+@Suppress("UNCHECKED_CAST")
+private fun <T : Comparable<T>> NmsBlockState.setValue(property: BlockStateProperty<T>, value: Any): NmsBlockState =
+    setValue(property.nmsProperty, value as T)
 
 /**
- * Converts [this][RegistryEntry.Nova] to an [RegistryEntry.Either] of [NovaBlock] and [BlockType].
+ * Shortcut for `bootstrapFlatMap { it.config }` 
  */
-fun RegistryEntry.Nova<NovaBlock>.asEither(): RegistryEntry.Either<NovaBlock, BlockType> =
-    RegistryEntry.either(this, RegistryKey.BLOCK)
+val Provider<BlockType>.config: Provider<ConfigProvider>
+    get() = bootstrapFlatMap { it.config }
 
 /**
- * Converts [this][RegistryEntry.Paper] to an [RegistryEntry.Either] of [NovaBlock] and [BlockType].
+ * Gets the type's config if [BlockType.isNova], otherwise [ConfigProvider.Empty].
  */
-fun RegistryEntry.Paper<BlockType>.asEither(): RegistryEntry.Either<NovaBlock, BlockType> =
-    RegistryEntry.either(NovaRegistries.BLOCK, this)
+val BlockType.config: Provider<ConfigProvider>
+    get() = novaBlock?.config ?: provider(ConfigProvider.Empty)
 
 /**
- * Serializable type alias for `RegistryEntry.Nova<NovaBlock>` using [NovaBlockEntrySerializer].
+ * Returns a snapshot of all nova tile entities in this chunk.
  */
-typealias NovaBlockEntry = @Serializable(with = NovaBlockEntrySerializer::class) RegistryEntry.Nova<NovaBlock>
+val Chunk.novaTileEntities: List<TileEntity>
+    get() = levelChunk.blockEntities.values.mapNotNull { (it as? NovaTileEntityProxy)?.tileEntity }
 
-/**
- * Serializable type alias for `RegistryEntry.Either<NovaBlock, BlockType>` using [BlockTypeEitherEntrySerializer].
- */
-typealias EitherBlockTypeEntry = @Serializable(with = BlockTypeEitherEntrySerializer::class) RegistryEntry.Either<NovaBlock, BlockType>
-
-/**
- * Serializable type alias for `RegistryEntrySet.Nova<NovaBlock>` using [NovaBlockEntrySetSerializer].
- */
-typealias NovaBlockEntrySet = @Serializable(with = NovaBlockEntrySetSerializer::class) RegistryEntrySet.Nova<NovaBlock>
-
-/**
- * Serializable type alias for `RegistryEntrySet.Mixed<NovaBlock, BlockType>` using [BlockTypeMixedEntrySetSerializer].
- */
-typealias MixedBlockTypeEntrySet = @Serializable(with = BlockTypeMixedEntrySetSerializer::class) RegistryEntrySet.Mixed<NovaBlock, BlockType>
-
-/**
- * Represents a custom Nova block type.
- */
-@Serializable(with = NovaBlockSerializer::class)
-open class NovaBlock internal constructor(
-    override val entry: RegistryEntry.Nova<NovaBlock>,
-    /**
-     * The name of this [NovaBlock].
-     */
-    val name: Component,
-    /**
-     * The style of the [name] of this [NovaBlock]. (Already applied to [name])
-     */
-    val style: Style,
-    behaviors: List<BlockBehaviorHolder>,
-    /**
-     * A list of all the [ScopedBlockStateProperties][ScopedBlockStateProperty] of this [NovaBlock],
-     * responsible for defining the various [blockStates].
-     */
-    val stateProperties: List<ScopedBlockStateProperty<*>>,
-    /**
-     * The [NovaItem] associated with this [NovaBlock].
-     * May be `null` if this block does not have an associated item.
-     */
-    val item: RegistryEntry.Nova<NovaItem>?,
-    override val config: ConfigProvider,
-    /**
-     * A list of all possible [NovaBlockStates][NovaBlockState] of this [NovaBlock]
-     */
-    val blockStates: List<NovaBlockState>
-) : NovaRegistryElement<NovaBlock>, Configurable {
+internal open class NovaBlock(
+    val entry: RegistryEntry.Paper<BlockType>,
+    name: Provider<Component>,
+    style: Provider<Style>,
+    behaviors: Provider<List<BlockBehavior>>,
+    val stateProperties: List<BlockStateProperty<*>>,
+    item: Provider<RegistryEntry.Paper<ItemType>?>,
+    val config: Provider<ConfigProvider>,
+    properties: Provider<Properties>,
+    flammable: Provider<FlammableSettings>,
+    selectFluidFlowMode: Provider<BlockSelectorScope.() -> FluidFlowMode>
+) : Block(properties.get()) {
     
-    /**
-     * A list of all [BlockBehaviors][BlockBehavior] of this [NovaBlock].
-     */
-    val behaviors: List<BlockBehavior> = behaviors.map { holder ->
-        when (holder) {
-            is BlockBehavior -> holder
-            is BlockBehaviorFactory<*> -> holder.create(this)
+    val key: Key
+        get() = entry.key
+    
+    val name by combinedProvider(name, style) { name, style -> name.style(style) }
+    val style by style
+    val behaviors by behaviors
+    val item by item
+    
+    val fluidFlowModes: Map<NmsBlockState, FluidFlowMode>
+        by selectFluidFlowMode.map { selector ->
+            stateDefinition.possibleStates.associateWithTo(IdentityHashMap()) { state ->
+                val proto = ProtoBlockState(entry, state.toPropertyStringMap())
+                val mode = BlockSelectorScope(proto).selector()
+                if (mode.requiresWaterloggedState && !state.hasProperty(BlockStateProperties.WATERLOGGED))
+                    FluidFlowMode.BLOCK
+                else mode
+            }
+        }
+    
+    val modelProviders: Provider<Map<NmsBlockState, BlockModelProvider>> = ResourceLookups.blockModelLookup.map { lookup ->
+        lookup.entries
+            .filter { [protoState, _] -> protoState.entry == entry }
+            .associateTo(IdentityHashMap()) { [protoState, model] -> protoState.toBlockState(defaultBlockState) to model }
+    }
+    
+    private val _clientsideBlockStates: Provider<Map<NmsBlockState, NmsBlockState>> =
+        modelProviders.map { it.mapValues { [_, mp] -> mp.clientsideBlockState } }
+    
+    val clientsideBlockStates: Map<NmsBlockState, NmsBlockState> by _clientsideBlockStates
+    val clientsideBlock: Block by _clientsideBlockStates.map { it.entries.first().value.block }
+    
+    init {
+        // adjust defaultBlockState to the actual defaults of the properties
+        registerDefaultState(stateProperties.fold(defaultBlockState) { state, prop -> state.setValue(prop, prop.defaultValue) })
+        
+        // Vanilla initializes these caches before Nova's blocks are registered.
+        stateDefinition.possibleStates.forEach { it.initCache() }
+        
+        val flammable = flammable.get()
+        (Blocks.FIRE as FireBlock).setFlammable(this, flammable.igniteOdds, flammable.burnOdds)
+    }
+    
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, NmsBlockState>) {
+        for (property in STATE_PROPERTIES.get()) {
+            builder.add(property.nmsProperty)
         }
     }
     
-    /**
-     * The default block state of this [NovaBlock].
-     */
-    val defaultBlockState = blockStates[0]
+    override fun getShape(state: NmsBlockState, level: BlockGetter, pos: NmsBlockPos, context: CollisionContext): VoxelShape =
+        modelProviders.get()[state]!!.clientsideBlockState.getShape(level, pos, context)
     
-    /**
-     * Checks whether this [NovaBlock] has a [BlockBehavior] of the reified type [T], or a subclass of it.
-     */
-    inline fun <reified T : Any> hasBehavior(): Boolean =
-        hasBehavior(T::class)
+    override fun getCollisionShape(state: NmsBlockState, level: BlockGetter, pos: NmsBlockPos, context: CollisionContext): VoxelShape =
+        modelProviders.get()[state]!!.clientsideBlockState.getCollisionShape(level, pos, context)
     
-    /**
-     * Checks whether this [NovaBlock] has a [BlockBehavior] of the specified class [type], or a subclass of it.
-     */
-    fun <T : Any> hasBehavior(type: KClass<T>): Boolean =
-        behaviors.any { type.isSuperclassOf(it::class) }
+    override fun getOcclusionShape(state: NmsBlockState): VoxelShape =
+        modelProviders.get()[state]!!.clientsideBlockState.occlusionShape
     
-    /**
-     * Checks whether this [NovaBlock] has a [BlockBehavior] of the specified class [type], or a subclass of it.
-     */
-    fun <T : Any> hasBehavior(type: Class<T>): Boolean =
-        behaviors.any { type.isAssignableFrom(it::class.java) }
+    override fun getLightDampening(state: NmsBlockState): Int =
+        modelProviders.get()[state]!!.clientsideBlockState.lightDampening
     
-    /**
-     * Gets the first [BlockBehavior] that is an instance of [T], or null if there is none.
-     */
-    inline fun <reified T : Any> getBehaviorOrNull(): T? =
-        getBehaviorOrNull(T::class)
+    override fun propagatesSkylightDown(state: NmsBlockState): Boolean =
+        modelProviders.get()[state]!!.clientsideBlockState.propagatesSkylightDown()
     
-    /**
-     * Gets the first [BlockBehavior] that is an instance of [type] or a subclass, or null if there is none.
-     */
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Any> getBehaviorOrNull(type: KClass<T>): T? =
-        behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
-    
-    /**
-     * Gets the first [BlockBehavior] that is an instance of [type] or a subclass, or null if there is none.
-     */
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Any> getBehaviorOrNull(type: Class<T>): T? =
-        behaviors.firstOrNull { type.isAssignableFrom(it::class.java) } as T?
-    
-    /**
-     * Gets the first [BlockBehavior] that is an instance of [T], or throws an [IllegalStateException] if there is none.
-     */
-    inline fun <reified T : Any> getBehavior(): T =
-        getBehavior(T::class)
-    
-    /**
-     * Gets the first [BlockBehavior] that is an instance of [type], or throws an [IllegalStateException] if there is none.
-     */
-    fun <T : Any> getBehavior(type: KClass<T>): T =
-        getBehaviorOrNull(type) ?: throw IllegalStateException("Block $key does not have a behavior of type ${type.simpleName}")
-    
-    /**
-     * Gets the first [BlockBehavior] that is an instance of [type], or throws an [IllegalStateException] if there is none.
-     */
-    fun <T : Any> getBehavior(type: Class<T>): T =
-        getBehaviorOrNull(type) ?: throw IllegalStateException("Block $key does not have a behavior of type ${type.simpleName}")
+    override fun getFluidState(state: NmsBlockState): FluidState {
+        return if (state.getOptionalValue(BlockStateProperties.WATERLOGGED).orElse(false) == true)
+            Fluids.WATER.getSource(false)
+        else super.getFluidState(state)
+    }
     
     //<editor-fold desc="event methods">
     /**
      * Checks whether a block of [state] can be placed at [pos] using the given [ctx].
      */
     suspend fun canPlace(
-        pos: BlockPos,
+        block: BukkitBlock,
         state: NovaBlockState,
         ctx: Context<BlockPlace>
     ): Boolean = coroutineScope {
@@ -202,7 +309,7 @@ open class NovaBlock internal constructor(
             return@coroutineScope true
         
         return@coroutineScope behaviors
-            .map { async { it.canPlace(pos, state, ctx) } }
+            .map { async { it.canPlace(block, state, ctx) } }
             .awaitAll()
             .all { it }
     }
@@ -211,39 +318,56 @@ open class NovaBlock internal constructor(
      * Chooses the appropriate [NovaBlockState] for placement given the [ctx].
      */
     fun chooseBlockState(ctx: Context<BlockPlace>): NovaBlockState {
-        return defaultBlockState.tree?.get(ctx) ?: defaultBlockState
+        var blockState = defaultBlockState
+        
+        for (property in stateProperties) {
+            blockState = blockState.setValue(property, property.initializer(ctx))
+        }
+        
+        return NovaBlockStateImpl(blockState)
     }
     
-    internal fun useItemOnNms(
-        pos: BlockPos,
-        state: NovaBlockState,
+    override fun useItemOn(
         nmsItemStack: NmsItemStack,
+        nmsBlockState: NmsBlockState,
+        nmsLevel: Level,
+        nmsPos: NmsBlockPos,
         nmsPlayer: NmsPlayer,
         nmsHand: InteractionHand,
-        hitResult: BlockHitResult,
+        nmsHitResult: BlockHitResult
     ): NmsInteractionResult {
         // check cooldown since Nova applies cooldowns in all item-use cases
         if (nmsPlayer.cooldowns.isOnCooldown(nmsItemStack))
             return NmsInteractionResult.PASS
         
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
         val player = nmsPlayer.bukkitEntity
         val itemStack = nmsItemStack.asBukkitCopy()
         val hand = nmsHand.bukkitEquipmentSlot
-        val face = hitResult.direction.blockFace
+        val face = nmsHitResult.direction.blockFace
         
-        if (player is Player && !ProtectionManager.canUseBlock(player, itemStack, pos))
+        if (player is Player && !ProtectionManager.canUseBlock(player, itemStack, block))
             return NmsInteractionResult.FAIL
         
         val ctx = Context.intention(BlockInteract)
-            .param(BlockInteract.BLOCK_POS, pos)
-            .param(BlockInteract.BLOCK_STATE_NOVA, state)
+            .param(BlockInteract.BLOCK, block)
+            .param(BlockInteract.BLOCK_STATE, blockState)
             .param(BlockInteract.SOURCE_ENTITY, player)
             .param(BlockInteract.HELD_ITEM_STACK, itemStack)
             .param(BlockInteract.HELD_HAND, hand)
             .param(BlockInteract.CLICKED_BLOCK_FACE, face)
             .build()
         
-        val result = useItemOn(pos, state, ctx)
+        val result = runSafely("use item on", InteractionResult.Fail) {
+            for (behavior in behaviors) {
+                val result = behavior.useItemOn(block, blockState, ctx)
+                if (result !is InteractionResult.Pass)
+                    return@runSafely result
+            }
+            return@runSafely InteractionResult.Pass
+        }
+        
         if (result is InteractionResult.Success)
             result.performActions(player, hand)
         
@@ -253,185 +377,282 @@ open class NovaBlock internal constructor(
         }
     }
     
-    /**
-     * Uses an item on the block of [state] at [pos].
-     */
-    fun useItemOn(
-        pos: BlockPos,
-        state: NovaBlockState,
-        ctx: Context<BlockInteract>
-    ): InteractionResult = runSafely("use item on", InteractionResult.Fail) {
-        for (behavior in behaviors) {
-            val result = behavior.useItemOn(pos, state, ctx)
-            if (result !is InteractionResult.Pass)
-                return result
-        }
-        return InteractionResult.Pass
-    }
-    
-    internal fun useNms(
-        pos: BlockPos,
-        state: NovaBlockState,
+    override fun useWithoutItem(
+        nmsBlockState: NmsBlockState,
+        nmsLevel: Level,
+        nmsPos: NmsBlockPos,
         nmsPlayer: NmsPlayer,
-        hitResult: BlockHitResult,
+        nmsHitResult: BlockHitResult
     ): NmsInteractionResult {
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
         val player = nmsPlayer.bukkitEntity
-        val face = hitResult.direction.blockFace
+        val face = nmsHitResult.direction.blockFace
         
-        if (player is Player && !ProtectionManager.canUseBlock(player, null, pos))
+        if (player is Player && !ProtectionManager.canUseBlock(player, null, block))
             return NmsInteractionResult.FAIL
         
         val ctx = Context.intention(BlockInteract)
-            .param(BlockInteract.BLOCK_POS, pos)
-            .param(BlockInteract.BLOCK_STATE_NOVA, state)
+            .param(BlockInteract.BLOCK, block)
+            .param(BlockInteract.BLOCK_STATE, blockState)
             .param(BlockInteract.SOURCE_ENTITY, player)
             .param(BlockInteract.CLICKED_BLOCK_FACE, face)
             .build()
         
-        val result = use(pos, state, ctx)
-        if (result is InteractionResult.Success) {
-            require(!result.wasItemInteraction) { "useWithoutItem cannot result in an item interaction" }
-            result.performActions(player, EquipmentSlot.HAND)
+        val result = runSafely("use", InteractionResult.Fail) {
+            for (behavior in behaviors) {
+                val result = behavior.use(block, blockState, ctx)
+                if (result is InteractionResult.Success && result.wasItemInteraction)
+                    throw IllegalArgumentException("useWithoutItem cannot result in an item interaction")
+                if (result !is InteractionResult.Pass)
+                    return@runSafely result
+            }
+            return@runSafely InteractionResult.Pass
         }
+        
+        if (result is InteractionResult.Success)
+            result.performActions(player, EquipmentSlot.HAND)
+        
         return result.toNms()
     }
     
-    /**
-     * Uses the block of [state] at [pos] by itself, without using an item.
-     */
-    fun use(
-        pos: BlockPos,
-        state: NovaBlockState,
-        ctx: Context<BlockInteract>
-    ): InteractionResult = runSafely("use", InteractionResult.Fail) {
-        for (behavior in behaviors) {
-            val result = behavior.use(pos, state, ctx)
-            if (result !is InteractionResult.Pass)
-                return result
+    override fun attack(
+        nmsBlockState: NmsBlockState,
+        nmsLevel: Level,
+        nmsPos: NmsBlockPos,
+        nmsPlayer: NmsPlayer
+    ) {
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
+        val ctx = Context.intention(BlockBreak)
+            .param(BlockBreak.BLOCK, block)
+            .param(BlockBreak.BLOCK_STATE, blockState)
+            .param(BlockBreak.SOURCE_ENTITY, nmsPlayer.bukkitEntity)
+            .build()
+        
+        runSafely("handle attack") {
+            behaviors.forEach { it.handleAttack(block, blockState, ctx) }
         }
-        return InteractionResult.Pass
     }
     
-    /**
-     * Handles attack (left-click) on a block of [state] at [pos] with the given [ctx].
-     */
-    fun handleAttack(
-        pos: BlockPos,
-        state: NovaBlockState,
-        ctx: Context<BlockBreak>
-    ): Unit = runSafely("handle attack") {
-        behaviors.forEach { it.handleAttack(pos, state, ctx) }
+    fun nmsHandlePlace(
+        nmsBlockState: NmsBlockState,
+        nmsLevel: Level,
+        nmsPos: NmsBlockPos,
+        nmsOldBlockState: NmsBlockState
+    ) {
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
+        val ctx = ImplicitIntentions.BLOCK_PLACE.getOrNull()
+            ?: Context.intention(BlockPlace)
+                .param(BlockPlace.BLOCK, block)
+                .param(BlockPlace.BLOCK_STATE, blockState)
+                .param(BlockPlace.PREVIOUS_BLOCK_STATE, nmsOldBlockState.bukkitBlockData)
+                .build()
+        
+        handlePlace(block, blockState, ctx)
     }
     
     /**
      * Handles the placement of a block of [state] at [pos] with the given [ctx].
      */
-    open fun handlePlace(
-        pos: BlockPos,
+    protected fun handlePlace(
+        block: BukkitBlock,
         state: NovaBlockState,
         ctx: Context<BlockPlace>
     ): Unit = runSafely("handle place") {
-        state.modelProvider.set(pos, ctx[BlockPlace.BLOCK_UPDATE_METHOD])
-        behaviors.forEach { it.handlePlace(pos, state, ctx) }
+        modelProviders.get()[state.nmsBlockState]?.load(block)
+        behaviors.forEach { it.handlePlace(block, state, ctx) }
+    }
+    
+    fun nmsHandleStateChange(
+        nmsOldBlockState: NmsBlockState,
+        nmsNewBlockState: NmsBlockState,
+        nmsLevel: Level,
+        nmsPos: NmsBlockPos
+    ) {
+        val providers = modelProviders.get()
+        val oldProvider = providers[nmsOldBlockState] ?: return
+        val newProvider = providers[nmsNewBlockState] ?: return
+        newProvider.replace(nmsPos.toBlock(nmsLevel.world), oldProvider)
+    }
+    
+    fun nmsHandleBreak(
+        nmsBlockState: NmsBlockState,
+        nmsLevel: Level,
+        nmsPos: NmsBlockPos,
+        nmsNewBlockState: NmsBlockState // TODO: expose this or not?
+    ) {
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
+        val ctx = ImplicitIntentions.BLOCK_BREAK.getOrNull() // TODO: also look for block place implicit intention as that can cause replacement -> break
+            ?: Context.intention(BlockBreak)
+                .param(BlockBreak.BLOCK, block)
+                .param(BlockBreak.BLOCK_STATE, blockState)
+                .build()
+        
+        handleBreak(block, blockState, ctx)
     }
     
     /**
      * Handles the destruction of a block of [state] at [pos] with the given [ctx].
      */
-    open fun handleBreak(
-        pos: BlockPos,
+    protected fun handleBreak(
+        block: BukkitBlock,
         state: NovaBlockState,
         ctx: Context<BlockBreak>
     ): Unit = runSafely("handle break") {
-        state.modelProvider.remove(pos, ctx[BlockBreak.BLOCK_UPDATE_METHOD])
-        if (state[DefaultBlockStateProperties.WATERLOGGED] == true)
-            pos.block.type = Material.WATER
-        behaviors.forEach { it.handleBreak(pos, state, ctx) }
+        modelProviders.get()[state.nmsBlockState]?.unload(block)
+        behaviors.forEach { it.handleBreak(block, state, ctx) }
     }
     
-    /**
-     * Called when a redstone update happened that may affect this [state] at [pos].
-     */
-    fun handleNeighborChanged(
-        pos: BlockPos,
-        state: NovaBlockState
-    ): Unit = runSafely("handle neighbor changed") {
-        behaviors.forEach { it.handleNeighborChanged(pos, state) }
+    override fun neighborChanged(
+        nmsBlockState: NmsBlockState,
+        nmsLevel: Level,
+        nmsPos: NmsBlockPos,
+        nmsBlock: Block,
+        nmsOrientation: Orientation?,
+        movedByPiston: Boolean
+    ) {
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
+        runSafely("handle neighbor changed") {
+            behaviors.forEach { it.handleNeighborChanged(block, blockState) }
+        }
     }
     
-    /**
-     * Called when a block at [neighborPos] changed to update the [NovaBlockState] of this [state] at [pos].
-     */
-    fun updateShape(
-        pos: BlockPos,
-        state: NovaBlockState,
-        neighborPos: BlockPos
-    ): NovaBlockState = runSafely("update shape", state) {
-        return behaviors.fold(state) { acc, behavior -> behavior.updateShape(pos, acc, neighborPos) }
+    override fun updateShape(
+        nmsBlockState: NmsBlockState,
+        nmsLevel: LevelReader,
+        nmsTickAccess: ScheduledTickAccess,
+        nmsPos: NmsBlockPos,
+        nmsDirectionToNeighbour: Direction,
+        nmsNeighbourPos: NmsBlockPos,
+        nmsNeighbourState: NmsBlockState,
+        nmsRandom: RandomSource
+    ): NmsBlockState {
+        if (nmsLevel !is ServerLevel)
+            return nmsBlockState // TODO: Find a good way to handle non-server level (e.g. during some early world gen)
+        
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState: NovaBlockState = NovaBlockStateImpl(nmsBlockState)
+        val neighborBlock = nmsNeighbourPos.toBlock(nmsLevel.world)
+        val neighborBlockState = nmsNeighbourState.bukkitBlockData
+        return runSafely("update shape", blockState) {
+            behaviors.fold(blockState) { acc, behavior -> behavior.updateShape(block, acc, neighborBlock, neighborBlockState) }
+        }.nmsBlockState
     }
     
-    /**
-     * Handles a random tick for a block of [state] at [pos].
-     */
-    fun handleRandomTick(
-        pos: BlockPos,
-        state: NovaBlockState
-    ): Unit = runSafely("handle random tick") {
-        behaviors.forEach { it.handleRandomTick(pos, state) }
+    override fun randomTick(
+        nmsBlockState: NmsBlockState,
+        nmsLevel: ServerLevel,
+        nmsPos: NmsBlockPos,
+        nmsRandom: RandomSource
+    ) {
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
+        runSafely("handle random tick") {
+            behaviors.forEach { it.handleRandomTick(block, blockState) }
+        }
     }
     
-    /**
-     * Handles a scheduled tick for a block of [state] at [pos].
-     */
-    fun handleScheduledTick(
-        pos: BlockPos,
-        state: NovaBlockState
-    ): Unit = runSafely("handle scheduled tick") {
-        behaviors.forEach { it.handleScheduledTick(pos, state) }
+    override fun tick(
+        nmsBlockState: NmsBlockState,
+        nmsLevel: ServerLevel,
+        nmsPos: NmsBlockPos,
+        nmsRandom: RandomSource
+    ) {
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
+        runSafely("handle scheduled tick") {
+            behaviors.forEach { it.handleScheduledTick(block, blockState) }
+        }
     }
     
-    /**
-     * Called when an [entity] is inside a block of [state] at [pos].
-     */
-    fun handleEntityInside(
-        pos: BlockPos,
-        state: NovaBlockState,
-        entity: Entity
-    ): Unit = runSafely("handle entity inside") {
-        return behaviors.forEach { it.handleEntityInside(pos, state, entity) }
+    override fun isRandomlyTicking(nmsBlockState: NmsBlockState): Boolean {
+        val blockState = NovaBlockStateImpl(nmsBlockState)
+        return behaviors.any { it.ticksRandomly(blockState) }
+    }
+    
+    override fun entityInside(
+        nmsBlockState: NmsBlockState,
+        nmsLevel: Level,
+        nmsPos: NmsBlockPos,
+        nmsEntity: NmsEntity,
+        nmsEffectApplier: InsideBlockEffectApplier,
+        isPrecise: Boolean
+    ) {
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
+        val entity = nmsEntity.bukkitEntity
+        runSafely("handle entity inside") {
+            return behaviors.forEach { it.handleEntityInside(block, blockState, entity) }
+        }
     }
     
     /**
      * Retrieves the items that would be dropped when breaking a block of [state] at [pos] with the given [ctx].
      */
     fun getDrops(
-        pos: BlockPos,
+        block: BukkitBlock,
         state: NovaBlockState,
         ctx: Context<BlockBreak>
     ): List<ItemStack> = runSafely("get drops", emptyList()) {
-        return behaviors.flatMap { it.getDrops(pos, state, ctx) }
+        return behaviors.flatMap { it.getDrops(block, state, ctx) }
+    }
+    
+    override fun getExpDrop(
+        nmsBlockState: NmsBlockState,
+        nmsLevel: ServerLevel,
+        nmsPos: NmsBlockPos,
+        nmsTool: NmsItemStack,
+        dropExperience: Boolean
+    ): Int {
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
+        val ctx = ImplicitIntentions.BLOCK_BREAK.getOrNull()
+            ?: Context.intention(BlockBreak)
+                .param(BlockBreak.BLOCK, block)
+                .param(BlockBreak.BLOCK_STATE, blockState)
+                .param(BlockBreak.SOURCE_ENTITY, currentPacketSourcePlayer)
+                .param(BlockBreak.HELD_ITEM_STACK, nmsTool.asBukkitCopy())
+                .build()
+        
+        return getExp(block, blockState, ctx)
     }
     
     /**
      * Retrieves the amount of experience that would be dropped when breaking a block of [state] at [pos] with the given [ctx].
      */
     fun getExp(
-        pos: BlockPos,
+        block: BukkitBlock,
         state: NovaBlockState,
         ctx: Context<BlockBreak>
     ): Int = runSafely("get exp", 0) {
-        return behaviors.sumOf { it.getExp(pos, state, ctx) }
+        return behaviors.sumOf { it.getExp(block, state, ctx) }
     }
     
-    /**
-     * Chooses the [ItemStack] that should be given to the player when mid-clicking a block of [state] at [pos] with the given [ctx] in creative mode.
-     */
-    fun pickBlockCreative(
-        pos: BlockPos,
-        state: NovaBlockState,
-        ctx: Context<BlockInteract>
-    ): ItemStack? = runSafely("pick block creative", { item?.createItemStack() }) {
-        return behaviors.firstNotNullOfOrNull { it.pickBlockCreative(pos, state, ctx) } ?: item?.createItemStack()
+    override fun getCloneItemStack(
+        nmsLevel: LevelReader,
+        nmsPos: NmsBlockPos,
+        nmsBlockState: NmsBlockState,
+        includeData: Boolean
+    ): NmsItemStack {
+        if (nmsLevel !is ServerLevel) // shouldn't be possible
+            return NmsItemStack.EMPTY
+        
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
+        val ctx = Context.intention(BlockInteract)
+            .param(BlockInteract.BLOCK, block)
+            .param(BlockInteract.BLOCK_STATE, blockState)
+            .param(BlockInteract.INCLUDE_DATA, includeData)
+            .param(BlockInteract.SOURCE_ENTITY, currentPacketSourcePlayer)
+            .build()
+        
+        return runSafely("pick block creative", { item?.createItemStack() }) {
+            behaviors.firstNotNullOfOrNull { it.pickBlockCreative(block, blockState, ctx) } ?: item?.createItemStack()
+        }.unwrap()
     }
     
     private inline fun runSafely(name: String, run: () -> Unit) = runSafely(name, Unit, run)
@@ -457,6 +678,14 @@ open class NovaBlock internal constructor(
     }
     //</editor-fold>
     
-    override fun toString(): String = key.toString()
+    override fun toString(): String = key.asString()
+    
+    companion object {
+        
+        // hack to make properties available in createBlockStateDefinition 
+        // (called from super constructor, where a field wouldn't be initialized yet)
+        val STATE_PROPERTIES: ScopedValue<List<BlockStateProperty<*>>> = ScopedValue.newInstance()
+        
+    }
     
 }

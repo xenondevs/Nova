@@ -9,7 +9,6 @@ import net.kyori.adventure.key.Key
 import org.bukkit.Keyed
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.UnstableProviderApi
-import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.provider
 
 /**
@@ -18,8 +17,6 @@ import xyz.xenondevs.commons.provider.provider
  * Comparable, naturally ordered by registry key and then by entry key.
  * 
  * Two registry entries are considered equal `==` iff their registries and keys match.
- * A [RegistryEntry.Either] is equal to both the corresponding [RegistryEntry.Nova] and [RegistryEntry.Paper],
- * even though it only resolves to one of them.
  */
 sealed interface RegistryEntry<out T : Keyed> : Provider<T>, Comparable<RegistryEntry<@UnsafeVariance T>> {
     
@@ -57,82 +54,7 @@ sealed interface RegistryEntry<out T : Keyed> : Provider<T>, Comparable<Registry
         
     }
     
-    /**
-     * Represents a key-value pair that can be from either a Nova registry or a Paper registry.
-     * [N] and [P] should be corresponding concepts like `NovaItem` and `ItemType`.
-     * 
-     * Comparable, naturally ordered by nova registry key and then by entry key.
-     */
-    sealed interface Either<out N : NovaRegistryElement<N>, out P : Keyed> : RegistryEntry<Keyed> {
-        
-        /**
-         * The Nova registry that this entry may belong to.
-         */
-        val novaRegistry: NovaRegistry<N>
-        
-        /**
-         * The key of the Paper registry that this entry may belong to.
-         */
-        val paperRegistry: RegistryKey<@UnsafeVariance P>
-        
-    }
-    
     companion object {
-        
-        /**
-         * Returns an [Either] for [key] that is either in [novaRegistry] or in [paperRegistry] from [registryAccess].
-         * If the key is in both registries, the Nova registry will take precedence.
-         * 
-         * * If this function is called during bootstrap and the key exists in neither registry,
-         *   an erroneous [Either] is returned that throws [NoSuchElementException] when trying to resolve it.
-         *   Additionally, server startup will fail.
-         * * If this function is called after bootstrap and the key exists in neither registry,
-         *   a [NoSuchElementException] is thrown immediately.
-         */
-        fun <N : NovaRegistryElement<N>, P : Keyed> either(
-            key: Key,
-            novaRegistry: NovaRegistry<N>,
-            paperRegistry: RegistryKey<P>,
-            registryAccess: RegistryAccess = RegistryAccess.registryAccess()
-        ): Either<N, P> {
-            if (RegistryContext.isInBootstrapPhase) {
-                val typedKey = TypedKey.create(paperRegistry, key)
-                val entry = EitherRegistryEntry(
-                    key,
-                    novaRegistry,
-                    paperRegistry,
-                    combinedProvider(
-                        novaRegistry.getOptional(key),
-                        optionalPaper(typedKey, registryAccess)
-                    ) { nova, paper -> nova ?: paper }.flatMap {
-                        it ?: throw NoSuchElementException("Key $key not found in either ${novaRegistry.key.asString()} or ${paperRegistry.key().asString()}")
-                    }
-                )
-                RegistryContext.trackUnresolvedEntry(typedKey, novaRegistry, registryAccess)
-                return entry
-            } else {
-                if (key in novaRegistry) {
-                    val novaEntry = novaRegistry[key]
-                    return EitherRegistryEntry(key, novaRegistry, paperRegistry, novaEntry)
-                } else {
-                    val paperValue = registryAccess.getRegistry(paperRegistry).get(key)
-                        ?: throw NoSuchElementException("No element under ${key.asString()} in registry ${novaRegistry.key.asString()} or ${paperRegistry.key().asString()}")
-                    return EitherRegistryEntry(key, novaRegistry, paperRegistry, provider(paperValue))
-                }
-            }
-        }
-        
-        /**
-         * Returns an [Either] with the value [nova] and the unused [paperRegistry].
-         */
-        fun <N : NovaRegistryElement<N>, P : Keyed> either(nova: Nova<N>, paperRegistry: RegistryKey<P>): Either<N, P> =
-            EitherRegistryEntry(nova.key, nova.registry, paperRegistry, nova.delegate)
-        
-        /**
-         * Returns an [Either] with the value [paper] and the unused [novaRegistry].
-         */
-        fun <N : NovaRegistryElement<N>, P : Keyed> either(novaRegistry: NovaRegistry<N>, paper: Paper<P>): Either<N, P> =
-            EitherRegistryEntry(paper.key, novaRegistry, paper.registry, paper.delegate)
         
         /**
          * Returns a [RegistryEntry.Paper] for the given [key], lazily resolving from [registryAccess].
@@ -188,57 +110,6 @@ sealed interface RegistryEntry<out T : Keyed> : Provider<T>, Comparable<Registry
 }
 
 /**
- * [Maps][Provider.map] the value of this registry entry to a value of type [R] using either [transformNova] or [transformPaper],
- * depending on whether the entry is from a Nova registry or a Paper registry.
- */
-inline fun <reified N : NovaRegistryElement<N>, reified P : Keyed, R> RegistryEntry.Either<N, P>.map(
-    crossinline transformNova: (N) -> R,
-    crossinline transformPaper: (P) -> R
-): Provider<R> = map { value ->
-    when (value) {
-        is N -> transformNova(value)
-        is P -> transformPaper(value)
-        else -> throw AssertionError("Value $value is neither ${N::class.java} nor ${P::class.java}")
-    }
-}
-
-/**
- * [Flat-maps][Provider.flatMap] the value of this registry entry to a value of type [R] using either [transformNova] or [transformPaper],
- * depending on whether the entry is from a Nova registry or a Paper registry.
- */
-inline fun <reified N : NovaRegistryElement<N>, reified P : Keyed, R> RegistryEntry.Either<N, P>.flatMap(
-    crossinline transformNova: (N) -> Provider<R>,
-    crossinline transformPaper: (P) -> Provider<R>
-): Provider<R> = flatMap { value ->
-    when (value) {
-        is N -> transformNova(value)
-        is P -> transformPaper(value)
-        else -> throw AssertionError("Value $value is neither ${N::class.java} nor ${P::class.java}")
-    }
-}
-
-/**
- * Flat-maps the value of this registry entry to a value of type [R] using either [transformNova] or [transformPaper],
- * depending on whether the entry is from a Nova registry or a Paper registry.
- * During [bootstrap phase][RegistryContext.isInBootstrapPhase], uses [Provider.flatMap], otherwise [Provider.immediateFlatMap].
- * This allows creating flat-mapped providers based off of [RegistryEntries][RegistryEntry] lazily during bootstrap phase,
- * where resolving their value is not possible, without paying for the extra overhead post-bootstrap, where [immediateFlatMap] can be used.
- * 
- * The idea behind this is that for non-reloadable registries, [immediateFlatMap] basically just calls `transform(get())`, so no intemediate
- * flat-mapping provider needs to be created. For reloadable registries, the difference behind [flatMap] and [immediateFlatMap] should be negligible.
- */
-inline fun <reified N : NovaRegistryElement<N>, reified P : Keyed, R> RegistryEntry.Either<N, P>.bootstrapFlatMap(
-    crossinline transformNova: (N) -> Provider<R>,
-    crossinline transformPaper: (P) -> Provider<R>
-): Provider<R> = bootstrapFlatMap { value ->
-    when (value) {
-        is N -> transformNova(value)
-        is P -> transformPaper(value)
-        else -> throw AssertionError("Value $value is neither ${N::class.java} nor ${P::class.java}")
-    }
-}
-
-/**
  * Flat-maps the value of this provider via [transform].
  * During [bootstrap phase][RegistryContext.isInBootstrapPhase], uses [Provider.flatMap], otherwise [Provider.immediateFlatMap].
  * This allows creating flat-mapped providers based off of [RegistryEntries][RegistryEntry] lazily during bootstrap phase,
@@ -264,7 +135,6 @@ fun <T> Provider<Provider<T>>.bootstrapFlatten(): Provider<T> = bootstrapFlatMap
 private fun comparisonRegistryKey(entry: RegistryEntry<*>): Key = when (entry) {
     is RegistryEntry.Paper -> entry.key.registryKey().key()
     is RegistryEntry.Nova -> entry.registry.key
-    is RegistryEntry.Either<*, *> -> entry.novaRegistry.key
 }
 
 private class PaperRegistryEntry<T : Keyed>(
@@ -279,9 +149,6 @@ private class PaperRegistryEntry<T : Keyed>(
         return other === this ||
             (other is RegistryEntry.Paper<*>
                 && other.registry == registry
-                && symmetricKeyEquals(other.key, key)) ||
-            (other is RegistryEntry.Either<*, *>
-                && other.paperRegistry == registry
                 && symmetricKeyEquals(other.key, key))
     }
     
@@ -308,9 +175,6 @@ internal class NovaRegistryEntry<T : NovaRegistryElement<T>>(
         return other === this ||
             (other is RegistryEntry.Nova<*>
                 && other.registry == registry
-                && symmetricKeyEquals(other.key, key)) ||
-            (other is RegistryEntry.Either<*, *>
-                && other.novaRegistry == registry
                 && symmetricKeyEquals(other.key, key))
     }
     
@@ -324,40 +188,6 @@ internal class NovaRegistryEntry<T : NovaRegistryElement<T>>(
     }
     
     override fun toString(): String = "${registry.key.asString()}/${key.asString()}"
-    
-}
-
-private class EitherRegistryEntry<N : NovaRegistryElement<N>, P : Keyed>(
-    override val key: Key,
-    override val novaRegistry: NovaRegistry<N>,
-    override val paperRegistry: RegistryKey<P>,
-    override val delegate: Provider<Keyed>
-) : RegistryEntry.Either<N, P>, Provider<Keyed> by delegate {
-    
-    override fun equals(other: Any?): Boolean {
-        return other === this ||
-            (other is RegistryEntry.Either<*, *>
-                && other.novaRegistry == novaRegistry
-                && other.paperRegistry == paperRegistry
-                && symmetricKeyEquals(other.key, key)) ||
-            (other is RegistryEntry.Nova<*>
-                && other.registry == novaRegistry
-                && symmetricKeyEquals(other.key, key)) ||
-            (other is RegistryEntry.Paper<*>
-                && other.registry == paperRegistry
-                && symmetricKeyEquals(other.key, key))
-    }
-    
-    override fun hashCode(): Int = symmetricKeyHashCode(key)
-    
-    override fun compareTo(other: RegistryEntry<Keyed>): Int {
-        val registryComparison = novaRegistry.key.compareTo(comparisonRegistryKey(other))
-        if (registryComparison != 0)
-            return registryComparison
-        return key.compareTo(other.key)
-    }
-    
-    override fun toString(): String = "${novaRegistry.key.asString()}|${paperRegistry.key().asString()}/${key.asString()}"
     
 }
 

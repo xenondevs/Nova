@@ -4,9 +4,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.entries.ItemTypeEntries
-import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.asEither
-import xyz.xenondevs.nova.world.item.mapToItemStack
 
 /**
  * A type of fluid.
@@ -19,14 +16,14 @@ enum class FluidType(
     /**
      * The bucket item type of the fluid.
      */
-    val bucketType: RegistryEntry.Either<NovaItem, ItemType>
+    val bucketType: RegistryEntry.Paper<ItemType>
 ) {
     
-    WATER("block.minecraft.water", ItemTypeEntries.WATER_BUCKET.asEither()),
-    LAVA("block.minecraft.lava", ItemTypeEntries.LAVA_BUCKET.asEither());
+    WATER("block.minecraft.water", ItemTypeEntries.WATER_BUCKET),
+    LAVA("block.minecraft.lava", ItemTypeEntries.LAVA_BUCKET);
     
     private val _bucket: ItemStack
-        by bucketType.mapToItemStack()
+        by bucketType.map { it.createItemStack() }
     
     /**
      * An item stack representing a bucket of this fluid.

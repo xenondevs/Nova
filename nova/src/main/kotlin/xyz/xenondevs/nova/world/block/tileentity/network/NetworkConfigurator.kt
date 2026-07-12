@@ -178,7 +178,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
         val owner = node.owner
         return if (owner != null) {
             val results = CUBE_FACES.mapToArray { face ->
-                ProtectionManager.canUseBlockAsync(owner, null, node.pos.advance(face, 1))
+                ProtectionManager.canUseBlockAsync(owner, null, node.block.getRelative(face))
             }
             
             CompletableFuture.allOf(*results).thenApply {

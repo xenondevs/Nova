@@ -3,9 +3,11 @@ package xyz.xenondevs.nova.world.item.recipe
 import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
-import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.world.item.itemType
+import xyz.xenondevs.nova.world.item.novaItem
 
 interface ItemTest {
     fun test(item: ItemStack): Boolean
@@ -19,10 +21,10 @@ interface MultiItemTest : ItemTest {
     val examples: List<ItemStack>
 }
 
-class VanillaMaterialTest(private val type: Material, override val example: ItemStack) : SingleItemTest {
+class ItemTypeTest(private val type: ItemType, override val example: ItemStack = type.createItemStack()) : SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return item.type == type && item.novaItem == null
+        return item.itemType == type
     }
     
 }
@@ -38,7 +40,7 @@ class TagTest(private val tag: Tag<Material>, override val examples: List<ItemSt
 class NovaIdTest(private val id: String, override val example: ItemStack) : SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return item.novaItem?.key.toString() == id
+        return item.novaItem?.key?.asString() == id
     }
     
 }

@@ -27,31 +27,11 @@ interface RegistryContext {
     )
     
     /**
-     * Remembers that an unresolved either registry entry or tag for [key] was created during bootstrap which
-     * needs to be present to complete server startup.
-     */
-    fun <N : NovaRegistryElement<N>, T : Keyed> trackUnresolvedEntry(
-        key: TypedKey<T>,
-        novaRegistry: NovaRegistry<N>,
-        registryAccess: RegistryAccess
-    )
-    
-    /**
      * Remembers that an unresolved registry entry set for [key] was created during bootstrap which
      * needs to be present to complete server startup.
      */
     fun <T : Keyed> trackUnresolvedTag(
         key: TagKey<T>,
-        registryAccess: RegistryAccess
-    )
-    
-    /**
-     * Remembers that an unresolved mixed registry entry set for [key] was created during bootstrap which
-     * needs to be present to complete server startup.
-     */
-    fun <N : NovaRegistryElement<N>, T : Keyed> trackUnresolvedTag(
-        key: TagKey<T>,
-        novaRegistry: NovaRegistry<N>,
         registryAccess: RegistryAccess
     )
     

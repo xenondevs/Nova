@@ -42,7 +42,7 @@ internal class LoadChunkTask(
     override suspend fun run(): Boolean {
         val updatedNetworks = HashMap<ProtoNetwork<*>, MutableSet<NetworkNode>>()
         
-        val chunkNodes = NetworkManager.getNodes(chunkPos).associateByTo(HashMap(), NetworkNode::pos)
+        val chunkNodes = NetworkManager.getNodes(chunkPos).associateByTo(HashMap(), NetworkNode::block)
         val networkChunk = state.storage.getOrLoadRegionizedChunk(chunkPos)
         val networkNodes = networkChunk.getData()
         

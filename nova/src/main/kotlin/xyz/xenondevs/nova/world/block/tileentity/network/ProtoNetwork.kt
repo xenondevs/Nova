@@ -6,7 +6,7 @@ import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
-import xyz.xenondevs.nova.world.BlockPos
+import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.MutableNetworkNodeConnection
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
@@ -23,7 +23,7 @@ class ProtoNetwork<T : Network<T>>(
     private val state: NetworkState,
     override val type: NetworkType<T>,
     override val uuid: UUID = UUID.randomUUID(),
-    override val nodes: MutableMap<BlockPos, MutableNetworkNodeConnection> = HashMap()
+    override val nodes: MutableMap<Block, MutableNetworkNodeConnection> = HashMap()
 ) : NetworkData<T> {
     
     /**
@@ -51,7 +51,7 @@ class ProtoNetwork<T : Network<T>>(
     fun addAll(network: NetworkData<T>) {
         for ((node, faces) in network.nodes.values) {
             require(node !is GhostNetworkNode)
-            val myFaces = this.nodes.getOrPut(node.pos) { MutableNetworkNodeConnection(node) }.faces
+            val myFaces = this.nodes.getOrPut(node.block) { MutableNetworkNodeConnection(node) }.faces
             myFaces += faces
         }
         markDirty()
@@ -62,62 +62,62 @@ class ProtoNetwork<T : Network<T>>(
      */
     fun addBridge(bridge: NetworkBridge) {
         require(bridge !is GhostNetworkNode)
-        nodes[bridge.pos] = MutableNetworkNodeConnection(bridge, Collections.emptySet())
+        nodes[bridge.block] = MutableNetworkNodeConnection(bridge, Collections.emptySet())
         markDirty()
     }
     
     /**
-     * Adds [face] to the [NetworkEndPoint] at [endPoint.pos][NetworkEndPoint.pos],
+     * Adds [face] to the [NetworkEndPoint] at [endPoint.pos][NetworkEndPoint.block],
      * or adds [endPoint] and [face] to the [ProtoNetwork].
      *
      * @return - `true` if the [endPoint] was added to the [ProtoNetwork]
-     * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.pos]
+     * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.block]
      */
     fun addEndPoint(endPoint: NetworkNode, face: BlockFace): Boolean {
         require(endPoint !is GhostNetworkNode)
-        val presentFaces = nodes[endPoint.pos]?.faces
+        val presentFaces = nodes[endPoint.block]?.faces
         if (presentFaces != null) {
             if (presentFaces.add(face)) {
                 markDirty()
             }
             return false
         } else {
-            nodes[endPoint.pos] = MutableNetworkNodeConnection(endPoint, EnumSet.of(face))
+            nodes[endPoint.block] = MutableNetworkNodeConnection(endPoint, EnumSet.of(face))
             markDirty()
             return true
         }
     }
     
     /**
-     * Adds [faces] to the [NetworkEndPoint] at [endPoint.pos][NetworkEndPoint.pos],
+     * Adds [faces] to the [NetworkEndPoint] at [endPoint.pos][NetworkEndPoint.block],
      * or adds [endPoint] and [faces] to the [ProtoNetwork].
      *
      * @return - `true` if the [endPoint] was added to the [ProtoNetwork]
-     * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.pos]
+     * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.block]
      */
     fun addEndPoint(endPoint: NetworkNode, faces: Set<BlockFace>): Boolean {
         require(endPoint !is GhostNetworkNode)
-        val presentFaces = nodes[endPoint.pos]?.faces
+        val presentFaces = nodes[endPoint.block]?.faces
         if (presentFaces != null) {
             if (presentFaces.addAll(faces)) {
                 markDirty()
             }
             return false
         } else {
-            nodes[endPoint.pos] = MutableNetworkNodeConnection(endPoint, faces.toEnumSet())
+            nodes[endPoint.block] = MutableNetworkNodeConnection(endPoint, faces.toEnumSet())
             markDirty()
             return true
         }
     }
     
     /**
-     * Remove the [NetworkNode] at [node.pos][NetworkNode.pos] from this [ProtoNetwork].
+     * Remove the [NetworkNode] at [node.pos][NetworkNode.block] from this [ProtoNetwork].
      *
      * @return - `true` if the [node] was removed
-     * - `false` if there was no [NetworkNode] at [node.pos][NetworkNode.pos]
+     * - `false` if there was no [NetworkNode] at [node.pos][NetworkNode.block]
      */
     fun removeNode(node: NetworkNode): Boolean {
-        if (nodes.remove(node.pos) != null) {
+        if (nodes.remove(node.block) != null) {
             markDirty()
             return true
         }
@@ -126,13 +126,13 @@ class ProtoNetwork<T : Network<T>>(
     
     /**
      * Removes a [face] through which the [NetworkEndPoint] at
-     * [endPoint.pos][NetworkEndPoint.pos] connects to this [ProtoNetwork].
+     * [endPoint.pos][NetworkEndPoint.block] connects to this [ProtoNetwork].
      *
      * @return - `true` if [endPoint] was completely removed from this [ProtoNetwork]
      * - `false` if [endPoint] is still connected through other faces
      */
     fun removeFace(endPoint: NetworkEndPoint, face: BlockFace): Boolean {
-        val presentFaces = nodes[endPoint.pos]?.faces
+        val presentFaces = nodes[endPoint.block]?.faces
             ?: return false
         
         if (presentFaces.remove(face)) {
@@ -140,7 +140,7 @@ class ProtoNetwork<T : Network<T>>(
         }
         
         if (presentFaces.isEmpty()) {
-            nodes -= endPoint.pos
+            nodes -= endPoint.block
             return true
         }
         
@@ -152,7 +152,7 @@ class ProtoNetwork<T : Network<T>>(
      */
     fun removeAll(nodes: Set<NetworkNode>) {
         for (node in nodes) {
-            this.nodes -= node.pos
+            this.nodes -= node.block
         }
         markDirty()
     }

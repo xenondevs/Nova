@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.ui.menu
 
+import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.gui.Markers
 import xyz.xenondevs.invui.gui.Structure

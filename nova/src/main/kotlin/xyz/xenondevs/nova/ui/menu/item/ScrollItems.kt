@@ -16,7 +16,7 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.ui.menu.LEGACY_NON_DSL_INVUI_DEPRECATION
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
-import xyz.xenondevs.nova.world.item.clientsideProvider
+import xyz.xenondevs.nova.world.item.itemProvider
 
 /**
  * A UI item for decrementing the [line][ScrollGuiDsl.line] of the gui from the context on left-click.
@@ -24,8 +24,8 @@ import xyz.xenondevs.nova.world.item.clientsideProvider
  */
 context(dsl: ScrollGuiDsl<*>)
 fun scrollUpItem(
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_UP_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_UP_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_UP_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_UP_OFF.itemProvider
 ): Item = scrollUpItem(dsl.line, on, off)
 
 /**
@@ -34,8 +34,8 @@ fun scrollUpItem(
  */
 context(dsl: ScrollGuiDsl<*>)
 fun scrollLeftItem(
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_OFF.itemProvider
 ): Item = scrollLeftItem(dsl.line, on, off)
 
 /**
@@ -54,8 +54,8 @@ fun scrollUpItem(
  */
 context(dsl: ScrollGuiDsl<*>)
 fun scrollDownItem(
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_DOWN_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_DOWN_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_DOWN_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_DOWN_OFF.itemProvider
 ): Item = scrollDownItem(dsl.line, dsl.maxLine, on, off)
 
 /**
@@ -65,8 +65,8 @@ fun scrollDownItem(
  */
 context(dsl: ScrollGuiDsl<*>)
 fun scrollRightItem(
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_OFF.itemProvider
 ): Item = scrollRightItem(dsl.line, dsl.maxLine, on, off)
 
 /**
@@ -84,8 +84,8 @@ fun scrollDownItem(
  */
 fun scrollUpItem(
     line: MutableProvider<Int>,
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_UP_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_UP_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_UP_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_UP_OFF.itemProvider
 ): Item = scrollUpItem(
     line,
     combinedProvider(
@@ -99,8 +99,8 @@ fun scrollUpItem(
  */
 fun scrollLeftItem(
     line: MutableProvider<Int>,
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_OFF.itemProvider
 ): Item = scrollUpItem(
     line,
     combinedProvider(
@@ -132,8 +132,8 @@ fun scrollUpItem(
 fun scrollDownItem(
     line: MutableProvider<Int>,
     maxLine: Provider<Int>,
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_DOWN_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_DOWN_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_DOWN_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_DOWN_OFF.itemProvider
 ): Item = scrollDownItem(
     line,
     maxLine,
@@ -149,8 +149,8 @@ fun scrollDownItem(
 fun scrollRightItem(
     line: MutableProvider<Int>,
     maxLine: Provider<Int>,
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_OFF.itemProvider
 ): Item = scrollDownItem(
     line,
     maxLine,
@@ -182,8 +182,8 @@ fun scrollDownItem(
  */
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class ScrollUpItem(
-    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_UP_ON.clientsideProvider,
-    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_UP_OFF.clientsideProvider
+    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_UP_ON.itemProvider,
+    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_UP_OFF.itemProvider
 ) : AbstractScrollGuiBoundItem() {
     
     constructor(on: ItemProvider, off: ItemProvider) : this(provider(on), provider(off))
@@ -210,8 +210,8 @@ class ScrollUpItem(
  */
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class ScrollDownItem(
-    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_DOWN_ON.clientsideProvider,
-    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_DOWN_OFF.clientsideProvider
+    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_DOWN_ON.itemProvider,
+    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_DOWN_OFF.itemProvider
 ) : AbstractScrollGuiBoundItem() {
     
     constructor(on: ItemProvider, off: ItemProvider) : this(provider(on), provider(off))
@@ -238,8 +238,8 @@ class ScrollDownItem(
  */
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class ScrollLeftItem(
-    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_ON.clientsideProvider,
-    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_OFF.clientsideProvider
+    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_ON.itemProvider,
+    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_OFF.itemProvider
 ) : AbstractScrollGuiBoundItem() {
     
     constructor(on: ItemProvider, off: ItemProvider) : this(provider(on), provider(off))
@@ -266,8 +266,8 @@ class ScrollLeftItem(
  */
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class ScrollRightItem(
-    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_ON.clientsideProvider,
-    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_OFF.clientsideProvider
+    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_ON.itemProvider,
+    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_OFF.itemProvider
 ) : AbstractScrollGuiBoundItem() {
     
     constructor(on: ItemProvider, off: ItemProvider) : this(provider(on), provider(off))

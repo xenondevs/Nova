@@ -12,15 +12,15 @@ import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.dsl.ClickDsl
 import xyz.xenondevs.invui.dsl.item
+import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.ui.menu.LEGACY_NON_DSL_INVUI_DEPRECATION
-import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
-import xyz.xenondevs.nova.world.item.clientsideProvider
+import xyz.xenondevs.nova.world.item.itemProvider
 
 /**
  * A UI item for changing [number] by the following values:
@@ -58,7 +58,7 @@ fun changeNumberItem(
     val range by range
     
     onClick {
-        val targetNumber = (number + when(clickType) {
+        val targetNumber = (number + when (clickType) {
             ClickType.LEFT -> leftClick
             ClickType.SHIFT_LEFT -> shiftLeftClick
             ClickType.RIGHT -> rightClick
@@ -89,8 +89,8 @@ fun addNumberItem(
     number,
     localizedName
         ?.let { ln -> itemProvider(DefaultGuiItems.TP_PLUS_BTN_ON) { name by Component.translatable(ln) } }
-        ?: DefaultGuiItems.TP_PLUS_BTN_ON.clientsideProvider,
-    DefaultGuiItems.TP_PLUS_BTN_OFF.clientsideProvider
+        ?: DefaultGuiItems.TP_PLUS_BTN_ON.itemProvider,
+    DefaultGuiItems.TP_PLUS_BTN_OFF.itemProvider
 )
 
 /**
@@ -109,8 +109,8 @@ fun removeNumberItem(
     number,
     localizedName
         ?.let { ln -> itemProvider(DefaultGuiItems.TP_MINUS_BTN_ON) { name by Component.translatable(ln) } }
-        ?: DefaultGuiItems.TP_MINUS_BTN_ON.clientsideProvider,
-    DefaultGuiItems.TP_MINUS_BTN_OFF.clientsideProvider
+        ?: DefaultGuiItems.TP_MINUS_BTN_ON.itemProvider,
+    DefaultGuiItems.TP_MINUS_BTN_OFF.itemProvider
 )
 
 /**
@@ -187,8 +187,7 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
     
     override fun getItemProvider(player: Player): ItemProvider {
         val number = getNumber().coerceIn(0..999)
-        val builder = DefaultGuiItems.NUMBER.get()
-            .createClientsideItemBuilder()
+        val builder = ItemBuilder(DefaultGuiItems.NUMBER.get())
             .addCustomModelData(number)
         if (localizedName != null)
             builder.setName(Component.translatable(localizedName, Component.text(number)))
@@ -214,8 +213,8 @@ class AddNumberItem(
     setNumber,
     localizedName
         ?.let { ln -> itemProvider(DefaultGuiItems.PLUS_BTN_ON) { name by Component.translatable(ln) } }
-        ?: DefaultGuiItems.PLUS_BTN_ON.clientsideProvider,
-    DefaultGuiItems.PLUS_BTN_OFF.clientsideProvider
+        ?: DefaultGuiItems.PLUS_BTN_ON.itemProvider,
+    DefaultGuiItems.PLUS_BTN_OFF.itemProvider
 )
 
 @Suppress("DEPRECATION")
@@ -233,8 +232,8 @@ class RemoveNumberItem(
     setNumber,
     localizedName
         ?.let { ln -> itemProvider(DefaultGuiItems.MINUS_BTN_ON) { name by Component.translatable(ln) } }
-        ?: DefaultGuiItems.MINUS_BTN_ON.clientsideProvider,
-    DefaultGuiItems.MINUS_BTN_OFF.clientsideProvider
+        ?: DefaultGuiItems.MINUS_BTN_ON.itemProvider,
+    DefaultGuiItems.MINUS_BTN_OFF.itemProvider
 )
 
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)

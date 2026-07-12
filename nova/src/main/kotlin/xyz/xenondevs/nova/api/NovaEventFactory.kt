@@ -2,6 +2,8 @@
 
 package xyz.xenondevs.nova.api
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.event.tileentity.TileEntityBreakBlockEvent

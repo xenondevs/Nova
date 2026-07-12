@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ai.attributes.Attributes
 import org.bukkit.GameMode
 import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.craftbukkit.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -23,8 +24,6 @@ import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -36,15 +35,18 @@ import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.network.packetHandler
 import xyz.xenondevs.nova.network.send
+import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
-import xyz.xenondevs.nova.util.toNovaPos
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.util.toBlock
 import xyz.xenondevs.nova.world.block.behavior.Breakable
+import xyz.xenondevs.nova.world.block.blockType
+import xyz.xenondevs.nova.world.block.hasBehavior
+import xyz.xenondevs.nova.world.block.novaBlockState
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.max
@@ -68,10 +70,8 @@ internal object BlockBreaking : Listener, PacketListener {
         runTaskTimer(0, 1, BlockBreaking::handleTick)
     }
     
-    fun setBreakStage(pos: BlockPos, entityId: Int, stage: Int) {
-        val blockState = WorldDataManager.getBlockState(pos) ?: return
-        
-        val block = pos.block
+    fun setBreakStage(block: Block, entityId: Int, stage: Int) {
+        val blockState = block.novaBlockState ?: return
         var method = internalBreakers[entityId]
         
         // check that this is a valid stage, otherwise remove the current break effect
@@ -82,7 +82,7 @@ internal object BlockBreaking : Listener, PacketListener {
         }
         
         // check that the previous break effect is on that block, otherwise cancel the previous effect
-        if (method != null && method.pos != pos) {
+        if (method != null && method.block != block) {
             method.stop()
             method = null
             internalBreakers -= entityId
@@ -90,7 +90,7 @@ internal object BlockBreaking : Listener, PacketListener {
         
         // create a new break method if there isn't one
         if (method == null) {
-            method = BreakMethod.of(block, blockState.block, entityId) as? VisibleBreakMethod ?: return
+            method = BreakMethod.of(block, blockState.novaBlock, entityId) as? VisibleBreakMethod ?: return
             internalBreakers[entityId] = method
         }
         
@@ -134,11 +134,11 @@ internal object BlockBreaking : Listener, PacketListener {
         }
     }
     
-    private fun handleDestroyStart(player: Player, packet: ServerboundPlayerActionPacket, pos: BlockPos, direction: Direction, sequence: Int) {
+    private fun handleDestroyStart(player: Player, packet: ServerboundPlayerActionPacket, block: Block, direction: Direction, sequence: Int) {
         // pass packet further down the pipeline if:
         // - the block is from a custom item service
         // - the player is using a debug stick
-        if (CustomItemServiceManager.getBlockType(pos.block) != null
+        if (CustomItemServiceManager.getBlockType(block) != null
             || (player.gameMode == GameMode.CREATIVE && player.inventory.itemInMainHand.type == Material.DEBUG_STICK)
         ) {
             player.packetHandler?.injectIncoming(packet)
@@ -151,7 +151,7 @@ internal object BlockBreaking : Listener, PacketListener {
         val event = CraftEventFactory.callPlayerInteractEvent(
             serverPlayer,
             Action.LEFT_CLICK_BLOCK,
-            pos.nmsPos,
+            block.nmsPos,
             direction,
             serverPlayer.inventory.selectedItem,
             InteractionHand.MAIN_HAND
@@ -162,34 +162,25 @@ internal object BlockBreaking : Listener, PacketListener {
         }
         
         // call block state attack (e.g. teleport dragon egg, play note block sound...)
-        val novaBlockState = WorldDataManager.getBlockState(pos)
         if (player.gameMode != GameMode.CREATIVE) {
-            if (novaBlockState != null) {
-                val ctx = Context.intention(BlockBreak)
-                    .param(BlockBreak.BLOCK_POS, pos)
-                    .param(BlockBreak.BLOCK_STATE_NOVA, novaBlockState)
-                    .param(BlockBreak.SOURCE_PLAYER, player)
-                    .build()
-                novaBlockState.block.handleAttack(pos, novaBlockState, ctx)
-            } else {
-                val serverLevel = pos.world.serverLevel
-                val nmsPos = pos.nmsPos
-                serverLevel.getBlockState(nmsPos).attack(serverLevel, nmsPos, player.serverPlayer)
-            }
+            val serverLevel = block.world.serverLevel
+            val nmsPos = block.nmsPos
+            serverLevel.getBlockState(nmsPos).attack(serverLevel, nmsPos, player.serverPlayer)
         }
         
         // start breaker
+        val novaBlockState = block.novaBlockState
         val breaker: BlockBreaker
         if (novaBlockState != null) {
             // don't do any breaking logic if the block doesn't have the breakable behavior
-            if (!novaBlockState.block.hasBehavior<Breakable>()) {
+            if (!novaBlockState.blockType.hasBehavior<Breakable>()) {
                 player.send(ClientboundBlockChangedAckPacket(sequence))
                 return
             }
             
-            breaker = NovaBlockBreaker(player, pos, novaBlockState, sequence, getBlockedUntil(player))
+            breaker = NovaBlockBreaker(player, block, novaBlockState, sequence, getBlockedUntil(player))
         } else {
-            breaker = VanillaBlockBreaker(player, pos, sequence, getBlockedUntil(player))
+            breaker = VanillaBlockBreaker(player, block, sequence, getBlockedUntil(player))
         }
         
         // creative breakers should not be added to the playerBreakers map because players in creative mode
@@ -226,7 +217,7 @@ internal object BlockBreaking : Listener, PacketListener {
     @PacketHandler
     private fun handlePlayerAction(event: ServerboundPlayerActionPacketEvent) {
         val player = event.player
-        val pos = event.pos.toNovaPos(player.world)
+        val pos = event.pos.toBlock(player.world)
         
         event.isCancelled = when (event.action) {
             START_DESTROY_BLOCK -> {

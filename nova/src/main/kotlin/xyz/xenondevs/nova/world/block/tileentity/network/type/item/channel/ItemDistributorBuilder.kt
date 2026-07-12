@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.item.channel
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.BlockFace
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.getOrSet

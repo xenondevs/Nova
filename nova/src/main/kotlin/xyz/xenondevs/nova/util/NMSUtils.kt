@@ -36,13 +36,17 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
 import net.minecraft.world.level.chunk.LevelChunk
 import net.minecraft.world.level.chunk.LevelChunkSection
+import net.minecraft.world.level.material.MapColor
+import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
+import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -52,6 +56,7 @@ import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockType
+import org.bukkit.block.PistonMoveReaction
 import org.bukkit.block.data.BlockData
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.CraftWorld
@@ -72,11 +77,12 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import org.bukkit.util.Vector
 import org.joml.Vector3d
+import xyz.xenondevs.invui.util.ColorPalette
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.migrator.BlockMigrator
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
@@ -91,7 +97,6 @@ import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.item.ItemUseAnimation as MojangItemUseAnimation
 import net.minecraft.world.level.block.Block as MojangBlock
-
 
 val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
 val REGISTRY_ACCESS: RegistryAccess by lazy { MINECRAFT_SERVER.registryAccess() }
@@ -113,9 +118,22 @@ val BlockData.nmsBlockState: BlockState
     get() = (this as CraftBlockData).state
 
 val BlockState.bukkitBlockData: BlockData
-    get() = CraftBlockData.createData(this)
+    get() = asBlockData()
 
-val Location.blockPos: MojangBlockPos
+internal fun BlockState.toPropertyStringMap(): Map<String, String> =
+    properties.associate { serializeProperty(this, it) }
+
+private fun <T : Comparable<T>> serializeProperty(state: BlockState, property: Property<T>): Pair<String, String> =
+    property.name to property.getName(state.getValue(property))
+
+internal fun Color?.toNmsMapColor(): MapColor {
+    if (this == null)
+        return MapColor.NONE
+    val packedColor = ColorPalette.getColor(this).toInt() and 0xFF
+    return MapColor.byId(packedColor shr 2)
+}
+
+val Location.Block: MojangBlockPos
     get() = MojangBlockPos(blockX, blockY, blockZ)
 
 val Location.vec3: Vec3
@@ -335,6 +353,15 @@ val Material.nmsBlock: MojangBlock
 val BlockType.nmsBlock: MojangBlock
     get() = (this as CraftBlockType<*>).handle
 
+val PistonMoveReaction.nmsPushReaction: PushReaction
+    get() = when (this) {
+        PistonMoveReaction.MOVE -> PushReaction.NORMAL
+        PistonMoveReaction.BREAK -> PushReaction.DESTROY
+        PistonMoveReaction.BLOCK -> PushReaction.BLOCK
+        PistonMoveReaction.IGNORE -> PushReaction.IGNORE
+        PistonMoveReaction.PUSH_ONLY -> PushReaction.PUSH_ONLY
+    }
+
 val Material.nmsItem: MojangItem
     get() = CraftMagicNumbers.getItem(this)
 
@@ -350,14 +377,24 @@ val MojangBlock.bukkitMaterial: Material
 val MojangItem.bukkitMaterial: Material
     get() = CraftMagicNumbers.getMaterial(this)
 
+val Block.nmsPos: MojangBlockPos
+    get() = MojangBlockPos(x, y, z)
+
+@Deprecated("", ReplaceWith("nmsBlockState"))
 val Block.nmsState: BlockState
-    get() = world.serverLevel.getBlockState(MojangBlockPos(x, y, z))
+    get() = nmsBlockState
+
+val Block.nmsBlockState: BlockState
+    get() = world.serverLevel.getBlockState(nmsPos)
+
+val Block.nmsBlockEntity: BlockEntity?
+    get() = world.serverLevel.getBlockEntity(nmsPos)
 
 val BlockState.id: Int
     get() = MojangBlock.getId(this)
 
-fun MojangBlockPos.toNovaPos(world: World): BlockPos =
-    BlockPos(world, x, y, z)
+fun MojangBlockPos.toBlock(world: World): Block =
+    world.getBlockAt(x, y, z)
 
 fun Vec3.toVector3d(): Vector3d =
     Vector3d(x, y, z)
@@ -394,37 +431,37 @@ fun <T : Comparable<T>> BlockState.hasProperty(property: Property<T>, value: T):
     return hasProperty(property) && getValue(property) == value
 }
 
-fun BlockPos.setBlockStateNoUpdate(state: BlockState) {
+fun Block.setBlockStateNoUpdate(state: BlockState) {
     val section = chunkSection
     val old = section.getBlockState(this)
     section.setBlockStateSilently(this, state)
     world.serverLevel.sendBlockUpdated(nmsPos, old, state, 3)
 }
 
-fun BlockPos.setBlockStateSilently(state: BlockState) {
+fun Block.setBlockStateSilently(state: BlockState) {
     chunkSection.setBlockStateSilently(this, state)
 }
 
-fun BlockPos.setBlockState(state: BlockState) {
+fun Block.setBlockState(state: BlockState) {
     world.serverLevel.setBlock(nmsPos, state, 11)
 }
 
-fun BlockPos.getBlockState(): BlockState {
+fun Block.getBlockState(): BlockState {
     return chunkSection.getBlockState(this)
 }
 
-val BlockPos.chunkSection: LevelChunkSection
+val Block.chunkSection: LevelChunkSection
     get() {
         val chunk = world.serverLevel.getChunk(x shr 4, z shr 4)
         return chunk.getSection(chunk.getSectionIndex(y))
     }
 
-fun LevelChunkSection.setBlockStateSilently(pos: BlockPos, state: BlockState) {
-    setBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF, state)
+fun LevelChunkSection.setBlockStateSilently(block: Block, state: BlockState) {
+    setBlockState(block.x and 0xF, block.y and 0xF, block.z and 0xF, state)
 }
 
-fun LevelChunkSection.getBlockState(pos: BlockPos): BlockState {
-    return getBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF)
+fun LevelChunkSection.getBlockState(block: Block): BlockState {
+    return getBlockState(block.x and 0xF, block.y and 0xF, block.z and 0xF)
 }
 
 inline fun Level.captureDrops(run: () -> Unit): List<ItemEntity> {
@@ -510,8 +547,24 @@ fun <T : Any> Registry<T>.getValueOrThrow(key: String): T {
     return getValueOrThrow(Identifier.parse(key))
 }
 
+fun <T : Any> Registry<T>.getValueOrThrow(key: Key): T {
+    return getValueOrThrow(key.toIdentifier())
+}
+
 fun <T : Any> Registry<T>.getValueOrThrow(id: Identifier): T {
     return getOrThrow(ResourceKey.create(key(), id)).value()
+}
+
+fun <T : Any> Registry<T>.getValueOrNull(key: String): T? {
+    return Identifier.tryParse(key)?.let(::getValueOrThrow)
+}
+
+fun <T : Any> Registry<T>.getValueOrNull(key: Key): T? {
+    return getValueOrNull(key.toIdentifier())
+}
+
+fun <T : Any> Registry<T>.getValueOrNull(id: Identifier): T? {
+    return getOrNull(id)?.takeIf { it.isBound }?.value()
 }
 
 fun <T : Any> Registry<T>.getOrCreateHolder(id: Identifier): Holder<T> {
@@ -654,31 +707,32 @@ fun Identifier(namespaced: Namespaced, name: String): Identifier {
     return Identifier.fromNamespaceAndPath(namespaced.namespace(), name)
 }
 
-fun <T : Any> io.papermc.paper.registry.tag.TagKey<*>.toNmsTagKey(registry: ResourceKey<out Registry<T>>): TagKey<T> =
-    TagKey.create(registry, key().toIdentifier())
-
-fun <T : Any> TypedKey<*>.toResourceKey(registry: ResourceKey<out Registry<T>>): ResourceKey<T> =
-    ResourceKey.create(registry, key().toIdentifier())
+fun <T : Any> io.papermc.paper.registry.tag.TagKey<*>.toNmsTagKey(): TagKey<T> =
+    TagKey.create(registryKey().toResourceKey(), key().toIdentifier())
 
 fun <T : Any> RegistryKey<*>.toResourceKey(): ResourceKey<Registry<T>> =
-    ResourceKey.createRegistryKey<T>(key().toIdentifier())
+    ResourceKey.createRegistryKey(key().toIdentifier())
 
-fun <T : Any> Iterable<TypedKey<*>>.toHolderSet(
-    registryKey: ResourceKey<out Registry<T>>,
-    registry: HolderGetter<T>
-): HolderSet<T> {
-    return map { it.toResourceKey(registryKey) }
-        .map { registry.getOrThrow(it) }
-        .let { HolderSet.direct(it) }
+fun <T : Any> TypedKey<*>.toResourceKey(): ResourceKey<T> =
+    ResourceKey.create(registryKey().toResourceKey(), key().toIdentifier())
+
+fun <T : Any> Iterable<TypedKey<*>>.toHolderSet(registry: HolderGetter<T>): HolderSet<T> =
+    HolderSet.direct(map { registry.getOrThrow(it.toResourceKey()) })
+
+fun <T : Any> RegistryKeySet<*>.toHolderSet(registry: HolderGetter<T>): HolderSet<T> {
+    return when (this) {
+        is Tag -> registry.getOrThrow(tagKey().toNmsTagKey())
+        else -> values().toHolderSet(registry)
+    }
 }
 
-fun <T : Any> RegistryKeySet<*>.toNmsHolderSet(
-    registryKey: ResourceKey<out Registry<T>>,
-    registry: HolderGetter<T>
-): HolderSet<T> {
+fun <T : Any> RegistryEntry.Paper<*>.toHolder(registry: HolderGetter<T>): Holder.Reference<T> =
+    registry.getOrThrow(key.toResourceKey())
+
+fun <T : Any> RegistryEntrySet.Paper<*>.toHolderSet(registry: HolderGetter<T>): HolderSet<T> {
     return when (this) {
-        is Tag -> registry.getOrThrow(tagKey().toNmsTagKey(registryKey))
-        else -> values().toHolderSet(registryKey, registry)
+        is RegistryEntrySet.Paper.Tag<*> -> registry.getOrThrow(tagKey.toNmsTagKey())
+        is RegistryEntrySet.Paper.Direct<*> -> HolderSet.direct(entries.map { registry.getOrThrow(it.key.toResourceKey()) })
     }
 }
 
@@ -706,15 +760,6 @@ fun forcePacketBroadcast(run: () -> Unit) {
         run.invoke()
     } finally {
         NMSUtils.broadcastIgnoreExcludedPlayer.set(false)
-    }
-}
-
-internal inline fun withoutBlockMigration(pos: BlockPos, run: () -> Unit) {
-    BlockMigrator.migrationSuppression.set(BlockMigrator.migrationSuppression.get() + 1)
-    try {
-        run.invoke()
-    } finally {
-        BlockMigrator.migrationSuppression.set(BlockMigrator.migrationSuppression.get() - 1)
     }
 }
 

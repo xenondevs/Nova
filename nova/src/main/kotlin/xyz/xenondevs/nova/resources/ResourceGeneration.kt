@@ -20,7 +20,6 @@ import xyz.xenondevs.nova.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.data.update
 import xyz.xenondevs.nova.world.block.DefaultBlocks
-import xyz.xenondevs.nova.world.block.migrator.BlockMigrator
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.DefaultItems
@@ -97,7 +96,6 @@ internal object ResourceGeneration {
                 
                 activeBuilders.clear()
                 PermanentStorage.store(RESOURCES_HASH, resourcesHash)
-                BlockMigrator.updateMigrationId()
             } else {
                 // load here at the latest to ensure initialization failure on broken lookups
                 ResourceLookups.loadAll()

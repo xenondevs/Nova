@@ -10,7 +10,7 @@ import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
-import xyz.xenondevs.nova.world.item.clientsideProvider
+import xyz.xenondevs.nova.world.item.itemProvider
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
@@ -24,8 +24,8 @@ import java.util.*
 class VisualizeRegionItem(
     private val regionUuid: UUID,
     private val getRegion: () -> Region,
-    private val on: Provider<ItemProvider> = DefaultGuiItems.AREA_BTN_ON.clientsideProvider,
-    private val off: Provider<ItemProvider> = DefaultGuiItems.AREA_BTN_OFF.clientsideProvider
+    private val on: Provider<ItemProvider> = DefaultGuiItems.AREA_BTN_ON.itemProvider,
+    private val off: Provider<ItemProvider> = DefaultGuiItems.AREA_BTN_OFF.itemProvider
 ) : AbstractItem() {
     
     constructor(

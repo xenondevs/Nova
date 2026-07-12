@@ -61,7 +61,7 @@ private object ItemFilterBinarySerializer : VersionedBinarySerializer<ItemFilter
     @Suppress("UNCHECKED_CAST")
     private fun <T : ItemFilter<T>> write(filter: ItemFilter<T>, writer: ByteWriter) {
         if (filter is UnknownItemFilter) {
-            writer.writeString(filter.originalId.toString())
+            writer.writeString(filter.originalId.asString())
             Cbf.write(filter.originalData, writer)
         } else {
             writer.writeString(filter.type.key.asString())

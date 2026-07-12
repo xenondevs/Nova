@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.world.block.tileentity.network.node
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
-import xyz.xenondevs.nova.world.BlockPos
+import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
 import xyz.xenondevs.nova.world.format.chunk.NetworkNodeData
@@ -22,17 +22,17 @@ internal sealed interface GhostNetworkNode {
          */
         fun fromNode(node: NetworkNode): NetworkNode =
             when (node) {
-                is NetworkBridge -> GhostNetworkBridge(node.pos, node.owner, node.typeId)
-                is NetworkEndPoint -> GhostNetworkEndPoint(node.pos, node.owner)
+                is NetworkBridge -> GhostNetworkBridge(node.block, node.owner, node.typeId)
+                is NetworkEndPoint -> GhostNetworkEndPoint(node.block, node.owner)
             }
         
         /**
-         * Creates a [NetworkNode] from the given [pos] and [data].
+         * Creates a [NetworkNode] from the given [block] and [data].
          */
-        fun fromData(pos: BlockPos, data: NetworkNodeData): NetworkNode =
+        fun fromData(block: Block, data: NetworkNodeData): NetworkNode =
             when (data) {
-                is NetworkBridgeData -> GhostNetworkBridge(pos, data)
-                is NetworkEndPointData -> GhostNetworkEndPoint(pos, data)
+                is NetworkBridgeData -> GhostNetworkBridge(block, data)
+                is NetworkEndPointData -> GhostNetworkEndPoint(block, data)
             }
         
     }
@@ -45,7 +45,7 @@ internal sealed interface GhostNetworkNode {
  * Takes the place of all regular [NetworkBridges][NetworkBridge] after they've been unloaded.
  */
 internal class GhostNetworkBridge(
-    override val pos: BlockPos,
+    override val block: Block,
     override val owner: OfflinePlayer?,
     override val typeId: Key
 ) : NetworkBridge, GhostNetworkNode {
@@ -53,14 +53,14 @@ internal class GhostNetworkBridge(
     override val isValid = true
     override val linkedNodes: Set<NetworkNode> = emptySet()
     
-    constructor(pos: BlockPos, data: NetworkBridgeData) : this(pos, Bukkit.getOfflinePlayer(data.owner), data.typeId)
+    constructor(pos: Block, data: NetworkBridgeData) : this(pos, Bukkit.getOfflinePlayer(data.owner), data.typeId)
     
     override fun hashCode(): Int {
-        return pos.hashCode()
+        return block.hashCode()
     }
     
     override fun equals(other: Any?): Boolean {
-        return other is GhostNetworkBridge && other.pos == pos
+        return other is GhostNetworkBridge && other.block == block
     }
     
 }
@@ -71,7 +71,7 @@ internal class GhostNetworkBridge(
  * Takes the place of all regular [NetworkEndPoints][NetworkEndPoint] after they've been unloaded.
  */
 internal class GhostNetworkEndPoint(
-    override val pos: BlockPos,
+    override val block: Block,
     override val owner: OfflinePlayer?,
 ) : NetworkEndPoint, GhostNetworkNode {
     
@@ -79,14 +79,14 @@ internal class GhostNetworkEndPoint(
     override val holders: Collection<EndPointDataHolder> = emptyList()
     override val linkedNodes: Set<NetworkNode> = emptySet()
     
-    constructor(pos: BlockPos, data: NetworkEndPointData) : this(pos, Bukkit.getOfflinePlayer(data.owner))
+    constructor(pos: Block, data: NetworkEndPointData) : this(pos, Bukkit.getOfflinePlayer(data.owner))
     
     override fun hashCode(): Int {
-        return pos.hashCode()
+        return block.hashCode()
     }
     
     override fun equals(other: Any?): Boolean {
-        return other is GhostNetworkEndPoint && other.pos == pos
+        return other is GhostNetworkEndPoint && other.block == block
     }
     
 }

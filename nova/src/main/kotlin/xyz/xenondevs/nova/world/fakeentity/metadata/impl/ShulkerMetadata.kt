@@ -2,6 +2,8 @@
 
 package xyz.xenondevs.nova.world.fakeentity.metadata.impl
 
+import xyz.xenondevs.nova.world.*
+
 import net.minecraft.network.syncher.EntityDataSerializers
 import org.bukkit.DyeColor
 import org.bukkit.block.BlockFace

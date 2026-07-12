@@ -13,6 +13,7 @@ import io.papermc.paper.command.brigadier.Commands.literal
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver
+import io.papermc.paper.registry.RegistryKey
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -23,25 +24,25 @@ import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
-import net.minecraft.world.level.block.Block
 import org.bukkit.Bukkit
+import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemType
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
+import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.command.Command
-import xyz.xenondevs.nova.command.argument.NetworkTypeArgumentType
-import xyz.xenondevs.nova.command.argument.NovaBlockArgumentType
-import xyz.xenondevs.nova.command.argument.NovaItemArgumentType
-import xyz.xenondevs.nova.command.argument.ReloadableNovaRegistryArgumentType
+import xyz.xenondevs.nova.command.argument.KeyArgumentType
+import xyz.xenondevs.nova.command.argument.NovaRegistryArgumentType
 import xyz.xenondevs.nova.command.argument.ResourcePackIdArgumentType
 import xyz.xenondevs.nova.command.argument.UpdatableFileSuggestionProvider
-import xyz.xenondevs.nova.command.argument.VanillaBlockArgumentType
 import xyz.xenondevs.nova.command.executes0
 import xyz.xenondevs.nova.command.get
 import xyz.xenondevs.nova.command.player
@@ -49,8 +50,6 @@ import xyz.xenondevs.nova.command.requiresPermission
 import xyz.xenondevs.nova.command.requiresPlayer
 import xyz.xenondevs.nova.config.CONFIGS
 import xyz.xenondevs.nova.config.NovaConfigBackend
-import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.packetentity.MAX_PACKET_ENTITY_RENDER_DISTANCE
 import xyz.xenondevs.nova.packetentity.MIN_PACKET_ENTITY_RENDER_DISTANCE
 import xyz.xenondevs.nova.packetentity.packetEntityRenderDistance
@@ -62,46 +61,46 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
 import xyz.xenondevs.nova.ui.menu.explorer.itemTagExplorer
 import xyz.xenondevs.nova.ui.waila.WailaManager
-import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.CubeFaceSet
+import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.component.adventure.indent
 import xyz.xenondevs.nova.util.data.UpdatableFile
-import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.item.ItemUtils
-import xyz.xenondevs.nova.util.item.itemType
-import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
-import xyz.xenondevs.nova.util.novaBlock
-import xyz.xenondevs.nova.util.runTaskLater
+import xyz.xenondevs.nova.util.nmsBlock
+import xyz.xenondevs.nova.util.nmsBlockEntity
+import xyz.xenondevs.nova.util.nmsBlockState
+import xyz.xenondevs.nova.util.toBlock
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.behavior.LeavesBehavior
+import xyz.xenondevs.nova.world.block.NovaBlockState
+import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.hitbox.HitboxManager
+import xyz.xenondevs.nova.world.block.name
+import xyz.xenondevs.nova.world.block.novaBlock
+import xyz.xenondevs.nova.world.block.novaTileEntities
+import xyz.xenondevs.nova.world.block.novaTileEntity
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
-import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
-import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
-import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
-import xyz.xenondevs.nova.world.format.WorldDataManager
-import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
+import xyz.xenondevs.nova.world.item.itemType
 import xyz.xenondevs.nova.world.item.logic.AdvancedTooltips
 import xyz.xenondevs.nova.world.item.logic.PacketItems
+import xyz.xenondevs.nova.world.item.name
+import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.world.item.recipe.RecipeManager
 import xyz.xenondevs.nova.world.pos
-import xyz.xenondevs.nova.world.toNovaPos
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.max
@@ -113,7 +112,7 @@ internal object NovaCommand : Command() {
         .then(literal("give")
             .requiresPermission("nova.command.give")
             .then(argument("player", ArgumentTypes.players())
-                .then(argument("item", NovaItemArgumentType)
+                .then(argument("item", ArgumentTypes.resource(RegistryKey.ITEM))
                     .executes0(::giveSingleTo)
                     .then(argument("amount", IntegerArgumentType.integer())
                         .executes0(::giveTo)))))
@@ -123,15 +122,9 @@ internal object NovaCommand : Command() {
                 .requiresPlayer()
                 .then(argument("range", IntegerArgumentType.integer(0))
                     .executes0(::removeTileEntities)))
-            .then(literal("removeInvalidVTEs")
-                .then(argument("range", IntegerArgumentType.integer(0))
-                    .executes0(::removeInvalidVTEs)))
             .then(literal("getBlockData")
                 .requiresPlayer()
                 .executes0(::showBlockData))
-            .then(literal("getVanillaBlockData")
-                .requiresPlayer()
-                .executes0(::showVanillaBlockData))
             .then(literal("getBlockModelData")
                 .requiresPlayer()
                 .executes0(::showBlockModelData))
@@ -148,7 +141,7 @@ internal object NovaCommand : Command() {
                     .executes0(::showNetworkNodeInfoAt)))
             .then(literal("showNetwork")
                 .requiresPlayer()
-                .then(argument("type", NetworkTypeArgumentType)
+                .then(argument("type", NovaRegistryArgumentType(NETWORK_TYPE))
                     .executes0(::toggleNetworkDebugging)))
             .then(literal("showNetworkClusters")
                 .requiresPlayer()
@@ -161,31 +154,24 @@ internal object NovaCommand : Command() {
             .then(literal("showItemTags")
                 .requiresPlayer()
                 .executes0(::showItemTagsMenu))
-            .then(literal("fill")
-                .requiresPlayer()
-                .then(argument("from", ArgumentTypes.blockPosition())
-                    .then(argument("to", ArgumentTypes.blockPosition())
-                        .then(argument("block", NovaBlockArgumentType)
-                            .executes0(::fillArea)))))
             .then(literal("giveClientsideStack")
                 .requiresPlayer()
                 .executes0(::copyClientsideStack)
-                .then(argument("item", NovaItemArgumentType)
+                .then(argument("item", ArgumentTypes.resource(RegistryKey.ITEM))
                     .executes0(::giveClientsideStack)))
-            .then(literal("searchVanillaBlock")
+            .then(literal("searchBlock")
                 .requiresPlayer()
-                .then(argument("block", VanillaBlockArgumentType)
+                .then(argument("block", ArgumentTypes.resource(RegistryKey.BLOCK))
                     .then(argument("range", IntegerArgumentType.integer(0, 10))
-                        .executes0(::searchVanillaBlock))))
-            .then(literal("searchNovaBlock")
+                        .executes0(::searchBlock))))
+            .then(literal("fill")
                 .requiresPlayer()
-                .then(argument("block", NovaBlockArgumentType)
-                    .then(argument("range", IntegerArgumentType.integer(0, 10))
-                        .executes0(::searchNovaBlock))))
-            .then(literal("recalculateLeaveProperties")
-                .requiresPlayer()
-                .then(argument("range", IntegerArgumentType.integer(0, 20))
-                    .executes0(::recalculateLeaveProperties))))
+                .then(argument("from", ArgumentTypes.blockPosition())
+                    .then(argument("block", ArgumentTypes.resource(RegistryKey.BLOCK))
+                        .executes0 { ctx -> fillArea(ctx, "from", "from") })
+                    .then(argument("to", ArgumentTypes.blockPosition())
+                        .then(argument("block", ArgumentTypes.resource(RegistryKey.BLOCK))
+                            .executes0 { ctx -> fillArea(ctx, "from", "to") })))))
         .then(literal("items")
             .requiresPlayer()
             .requiresPermission("nova.command.items")
@@ -194,11 +180,9 @@ internal object NovaCommand : Command() {
             .requiresPlayer()
             .requiresPermission("nova.command.advancedTooltips")
             .then(literal("off")
-                .executes0 { toggleAdvancedTooltips(it, AdvancedTooltips.Type.OFF) })
-            .then(literal("nova")
-                .executes0 { toggleAdvancedTooltips(it, AdvancedTooltips.Type.NOVA) })
-            .then(literal("all")
-                .executes0 { toggleAdvancedTooltips(it, AdvancedTooltips.Type.ALL) }))
+                .executes0 { toggleAdvancedTooltips(it, false) })
+            .then(literal("on")
+                .executes0 { toggleAdvancedTooltips(it, true) }))
         .then(literal("waila")
             .requiresPlayer()
             .requiresPermission("nova.command.waila")
@@ -226,14 +210,20 @@ internal object NovaCommand : Command() {
                 .executes0(::reloadConfigs))
             .then(literal("recipes")
                 .executes0(::reloadRecipes))
-            .apply { 
+            .apply {
                 val reloadableRegistries = NovaRegistries.registries.values.filter(MutableNovaRegistry<*>::isReloadable)
-                if (reloadableRegistries.isNotEmpty()) {
+                val rerunnableRegistries = if (IS_DEV_SERVER) listOf(RegistryKey.ITEM, RegistryKey.BLOCK) else emptyList()
+                val registryKeys = reloadableRegistries.map { it.key } + rerunnableRegistries.map { it.key() }
+                
+                if (registryKeys.isNotEmpty()) {
                     then(literal("registry")
-                        .executes0 { reloadRegistries(it, reloadableRegistries) }
-                        .then(argument("registry", ReloadableNovaRegistryArgumentType)
-                            .executes0 { reloadRegistries(it, listOf(it["registry"])) }
-                        ))
+                        .executes0 { reloadRegistries(it, reloadableRegistries, rerunnableRegistries) }
+                        .then(argument("registry", KeyArgumentType(registryKeys)).executes0 { ctx ->
+                            val key: Key = ctx["registry"]
+                            val nova = reloadableRegistries.filter { it.key == key }
+                            val paper = rerunnableRegistries.filter { it.key() == key }
+                            reloadRegistries(ctx, nova, paper)
+                        }))
                 }
             }
         )
@@ -258,7 +248,7 @@ internal object NovaCommand : Command() {
                     Component.text(reloadedConfigs.size),
                     Component.join(
                         JoinConfiguration.commas(true),
-                        reloadedConfigs.map { cfgId -> Component.text(cfgId.toString(), NamedTextColor.AQUA) }
+                        reloadedConfigs.map { cfgId -> Component.text(cfgId.asString(), NamedTextColor.AQUA) }
                     )
                 ))
             } else {
@@ -285,13 +275,13 @@ internal object NovaCommand : Command() {
         }
     }
     
-    private fun reloadRegistries(ctx: CommandContext<CommandSourceStack>, registries: Iterable<MutableNovaRegistry<*>>) {
-        for (registry in registries) {
+    private fun reloadRegistries(ctx: CommandContext<CommandSourceStack>, nova: Iterable<MutableNovaRegistry<*>>, paper: Iterable<RegistryKey<*>>) {
+        for (registry in nova) {
             RegistryLoader.reload(registry)
             ctx.source.sender.sendMessage(Component.translatable(
                 "command.nova.reload_registry.success",
                 NamedTextColor.GRAY,
-                Component.text(registry.key.toString(), NamedTextColor.AQUA),
+                Component.text(registry.key.asString(), NamedTextColor.AQUA),
                 Component.text(registry.entrySet.get().size, NamedTextColor.AQUA)
             ))
         }
@@ -309,12 +299,10 @@ internal object NovaCommand : Command() {
         }
     }
     
-    private fun toggleAdvancedTooltips(ctx: CommandContext<CommandSourceStack>, type: AdvancedTooltips.Type) {
+    private fun toggleAdvancedTooltips(ctx: CommandContext<CommandSourceStack>, type: Boolean) {
         val player = ctx.player
-        val changed = AdvancedTooltips.setType(player, type)
-        
-        val typeName = type.name.lowercase()
-        if (changed) {
+        val typeName = if (type) "on" else "off"
+        if (AdvancedTooltips.set(player, type)) {
             ctx.source.sender.sendMessage(Component.translatable("command.nova.advanced_tooltips.$typeName.success", NamedTextColor.GRAY))
             player.updateInventory()
         } else {
@@ -340,7 +328,7 @@ internal object NovaCommand : Command() {
     private fun giveSingleTo(ctx: CommandContext<CommandSourceStack>) =
         giveTo(ctx, ctx["item"], 1)
     
-    private fun giveTo(ctx: CommandContext<CommandSourceStack>, item: NovaItem, amount: Int) {
+    private fun giveTo(ctx: CommandContext<CommandSourceStack>, item: ItemType, amount: Int) {
         val targetPlayers = ctx.getArgument("player", PlayerSelectorArgumentResolver::class.java)
             .resolve(ctx.source)
         
@@ -352,7 +340,7 @@ internal object NovaCommand : Command() {
                     "command.nova.give.success",
                     NamedTextColor.GRAY,
                     Component.text(amount).color(NamedTextColor.AQUA),
-                    item.name?.color(NamedTextColor.AQUA) ?: Component.empty(),
+                    item.name.color(NamedTextColor.AQUA),
                     Component.text(player.name).color(NamedTextColor.AQUA)
                 ))
             }
@@ -361,19 +349,16 @@ internal object NovaCommand : Command() {
     
     private fun removeTileEntities(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
-        val chunks = player.location.chunk.getSurroundingChunks(ctx["range"], true)
+        val range: Int = ctx["range"]
         
         var count = 0
-        chunks.asSequence()
-            .flatMap { WorldDataManager.getTileEntities(it.pos) }
-            .forEach { tileEntity ->
-                BlockUtils.breakBlock(
-                    Context.intention(BlockBreak)
-                        .param(BlockBreak.BLOCK_POS, tileEntity.pos)
-                        .build()
-                )
+        val (x, z) = player.location.chunkPos
+        for (dx in -range..range) for (dz in -range..range) {
+            for (te in player.world.getChunkAt(x + dx, z + dz).novaTileEntities) {
+                te.block.blockType = BlockType.AIR
                 count++
             }
+        }
         
         ctx.source.sender.sendMessage(Component.translatable(
             "command.nova.remove_tile_entities.success",
@@ -382,156 +367,120 @@ internal object NovaCommand : Command() {
         ))
     }
     
-    private fun removeInvalidVTEs(ctx: CommandContext<CommandSourceStack>) {
-        val player = ctx.player
-        val chunks = player.location.chunk.getSurroundingChunks(ctx["range"], true)
-        
-        var count = 0
-        for (chunk in chunks) {
-            for (vte in WorldDataManager.getVanillaTileEntities(chunk.pos)) {
-                if (vte.pos.block.type !in vte.type.materials) {
-                    WorldDataManager.setVanillaTileEntity(vte.pos, null)
-                    vte.handleBreak()
-                    count++
-                }
-            }
-        }
-        
-        if (count > 0) {
-            ctx.source.sender.sendMessage(Component.translatable(
-                "command.nova.remove_invalid_vtes.success",
-                NamedTextColor.GRAY,
-                Component.text(count).color(NamedTextColor.AQUA)
-            ))
-        } else {
-            ctx.source.sender.sendMessage(Component.translatable(
-                "command.nova.remove_invalid_vtes.failure",
-                NamedTextColor.RED
-            ))
-        }
-    }
-    
     private fun showBlockData(ctx: CommandContext<CommandSourceStack>) {
-        val pos = ctx.player.getTargetBlockExact(8)?.location?.pos
-        if (pos != null) {
-            val novaBlockState = WorldDataManager.getBlockState(pos)
-            if (novaBlockState != null) {
-                val tileEntity = WorldDataManager.getTileEntity(pos)
-                if (tileEntity != null) {
-                    tileEntity.saveData()
-                    ctx.source.sender.sendMessage(Component.translatable(
-                        "command.nova.show_block_data.nova_tile_entity",
-                        NamedTextColor.GRAY,
-                        Component.text(novaBlockState.toString(), NamedTextColor.AQUA),
-                        Component.text(tileEntity.data.toString(), NamedTextColor.WHITE)
-                    ))
-                } else {
-                    ctx.source.sender.sendMessage(Component.translatable(
-                        "command.nova.show_block_data.nova_block",
-                        NamedTextColor.GRAY,
-                        Component.text(novaBlockState.toString(), NamedTextColor.AQUA)
-                    ))
-                }
+        val block = ctx.player.getTargetBlockExact(8)?.location?.block
+            ?: return
+        val blockState = block.blockData
+        if (blockState is NovaBlockState) {
+            val tileEntity = block.novaTileEntity
+            if (tileEntity != null) {
+                tileEntity.saveData()
+                ctx.source.sender.sendMessage(Component.translatable(
+                    "command.nova.show_block_data.nova_tile_entity",
+                    NamedTextColor.GRAY,
+                    Component.text(blockState.asString, NamedTextColor.AQUA),
+                    Component.text(tileEntity.data.toString(), NamedTextColor.WHITE)
+                ))
             } else {
-                val vanillaBlockState = pos.nmsBlockState
-                val vanillaTileEntity = WorldDataManager.getVanillaTileEntity(pos)
-                if (vanillaTileEntity != null) {
-                    vanillaTileEntity.saveData()
-                    ctx.source.sender.sendMessage(Component.translatable(
-                        "command.nova.show_block_data.vanilla_tile_entity",
-                        NamedTextColor.GRAY,
-                        Component.text(vanillaBlockState.toString(), NamedTextColor.AQUA),
-                        Component.text(vanillaTileEntity.data.toString(), NamedTextColor.WHITE)
-                    ))
-                } else {
-                    ctx.source.sender.sendMessage(Component.translatable(
-                        "command.nova.show_block_data.vanilla_block",
-                        NamedTextColor.GRAY,
-                        Component.text(vanillaBlockState.toString(), NamedTextColor.AQUA)
-                    ))
-                }
+                ctx.source.sender.sendMessage(Component.translatable(
+                    "command.nova.show_block_data.nova_block",
+                    NamedTextColor.GRAY,
+                    Component.text(blockState.asString, NamedTextColor.AQUA)
+                ))
             }
-        }
-    }
-    
-    private fun showVanillaBlockData(ctx: CommandContext<CommandSourceStack>) {
-        val pos = ctx.player.getTargetBlockExact(8)?.location?.pos
-        if (pos != null) {
-            val blockState = pos.nmsBlockState
-            ctx.source.sender.sendMessage(Component.translatable(
-                "command.nova.show_vanilla_block_state.success",
-                NamedTextColor.GRAY,
-                Component.text(blockState.toString(), NamedTextColor.AQUA)
-            ))
         } else {
-            ctx.source.sender.sendMessage(Component.translatable("command.nova.show_vanilla_block_state.failure", NamedTextColor.RED))
+            val blockEntity = block.nmsBlockEntity
+            if (blockEntity != null) {
+                val data = blockEntity.saveWithFullMetadata(REGISTRY_ACCESS)
+                ctx.source.sender.sendMessage(Component.translatable(
+                    "command.nova.show_block_data.vanilla_tile_entity",
+                    NamedTextColor.GRAY,
+                    Component.text(blockState.asString, NamedTextColor.AQUA),
+                    Component.text(data.toString(), NamedTextColor.WHITE)
+                ))
+            } else {
+                ctx.source.sender.sendMessage(Component.translatable(
+                    "command.nova.show_block_data.vanilla_block",
+                    NamedTextColor.GRAY,
+                    Component.text(blockState.asString, NamedTextColor.AQUA)
+                ))
+            }
         }
     }
     
     private fun showBlockModelData(ctx: CommandContext<CommandSourceStack>) {
-        val pos = ctx.player.getTargetBlockExact(8)?.location?.pos
-        if (pos != null) {
-            val novaBlockState = WorldDataManager.getBlockState(pos)
-            if (novaBlockState != null) {
-                val modelProvider = novaBlockState.modelProvider
-                
-                val message = when (modelProvider) {
-                    is ModelLessBlockModelProvider -> {
-                        val info = modelProvider.info
-                        Component.translatable(
-                            "command.nova.show_block_model_data.model_less",
-                            NamedTextColor.GRAY,
-                            Component.text(novaBlockState.toString(), NamedTextColor.AQUA),
-                            Component.text(info.toString(), NamedTextColor.AQUA)
-                        )
-                    }
-                    
-                    is BackingStateBlockModelProvider -> {
-                        val info = modelProvider.info
-                        Component.translatable(
-                            "command.nova.show_block_model_data.backing_state",
-                            NamedTextColor.GRAY,
-                            Component.text(novaBlockState.toString(), NamedTextColor.AQUA),
-                            Component.translatable(info.vanillaBlockState.block.descriptionId, NamedTextColor.AQUA),
-                            Component.text(info.variantMap.toString(), NamedTextColor.AQUA)
-                        )
-                    }
-                    
-                    is DisplayEntityBlockModelProvider -> {
-                        val info = modelProvider.info
-                        val format = DecimalFormat("#.##")
-                        
-                        val modelComponents = info.models.map { model ->
-                            val transform = Transformation(Matrix4f(model.transform))
-                            val leftRotation = transform.leftRotation().getEulerAnglesXYZ(Vector3f())
-                                .mul(1 / Math.PI.toFloat() * 180f).toString(format)
-                            val rightRotation = transform.rightRotation().getEulerAnglesXYZ(Vector3f())
-                                .mul(1 / Math.PI.toFloat() * 180f).toString(format)
-                            
-                            Component.translatable(
-                                "command.nova.show_block_model_data.display_entity.model",
-                                NamedTextColor.GRAY,
-                                Component.text(model.model.toString(), NamedTextColor.AQUA),
-                                Component.text(Vector3f(transform.translation()).toString(format), NamedTextColor.AQUA),
-                                Component.text(leftRotation, NamedTextColor.AQUA),
-                                Component.text(Vector3f(transform.scale()).toString(format), NamedTextColor.AQUA),
-                                Component.text(rightRotation, NamedTextColor.AQUA)
-                            )
-                        }
-                        
-                        Component.translatable(
-                            "command.nova.show_block_model_data.display_entity",
-                            NamedTextColor.GRAY,
-                            Component.text(novaBlockState.toString(), NamedTextColor.AQUA),
-                            Component.translatable(info.collider.material.blockTranslationKey ?: "", NamedTextColor.AQUA),
-                            Component.text(info.models.size),
-                            Component.join(JoinConfiguration.newlines(), modelComponents)
-                        )
-                    }
-                }
-                ctx.source.sender.sendMessage(message)
-            } else ctx.source.sender.sendMessage(Component.translatable("command.nova.show_block_model_data.failure", NamedTextColor.RED))
+        val block = ctx.player.getTargetBlockExact(8)?.location?.block
+            ?: return
+        
+        val blockState = block.blockData
+        if (blockState !is NovaBlockState) {
+            ctx.source.sender.sendMessage(Component.translatable("command.nova.show_block_model_data.failure", NamedTextColor.RED))
+            return
         }
+        
+        val message = when (val modelProvider = blockState.novaBlock.modelProviders.get()[blockState.nmsBlockState]!!) {
+            is ModelLessBlockModelProvider -> {
+                val info = modelProvider.info
+                Component.translatable(
+                    "command.nova.show_block_model_data.model_less",
+                    NamedTextColor.GRAY,
+                    Component.text(blockState.asString, NamedTextColor.AQUA),
+                    Component.text(info.toString(), NamedTextColor.AQUA)
+                )
+            }
+            
+            is BackingStateBlockModelProvider -> {
+                val info = modelProvider.info
+                Component.translatable(
+                    "command.nova.show_block_model_data.backing_state",
+                    NamedTextColor.GRAY,
+                    Component.text(blockState.asString, NamedTextColor.AQUA),
+                    Component.translatable(info.vanillaBlockState.block.descriptionId, NamedTextColor.AQUA),
+                    Component.text(info.variantMap.toString(), NamedTextColor.AQUA)
+                )
+            }
+            
+            is DisplayEntityBlockModelProvider -> {
+                val info = modelProvider.info
+                val format = DecimalFormat("#.##")
+                
+                fun createModelComponent(model: Key, matrix: Matrix4f): Component {
+                    val transform = Transformation(matrix)
+                    val leftRotation = transform.leftRotation().getEulerAnglesXYZ(Vector3f())
+                        .mul(1 / Math.PI.toFloat() * 180f).toString(format)
+                    val rightRotation = transform.rightRotation().getEulerAnglesXYZ(Vector3f())
+                        .mul(1 / Math.PI.toFloat() * 180f).toString(format)
+                    
+                    return Component.translatable(
+                        "command.nova.show_block_model_data.display_entity.model",
+                        NamedTextColor.GRAY,
+                        Component.text(model.asString(), NamedTextColor.AQUA),
+                        Component.text(Vector3f(transform.translation()).toString(format), NamedTextColor.AQUA),
+                        Component.text(leftRotation, NamedTextColor.AQUA),
+                        Component.text(Vector3f(transform.scale()).toString(format), NamedTextColor.AQUA),
+                        Component.text(rightRotation, NamedTextColor.AQUA)
+                    )
+                }
+                
+                val modelComponents = info.models
+                    .mapTo(ArrayList(info.models.size + 1)) { model ->
+                        createModelComponent(model.model, Matrix4f(model.transform))
+                    }
+                if (info.waterlogged) {
+                    modelComponents += createModelComponent(DefaultBlockOverlays.WATERLOGGED.key, Matrix4f())
+                }
+                
+                Component.translatable(
+                    "command.nova.show_block_model_data.display_entity",
+                    NamedTextColor.GRAY,
+                    Component.text(blockState.asString, NamedTextColor.AQUA),
+                    Component.translatable(info.collider.material.blockTranslationKey ?: "", NamedTextColor.AQUA),
+                    Component.text(modelComponents.size),
+                    Component.join(JoinConfiguration.newlines(), modelComponents)
+                )
+            }
+        }
+        ctx.source.sender.sendMessage(message)
     }
     
     private fun showItemBehaviors(ctx: CommandContext<CommandSourceStack>) {
@@ -564,7 +513,7 @@ internal object NovaCommand : Command() {
                 NamedTextColor.GRAY,
                 ItemUtils.getName(itemStack).color(NamedTextColor.AQUA),
                 Component.translatable(clientSideType.translationKey(), NamedTextColor.AQUA),
-                Component.text(item.key.toString(), NamedTextColor.AQUA)
+                Component.text(item.key.asString(), NamedTextColor.AQUA)
             ))
         } else ctx.source.sender.sendMessage(Component.translatable("command.nova.show_item_model_data.no_item", NamedTextColor.RED))
     }
@@ -618,7 +567,7 @@ internal object NovaCommand : Command() {
     }
     
     private fun showNetworkNodeInfoLookingAt(ctx: CommandContext<CommandSourceStack>) {
-        val pos = ctx.player.getTargetBlockExact(8)?.location?.pos
+        val pos = ctx.player.getTargetBlockExact(8)?.location?.block
         if (pos != null) {
             showNetworkNodeInfo(pos, ctx)
         } else ctx.source.sender.sendMessage(Component.translatable("command.nova.show_network_node_info.failure", NamedTextColor.RED))
@@ -627,22 +576,22 @@ internal object NovaCommand : Command() {
     private fun showNetworkNodeInfoAt(ctx: CommandContext<CommandSourceStack>) {
         val pos = ctx.get<BlockPositionResolver>("pos")
             .resolve(ctx.source)
-            .toNovaPos(ctx.source.location.world)
+            .toBlock(ctx.source.location.world)
         
         showNetworkNodeInfo(pos, ctx)
     }
     
-    private fun showNetworkNodeInfo(pos: BlockPos, ctx: CommandContext<CommandSourceStack>) {
-        val node = runBlocking { NetworkManager.getNode(pos) }
+    private fun showNetworkNodeInfo(block: Block, ctx: CommandContext<CommandSourceStack>) {
+        val node = runBlocking { NetworkManager.getNode(block) }
         if (node != null) {
-            NetworkManager.queueRead(pos.chunkPos) { state ->
+            NetworkManager.queueRead(block.chunkPos) { state ->
                 val connectedNodes = state.getConnectedNodes(node)
                 
-                suspend fun buildNetworkInfoComponent(type: NetworkType<*>, id: UUID): Component {
+                fun buildNetworkInfoComponent(type: NetworkType<*>, id: UUID): Component {
                     val network = state.getNetworkOrThrow(type, id)
                     return Component.translatable(
                         "command.nova.show_network_node_info.network", NamedTextColor.GRAY,
-                        Component.text(network.type.key.toString(), NamedTextColor.AQUA),
+                        Component.text(network.type.key.asString(), NamedTextColor.AQUA),
                         Component.text(id.toString(), NamedTextColor.AQUA),
                         Component.text(network.nodes.size, NamedTextColor.AQUA),
                         Component.text(network.nodes.values.count { [node, _] -> node is NetworkBridge }, NamedTextColor.AQUA),
@@ -653,23 +602,18 @@ internal object NovaCommand : Command() {
                 fun buildNodeNameComponent(node: NetworkNode): Component =
                     Component.text()
                         .color(NamedTextColor.AQUA)
-                        .append(
-                            when (node) {
-                                is TileEntity -> node.block.name
-                                is VanillaTileEntity -> Component.translatable(node.pos.block.type.blockTranslationKey ?: "")
-                                else -> Component.text(node::class.simpleName ?: "")
-                            }
-                        ).build()
+                        .append(node.block.blockType.name)
+                        .build()
                 
                 fun buildNodeComponent(node: NetworkNode): Component =
                     buildNodeNameComponent(node)
                         .hoverEvent(Component.translatable(
                             "command.nova.show_network_node_info.node", NamedTextColor.GRAY,
                             buildNodeNameComponent(node),
-                            Component.text(node.pos.world.name, NamedTextColor.AQUA),
-                            Component.text(node.pos.x, NamedTextColor.AQUA),
-                            Component.text(node.pos.y, NamedTextColor.AQUA),
-                            Component.text(node.pos.z, NamedTextColor.AQUA)
+                            Component.text(node.block.world.name, NamedTextColor.AQUA),
+                            Component.text(node.block.x, NamedTextColor.AQUA),
+                            Component.text(node.block.y, NamedTextColor.AQUA),
+                            Component.text(node.block.z, NamedTextColor.AQUA)
                         ))
                 
                 val builder = Component.text()
@@ -686,7 +630,7 @@ internal object NovaCommand : Command() {
                                 "command.nova.show_network_node_info.bridge.supported_network_types",
                                 Component.join(
                                     JoinConfiguration.commas(true),
-                                    state.getSupportedNetworkTypes(node).map { Component.text(it.key.toString(), NamedTextColor.AQUA) }
+                                    state.getSupportedNetworkTypes(node).map { Component.text(it.key.asString(), NamedTextColor.AQUA) }
                                 )))
                             .appendNewline().indent(2)
                             .append(Component.translatable(
@@ -708,7 +652,7 @@ internal object NovaCommand : Command() {
                                 .indent(4)
                                 .append(Component.translatable(
                                     "command.nova.show_network_node_info.bridge.networks.entry",
-                                    Component.text(type.key.toString(), NamedTextColor.AQUA),
+                                    Component.text(type.key.asString(), NamedTextColor.AQUA),
                                     Component
                                         .text(id.toString().take(8) + "...", NamedTextColor.AQUA)
                                         .hoverEvent(buildNetworkInfoComponent(type, id))
@@ -734,7 +678,7 @@ internal object NovaCommand : Command() {
                                 .indent(4)
                                 .append(Component.translatable(
                                     "command.nova.show_network_node_info.end_point.networks.entry",
-                                    Component.text(type.key.toString(), NamedTextColor.AQUA),
+                                    Component.text(type.key.asString(), NamedTextColor.AQUA),
                                     Component.text(face.name, NamedTextColor.AQUA),
                                     Component
                                         .text(id.toString().take(8) + "...", NamedTextColor.AQUA)
@@ -760,7 +704,7 @@ internal object NovaCommand : Command() {
                         .indent(4)
                         .append(Component.translatable(
                             "command.nova.show_network_node_info.connected_nodes.entry",
-                            Component.text(type.key.toString(), NamedTextColor.AQUA),
+                            Component.text(type.key.asString(), NamedTextColor.AQUA),
                             Component.text(face.name, NamedTextColor.AQUA),
                             buildNodeComponent(connectedNode)
                         ))
@@ -799,10 +743,10 @@ internal object NovaCommand : Command() {
         } else {
             ctx.source.sender.sendMessage(Component.translatable(
                 "command.nova.show_network_node_info.failure", NamedTextColor.RED,
-                Component.text(pos.world.name, NamedTextColor.AQUA),
-                Component.text(pos.x, NamedTextColor.AQUA),
-                Component.text(pos.y, NamedTextColor.AQUA),
-                Component.text(pos.z, NamedTextColor.AQUA)
+                Component.text(block.world.name, NamedTextColor.AQUA),
+                Component.text(block.x, NamedTextColor.AQUA),
+                Component.text(block.y, NamedTextColor.AQUA),
+                Component.text(block.z, NamedTextColor.AQUA)
             ))
         }
     }
@@ -821,11 +765,14 @@ internal object NovaCommand : Command() {
         itemTagExplorer(ctx.player).open()
     }
     
-    private fun fillArea(ctx: CommandContext<CommandSourceStack>) {
-        val block: NovaBlock = ctx["block"]
+    private fun fillArea(ctx: CommandContext<CommandSourceStack>, from: String, to: String) {
+        val blockType: BlockType = ctx["block"]
+        val blockState = blockType.createBlockData()
+        
+        val from = ctx.get<BlockPositionResolver>(from).resolve(ctx.source)
+        val to = ctx.get<BlockPositionResolver>(to).resolve(ctx.source)
+        
         val world = ctx.source.location.world
-        val from = ctx.get<BlockPositionResolver>("from").resolve(ctx.source)
-        val to = ctx.get<BlockPositionResolver>("to").resolve(ctx.source)
         val minX = min(from.blockX(), to.blockX())
         val maxX = max(from.blockX(), to.blockX())
         val minY = min(from.blockY(), to.blockY())
@@ -833,12 +780,8 @@ internal object NovaCommand : Command() {
         val minZ = min(from.blockZ(), to.blockZ())
         val maxZ = max(from.blockZ(), to.blockZ())
         
-        for (x in minX..maxX) {
-            for (y in minY..maxY) {
-                for (z in minZ..maxZ) {
-                    world.getBlockAt(x, y, z).novaBlock = block
-                }
-            }
+        for (x in minX..maxX) for (y in minY..maxY) for (z in minZ..maxZ) {
+            world.setBlockData(x, y, z, blockState)
         }
         
         ctx.source.sender.sendMessage(Component.translatable(
@@ -849,13 +792,13 @@ internal object NovaCommand : Command() {
             Component.text(maxX, NamedTextColor.AQUA),
             Component.text(maxY, NamedTextColor.AQUA),
             Component.text(maxZ, NamedTextColor.AQUA),
-            block.name.color(NamedTextColor.AQUA)
+            blockType.name.color(NamedTextColor.AQUA)
         ))
     }
     
     private fun giveClientsideStack(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
-        val item: NovaItem = ctx["item"]
+        val item: ItemType = ctx["item"]
         val clientSideStack = PacketItems.getClientSideStack(
             player,
             item.createItemStack().unwrap()
@@ -866,7 +809,7 @@ internal object NovaCommand : Command() {
         ctx.source.sender.sendMessage(Component.translatable(
             "command.nova.give_clientside_stack.success",
             NamedTextColor.GRAY,
-            item.name?.color(NamedTextColor.AQUA) ?: Component.empty()
+            item.name.color(NamedTextColor.AQUA)
         ))
     }
     
@@ -886,37 +829,17 @@ internal object NovaCommand : Command() {
         ))
     }
     
-    private fun searchVanillaBlock(ctx: CommandContext<CommandSourceStack>) {
+    private fun searchBlock(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
-        val block: Block = ctx["block"]
+        val block: BlockType = ctx["block"]
         val range: Int = ctx["range"]
         
+        val nmsBlock = block.nmsBlock
         val center = player.location.chunkPos
         for (xOff in -range..range) {
             for (zOff in -range..range) {
                 val chunkPos = ChunkPos(center.worldUUID, center.x + xOff, center.z + zOff)
-                BlockStateSearcher.searchChunk(chunkPos, listOf { it.block == block })[0]?.forEach { [pos, _] ->
-                    sendBlockSearchResult(ctx, Component.translatable(block.descriptionId), pos.x, pos.y, pos.z)
-                }
-            }
-        }
-        
-        ctx.source.sender.sendMessage(Component.translatable("command.nova.search_block.done", NamedTextColor.GRAY))
-    }
-    
-    private fun searchNovaBlock(ctx: CommandContext<CommandSourceStack>) = runBlocking {
-        val player = ctx.player
-        val block: NovaBlock = ctx["block"]
-        val range: Int = ctx["range"]
-        
-        val center = player.location.chunkPos
-        for (xOff in -range..range) {
-            for (zOff in -range..range) {
-                val chunkPos = ChunkPos(center.worldUUID, center.x + xOff, center.z + zOff)
-                WorldDataManager.getOrLoadChunk(chunkPos).forEachNonEmpty { pos, blockState ->
-                    if (blockState.block != block)
-                        return@forEachNonEmpty
-                    
+                BlockStateSearcher.searchChunk(chunkPos, listOf { it.block == nmsBlock })[0]?.forEach { [pos, _] ->
                     sendBlockSearchResult(ctx, block.name, pos.x, pos.y, pos.z)
                 }
             }
@@ -932,52 +855,6 @@ internal object NovaCommand : Command() {
             blockName,
             Component.text("x=$x, y=$y, z=$z", NamedTextColor.AQUA).clickEvent(ClickEvent.suggestCommand("/tp $x $y $z"))
         ))
-    }
-    
-    private fun recalculateLeaveProperties(ctx: CommandContext<CommandSourceStack>) = runBlocking {
-        val player = ctx.player
-        val range: Int = ctx["range"]
-        
-        // let all leaves tick, which triggers a chain reaction of scheduled ticks that updates all distances
-        val leaves = HashSet<BlockPos>()
-        val center = player.location.chunkPos
-        for (xOff in -range..range) {
-            for (zOff in -range..range) {
-                val chunkPos = ChunkPos(center.worldUUID, center.x + xOff, center.z + zOff)
-                WorldDataManager.getOrLoadChunk(chunkPos).forEachNonEmpty { pos, blockState ->
-                    val leavesBehavior = blockState.block.getBehaviorOrNull<LeavesBehavior>()
-                    if (leavesBehavior != null
-                        && blockState[DefaultBlockStateProperties.LEAVES_PERSISTENT] == true
-                        && blockState[DefaultBlockStateProperties.LEAVES_DISTANCE] == 7
-                    ) {
-                        leavesBehavior.handleScheduledTick(pos, blockState)
-                        leaves += pos
-                    }
-                }
-            }
-        }
-        
-        // assume that all leaves who now have a distance < 7 are part of a tree and not supposed to be persistent
-        runTaskLater(20) {
-            var count = 0
-            for (pos in leaves) {
-                val blockState = WorldDataManager.getBlockState(pos)
-                if (blockState != null
-                    && blockState.block.hasBehavior<LeavesBehavior>()
-                    && blockState.getOrThrow(DefaultBlockStateProperties.LEAVES_DISTANCE) < 7
-                ) {
-                    count++
-                    WorldDataManager.setBlockState(pos, blockState.with(DefaultBlockStateProperties.LEAVES_PERSISTENT, false))
-                }
-            }
-            
-            ctx.source.sender.sendMessage(Component.translatable(
-                "command.nova.recalculate_leave_properties.done",
-                NamedTextColor.GRAY,
-                Component.text(leaves.size, NamedTextColor.AQUA),
-                Component.text(count, NamedTextColor.AQUA)
-            ))
-        }
     }
     
     private fun openItemInventory(ctx: CommandContext<CommandSourceStack>) {

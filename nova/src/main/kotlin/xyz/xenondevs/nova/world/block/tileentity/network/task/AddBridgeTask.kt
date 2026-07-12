@@ -34,7 +34,7 @@ internal class AddBridgeTask(
     private inner class AddBridgeTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = node.pos.toString()
+        val pos: String = node.block.toString()
         
     }
     
@@ -43,7 +43,7 @@ internal class AddBridgeTask(
     
     override suspend fun add() {
         state.setBridgeData(
-            node.pos,
+            node.block,
             NetworkBridgeData(
                 typeId = node.typeId,
                 owner = node.owner?.uniqueId ?: UUID(0L, 0L),
@@ -53,7 +53,7 @@ internal class AddBridgeTask(
         )
         
         val allowedFaces: CubeFaceSet = bridgeFaces and protectionResult
-        val nearbyNodes: CubeFaceMap<NetworkNode?> = state.getNearbyNodes(node.pos, allowedFaces)
+        val nearbyNodes: CubeFaceMap<NetworkNode?> = state.getNearbyNodes(node.block, allowedFaces)
         val nearbyBridges: CubeFaceMap<NetworkBridge?> = nearbyNodes.map { it as? NetworkBridge }
         val nearbyEndPoints: CubeFaceMap<NetworkEndPoint?> = nearbyNodes.map { it as? NetworkEndPoint }
         

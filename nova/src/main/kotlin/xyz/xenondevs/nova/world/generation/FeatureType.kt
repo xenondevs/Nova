@@ -13,9 +13,7 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
 import org.bukkit.Material
 import xyz.xenondevs.nova.util.nmsBlock
-import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.function.Predicate
 
 /**
@@ -40,13 +38,6 @@ abstract class FeatureType<FC : FeatureConfiguration>(codec: Codec<FC>) : Featur
      */
     protected fun setBlock(level: WorldGenLevel, pos: BlockPos, material: Material, flags: Int) {
         level.setBlock(pos, material.nmsBlock.defaultBlockState(), flags)
-    }
-    
-    /**
-     * Sets the block at the given position to the given [NovaBlock].
-     */
-    protected fun setBlock(level: WorldGenLevel, pos: BlockPos, block: NovaBlock) {
-        WorldDataManager.setBlockState(pos.toNovaPos(level.level.world), block.defaultBlockState)
     }
     
     //<editor-fold desc="Overrides for better param names" defaultstate="collapsed">

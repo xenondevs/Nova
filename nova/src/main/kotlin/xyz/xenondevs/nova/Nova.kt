@@ -48,11 +48,7 @@ internal val HTTP_CLIENT = HttpClient(CIO) {
 internal var PLUGIN_READY = false
     private set
 
-private val INCOMPATIBLE_PLUGINS = setOf(
-    // FAWE replaces LevelChunkSections, preventing Nova from doing block migrations & world gen
-    // https://github.com/xenondevs/Nova/issues/560
-    "FastAsyncWorldEdit"
-)
+private val INCOMPATIBLE_PLUGINS: Set<String> = emptySet()
 
 internal object Nova : JavaPlugin(), INova {
     

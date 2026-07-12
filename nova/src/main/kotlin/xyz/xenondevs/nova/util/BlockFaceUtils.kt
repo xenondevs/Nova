@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.util
 
+import xyz.xenondevs.nova.world.*
+
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
@@ -9,7 +11,6 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
 import xyz.xenondevs.commons.collections.after
-import xyz.xenondevs.nova.world.BlockPos
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -274,7 +275,7 @@ object BlockFaceUtils {
      * Determines the block face that needs to be used to advance from [from] to [to] with step size 1,
      * or null if the two positions are not adjacent.
      */
-    fun determineBlockFaceBetween(from: BlockPos, to: BlockPos): BlockFace? {
+    fun determineBlockFaceBetween(from: Block, to: Block): BlockFace? {
         val x = to.x - from.x
         val y = to.y - from.y
         val z = to.z - from.z

@@ -2,6 +2,8 @@
 
 package xyz.xenondevs.nova.world.block.sound
 
+import xyz.xenondevs.nova.world.*
+
 import net.minecraft.world.level.block.SoundType
 import org.bukkit.Location
 import org.bukkit.SoundCategory
@@ -201,11 +203,11 @@ data class SoundGroup(
             return SoundGroup(
                 soundGroup.volume,
                 soundGroup.pitch,
-                soundGroup.breakSound.key().toString(),
-                soundGroup.stepSound.key().toString(),
-                soundGroup.placeSound.key().toString(),
-                soundGroup.hitSound.key().toString(),
-                soundGroup.fallSound.key().toString()
+                soundGroup.breakSound.key().asString(),
+                soundGroup.stepSound.key().asString(),
+                soundGroup.placeSound.key().asString(),
+                soundGroup.hitSound.key().asString(),
+                soundGroup.fallSound.key().asString()
             )
         }
         

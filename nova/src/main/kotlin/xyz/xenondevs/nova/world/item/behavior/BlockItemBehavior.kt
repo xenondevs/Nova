@@ -4,9 +4,9 @@ import kotlinx.coroutines.runBlocking
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
-import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
@@ -14,67 +14,66 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.registry.entries.BlockTypeTags
 import xyz.xenondevs.nova.util.BlockUtils
-import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
+import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.InteractionResult
-import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
-import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
-import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
-import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.block.NovaBlockState
+import xyz.xenondevs.nova.world.block.blockType
+import xyz.xenondevs.nova.world.block.clientsideBlockState
+import xyz.xenondevs.nova.world.block.novaBlock
 import xyz.xenondevs.nova.world.item.ItemAction
 
-internal class BlockItemBehavior(blockType: Provider<NovaBlock>) : ItemBehavior {
+internal class BlockItemBehavior(blockType: Provider<BlockType>) : ItemBehavior {
     
-    private val novaBlock by blockType
+    private val blockType by blockType
     
     override fun useOnBlock(itemStack: ItemStack, block: Block, ctx: Context<BlockInteract>): InteractionResult {
         val player = ctx[BlockInteract.SOURCE_PLAYER]
             ?: return InteractionResult.Fail
         val handItem = ctx[BlockInteract.HELD_ITEM_STACK]
-        var pos = ctx[BlockInteract.BLOCK_POS]
+        var block = ctx[BlockInteract.BLOCK]
         val clickedFace = ctx[BlockInteract.CLICKED_BLOCK_FACE] ?: BlockFace.NORTH
-        if (!Tag.REPLACEABLE.isTagged(pos.block.type) || WorldDataManager.getBlockState(pos) != null)
-            pos = pos.advance(clickedFace)
+        if (block.blockType !in BlockTypeTags.REPLACEABLE)
+            block = block.getRelative(clickedFace)
         
         val ctx = Context.intention(BlockPlace)
-            .param(BlockPlace.BLOCK_POS, pos)
+            .param(BlockPlace.BLOCK, block)
+            .param(BlockPlace.BLOCK_TYPE, blockType)
+            .param(BlockPlace.PREVIOUS_BLOCK_STATE, block.blockData)
             .param(BlockPlace.BLOCK_ITEM_STACK, handItem)
             .param(BlockPlace.SOURCE_ENTITY, player)
             .param(BlockPlace.CLICKED_BLOCK_FACE, ctx[BlockInteract.CLICKED_BLOCK_FACE])
+            .param(BlockPlace.HELD_HAND, ctx[BlockInteract.HELD_HAND])
+            .param(BlockPlace.HELD_ITEM_STACK, handItem)
             .build()
         
-        val newState = ctx[BlockPlace.BLOCK_STATE_NOVA]!!
+        val newState = ctx[BlockPlace.BLOCK_STATE]
+        require(newState is NovaBlockState)
         
-        val vanillaState = when (val modelProvider = newState.modelProvider) {
-            is BackingStateBlockModelProvider -> modelProvider.info.vanillaBlockState.bukkitBlockData
-            is DisplayEntityBlockModelProvider -> modelProvider.info.collider
-            is ModelLessBlockModelProvider -> modelProvider.info
-        }
+        val vanillaState = newState.clientsideBlockState
         
-        if (pos.location.isInsideWorldRestrictions()
-            && BlockUtils.isUnobstructed(pos, player, vanillaState)
-            && ProtectionManager.canPlace(player, handItem, pos)
-            && canPlace(player, handItem, pos, pos.advance(clickedFace.oppositeFace))
-            && runBlocking { novaBlock.canPlace(pos, newState, ctx) } // assume blocking is ok because player is online
+        if (block.location.isInsideWorldRestrictions()
+            && BlockUtils.isUnobstructed(block, player, vanillaState)
+            && ProtectionManager.canPlace(player, handItem, block)
+            && canPlace(player, handItem, block, block.getRelative(clickedFace.oppositeFace, 1))
+            && runBlocking { blockType.novaBlock?.canPlace(block, newState, ctx) != false } // assume blocking is ok because player is online
         ) {
-            BlockUtils.placeNovaBlock(pos, newState, ctx)
+            BlockUtils.placeBlock(ctx)
             return InteractionResult.Success(swing = true, action = ItemAction.Consume())
         }
         
         return InteractionResult.Fail
     }
     
-    private fun canPlace(player: Player, item: ItemStack, block: BlockPos, placedOn: BlockPos): Boolean {
+    private fun canPlace(player: Player, item: ItemStack, block: Block, placedOn: Block): Boolean {
         if (
             player.gameMode == GameMode.SPECTATOR
             || !block.location.isInsideWorldRestrictions()
-            || !Tag.REPLACEABLE.isTagged(block.block.type)
-            || WorldDataManager.getBlockState(block) != null
+            || block.blockType !in BlockTypeTags.REPLACEABLE
         ) return false
         
         if (player.gameMode == GameMode.ADVENTURE) {

@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import xyz.xenondevs.nova.util.item.ItemUtilsKt;
+import xyz.xenondevs.nova.world.item.NovaItem;
 import xyz.xenondevs.nova.world.item.behavior.Tool;
 
 @Mixin(Player.class)
@@ -20,8 +20,7 @@ abstract class PlayerMixin {
     @Expression("?.is(SWORDS)")
     @Redirect(method = "isSweepAttack", at = @At("MIXINEXTRAS:EXPRESSION"))
     private boolean canDoSweepAttack(ItemStack stack, TagKey<Item> swords) {
-        var novaItem = ItemUtilsKt.getNovaItem(stack);
-        if (novaItem != null) {
+        if (stack.getItem() instanceof NovaItem novaItem) {
             var tool = novaItem.getBehaviorOrNull(Tool.class);
             return tool != null && tool.getCanSweepAttack();
         }

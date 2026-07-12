@@ -28,7 +28,7 @@ internal class AddEndPointTask(
     private inner class AddEndPointTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = node.pos.toString()
+        val pos: String = node.block.toString()
         
     }
     
@@ -37,7 +37,7 @@ internal class AddEndPointTask(
     
     override suspend fun add() {
         state.setEndPointData(
-            node.pos,
+            node.block,
             NetworkEndPointData(node.owner)
         )
         
@@ -48,7 +48,7 @@ internal class AddEndPointTask(
             if (allowedFaces.isEmpty())
                 continue
             
-            state.forEachNearbyNode(node.pos, allowedFaces) { face, neighborNode ->
+            state.forEachNearbyNode(node.block, allowedFaces) { face, neighborNode ->
                 // do not allow networks between two vanilla tile entities
                 if (node is VanillaTileEntity && neighborNode is VanillaTileEntity)
                     return@forEachNearbyNode

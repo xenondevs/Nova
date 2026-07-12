@@ -1,33 +1,46 @@
 package xyz.xenondevs.nova.world.format.chunk
 
+import xyz.xenondevs.nova.world.*
+
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
-import xyz.xenondevs.nova.world.BlockPos
+import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.chunk.RegionizedChunk.Companion.packBlockPos
 
 internal class NetworkChunk(
-    private val bridges: MutableMap<BlockPos, NetworkBridgeData> = HashMap(),
-    private val endPoints: MutableMap<BlockPos, NetworkEndPointData> = HashMap()
+    private val bridges: MutableMap<Block, NetworkBridgeData> = HashMap(),
+    private val endPoints: MutableMap<Block, NetworkEndPointData> = HashMap()
 ) : RegionizedChunk {
     
-    fun getData(): Map<BlockPos, NetworkNodeData> {
-        val map = HashMap<BlockPos, NetworkNodeData>(bridges.size + endPoints.size)
+    @Volatile
+    var accessedSinceLastSave: Boolean = false
+    
+    fun getData(): Map<Block, NetworkNodeData> {
+        accessedSinceLastSave = true
+        val map = HashMap<Block, NetworkNodeData>(bridges.size + endPoints.size)
         map.putAll(bridges)
         map.putAll(endPoints)
         return map
     }
     
-    fun getData(pos: BlockPos): NetworkNodeData? =
-        bridges[pos] ?: endPoints[pos]
+    fun getData(pos: Block): NetworkNodeData? {
+        accessedSinceLastSave = true
+        return bridges[pos] ?: endPoints[pos]
+    }
     
-    fun getBridgeData(pos: BlockPos): NetworkBridgeData? =
-        bridges[pos]
+    fun getBridgeData(pos: Block): NetworkBridgeData? {
+        accessedSinceLastSave = true
+        return bridges[pos]
+    }
     
-    fun getEndPointData(pos: BlockPos): NetworkEndPointData? =
-        endPoints[pos]
+    fun getEndPointData(pos: Block): NetworkEndPointData? {
+        accessedSinceLastSave = true
+        return endPoints[pos]
+    }
     
-    fun setData(pos: BlockPos, data: NetworkNodeData?) {
+    fun setData(pos: Block, data: NetworkNodeData?) {
+        accessedSinceLastSave = true
         when (data) {
             is NetworkBridgeData -> {
                 bridges[pos] = data
@@ -46,7 +59,8 @@ internal class NetworkChunk(
         }
     }
     
-    fun setBridgeData(pos: BlockPos, data: NetworkBridgeData?) {
+    fun setBridgeData(pos: Block, data: NetworkBridgeData?) {
+        accessedSinceLastSave = true
         if (data != null) {
             bridges[pos] = data
         } else {
@@ -54,7 +68,8 @@ internal class NetworkChunk(
         }
     }
     
-    fun setEndPointData(pos: BlockPos, data: NetworkEndPointData?) {
+    fun setEndPointData(pos: Block, data: NetworkEndPointData?) {
+        accessedSinceLastSave = true
         if (data != null) {
             endPoints[pos] = data
         } else {
@@ -85,19 +100,19 @@ internal class NetworkChunk(
         
         override fun read(pos: ChunkPos, reader: ByteReader): NetworkChunk {
             val bridgeSize = reader.readVarInt()
-            val bridges = HashMap<BlockPos, NetworkBridgeData>(bridgeSize)
+            val bridges = HashMap<Block, NetworkBridgeData>(bridgeSize)
             repeat(bridgeSize) {
-                val blockPos = unpackBlockPos(pos, reader.readInt())
+                val Block = unpackBlockPos(pos, reader.readInt())
                 val data = NetworkBridgeData.read(reader)
-                bridges[blockPos] = data
+                bridges[Block] = data
             }
             
             val endPointSize = reader.readVarInt()
-            val endPoints = HashMap<BlockPos, NetworkEndPointData>(endPointSize)
+            val endPoints = HashMap<Block, NetworkEndPointData>(endPointSize)
             repeat(endPointSize) {
-                val blockPos = unpackBlockPos(pos, reader.readInt())
+                val Block = unpackBlockPos(pos, reader.readInt())
                 val data = NetworkEndPointData.read(reader)
-                endPoints[blockPos] = data
+                endPoints[Block] = data
             }
             
             return NetworkChunk(bridges, endPoints)

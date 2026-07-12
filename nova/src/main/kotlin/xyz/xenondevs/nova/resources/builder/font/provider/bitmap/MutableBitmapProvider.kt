@@ -102,7 +102,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
         }
         
         override fun toJson() = super.toJson().apply {
-            addProperty("file", file.toString())
+            addProperty("file", file.asString())
             addProperty("height", height)
             addProperty("ascent", ascent)
             val rows = if (codePointsChanged) codePointGrid.toStringList() else codePointRows

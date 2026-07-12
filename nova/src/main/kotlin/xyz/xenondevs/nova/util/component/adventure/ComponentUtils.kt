@@ -86,7 +86,7 @@ fun Component.font(font: String): Component {
 }
 
 fun Component.fontName(): String? {
-    return font()?.toString()
+    return font()?.asString()
 }
 
 fun Component.withoutPreFormatting(): Component {

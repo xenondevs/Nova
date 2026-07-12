@@ -5,7 +5,7 @@ import jdk.jfr.Event
 import jdk.jfr.Label
 import jdk.jfr.Name
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.world.BlockPos
+import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.MutableNetworkNodeConnection
@@ -32,7 +32,7 @@ internal class RemoveBridgeTask(
     private inner class AddBridgeTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = node.pos.toString()
+        val pos: String = node.block.toString()
         
     }
     
@@ -127,7 +127,7 @@ internal class RemoveBridgeTask(
      * for all nodes in [layouts], assuming [layouts] indices correspond the [networks] indices.
      */
     private suspend fun reassignNetworks(
-        layouts: List<Map<BlockPos, MutableNetworkNodeConnection>>,
+        layouts: List<Map<Block, MutableNetworkNodeConnection>>,
         networks: List<ProtoNetwork<*>>
     ) {
         for ([i, layout] in layouts.withIndex()) {
@@ -152,14 +152,14 @@ internal class RemoveBridgeTask(
         bridge: NetworkBridge,
         connectedPreviously: Set<NetworkBridge>,
         networkType: NetworkType<*>
-    ): List<Map<BlockPos, MutableNetworkNodeConnection>>? {
+    ): List<Map<Block, MutableNetworkNodeConnection>>? {
         require(connectedPreviously.size > 1) { "Recalculating networks is not required" }
         
-        val potentialNetworks = ArrayList<MutableMap<BlockPos, MutableNetworkNodeConnection>>()
+        val potentialNetworks = ArrayList<MutableMap<Block, MutableNetworkNodeConnection>>()
         val previouslyExploredBridges = HashSet<NetworkBridge>() // used for detecting identical side iterations
         
         state.forEachConnectedNode(bridge, networkType) sideIteration@{ startFace, startNode ->
-            val potentialNetwork = HashMap<BlockPos, MutableNetworkNodeConnection>()
+            val potentialNetwork = HashMap<Block, MutableNetworkNodeConnection>()
             val exploredNodes = HashSet<NetworkNode>()
             val exploredBridges = HashSet<NetworkBridge>()
             val remainingConnectedPreviously = HashSet(connectedPreviously)
@@ -188,7 +188,7 @@ internal class RemoveBridgeTask(
                             exploredNodes += neighbor
                         } else if (neighbor is NetworkEndPoint) {
                             // the connection from a different side might still be important
-                            potentialNetwork.getOrPut(neighbor.pos) {
+                            potentialNetwork.getOrPut(neighbor.block) {
                                 MutableNetworkNodeConnection(neighbor)
                             }.faces += face.oppositeFace
                         }
@@ -198,7 +198,7 @@ internal class RemoveBridgeTask(
                 }
                 
                 // node is now explored, add to network content
-                potentialNetwork.getOrPut(currentNode.pos) {
+                potentialNetwork.getOrPut(currentNode.block) {
                     MutableNetworkNodeConnection(currentNode)
                 }.faces += approachingFace.oppositeFace
             }

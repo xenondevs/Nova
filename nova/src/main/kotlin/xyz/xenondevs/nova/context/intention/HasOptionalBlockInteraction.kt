@@ -2,6 +2,8 @@
 
 package xyz.xenondevs.nova.context.intention
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention

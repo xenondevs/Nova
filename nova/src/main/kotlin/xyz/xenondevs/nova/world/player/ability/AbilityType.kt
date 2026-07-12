@@ -11,5 +11,5 @@ class AbilityType<T : Ability> internal constructor(
     override val entry: RegistryEntry.Nova<AbilityType<T>>,
     val createAbility: (Player) -> T
 ) : NovaRegistryElement<AbilityType<T>> {
-    override fun toString(): String = key.toString()
+    override fun toString(): String = this@AbilityType.key.asString()
 }

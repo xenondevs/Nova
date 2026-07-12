@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xyz.xenondevs.nova.util.item.ItemUtilsKt;
+import xyz.xenondevs.nova.world.item.NovaItem;
 
 @Mixin(Item.class)
 abstract class ItemMixin {
@@ -29,8 +29,7 @@ abstract class ItemMixin {
     )
     private void novaUse(Level level, Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         var itemStack = player.getItemInHand(hand);
-        var novaItem = ItemUtilsKt.getNovaItem(itemStack);
-        if (novaItem == null)
+        if (!(itemStack.getItem() instanceof NovaItem novaItem))
             return;
         
         var novaUseDuration = novaItem.modifyUseDuration(

@@ -146,34 +146,4 @@ class ArraySectionDataContainerTest : AbstractSectionDataContainerTest() {
         testDataMigrateOnPaletteResize(ArraySectionDataContainer(MockIdResolver()))
     }
     
-    @Test
-    fun testMatchEmptyContainer() {
-        testMatchEmptyContainer(ArraySectionDataContainer(MockIdResolver()))
-    }
-    
-    @Test
-    fun testMatchEmptySet() {
-        testMatchEmptySet(ArraySectionDataContainer(MockIdResolver()))
-    }
-    
-    @Test
-    fun testMatchValuesNotInPalette() {
-        testMatchValuesNotInPalette(ArraySectionDataContainer(MockIdResolver()))
-    }
-    
-    @Test
-    fun testMatchSingleValue() {
-        testMatchSingleValue(ArraySectionDataContainer(MockIdResolver()))
-    }
-    
-    @Test
-    fun testMatchMultipleValues() {
-        testMatchMultipleValues(ArraySectionDataContainer(MockIdResolver()))
-    }
-    
-    @Test
-    fun testMatchMultipleValuesPartiallyInPalette() {
-        testMatchMultipleValuesPartiallyInPalette(ArraySectionDataContainer(MockIdResolver()))
-    }
-    
 }

@@ -2,17 +2,18 @@ package xyz.xenondevs.nova.world.block.limits
 
 import net.kyori.adventure.key.Key
 import org.bukkit.World
+import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockPlace
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits.PlaceResult
+import xyz.xenondevs.nova.world.chunkPos
 import java.util.*
 
 internal interface BlockLimiter {
     
-    fun canPlace(material: NovaBlock, ctx: Context<BlockPlace>): PlaceResult
+    fun canPlace(type: BlockType, ctx: Context<BlockPlace>): PlaceResult
     
     companion object {
         
@@ -26,25 +27,25 @@ internal abstract class SimpleBlockLimiter(denyMessage: String) : BlockLimiter {
     
     private val denied = PlaceResult(false, denyMessage)
     
-    final override fun canPlace(material: NovaBlock, ctx: Context<BlockPlace>): PlaceResult {
-        return if (testPlace(material, ctx)) ALLOWED else denied
+    final override fun canPlace(type: BlockType, ctx: Context<BlockPlace>): PlaceResult {
+        return if (testPlace(type, ctx)) ALLOWED else denied
     }
     
-    abstract fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean
+    abstract fun testPlace(type: BlockType, ctx: Context<BlockPlace>): Boolean
     
 }
 
 internal class TypeBlacklist(private val blacklist: Set<Key>) : SimpleBlockLimiter("nova.tile_entity_limits.type_blacklist.deny") {
     
-    override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
-        return material.key !in blacklist
+    override fun testPlace(type: BlockType, ctx: Context<BlockPlace>): Boolean {
+        return type.key !in blacklist
     }
     
 }
 
 internal class WorldBlacklist(private val blacklist: Set<String>) : SimpleBlockLimiter("nova.tile_entity_limits.world_blacklist.deny") {
     
-    override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
+    override fun testPlace(type: BlockType, ctx: Context<BlockPlace>): Boolean {
         return !blacklist.contains("*") && ctx[BlockPlace.BLOCK_WORLD].name !in blacklist
     }
     
@@ -52,8 +53,8 @@ internal class WorldBlacklist(private val blacklist: Set<String>) : SimpleBlockL
 
 internal class TypeWorldBlacklist(private val blacklist: Map<String, Set<Key>>) : SimpleBlockLimiter("nova.tile_entity_limits.type_world_blacklist.deny") {
     
-    override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
-        val id = material.key
+    override fun testPlace(type: BlockType, ctx: Context<BlockPlace>): Boolean {
+        val id = type.key
         val world: World = ctx[BlockPlace.BLOCK_WORLD]
         return blacklist["*"]?.contains(id) != true && blacklist[world.name]?.contains(id) != true
     }
@@ -65,19 +66,19 @@ internal class AmountLimiter(private val type: Type, private val limits: Map<Key
     private val deniedSpecific = PlaceResult(false, "nova.tile_entity_limits.amount_${type.name.lowercase()}.deny")
     private val deniedTotal = PlaceResult(false, "nova.tile_entity_limits.amount_${type.name.lowercase()}_total.deny")
     
-    override fun canPlace(material: NovaBlock, ctx: Context<BlockPlace>): PlaceResult {
-        val id: Key = material.key
+    override fun canPlace(type: BlockType, ctx: Context<BlockPlace>): PlaceResult {
+        val id: Key = type.key
         val owner: UUID = ctx[BlockPlace.SOURCE_UUID] ?: return ALLOWED
-        val pos: BlockPos = ctx[BlockPlace.BLOCK_POS]
+        val block: Block = ctx[BlockPlace.BLOCK]
         
         val specificLimit = limits[id]
         val totalLimit = limits[null]
         
         if (specificLimit != null) {
-            val amount = when (type) {
+            val amount = when (this@AmountLimiter.type) {
                 Type.GLOBAL -> TileEntityTracker.getBlocksPlacedAmount(owner, id)
-                Type.PER_WORLD -> TileEntityTracker.getBlocksPlacedAmount(owner, pos.world.uid, id)
-                Type.PER_CHUNK -> TileEntityTracker.getBlocksPlacedAmount(owner, pos.chunkPos, id)
+                Type.PER_WORLD -> TileEntityTracker.getBlocksPlacedAmount(owner, block.world.uid, id)
+                Type.PER_CHUNK -> TileEntityTracker.getBlocksPlacedAmount(owner, block.chunkPos, id)
             }
             
             if (amount >= specificLimit)
@@ -85,10 +86,10 @@ internal class AmountLimiter(private val type: Type, private val limits: Map<Key
         }
         
         if (totalLimit != null) {
-            val amount = when (type) {
+            val amount = when (this@AmountLimiter.type) {
                 Type.GLOBAL -> TileEntityTracker.getBlocksPlacedAmount(owner)
-                Type.PER_WORLD -> TileEntityTracker.getBlocksPlacedAmount(owner, pos.world.uid)
-                Type.PER_CHUNK -> TileEntityTracker.getBlocksPlacedAmount(owner, pos.chunkPos)
+                Type.PER_WORLD -> TileEntityTracker.getBlocksPlacedAmount(owner, block.world.uid)
+                Type.PER_CHUNK -> TileEntityTracker.getBlocksPlacedAmount(owner, block.chunkPos)
             }
             
             if (amount >= totalLimit)

@@ -26,13 +26,7 @@ class TestRegistryContext : RegistryContext {
         trackedEntries += key
     }
     
-    override fun <N : NovaRegistryElement<N>, T : Keyed> trackUnresolvedEntry(key: TypedKey<T>, novaRegistry: NovaRegistry<N>, registryAccess: RegistryAccess) {
-    }
-    
     override fun <T : Keyed> trackUnresolvedTag(key: TagKey<T>, registryAccess: RegistryAccess) {
-    }
-    
-    override fun <N : NovaRegistryElement<N>, T : Keyed> trackUnresolvedTag(key: TagKey<T>, novaRegistry: NovaRegistry<N>, registryAccess: RegistryAccess) {
     }
     
     override fun registerPostTagReloadListener(listener: () -> Unit) {

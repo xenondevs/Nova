@@ -3,9 +3,11 @@
 package xyz.xenondevs.nova.world.block.tileentity
 
 import kotlinx.coroutines.Job
-import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
 import org.bukkit.OfflinePlayer
+import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
@@ -23,19 +25,21 @@ import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.packetentity.PacketItemDisplay
 import xyz.xenondevs.nova.serialization.DataHolder
 import xyz.xenondevs.nova.util.item.storeData
+import xyz.xenondevs.nova.util.nmsBlockState
+import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.salt
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.InteractionResult
-import xyz.xenondevs.nova.world.block.BlockUpdateMethod
-import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
+import xyz.xenondevs.nova.world.block.BlockUpdateFlags
+import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.blockType
+import xyz.xenondevs.nova.world.block.itemTypeOrNull
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.FluidContainer
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
-import xyz.xenondevs.nova.world.format.WorldDataManager
-import xyz.xenondevs.nova.world.item.createItemStack
 import xyz.xenondevs.nova.world.region.DynamicRegion
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
@@ -45,7 +49,7 @@ import java.util.*
  * A custom tile entity.
  */
 abstract class TileEntity(
-    val pos: BlockPos,
+    val block: Block,
     blockState: NovaBlockState,
     override val data: Compound
 ) : DataHolder(true) {
@@ -60,7 +64,7 @@ abstract class TileEntity(
         /**
          * The key under which [TileEntity] data is stored in [ItemStacks][ItemStack].
          */
-        val TILE_ENTITY_DATA_KEY = Key.key("nova", "tileentity")
+        val TILE_ENTITY_DATA_KEY = NamespacedKey("nova", "tileentity")
         
     }
     
@@ -86,23 +90,30 @@ abstract class TileEntity(
      */
     var blockState: NovaBlockState = blockState
         internal set
+        get() = field.clone()
     
     /**
-     * The [NovaTileEntityBlock] this [TileEntity].
+     * The [BlockType] of this [TileEntity].
      */
-    val block: NovaTileEntityBlock
-        get() = blockState.block as NovaTileEntityBlock
+    val blockType: BlockType
+        get() = blockState.blockType
     
     /**
      * The [PacketItemDisplay(s)][PacketItemDisplay] used to display the model of this [TileEntity], if it is entity-backed.
      */
     val displayEntities: List<PacketItemDisplay>?
-        get() = DisplayEntityBlockModelProvider.entities[pos]
+        get() = DisplayEntityBlockModelProvider.entities[block]
     
     /**
      * Whether this [TileEntity] is enabled.
      */
     var isEnabled: Boolean = false
+        internal set
+    
+    /**
+     * Whether this [TileEntity] is ticking.
+     */
+    var isTicking: Boolean = false
         internal set
     
     /**
@@ -114,10 +125,10 @@ abstract class TileEntity(
     /**
      * The supervisor [Job] for coroutines of this [TileEntity].
      *
-     * Will be available for use after ticking was enabled, indicated by [handleEnableTicking].
-     * Will be automatically cancelled when ticking is disabled, indicated by [handleDisableTicking].
+     * Will be available after ticking was enabled, indicated by [handleEnableTicking].
+     * Will be automatically cancelled and reset to `null` when ticking is disabled, indicated by [handleDisableTicking].
      */
-    lateinit var coroutineSupervisor: Job
+    var coroutineSupervisor: Job? = null
         internal set
     
     private val dropProviders = ArrayList<() -> Collection<ItemStack>>()
@@ -195,7 +206,7 @@ abstract class TileEntity(
         if (includeSelf) {
             saveData()
             
-            val item = block.item?.createItemStack()
+            val item = blockType.itemTypeOrNull?.createItemStack()
             if (item != null) {
                 if (persistentData.isNotEmpty()) {
                     item.storeData(TILE_ENTITY_DATA_KEY, persistentData)
@@ -226,23 +237,29 @@ abstract class TileEntity(
      * visible for.
      */
     fun getViewers(): List<Player> =
-        FakeEntityManager.getChunkViewers(pos.chunkPos)
+        FakeEntityManager.getChunkViewers(block.chunkPos)
     
     /**
      * Changes the block state of this [TileEntity] to [blockState].
      *
+     * This retains the existing tile entity and does not invoke block placement handling.
+     *
+     * @param flags The notifications and block updates to perform.
      * @throws IllegalArgumentException If [blockState] is not of this [TileEntity's][TileEntity] block type.
      */
-    fun updateBlockState(blockState: NovaBlockState, method: BlockUpdateMethod = BlockUpdateMethod.WITH_BLOCK_UPDATES) {
+    fun updateBlockState(
+        blockState: NovaBlockState,
+        flags: BlockUpdateFlags = BlockUpdateFlags.ALL
+    ) {
         require(isEnabled) { "TileEntity needs to be enabled" }
-        require(blockState.block == block) { "New block state needs to be of the same block type" }
+        require(blockState.blockType == blockType) { "New block state needs to be of the same block type" }
         
-        val prevBlockState = this.blockState
-        if (blockState == prevBlockState)
+        if (blockState == this.blockState)
             return
         
-        blockState.modelProvider.replace(pos, prevBlockState.modelProvider, method)
-        WorldDataManager.setBlockState(pos, blockState)
+        val updateFlags = flags + BlockUpdateFlags.SKIP_ON_PLACE
+        if (block.world.serverLevel.setBlock(block.nmsPos, blockState.nmsBlockState, updateFlags.value))
+            this.blockState = blockState.clone()
     }
     
     /**
@@ -360,7 +377,7 @@ abstract class TileEntity(
     }
     
     override fun toString(): String {
-        return "${javaClass.simpleName}(blockState=$blockState, pos=$pos, data=$data)"
+        return "${javaClass.simpleName}(blockState=$blockState, block=$block, data=$data)"
     }
     
 }

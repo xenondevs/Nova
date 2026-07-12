@@ -3,8 +3,9 @@
 package xyz.xenondevs.nova.util.item
 
 import com.mojang.brigadier.StringReader
-import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.text.Component
 import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.core.component.DataComponentMap
@@ -12,7 +13,6 @@ import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.component.TypedDataComponent
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.AdventureModePredicate
@@ -26,84 +26,38 @@ import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Registry
 import org.bukkit.Tag
 import org.bukkit.World
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.ItemType
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.cbf.Cbf
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.registry.RegistryEntry
-import xyz.xenondevs.nova.registry.entry
 import xyz.xenondevs.nova.serialization.cbf.NAMESPACED_COMPOUND_DEPRECATION
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
-import xyz.xenondevs.nova.util.bukkitMaterial
-import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
 import xyz.xenondevs.nova.util.data.getByteArrayOrNull
-import xyz.xenondevs.nova.util.data.getCompoundOrNull
-import xyz.xenondevs.nova.util.data.getStringOrNull
-import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
-import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.isNova
+import xyz.xenondevs.nova.world.item.itemType
 import xyz.xenondevs.nova.world.item.logic.PacketItems
+import xyz.xenondevs.nova.world.item.name
 import xyz.xenondevs.nova.world.item.recipe.ComplexTest
 import xyz.xenondevs.nova.world.item.recipe.CustomRecipeChoice
-import xyz.xenondevs.nova.world.item.recipe.NovaIdTest
+import xyz.xenondevs.nova.world.item.recipe.ItemTypeTest
 import xyz.xenondevs.nova.world.item.recipe.NovaNameTest
 import xyz.xenondevs.nova.world.item.recipe.TagTest
-import xyz.xenondevs.nova.world.item.recipe.VanillaMaterialTest
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.contracts.contract
 import kotlin.math.max
 import net.minecraft.world.item.ItemStack as MojangStack
 
-/**
- * The [NovaItem] of [this][ItemStack], or `null` if it's not one.
- */
-val ItemStack.novaItem: NovaItem?
-    get() = unwrap().novaItem
-
-/**
- * The [RegistryEntry] of this [ItemStack's][ItemStack] [type][ItemStack.getType].
- */
-val ItemStack.typeEntry: RegistryEntry.Either<NovaItem, ItemType>
-    get() = novaItem?.let { RegistryEntry.either(it.entry, RegistryKey.ITEM) }
-        ?: RegistryEntry.either(NovaRegistries.ITEM, type.asItemType()!!.entry)
-
-/**
- * The [ItemType] of this [ItemStack].
- */
-val ItemStack.itemType: ItemType
-    get() = type.asItemType()!!
-
-/**
- * The [NovaItem] of [this][MojangStack], or `null` if it's not one.
- */
-val MojangStack.novaItem: NovaItem?
-    get() = unsafeNovaTag
-        ?.getStringOrNull("id")
-        ?.let(Key::key)
-        ?.let(NovaRegistries.ITEM::getValue)
-
-/**
- * The [RegistryEntry] of this [ItemStack's][MojangStack] [type][MojangStack.item].
- */
-val MojangStack.typeEntry: RegistryEntry.Either<NovaItem, ItemType>
-    get() = novaItem?.let { RegistryEntry.either(it.entry, RegistryKey.ITEM) }
-        ?: RegistryEntry.either(NovaRegistries.ITEM, item.bukkitMaterial.asItemType()!!.entry)
-
 @Suppress("DEPRECATION")
 internal val MojangStack.unsafeCustomData: CompoundTag?
     get() = components.get(DataComponents.CUSTOM_DATA)?.unsafe
-
-internal val MojangStack.unsafeNovaTag: CompoundTag?
-    get() = unsafeCustomData?.getCompoundOrNull("nova")
 
 internal val ItemStack.namelessCopyOrSelf: ItemStack
     get() {
@@ -235,19 +189,8 @@ inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: Strin
 
 object ItemUtils {
     
-    fun isIdRegistered(id: String): Boolean {
-        try {
-            val nid = Key.key(id)
-            return when (nid.namespace()) {
-                "minecraft" -> runCatching { Material.valueOf(nid.value().uppercase()) }.isSuccess
-                "nova" -> NovaRegistries.ITEM.getValuesByName(nid.value()).isNotEmpty()
-                else -> nid in NovaRegistries.ITEM || CustomItemServiceManager.getItemByName(id) != null
-            }
-        } catch (ignored: Exception) {
-        }
-        
-        return false
-    }
+    @Deprecated("Check registry instead", ReplaceWith("Registry.ITEM.get(Key.key(id)) != null", imports = ["org.bukkit.Registry", "net.kyori.adventure.key.Key"]))
+    fun isIdRegistered(id: String): Boolean = Registry.ITEM.get(Key.key(id)) != null
     
     fun getRecipeChoice(nameList: List<String>): RecipeChoice {
         val tests = nameList.map { id ->
@@ -264,27 +207,15 @@ object ItemUtils {
                     return@map ComplexTest(toItemStack(id))
                 
                 when (id.substringBefore(':')) {
-                    "minecraft" -> {
-                        val material = Material.valueOf(id.drop(10).uppercase())
-                        return@map VanillaMaterialTest(material, ItemStack(material))
-                    }
-                    
                     "nova" -> {
                         val name = id.substringAfter(':')
-                        val novaItems = NovaRegistries.ITEM.getValuesByName(name)
+                        val novaItems = Registry.ITEM.filter { it.isNova && it.key.value() == name }
                         if (novaItems.isNotEmpty()) {
                             return@map NovaNameTest(name, novaItems.map { it.createItemStack() })
                         } else throw IllegalArgumentException("Not an item name in Nova: $name")
                     }
                     
-                    else -> {
-                        val novaItem = NovaRegistries.ITEM.getValue(Key.key(id))
-                        if (novaItem != null) {
-                            return@map NovaIdTest(id, novaItem.createItemStack())
-                        } else {
-                            return@map CustomItemServiceManager.getItemTest(id)!!
-                        }
-                    }
+                    else -> ItemTypeTest(Registry.ITEM.getOrThrow(key(id)))
                 }
             } catch (ex: Exception) {
                 throw IllegalArgumentException("Unknown item $id", ex)
@@ -301,45 +232,23 @@ object ItemUtils {
     fun getItemStack(s: String): ItemStack {
         return when (s.substringBefore(':')) {
             "minecraft" -> toItemStack(s)
-            else -> getItemStack(Key.key(s))
+            else -> getItemStack(key(s))
         }
     }
     
     /**
      * Creates an [ItemStack] from the given [id]. Resolves ids from vanilla, nova and custom item services.
      */
-    fun getItemStack(id: Key): ItemStack {
-        return when (id.namespace()) {
-            "minecraft" -> ItemStack(BuiltInRegistries.ITEM.getValue(id).bukkitMaterial)
-            "nova" -> NovaRegistries.ITEM.getValuesByName(id.value()).firstOrNull()?.createItemStack()
-            else -> NovaRegistries.ITEM.getValue(id)?.createItemStack()
-                ?: CustomItemServiceManager.getItemByName(id.toString())
-        } ?: throw IllegalArgumentException("Could not find item with id $id")
-    }
+    @Deprecated("Use registry instead", ReplaceWith("Registry.ITEM.get(id).createItemStack()", imports = ["org.bukkit.Registry"]))
+    fun getItemStack(id: Key): ItemStack =
+        Registry.ITEM.get(id)!!.createItemStack()
     
     /**
      * Gets the actually displayed name of the given [itemStack].
      * If the [itemStack] has a custom display name, that will be returned. Otherwise, the localized name will be returned.
      */
     fun getName(itemStack: ItemStack): Component =
-        getName(itemStack.unwrap())
-    
-    /**
-     * Gets the actually displayed name of the given [itemStack].
-     * If the [itemStack] has a custom display name, that will be returned. Otherwise, the localized name will be returned.
-     */
-    internal fun getName(itemStack: MojangStack): Component {
-        val displayName = itemStack.get(DataComponents.CUSTOM_NAME)?.toAdventureComponent()
-        
-        if (displayName != null)
-            return displayName
-        
-        val novaItem = itemStack.novaItem
-        if (novaItem != null)
-            return novaItem.name ?: Component.empty()
-        
-        return itemStack.item.getName(itemStack).toAdventureComponent()
-    }
+         itemStack.getData(DataComponentTypes.CUSTOM_NAME) ?: itemStack.itemType.name
     
     /**
      * Converts the given string to an [ItemStack].
@@ -354,15 +263,8 @@ object ItemUtils {
     /**
      * Gets the id of the given [itemStack].
      */
-    fun getId(itemStack: ItemStack): Key {
-        val novaItem = itemStack.novaItem
-        if (novaItem != null) return novaItem.key
-        
-        val customNameKey = CustomItemServiceManager.getId(itemStack)
-        if (customNameKey != null) return Key.key(customNameKey)
-        
-        return itemStack.type.key()
-    }
+    @Deprecated("Use ItemType instead", ReplaceWith("itemStack.itemType.key", imports = ["xyz.xenondevs.nova.world.item.itemType"]))
+    fun getId(itemStack: ItemStack): Key = itemStack.itemType.key
     
     @Suppress("UNCHECKED_CAST")
     internal fun mergeDataComponentPatches(dataComponentPatches: List<DataComponentPatch>): DataComponentPatch {

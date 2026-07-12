@@ -2,13 +2,35 @@
 
 package xyz.xenondevs.nova.world.item.logic
 
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.LoadingCache
+import com.google.common.hash.HashCode
+import com.mojang.brigadier.Command
+import com.mojang.brigadier.arguments.ArgumentType
+import com.mojang.brigadier.builder.ArgumentBuilder
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.serialization.Dynamic
+import io.papermc.paper.command.brigadier.PaperCommands
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.ints.IntArrayList
-import net.kyori.adventure.key.Key.key
-import net.minecraft.ChatFormatting
+import it.unimi.dsi.fastutil.objects.Reference2IntMap
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
+import it.unimi.dsi.fastutil.objects.ReferenceSet
 import net.minecraft.advancements.Advancement
 import net.minecraft.advancements.AdvancementHolder
 import net.minecraft.advancements.DisplayInfo
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands
+import net.minecraft.commands.arguments.ResourceArgument
+import net.minecraft.commands.arguments.ResourceKeyArgument
+import net.minecraft.commands.arguments.ResourceOrTagArgument
+import net.minecraft.commands.arguments.ResourceOrTagKeyArgument
+import net.minecraft.commands.arguments.ResourceSelectorArgument
+import net.minecraft.commands.synchronization.SuggestionProviders
+import net.minecraft.core.Holder
+import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponentExactPredicate
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch
@@ -22,23 +44,56 @@ import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
 import net.minecraft.network.HashedPatchMap
 import net.minecraft.network.HashedStack
+import net.minecraft.network.chat.ChatType
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.ComponentContents
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.chat.Style
+import net.minecraft.network.chat.contents.NbtContents
+import net.minecraft.network.chat.contents.ObjectContents
+import net.minecraft.network.chat.contents.SelectorContents
+import net.minecraft.network.chat.contents.TranslatableContents
+import net.minecraft.network.protocol.game.ClientboundCommandSuggestionsPacket
+import net.minecraft.network.protocol.game.ClientboundCommandsPacket
 import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
+import net.minecraft.resources.Identifier
 import net.minecraft.resources.RegistryOps
+import net.minecraft.server.dialog.ActionButton
+import net.minecraft.server.dialog.CommonButtonData
+import net.minecraft.server.dialog.CommonDialogData
+import net.minecraft.server.dialog.ConfirmationDialog
+import net.minecraft.server.dialog.Dialog
+import net.minecraft.server.dialog.DialogListDialog
+import net.minecraft.server.dialog.Input
+import net.minecraft.server.dialog.MultiActionDialog
+import net.minecraft.server.dialog.NoticeDialog
+import net.minecraft.server.dialog.ServerLinksDialog
+import net.minecraft.server.dialog.body.DialogBody
+import net.minecraft.server.dialog.body.ItemBody
+import net.minecraft.server.dialog.body.PlainMessage
+import net.minecraft.server.dialog.input.BooleanInput
+import net.minecraft.server.dialog.input.InputControl
+import net.minecraft.server.dialog.input.NumberRangeInput
+import net.minecraft.server.dialog.input.SingleOptionInput
+import net.minecraft.server.dialog.input.TextInput
 import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagNetworkSerialization
+import net.minecraft.util.HashOps
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.item.component.BundleContents
+import net.minecraft.world.item.component.ChargedProjectiles
 import net.minecraft.world.item.component.CustomData
-import net.minecraft.world.item.component.DyedItemColor
+import net.minecraft.world.item.component.ItemContainerContents
 import net.minecraft.world.item.component.ItemLore
 import net.minecraft.world.item.component.TooltipDisplay
+import net.minecraft.world.item.component.UseRemainder
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.SelectableRecipe
 import net.minecraft.world.item.crafting.display.FurnaceRecipeDisplay
@@ -52,49 +107,67 @@ import net.minecraft.world.item.crafting.display.StonecutterRecipeDisplay
 import net.minecraft.world.item.trading.ItemCost
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
-import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemType
+import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockEntityDataPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundCommandSuggestionsPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundCommandsPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundDisconnectPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundDisguisedChatPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundLoginDisconnectPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundMerchantOffersPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundOpenScreenPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlaceGhostRecipePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlayerChatPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlayerCombatKillPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundRecipeBookAddPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundResourcePackPushPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundServerDataPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetActionBarTextPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetCursorItemPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEquipmentPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetPlayerInventoryPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetScorePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetSubtitleTextPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetTitleTextPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundShowDialogPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSystemChatPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundTabListPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundTestInstanceBlockStatusEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAdvancementsPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateTagsPacketEvent
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClickPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
-import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
-import xyz.xenondevs.nova.util.bukkitItemType
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
-import xyz.xenondevs.nova.util.data.getFirstOrThrow
 import xyz.xenondevs.nova.util.data.getStringOrNull
-import xyz.xenondevs.nova.util.item.novaCompound
+import xyz.xenondevs.nova.util.data.resultFirstOrNull
+import xyz.xenondevs.nova.util.getOrNull
 import xyz.xenondevs.nova.util.item.unsafeCustomData
-import xyz.xenondevs.nova.util.item.unsafeNovaTag
-import xyz.xenondevs.nova.util.item.update
 import xyz.xenondevs.nova.util.nmsItem
-import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.toTemplate
 import xyz.xenondevs.nova.util.unwrap
-import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.novaItem
 import java.util.*
+import java.util.concurrent.TimeUnit
+import java.util.function.Predicate
+import kotlin.jvm.optionals.getOrNull
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -102,22 +175,368 @@ import net.minecraft.world.item.ItemStack as MojangStack
     stage = InternalInitStage.POST_WORLD,
     runAfter = [ResourceGeneration.PreWorld::class]
 )
-internal object PacketItems : Listener, PacketListener {
+internal object PacketItems : PacketListener {
     
-    val SERVER_SIDE_ITEM_TYPE = ItemType.SHULKER_SHELL
-    val SCROLLABLE_ITEM_TYPE = ItemType.STRUCTURE_VOID
-    val SCROLLABLE_ITEM_HOLDER = BuiltInRegistries.ITEM.wrapAsHolder(SCROLLABLE_ITEM_TYPE.nmsItem)
-    val SERVER_SIDE_ITEM = SERVER_SIDE_ITEM_TYPE.nmsItem
-    val SERVER_SIDE_ITEM_HOLDER = BuiltInRegistries.ITEM.wrapAsHolder(SERVER_SIDE_ITEM)
-    const val SKIP_SERVER_SIDE_TOOLTIP = "NovaSkipPacketItems"
+    val SCROLLABLE_ITEM_HOLDER = BuiltInRegistries.ITEM.wrapAsHolder(Items.STRUCTURE_VOID)
+    val ADVANCED_TOOLTIP_OVERRIDE = NamespacedKey("nova", "no_advanced_tooltip")
+    val SCROLL_SUPPORT_MARKER = NamespacedKey("nova", "use_scrollable_item")
+    const val SERVER_SIDE_COMPONENTS_TAG = "NovaServerSideComponents"
+    const val SERVER_SIDE_ITEM_TYPE_TAG = "NovaServerSideType"
     
     @InitFun
     private fun init() {
-        registerEvents()
         registerPacketListener()
     }
     
-    //<editor-fold desc="packet events", defaultstate="collapsed">
+    //<editor-fold desc="command packet", defaultstate="collapsed">
+    private val commandNodeBuilder = object : ClientboundCommandsPacket.NodeBuilder<CommandSourceStack> {
+        
+        private val AFFECTED_REGISTRY_KEYS = setOf(Registries.ITEM, Registries.BLOCK)
+        private val ASK_SERVER_ID = Identifier.withDefaultNamespace("ask_server")
+        private val EXECUTABLE_COMMAND = Command<CommandSourceStack> { 0 }
+        private val RESTRICTED_REQUIREMENT = object : Predicate<CommandSourceStack>, Commands.RestrictedMarker {
+            override fun test(source: CommandSourceStack) = true
+        }
+        
+        override fun createLiteral(id: String): ArgumentBuilder<CommandSourceStack, *> =
+            LiteralArgumentBuilder.literal(id)
+        
+        override fun createArgument(
+            id: String,
+            argumentType: ArgumentType<*>,
+            suggestionId: Identifier?
+        ): ArgumentBuilder<CommandSourceStack, *> {
+            val builder: RequiredArgumentBuilder<CommandSourceStack, *> =
+                RequiredArgumentBuilder.argument(id, argumentType.toClientSideArgumentType())
+            val clientSuggestionId = if (argumentType.requiresServerSuggestions()) ASK_SERVER_ID else suggestionId
+            if (clientSuggestionId != null)
+                builder.suggests(SuggestionProviders.getProvider(clientSuggestionId))
+            return builder
+        }
+        
+        override fun configure(
+            input: ArgumentBuilder<CommandSourceStack, *>,
+            executable: Boolean,
+            restricted: Boolean
+        ): ArgumentBuilder<CommandSourceStack, *> {
+            if (executable)
+                input.executes(EXECUTABLE_COMMAND)
+            if (restricted)
+                input.requires(RESTRICTED_REQUIREMENT)
+            return input
+        }
+        
+        private fun ArgumentType<*>.requiresServerSuggestions(): Boolean = when (this) {
+            is ResourceArgument<*> -> registryKey
+            is ResourceKeyArgument<*> -> registryKey
+            is ResourceOrTagArgument<*> -> registryKey
+            is ResourceOrTagKeyArgument<*> -> registryKey
+            is ResourceSelectorArgument<*> -> registryKey
+            else -> return false
+        } in AFFECTED_REGISTRY_KEYS
+        
+        private fun ArgumentType<*>.toClientSideArgumentType(): ArgumentType<*> = when (this) {
+            is ResourceArgument<*> if registryKey in AFFECTED_REGISTRY_KEYS -> ResourceKeyArgument.key(registryKey)
+            is ResourceOrTagArgument<*> if registryKey in AFFECTED_REGISTRY_KEYS -> ResourceOrTagKeyArgument.resourceOrTagKey(registryKey)
+            else -> this
+        }
+    }
+    
+    @PacketHandler
+    private fun handleCommands(event: ClientboundCommandsPacketEvent) {
+        val root = event.packet.getRoot(PaperCommands.INSTANCE.buildContext, commandNodeBuilder)
+        event.packet = ClientboundCommandsPacket(root, Commands.COMMAND_NODE_INSPECTOR)
+    }
+    //</editor-fold>
+    
+    //<editor-fold desc="chat component packets", defaultstate="collapsed">
+    @PacketHandler
+    private fun handleCommandSuggestions(event: ClientboundCommandSuggestionsPacketEvent) {
+        event.suggestions = event.suggestions.map { entry ->
+            ClientboundCommandSuggestionsPacket.Entry(
+                entry.text,
+                entry.tooltip.map { getClientSideComponent(event.player, it) }
+            )
+        }
+    }
+    
+    @PacketHandler
+    private fun handleSystemChat(event: ClientboundSystemChatPacketEvent) {
+        event.content = getClientSideComponent(event.player, event.content)
+    }
+    
+    @PacketHandler
+    private fun handleDisguisedChat(event: ClientboundDisguisedChatPacketEvent) {
+        event.message = getClientSideComponent(event.player, event.message)
+        event.chatType = event.chatType.mapComponents(event.player)
+    }
+    
+    @PacketHandler
+    private fun handlePlayerChat(event: ClientboundPlayerChatPacketEvent) {
+        event.unsignedContent = event.unsignedContent?.let { getClientSideComponent(event.player, it) }
+        event.chatType = event.chatType.mapComponents(event.player)
+    }
+    
+    @PacketHandler
+    private fun handleOpenScreen(event: ClientboundOpenScreenPacketEvent) {
+        event.title = getClientSideComponent(event.player, event.title)
+    }
+    
+    @PacketHandler
+    private fun handlePlayerCombatKill(event: ClientboundPlayerCombatKillPacketEvent) {
+        event.message = getClientSideComponent(event.player, event.message)
+    }
+    
+    @PacketHandler
+    private fun handleServerData(event: ClientboundServerDataPacketEvent) {
+        event.motd = getClientSideComponent(event.player, event.motd)
+    }
+    
+    @PacketHandler
+    private fun handleActionBar(event: ClientboundSetActionBarTextPacketEvent) {
+        event.text = getClientSideComponent(event.player, event.text)
+    }
+    
+    @PacketHandler
+    private fun handleTitle(event: ClientboundSetTitleTextPacketEvent) {
+        event.text = getClientSideComponent(event.player, event.text)
+    }
+    
+    @PacketHandler
+    private fun handleSubtitle(event: ClientboundSetSubtitleTextPacketEvent) {
+        event.text = getClientSideComponent(event.player, event.text)
+    }
+    
+    @PacketHandler
+    private fun handleScore(event: ClientboundSetScorePacketEvent) {
+        event.display = event.display.map { getClientSideComponent(event.player, it) }
+    }
+    
+    @PacketHandler
+    private fun handleTabList(event: ClientboundTabListPacketEvent) {
+        event.header = getClientSideComponent(event.player, event.header)
+        event.footer = getClientSideComponent(event.player, event.footer)
+    }
+    
+    @PacketHandler
+    private fun handleTestInstanceStatus(event: ClientboundTestInstanceBlockStatusEvent) {
+        event.status = getClientSideComponent(event.player, event.status)
+    }
+    
+    @PacketHandler
+    private fun handleResourcePackPrompt(event: ClientboundResourcePackPushPacketEvent) {
+        event.prompt = event.prompt.map { getClientSideComponent(null, it) }
+    }
+    
+    @PacketHandler
+    private fun handleDisconnect(event: ClientboundDisconnectPacketEvent) {
+        event.reason = getClientSideComponent(null, event.reason)
+    }
+    
+    @PacketHandler
+    private fun handleLoginDisconnect(event: ClientboundLoginDisconnectPacketEvent) {
+        event.reason = getClientSideComponent(null, event.reason)
+    }
+    
+    private fun ChatType.Bound.mapComponents(player: Player) =
+        ChatType.Bound(
+            chatType,
+            getClientSideComponent(player, name),
+            targetName.map { getClientSideComponent(player, it) }
+        )
+    
+    private fun getClientSideComponent(player: Player?, component: Component): Component {
+        val result = getClientSideContents(player, component.contents)
+            .setStyle(getClientSideStyle(player, component.style))
+        component.siblings.forEach { result.append(getClientSideComponent(player, it)) }
+        return result
+    }
+    
+    private fun getClientSideContents(player: Player?, contents: ComponentContents): MutableComponent = when (contents) {
+        is TranslatableContents -> Component.translatableWithFallback(
+            contents.key,
+            contents.fallback,
+            *contents.args.map { if (it is Component) getClientSideComponent(player, it) else it }.toTypedArray()
+        )
+        
+        is SelectorContents -> MutableComponent.create(SelectorContents(
+            contents.selector,
+            contents.separator.map { getClientSideComponent(player, it) }
+        ))
+        
+        is NbtContents -> MutableComponent.create(NbtContents(
+            contents.nbtPath,
+            contents.interpreting,
+            contents.plain,
+            contents.separator.map { getClientSideComponent(player, it) },
+            contents.dataSource
+        ))
+        
+        is ObjectContents -> MutableComponent.create(ObjectContents(
+            contents.contents,
+            contents.fallback.map { getClientSideComponent(player, it) }
+        ))
+        
+        else -> MutableComponent.create(contents)
+    }
+    
+    private fun getClientSideStyle(player: Player?, style: Style): Style {
+        val hoverEvent = when (val hover = style.hoverEvent) {
+            is HoverEvent.ShowText -> HoverEvent.ShowText(getClientSideComponent(player, hover.value))
+            is HoverEvent.ShowItem -> HoverEvent.ShowItem(getClientSideItem(player, hover.item))
+            else -> hover
+        }
+        return style.withHoverEvent(hoverEvent)
+    }
+    
+    private fun getClientSideItem(player: Player?, template: ItemStackTemplate): ItemStackTemplate {
+        val stack = getClientSideStack(player, template.create(), false)
+        return ItemStackTemplate.fromNonEmptyStack(stack)
+    }
+    
+    @PacketHandler
+    private fun handleShowDialog(event: ClientboundShowDialogPacketEvent) {
+        event.dialog = getClientSideDialogHolder(null, event.dialog, Collections.newSetFromMap(IdentityHashMap()))
+    }
+    
+    private fun getClientSideDialogHolder(player: Player?, holder: Holder<Dialog>, visiting: MutableSet<Dialog>): Holder<Dialog> {
+        val dialog = holder.value()
+        if (!visiting.add(dialog))
+            return holder
+        
+        val rewritten = getClientSideDialog(player, dialog, visiting)
+        visiting.remove(dialog)
+        return Holder.direct(rewritten)
+    }
+    
+    private fun getClientSideDialog(player: Player?, dialog: Dialog, visiting: MutableSet<Dialog>): Dialog = when (dialog) {
+        is ConfirmationDialog -> ConfirmationDialog(
+            getClientSideCommonDialogData(player, dialog.common),
+            getClientSideActionButton(player, dialog.yesButton),
+            getClientSideActionButton(player, dialog.noButton)
+        )
+        
+        is DialogListDialog -> DialogListDialog(
+            getClientSideCommonDialogData(player, dialog.common),
+            HolderSet.direct(dialog.dialogs.map { getClientSideDialogHolder(player, it, visiting) }),
+            dialog.exitAction.map { getClientSideActionButton(player, it) },
+            dialog.columns,
+            dialog.buttonWidth
+        )
+        
+        is MultiActionDialog -> MultiActionDialog(
+            getClientSideCommonDialogData(player, dialog.common),
+            dialog.actions.map { getClientSideActionButton(player, it) },
+            dialog.exitAction.map { getClientSideActionButton(player, it) },
+            dialog.columns
+        )
+        
+        is NoticeDialog -> NoticeDialog(
+            getClientSideCommonDialogData(player, dialog.common),
+            getClientSideActionButton(player, dialog.action)
+        )
+        
+        is ServerLinksDialog -> ServerLinksDialog(
+            getClientSideCommonDialogData(player, dialog.common),
+            dialog.exitAction.map { getClientSideActionButton(player, it) },
+            dialog.columns,
+            dialog.buttonWidth
+        )
+        
+        else -> dialog
+    }
+    
+    private fun getClientSideCommonDialogData(player: Player?, data: CommonDialogData) = CommonDialogData(
+        getClientSideComponent(player, data.title),
+        data.externalTitle.map { getClientSideComponent(player, it) },
+        data.canCloseWithEscape,
+        data.pause,
+        data.afterAction,
+        data.body.map { getClientSideDialogBody(player, it) },
+        data.inputs.map { getClientSideInput(player, it) }
+    )
+    
+    private fun getClientSideDialogBody(player: Player?, body: DialogBody): DialogBody = when (body) {
+        is ItemBody -> ItemBody(
+            getClientSideItem(player, body.item),
+            body.description.map { getClientSidePlainMessage(player, it) },
+            body.showDecorations,
+            body.showTooltip,
+            body.width,
+            body.height
+        )
+        
+        is PlainMessage -> getClientSidePlainMessage(player, body)
+        else -> body
+    }
+    
+    private fun getClientSidePlainMessage(player: Player?, message: PlainMessage) = PlainMessage(
+        getClientSideComponent(player, message.contents),
+        message.width
+    )
+    
+    private fun getClientSideInput(player: Player?, input: Input) = Input(input.key, getClientSideInputControl(player, input.control))
+    
+    private fun getClientSideInputControl(player: Player?, control: InputControl): InputControl = when (control) {
+        is BooleanInput -> BooleanInput(
+            getClientSideComponent(player, control.label),
+            control.initial,
+            control.onTrue,
+            control.onFalse
+        )
+        
+        is NumberRangeInput -> NumberRangeInput(
+            control.width,
+            getClientSideComponent(player, control.label),
+            control.labelFormat,
+            control.rangeInfo
+        )
+        
+        is SingleOptionInput -> SingleOptionInput(
+            control.width,
+            control.entries.map { entry ->
+                SingleOptionInput.Entry(
+                    entry.id,
+                    entry.display.map { getClientSideComponent(player, it) },
+                    entry.initial
+                )
+            },
+            getClientSideComponent(player, control.label),
+            control.labelVisible
+        )
+        
+        is TextInput -> TextInput(
+            control.width,
+            getClientSideComponent(player, control.label),
+            control.labelVisible,
+            control.initial,
+            control.maxLength,
+            control.multiline
+        )
+        
+        else -> control
+    }
+    
+    private fun getClientSideActionButton(player: Player?, button: ActionButton) = ActionButton(
+        CommonButtonData(
+            getClientSideComponent(player, button.button.label),
+            button.button.tooltip.map { getClientSideComponent(player, it) },
+            button.button.width
+        ),
+        button.action
+    )
+    //</editor-fold>
+    
+    //<editor-fold desc="block packets", defaultstate="collapsed">
+    @Suppress("DEPRECATION")
+    @PacketHandler
+    private fun handleBlockEntityData(event: ClientboundBlockEntityDataPacketEvent) {
+        if (event.type.builtInRegistryHolder().key().identifier().namespace != "minecraft")
+            event.isCancelled = true
+    }
+    //</editor-fold>
+    
+    //<editor-fold desc="item packets", defaultstate="collapsed">
     @PacketHandler
     private fun handleSetContentPacket(event: ClientboundContainerSetContentPacketEvent) {
         val player = event.player
@@ -133,6 +552,11 @@ internal object PacketItems : Listener, PacketListener {
     @PacketHandler
     private fun handleSetCursorPacket(event: ClientboundSetCursorItemPacketEvent) {
         event.contents = getClientSideStack(event.player, event.contents.copy())
+    }
+    
+    @PacketHandler
+    private fun handleSetPlayerInventory(event: ClientboundSetPlayerInventoryPacketEvent) {
+        event.contents = getClientSideStack(event.player, event.contents)
     }
     
     @PacketHandler
@@ -169,11 +593,11 @@ internal object PacketItems : Listener, PacketListener {
     
     @PacketHandler
     private fun handleClick(event: ServerboundContainerClickPacketEvent) {
-        // fixme: HashedStack breaks the approach of saving server-side data in the client-side stack via custom data
-        //        This could be solved by caching a mapping from client-side stack to server-side stack during getClientSideStack
-        
-        // carried item needs to always be set to an item that triggers an update to prevent desync on single-item drag
-        event.carriedItem = HashedStack.ActualItem(Items.DIRT.builtInRegistryHolder(), -1, HashedPatchMap(emptyMap(), emptySet()))
+        val playerId = event.player.uniqueId
+        event.changedSlots = event.changedSlots.mapValuesTo(Int2ObjectOpenHashMap()) { [_, stack] ->
+            stackHashMappings.getIfPresent(stack.toCacheKey(playerId)) ?: stack
+        }
+        event.carriedItem = stackHashMappings.getIfPresent(event.carriedItem.toCacheKey(playerId)) ?: event.carriedItem
     }
     
     @PacketHandler
@@ -257,8 +681,8 @@ internal object PacketItems : Listener, PacketListener {
                     it.value.display.map { display ->
                         DisplayInfo(
                             getClientSideStack(event.player, display.icon.create(), false).toTemplate()!!,
-                            display.title,
-                            display.description,
+                            getClientSideComponent(event.player, display.title),
+                            getClientSideComponent(event.player, display.description),
                             display.background,
                             display.type,
                             display.shouldShowToast(),
@@ -299,7 +723,7 @@ internal object PacketItems : Listener, PacketListener {
                 val registry = REGISTRY_ACCESS.lookupOrThrow(tagKey.registry())
                 tagKey.location() to tagValues.mapTo(IntArrayList()) { registry.getId(it.value()) }
             }
-
+            
             TagNetworkSerialization.NetworkPayload(serialized)
         }
     }
@@ -367,7 +791,7 @@ internal object PacketItems : Listener, PacketListener {
         )
         
         is SlotDisplay.ItemStackSlotDisplay -> SlotDisplay.ItemStackSlotDisplay(
-            ItemStackTemplate.fromNonEmptyStack(getClientSideNovaStack(player, display.stack.create(), false))
+            ItemStackTemplate.fromNonEmptyStack(getClientSideStack(player, display.stack.create(), false))
         )
         
         is SlotDisplay.SmithingTrimDemoSlotDisplay -> SlotDisplay.SmithingTrimDemoSlotDisplay(
@@ -408,60 +832,67 @@ internal object PacketItems : Listener, PacketListener {
     //</editor-fold>
     
     //<editor-fold desc="server-side stack -> client-side stack", defaultstate="collapsed">
-    fun getClientSideStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean = true): MojangStack {
-        if (itemStack.isEmpty)
-            return itemStack
+    fun getClientSideStack(player: Player?, serverSideStack: MojangStack, storeServerSideTag: Boolean = true): MojangStack {
+        if (serverSideStack.isEmpty)
+            return MojangStack.EMPTY
         
-        return if (itemStack.unsafeNovaTag != null) {
-            getClientSideNovaStack(player, itemStack, storeServerSideTag)
-        } else getClientSideVanillaStack(player, itemStack, storeServerSideTag)
-    }
-    
-    //<editor-fold desc="Nova", defaultstate="collapsed">
-    private fun getClientSideNovaStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean): MojangStack {
-        val novaTag = itemStack.unsafeNovaTag // read-only!
-            ?: return itemStack
-        val id = novaTag.getStringOrNull("id")
-            ?: return getUnknownItem(itemStack, null)
-        val novaItem = NovaRegistries.ITEM.getValue(key(id))
-            ?: return getUnknownItem(itemStack, id)
+        val severSideType = serverSideStack.typeHolder()
+        val novaItem = serverSideStack.novaItem
         
         // client-side item stack copy
-        val newItemType = novaItem.modifyClientSideItemType(player, itemStack.asBukkitCopy(), itemStack.item.bukkitItemType).nmsItem
-        val newItemHolder = BuiltInRegistries.ITEM.wrapAsHolder(newItemType)
-        var newItemStack = MojangStack(
-            newItemHolder, itemStack.count,
-            buildClientSideDataComponentsPatch(newItemType, novaItem, itemStack.componentsPatch)
+        val clientSideType: Holder<Item>
+        if (serverSideStack.asBukkitMirror().persistentDataContainer.get(SCROLL_SUPPORT_MARKER, PersistentDataType.BOOLEAN) == true) {
+            clientSideType = SCROLLABLE_ITEM_HOLDER
+        } else if (novaItem != null) {
+            clientSideType = novaItem.modifyClientSideItemType(player, serverSideStack.asBukkitCopy(), ItemType.SHULKER_SHELL).nmsItem.builtInRegistryHolder()
+        } else {
+            clientSideType = severSideType
+        }
+        
+        var clientSideStack = MojangStack(
+            clientSideType, serverSideStack.count,
+            buildClientSideDataComponentsPatch(severSideType, clientSideType, serverSideStack.componentsPatch)
         )
         
         // customization through item behaviors
-        newItemStack = novaItem.modifyClientSideStack(player, itemStack.asBukkitCopy(), newItemStack.asBukkitMirror()).unwrap()
+        if (novaItem != null) {
+            clientSideStack = novaItem.modifyClientSideStack(player, serverSideStack.asBukkitCopy(), clientSideStack.asBukkitMirror()).unwrap()
+        }
+        
+        fixNestedStacks(player, clientSideStack)
         
         // generate tooltip server-side and apply as lore
         // we do not want data component modifications done by item behaviors in modifyClientSideStack
         // to be reflected in the tooltip, except for the item lore itself
-        val itemStackToGenerateTooltipOf = itemStack.copy()
-        itemStackToGenerateTooltipOf.set(DataComponents.LORE, newItemStack.get(DataComponents.LORE))
-        applyServerSideTooltip(newItemStack, generateNovaTooltipLore(player, novaItem, itemStack.novaCompound?.keys?.size ?: 0, itemStackToGenerateTooltipOf))
+        val itemStackToGenerateTooltipOf = serverSideStack.copy()
+        itemStackToGenerateTooltipOf.set(DataComponents.LORE, clientSideStack.get(DataComponents.LORE))
+        applyServerSideTooltip(clientSideStack, generateTooltipLore(player, serverSideStack))
         
         // save server-side nbt data (for creative mode)
         // this also drops existing custom data, which is ignored by the client anyway
         if (storeServerSideTag)
-            storeServerSideTag(newItemStack, itemStack)
+            storeServerSideTag(clientSideStack, serverSideStack)
         
-        return newItemStack
+        if (player != null) {
+            stackHashMappings.put(
+                HashedStack.create(clientSideStack, HASH_GENERATOR).toCacheKey(player.uniqueId),
+                HashedStack.create(serverSideStack, HASH_GENERATOR)
+            )
+        }
+        
+        return clientSideStack
     }
     
-    private fun buildClientSideDataComponentsPatch(vanilla: Item, nova: NovaItem, patch: DataComponentPatch): DataComponentPatch {
+    private fun buildClientSideDataComponentsPatch(server: Holder<Item>, client: Holder<Item>, patch: DataComponentPatch): DataComponentPatch {
         val builder = DataComponentPatch.builder()
         
-        // remove vanilla default base components
-        for (vanillaBase in vanilla.components()) {
+        // remove client-side default base components
+        for (vanillaBase in client.components()) {
             builder.remove(vanillaBase.type)
         }
         
-        // add nova default base components
-        mergeIntoClientSidePatch(builder, nova.baseDataComponents.handle)
+        // add server-side default base components
+        mergeIntoClientSidePatch(builder, server.components())
         // add item stack patch components
         mergeIntoClientSidePatch(builder, patch)
         
@@ -494,107 +925,47 @@ internal object PacketItems : Listener, PacketListener {
         return type == DataComponents.CUSTOM_DATA
     }
     
-    private fun getUnknownItem(itemStack: MojangStack, id: String?): MojangStack {
-        return MojangStack(Items.BARRIER).apply {
-            set(
-                DataComponents.ITEM_NAME,
-                Component.literal("Unknown item: $id").withStyle(ChatFormatting.RED)
-            )
-            storeServerSideTag(this, itemStack)
-        }
-    }
-    
-    private fun generateNovaTooltipLore(player: Player?, novaItem: NovaItem, cbfTagCount: Int, itemStack: MojangStack): List<Component> {
-        val isAdvanced = player?.let(AdvancedTooltips::hasNovaTooltips) == true
-        val lore = generateTooltipLore(player, isAdvanced, itemStack).toMutableList()
-        
-        // entire tooltip is hidden
-        if (lore.isEmpty())
-            return emptyList()
-        
-        if (isAdvanced) {
-            // nova item id
-            lore[lore.size - 2] = Component.literal(novaItem.key.toString()).withStyle(ChatFormatting.DARK_GRAY)
-            
-            // cbf tag count
-            if (cbfTagCount > 0) {
-                lore.add(
-                    Component.translatable(
-                        "item.cbf_tags",
-                        Component.literal(cbfTagCount.toString())
-                    ).withStyle(ChatFormatting.DARK_GRAY)
-                )
-            }
-        }
-        
-        return lore
-    }
-    //</editor-fold>
-    
-    //<editor-fold desc="Vanilla", defaultstate="collapsed">
-    private fun getClientSideVanillaStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean): MojangStack {
-        val newItemStack = itemStack.copy()
+    private fun fixNestedStacks(player: Player?, itemStack: MojangStack): Boolean {
         var modified = false
         
-        if (fixArmorColor(newItemStack))
-            modified = true
-        if (fixBundleContents(player, newItemStack))
-            modified = true
-        
-        if (itemStack.unsafeCustomData?.contains(SKIP_SERVER_SIDE_TOOLTIP) != true) {
-            val isAdvanced = player?.let(AdvancedTooltips::hasVanillaTooltips) == true
-            if (isAdvanced || modified) { // server-side tooltip is only required if the server-side stack differs from the client-side stack
-                applyServerSideTooltip(newItemStack, generateTooltipLore(player, isAdvanced, itemStack))
-                modified = true
-            }
-        } else {
-            disableClientSideTooltip(newItemStack)
+        itemStack.get(DataComponents.BUNDLE_CONTENTS)?.let { contents ->
+            itemStack.set(
+                DataComponents.BUNDLE_CONTENTS,
+                BundleContents(contents.items().map { getClientSideItem(player, it) })
+            )
             modified = true
         }
         
-        // save server-side nbt data (for creative mode)
-        // this also drops existing custom data, which is ignored by the client anyway
-        if (modified && storeServerSideTag)
-            storeServerSideTag(newItemStack, itemStack)
-        
-        return newItemStack
-    }
-    
-    /**
-     * Fixes the [DataComponents.DYED_COLOR] rgb value of vanilla armor items to prevent accidental use of
-     * custom textures and returns whether the [itemStack] was modified.
-     */
-    private fun fixArmorColor(itemStack: MojangStack): Boolean {
-        val color = itemStack.get(DataComponents.DYED_COLOR)
-            ?: return false
-        val rgb = color.rgb
-        
-        if (rgb % 2 == 0)
-            return false
-        
-        if (CustomItemServiceManager.getId(itemStack.asBukkitMirror()) != null)
-            return false
-        
-        itemStack.set(DataComponents.DYED_COLOR, DyedItemColor(rgb - 1))
-        
-        return true
-    }
-    
-    /**
-     * Updates the [BundleContents.items] to use client-side item stacks
-     * and returns whether the [itemStack] was modified.
-     */
-    private fun fixBundleContents(player: Player?, itemStack: MojangStack): Boolean {
-        if (!itemStack.has(DataComponents.BUNDLE_CONTENTS))
-            return false
-        
-        itemStack.update(DataComponents.BUNDLE_CONTENTS) { bundleContents ->
-            BundleContents(bundleContents.items().mapNotNull { getClientSideStack(player, it.create(), false).toTemplate() })
+        itemStack.get(DataComponents.CHARGED_PROJECTILES)?.let { projectiles ->
+            itemStack.set(
+                DataComponents.CHARGED_PROJECTILES,
+                ChargedProjectiles(projectiles.items.map { getClientSideItem(player, it) })
+            )
+            modified = true
         }
         
-        return true
+        itemStack.get(DataComponents.CONTAINER)?.let { contents ->
+            itemStack.set(
+                DataComponents.CONTAINER,
+                ItemContainerContents.fromItems(
+                    contents.allItemsCopyStream()
+                        .map { getClientSideStack(player, it, false) }
+                        .toList()
+                )
+            )
+            modified = true
+        }
+        
+        itemStack.get(DataComponents.USE_REMAINDER)?.let { remainder ->
+            itemStack.set(
+                DataComponents.USE_REMAINDER,
+                UseRemainder(getClientSideItem(player, remainder.convertInto))
+            )
+            modified = true
+        }
+        
+        return modified
     }
-    //</editor-fold>
     
     //<editor-fold desc="tooltip", defaultstate="collapsed">
     private fun applyServerSideTooltip(itemStack: ItemStack, tooltip: List<Component>) {
@@ -605,11 +976,14 @@ internal object PacketItems : Listener, PacketListener {
         disableClientSideTooltip(itemStack)
     }
     
-    private fun generateTooltipLore(player: Player?, advancedTooltips: Boolean, itemStack: MojangStack): List<Component> {
-        val lore = itemStack.getTooltipLines(
+    private fun generateTooltipLore(player: Player?, serverSideStack: MojangStack): List<Component> {
+        val isAdvanced = (serverSideStack.asBukkitMirror().persistentDataContainer.get(ADVANCED_TOOLTIP_OVERRIDE, PersistentDataType.BOOLEAN)
+            ?: (serverSideStack.novaItem?.isHidden != true && player?.let(AdvancedTooltips::get) == true))
+        
+        val lore = serverSideStack.getTooltipLines(
             Item.TooltipContext.of(REGISTRY_ACCESS),
             player?.serverPlayer,
-            if (advancedTooltips) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
+            if (isAdvanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
         )
         
         // entire tooltip is hidden
@@ -632,24 +1006,70 @@ internal object PacketItems : Listener, PacketListener {
     
     //<editor-fold desc="client-side stack -> server-side stack", defaultstate="collapsed">
     fun getServerSideStack(itemStack: MojangStack): MojangStack {
-        val serversideTag = itemStack.get(DataComponents.CUSTOM_DATA)?.unsafe
-            ?.getCompoundOrNull("NovaServerSideTag")
+        val nbt = itemStack.unsafeCustomData
+        val serverSideType = nbt
+            ?.getStringOrNull(SERVER_SIDE_ITEM_TYPE_TAG)
+            ?.let { BuiltInRegistries.ITEM.getOrNull(it) }
             ?: return itemStack
-        val serversideComponents = decodeComponents(serversideTag)
-        
-        // use server-side item for all Nova items, otherwise keep current item
-        val serversideCustomData = serversideComponents.get(itemStack, DataComponents.CUSTOM_DATA)
-        val item = if (serversideCustomData?.unsafe?.getCompoundOrNull("nova") != null)
-            SERVER_SIDE_ITEM_HOLDER
-        else itemStack.typeHolder()
-        
-        return MojangStack(item, itemStack.count, serversideComponents)
+        val serverSideComponents = nbt
+            .getCompoundOrNull(SERVER_SIDE_COMPONENTS_TAG)
+            ?.let(::decodeComponents)
+            ?: return itemStack
+        return MojangStack(serverSideType, itemStack.count, serverSideComponents)
     }
+    //</editor-fold>
+    
+    //<editor-fold desc="hashed stack caching", defaultstate="collapsed">
+    // HashedStack does not have proper equals/hashCode as internal collections are (sometimes) identity-based
+    private sealed interface HashedStackKey {
+        
+        data object Empty : HashedStackKey
+        
+        data class ActualItem(
+            val playerUuid: UUID,
+            val item: Holder<Item>,
+            val count: Int,
+            val addedComponents: Reference2IntMap<DataComponentType<*>>,
+            val removedComponents: ReferenceSet<DataComponentType<*>>
+        ) : HashedStackKey
+    }
+    
+    private val stackHashMappings = Caffeine.newBuilder()
+        .expireAfterAccess(5, TimeUnit.MINUTES)
+        .build<HashedStackKey, HashedStack>()
+    
+    private val HASH_GENERATOR: HashedPatchMap.HashGenerator = object : HashedPatchMap.HashGenerator {
+        
+        private val hashOps = RegistryOps.create<HashCode>(HashOps.CRC32C_INSTANCE, REGISTRY_ACCESS)
+        private val cache: LoadingCache<TypedDataComponent<*>, Int> = Caffeine.newBuilder()
+            .expireAfterAccess(5, TimeUnit.MINUTES)
+            .build { it.encodeValue(hashOps).getOrThrow()!!.asInt() }
+        
+        override fun apply(tdc: TypedDataComponent<*>): Int {
+            return cache.get(tdc)
+        }
+        
+    }
+    
+    private fun HashedStack.toCacheKey(playerUuid: UUID): HashedStackKey =
+        when (this) {
+            is HashedStack.ActualItem -> HashedStackKey.ActualItem(
+                playerUuid,
+                item,
+                count,
+                Reference2IntOpenHashMap(components.addedComponents()),
+                ReferenceOpenHashSet(components.removedComponents())
+            )
+            
+            else -> HashedStackKey.Empty
+        }
     //</editor-fold>
     
     private fun storeServerSideTag(clientSide: MojangStack, serverSide: MojangStack) {
         clientSide.set(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag().apply {
-            put("NovaServerSideTag", encodeComponents(serverSide))
+            val type = serverSide.typeHolder().unwrapKey().getOrNull()?.identifier()?.toString()
+            putString(SERVER_SIDE_ITEM_TYPE_TAG, type ?: "")
+            put(SERVER_SIDE_COMPONENTS_TAG, encodeComponents(serverSide))
         }))
     }
     
@@ -661,11 +1081,11 @@ internal object PacketItems : Listener, PacketListener {
         ).getOrThrow()
     }
     
-    private fun decodeComponents(components: Tag): DataComponentPatch {
+    private fun decodeComponents(components: Tag): DataComponentPatch? {
         return DataComponentPatch.CODEC.decode(Dynamic(
             RegistryOps.create(NbtOps.INSTANCE, REGISTRY_ACCESS),
             components
-        )).getFirstOrThrow()
+        )).resultFirstOrNull()
     }
     
 }

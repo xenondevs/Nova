@@ -2,25 +2,16 @@ package xyz.xenondevs.nova.context.intention
 
 import io.papermc.paper.datacomponent.DataComponentTypes
 import org.bukkit.GameMode
+import org.bukkit.block.BlockType
+import org.bukkit.block.data.BlockData
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.AbstractContextIntention
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
 import xyz.xenondevs.nova.context.DefaultingContextParamType
-import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_DROPS
-import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_EXP_DROPS
-import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_POS
-import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_STATE_NOVA
-import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_STATE_VANILLA
-import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_STORAGE_DROPS
-import xyz.xenondevs.nova.context.intention.BlockBreak.HELD_ITEM_STACK
-import xyz.xenondevs.nova.context.intention.BlockBreak.SOURCE_PLAYER
-import xyz.xenondevs.nova.context.intention.BlockBreak.TOOL_ITEM_STACK
-import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
-
 
 /**
  * A [ContextIntention] for when a block is broken.
@@ -33,22 +24,32 @@ import xyz.xenondevs.nova.world.item.tool.ToolCategory
  * | Target | # | Source(s) | Notes |
  * |--------|---|-----------|-------|
  * | [TOOL_ITEM_STACK] | 1. | [HELD_ITEM_STACK] | Only if tool |
- * | [BLOCK_DROPS] | 1. | [BLOCK_POS], [TOOL_ITEM_STACK], [SOURCE_PLAYER] | |
- * | | 2. | [BLOCK_POS], [SOURCE_PLAYER] | |
- * | | 3. | [BLOCK_POS] | |
+ * | [BLOCK_DROPS] | 1. | [BLOCK], [TOOL_ITEM_STACK], [SOURCE_PLAYER] | |
+ * | | 2. | [BLOCK], [SOURCE_PLAYER] | |
+ * | | 3. | [BLOCK] | |
  * | [BLOCK_EXP_DROPS] | 1. | [BLOCK_DROPS] | |
- * | [BLOCK_STATE_NOVA] | +1. | [BLOCK_POS] | Only if Nova block |
- * | [BLOCK_STATE_VANILLA] | +1. | [BLOCK_POS] | Only if vanilla block |
+ * | [BLOCK_STATE_NOVA] | +1. | [BLOCK] | Only if Nova block |
+ * | [BLOCK_STATE] | +1. | [BLOCK] | Only if vanilla block |
  */
 object BlockBreak :
     AbstractContextIntention<BlockBreak>(),
     HasRequiredBlock<BlockBreak>,
-    HasBlockUpdateMethod<BlockBreak>,
+    HasBlockUpdateFlags<BlockBreak>,
     HasOptionalTileEntity<BlockBreak>,
     HasOptionalSource<BlockBreak>,
     HasOptionalBlockInteraction<BlockBreak>,
     HasHeldItem<BlockBreak> {
-    
+        
+   // TODO: decide on whether or not to keep this. There is a problem with this in that this information cannot be autofilled depending on when the ctx is created
+   
+    /**
+     * The block data (block state) that is replacing this block.
+     */
+    val NEW_BLOCK_STATE = DefaultingContextParamType<BlockData, BlockPlace>(
+        novaKey("new_block_state"),
+        default = BlockType.AIR.createBlockData()
+    )
+        
     /**
      * The item stack used as a tool.
      * Defaults to an empty item stack.
@@ -112,14 +113,13 @@ object BlockBreak :
         HasHeldItem.applyDefaults(this)
         
         addAutofiller(TOOL_ITEM_STACK, Autofiller.from(HELD_ITEM_STACK) { if (it.hasData(DataComponentTypes.TOOL) || ToolCategory.ofItem(it).isNotEmpty()) it else null })
-        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK_POS, TOOL_ITEM_STACK, SOURCE_PLAYER) { pos, tool, player -> player.gameMode != GameMode.CREATIVE && ToolUtils.isCorrectToolForDrops(pos.block, tool) })
-        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK_POS, SOURCE_PLAYER) { pos, player -> player.gameMode != GameMode.CREATIVE && ToolUtils.isCorrectToolForDrops(pos.block, null) })
-        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK_POS) { pos -> ToolUtils.isCorrectToolForDrops(pos.block, null) })
+        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK, TOOL_ITEM_STACK, SOURCE_PLAYER) { block, tool, player -> player.gameMode != GameMode.CREATIVE && ToolUtils.isCorrectToolForDrops(block, tool) })
+        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK, SOURCE_PLAYER) { block, player -> player.gameMode != GameMode.CREATIVE && ToolUtils.isCorrectToolForDrops(block, null) })
+        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK) { block -> ToolUtils.isCorrectToolForDrops(block, null) })
         addAutofiller(BLOCK_EXP_DROPS, Autofiller.from(BLOCK_DROPS) { it })
         
         // extra autofillers for inherited properties
-        addAutofiller(BLOCK_STATE_NOVA, Autofiller.from(BLOCK_POS) { it.novaBlockState })
-        addAutofiller(BLOCK_STATE_VANILLA, Autofiller.from(BLOCK_POS) { if(it.block.id.namespace() == "minecraft") it.block.blockData else null })
+        addAutofiller(BLOCK_STATE, Autofiller.from(BLOCK) { it.blockData })
     }
     
 }

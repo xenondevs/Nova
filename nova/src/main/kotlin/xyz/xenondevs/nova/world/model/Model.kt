@@ -6,11 +6,11 @@ import org.bukkit.Location
 import org.bukkit.entity.Display.Billboard
 import org.bukkit.entity.Display.Brightness
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.joml.Quaternionf
 import org.joml.Vector3f
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemDisplayMetadata
-import xyz.xenondevs.nova.world.item.NovaItem
 
 @Deprecated(MULTI_MODEL_DEPRECATION)
 data class Model(
@@ -28,7 +28,7 @@ data class Model(
 ) {
     
     constructor(
-        item: NovaItem,
+        item: ItemType,
         location: Location,
         constraints: Billboard = Billboard.FIXED,
         translation: Vector3f = Vector3f(),
@@ -39,7 +39,7 @@ data class Model(
         width: Float = 0f,
         height: Float = 0f,
         glowColor: Int = -1
-    ) : this(item.clientsideProvider.get().get(), location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
+    ) : this(item.createItemStack(), location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
     
     fun createFakeItemDisplay(autoRegister: Boolean = true): FakeItemDisplay =
         FakeItemDisplay(location, autoRegister) { _, data -> applyMetadata(data) }

@@ -4,14 +4,27 @@ import io.papermc.paper.datacomponent.DataComponentTypes
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
+import net.minecraft.world.level.block.state.BlockState
+import org.bukkit.Bukkit
+import org.bukkit.Chunk
 import org.bukkit.Fluid
-import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Display.Brightness
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.world.ChunkLoadEvent
+import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.joml.Matrix4f
 import org.joml.Matrix4fc
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.invui.item.ItemBuilder
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.packetentity.ItemDisplayMetadata
 import xyz.xenondevs.nova.packetentity.PacketItemDisplay
 import xyz.xenondevs.nova.packetentity.packetItemDisplay
@@ -20,16 +33,18 @@ import xyz.xenondevs.nova.serialization.kotlinx.DisplayEntityBlockModelDataSeria
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.Matrix4fcAsArraySerializer
 import xyz.xenondevs.nova.util.item.requiresLight
+import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.nmsBlockState
+import xyz.xenondevs.nova.util.nmsPos
+import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverLevel
-import xyz.xenondevs.nova.util.setBlockState
-import xyz.xenondevs.nova.util.setBlockStateNoUpdate
-import xyz.xenondevs.nova.util.setBlockStateSilently
-import xyz.xenondevs.nova.util.withoutBlockMigration
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.BlockUpdateMethod
+import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
+import xyz.xenondevs.nova.world.pos
 import java.awt.Color
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 @Serializable(DisplayEntityBlockModelDataSerializer::class)
@@ -50,7 +65,7 @@ internal class DisplayEntityBlockModelData(
     ) {
         
         val itemStack: ItemStack
-            get() = ItemStack(Material.PAPER).apply {
+            get() = ItemType.PAPER.createItemStack().apply {
                 @Suppress("UnstableApiUsage")
                 setData(DataComponentTypes.ITEM_MODEL, model)
             }
@@ -66,89 +81,154 @@ internal class DisplayEntityBlockModelData(
 @SerialName("entity_backed")
 internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModelData) : BlockModelProvider {
     
-    companion object {
-        val entities = ConcurrentHashMap<BlockPos, List<PacketItemDisplay>>()
-    }
-    
-    override fun set(pos: BlockPos, method: BlockUpdateMethod) {
-        placeHitbox(pos, method)
-        load(pos)
-    }
-    
-    private fun placeHitbox(pos: BlockPos, method: BlockUpdateMethod) {
-        withoutBlockMigration(pos) {
-            when (method) {
-                BlockUpdateMethod.WITH_BLOCK_UPDATES -> pos.setBlockState(info.collider.nmsBlockState)
-                BlockUpdateMethod.WITHOUT_BLOCK_UPDATES -> pos.setBlockStateNoUpdate(info.collider.nmsBlockState)
-                BlockUpdateMethod.WITHOUT_BOCK_UPDATES_WITHOUT_PACKETS -> pos.setBlockStateSilently(info.collider.nmsBlockState)
+    @Suppress("unused")
+    @InternalInit(stage = InternalInitStage.POST_WORLD)
+    companion object : Listener {
+        
+        val entities = ConcurrentHashMap<Block, List<PacketItemDisplay>>()
+        private val blocksByChunk = HashMap<ChunkPos, MutableSet<Block>>()
+        
+        @InitFun
+        private fun init() {
+            registerEvents()
+            Bukkit.getWorlds()
+                .asSequence()
+                .flatMap { it.loadedChunks.asSequence() }
+                .forEach(::loadChunk)
+        }
+        
+        @DisableFun
+        private fun disable() {
+            entities.values.flatten().forEach(PacketItemDisplay::despawn)
+            entities.clear()
+            blocksByChunk.clear()
+        }
+        
+        @EventHandler
+        private fun handleChunkLoad(event: ChunkLoadEvent) {
+            loadChunk(event.chunk)
+        }
+        
+        @EventHandler
+        private fun handleChunkUnload(event: ChunkUnloadEvent) {
+            blocksByChunk.remove(event.chunk.pos)
+                ?.forEach { block -> entities.remove(block)?.forEach(PacketItemDisplay::despawn) }
+        }
+        
+        private fun loadChunk(chunk: Chunk) {
+            val levelChunk = chunk.levelChunk
+            val providerMaps = IdentityHashMap<NovaBlock, Map<BlockState, BlockModelProvider>>()
+            
+            fun getProvider(state: BlockState): DisplayEntityBlockModelProvider? {
+                val block = state.block as? NovaBlock
+                    ?: return null
+                val providers = providerMaps.getOrPut(block) { block.modelProviders.get() }
+                return providers[state] as? DisplayEntityBlockModelProvider
+            }
+            
+            val blockX = chunk.x shl 4
+            val blockZ = chunk.z shl 4
+            for (sectionIndex in levelChunk.sections.indices) {
+                val chunkSection = levelChunk.sections[sectionIndex]
+                if (!chunkSection.maybeHas { getProvider(it) != null })
+                    continue
+                
+                val blockY = levelChunk.getSectionYFromSectionIndex(sectionIndex) shl 4
+                for (y in 0..<16) for (z in 0..<16) for (x in 0..<16) {
+                    val provider = getProvider(chunkSection.getBlockState(x, y, z))
+                        ?: continue
+                    provider.load(chunk.world.getBlockAt(blockX + x, blockY + y, blockZ + z))
+                }
             }
         }
+        
+        private fun track(block: Block) {
+            blocksByChunk.getOrPut(block.chunkPos) { HashSet() }.add(block)
+        }
+        
+        private fun untrack(block: Block) {
+            val chunkPos = block.chunkPos
+            val blocks = blocksByChunk[chunkPos] ?: return
+            blocks.remove(block)
+            if (blocks.isEmpty())
+                blocksByChunk.remove(chunkPos)
+        }
+        
     }
     
-    override fun load(pos: BlockPos) {
-        if (pos in entities.keys)
-            throw IllegalStateException("ItemDisplay already exists at $pos")
+    override val clientsideBlockState: BlockState
+        get() = info.collider.nmsBlockState
+    
+    override fun load(block: Block) {
+        if (entities.containsKey(block)) {
+            replace(block, this)
+            return
+        }
         
-        val models = info.models.mapTo(ArrayList()) { createDisplay(pos, it) }
+        val models = info.models.mapTo(ArrayList()) { createDisplay(block, it) }
         if (info.waterlogged)
-            models += createWaterlogDisplay(pos)
+            models += createWaterlogDisplay(block)
         
-        entities[pos] = models
+        entities[block] = models
+        track(block)
     }
     
-    override fun remove(pos: BlockPos, method: BlockUpdateMethod) {
-        super.remove(pos, method)
-        entities.remove(pos)?.forEach(PacketItemDisplay::despawn)
+    override fun unload(block: Block) {
+        entities.remove(block)?.forEach(PacketItemDisplay::despawn)
+        untrack(block)
     }
     
-    override fun unload(pos: BlockPos) {
-        entities.remove(pos)?.forEach(PacketItemDisplay::despawn)
-    }
-    
-    override fun replace(pos: BlockPos, method: BlockUpdateMethod) {
-        placeHitbox(pos, method)
+    override fun replace(block: Block, previous: BlockModelProvider) {
+        if (previous !is DisplayEntityBlockModelProvider) {
+            super.replace(block, previous)
+            return
+        }
         
         // re-use as many existing entities as possible
-        val prevEntities = entities[pos] ?: emptyList()
+        val prevEntities = entities[block] ?: emptyList()
         val newEntities = ArrayList<PacketItemDisplay>()
         
         var i = 0
         for (model in info.models) {
             newEntities += prevEntities.getOrNull(i++)
                 ?.also { prevEntity -> setMetadata(prevEntity.metadata, model) }
-                ?: createDisplay(pos, model)
+                ?: createDisplay(block, model)
         }
         if (info.waterlogged) {
-            newEntities += prevEntities.getOrNull(i)
-                ?.also { prevEntity -> setWaterlogMetadata(prevEntity.metadata, pos) }
-                ?: createWaterlogDisplay(pos)
+            newEntities += prevEntities.getOrNull(i++)
+                ?.also { prevEntity -> setWaterlogMetadata(prevEntity.metadata, block) }
+                ?: createWaterlogDisplay(block)
         }
         
-        entities[pos] = newEntities
+        for (j in i..<prevEntities.size)
+            prevEntities[j].despawn()
+        
+        entities[block] = newEntities
+        track(block)
     }
     
-    fun updateWaterlogEntity(pos: BlockPos) {
-        entities[pos]?.lastOrNull()?.metadata?.let { setWaterlogMetadata(it, pos) }
+    fun updateWaterlogEntity(block: Block) {
+        entities[block]?.lastOrNull()?.metadata?.let { setWaterlogMetadata(it, block) }
     }
     
-    private fun createDisplay(pos: BlockPos, model: DisplayEntityBlockModelData.Model) = packetItemDisplay {
-        location by pos.location.toCenterLocation()
+    private fun createDisplay(block: Block, model: DisplayEntityBlockModelData.Model) = packetItemDisplay {
+        location by block.location.toCenterLocation()
     }.apply {
         setMetadata(metadata, model)
         spawn()
     }
     
-    private fun createWaterlogDisplay(pos: BlockPos) = packetItemDisplay {
+    private fun createWaterlogDisplay(pos: Block) = packetItemDisplay {
         location by pos.location.toCenterLocation()
     }.apply {
         setWaterlogMetadata(metadata, pos)
         spawn()
     }
     
-    private fun setWaterlogMetadata(data: ItemDisplayMetadata, pos: BlockPos) {
+    private fun setWaterlogMetadata(data: ItemDisplayMetadata, pos: Block) {
         data.brightnessOverride = null
         @Suppress("DEPRECATION")
-        data.itemStack = DefaultBlockOverlays.WATERLOGGED.get().createClientsideItemBuilder()
+        data.itemStack = ItemBuilder(DefaultBlockOverlays.WATERLOGGED.get())
             .setCustomModelData(0, pos.world.getFluidData(pos.x, pos.y + 1, pos.z).fluidType == Fluid.WATER)
             .setCustomModelData(0, Color(pos.world.serverLevel.getBiome(pos.nmsPos).value().waterColor))
             .build()

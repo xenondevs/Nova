@@ -12,10 +12,6 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.clientsideProvider
 
-@JvmName("itemProviderByNovaItemProvider")
-infix fun DslProperty<in ItemProvider>.by(novaItem: Provider<NovaItem>): Unit =
-    by(novaItem.clientsideProvider)
-
 @JvmName("itemStackByItemProvider")
 infix fun DslProperty<in ItemStack>.by(itemProvider: ItemProvider): Unit =
     by(itemProvider.get())

@@ -24,8 +24,9 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.Ne
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
-import xyz.xenondevs.nova.world.item.clientsideProvider
+import xyz.xenondevs.nova.world.item.itemProvider
 
 private const val USE_DSL_SIDE_CONFIG_ITEM = "Use openSideConfigItem(...) with menu configuration directly."
 
@@ -172,24 +173,24 @@ class SideConfigMenu @Deprecated(USE_DSL_SIDE_CONFIG_ITEM) constructor(
             ) {
                 tabs by listOf(energyConfigMenu?.gui, itemConfigMenu?.gui, fluidConfigMenu?.gui)
                 
-                '<' by BackItem(DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.clientsideProvider, openPrevious)
+                '<' by BackItem(DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.itemProvider, openPrevious)
                 'e' by tabItem(
                     0, tab, tabs,
-                    DefaultGuiItems.TP_ENERGY_BTN_SELECTED.clientsideProvider,
-                    DefaultGuiItems.TP_ENERGY_BTN_ON.clientsideProvider,
-                    DefaultGuiItems.TP_ENERGY_BTN_OFF.clientsideProvider
+                    DefaultGuiItems.TP_ENERGY_BTN_SELECTED.itemProvider,
+                    DefaultGuiItems.TP_ENERGY_BTN_ON.itemProvider,
+                    DefaultGuiItems.TP_ENERGY_BTN_OFF.itemProvider
                 )
                 'i' by tabItem(
                     1, tab, tabs,
-                    DefaultGuiItems.TP_ITEM_BTN_SELECTED.clientsideProvider,
-                    DefaultGuiItems.TP_ITEM_BTN_ON.clientsideProvider,
-                    DefaultGuiItems.TP_ITEM_BTN_OFF.clientsideProvider
+                    DefaultGuiItems.TP_ITEM_BTN_SELECTED.itemProvider,
+                    DefaultGuiItems.TP_ITEM_BTN_ON.itemProvider,
+                    DefaultGuiItems.TP_ITEM_BTN_OFF.itemProvider
                 )
                 'f' by tabItem(
                     2, tab, tabs,
-                    DefaultGuiItems.TP_FLUID_BTN_SELECTED.clientsideProvider,
-                    DefaultGuiItems.TP_FLUID_BTN_ON.clientsideProvider,
-                    DefaultGuiItems.TP_FLUID_BTN_OFF.clientsideProvider
+                    DefaultGuiItems.TP_FLUID_BTN_SELECTED.itemProvider,
+                    DefaultGuiItems.TP_FLUID_BTN_ON.itemProvider,
+                    DefaultGuiItems.TP_FLUID_BTN_OFF.itemProvider
                 )
             }
             onOpen { updateNetworkData() }
@@ -202,7 +203,7 @@ class SideConfigMenu @Deprecated(USE_DSL_SIDE_CONFIG_ITEM) constructor(
     }
     
     private fun initNetworkData() {
-        NetworkManager.queueRead(endPoint.pos.chunkPos) { state ->
+        NetworkManager.queueRead(endPoint.block.chunkPos) { state ->
             energyConfigMenu?.init(state)
             itemConfigMenu?.init(state)
             fluidConfigMenu?.init(state)
@@ -210,7 +211,7 @@ class SideConfigMenu @Deprecated(USE_DSL_SIDE_CONFIG_ITEM) constructor(
     }
     
     internal fun updateNetworkData() {
-        NetworkManager.queueRead(endPoint.pos.chunkPos) { state ->
+        NetworkManager.queueRead(endPoint.block.chunkPos) { state ->
             energyConfigMenu?.refresh(state)
             itemConfigMenu?.refresh(state)
             fluidConfigMenu?.refresh(state)
@@ -241,7 +242,7 @@ context(windowDsl: WindowDsl, endPoint: NetworkEndPoint)
 fun openSideConfigItem(
     inventories: Map<NetworkedInventory, String>? = null,
     containers: Map<NetworkedFluidContainer, String>? = null,
-    itemProvider: Provider<ItemProvider> = DefaultGuiItems.TP_SIDE_CONFIG_BTN.clientsideProvider
+    itemProvider: Provider<ItemProvider> = DefaultGuiItems.TP_SIDE_CONFIG_BTN.itemProvider
 ): Item = item {
     val outerWindow = windowDsl.window
     // eagerly create the menu as loading network state is async
@@ -258,7 +259,7 @@ fun openSideConfigItem(
 @Suppress("FunctionName")
 @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 fun OpenSideConfigItem(sideConfigMenu: SideConfigMenu): Item = item {
-    itemProvider by DefaultGuiItems.SIDE_CONFIG_BTN.clientsideProvider
+    itemProvider by DefaultGuiItems.SIDE_CONFIG_BTN.itemProvider
     onClick {
         player.playClickSound()
         sideConfigMenu.openWindow(player)

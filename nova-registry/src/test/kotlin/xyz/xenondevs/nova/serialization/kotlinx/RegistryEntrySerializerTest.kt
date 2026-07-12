@@ -1,3 +1,4 @@
+
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import io.papermc.paper.registry.RegistryKey
@@ -24,7 +25,6 @@ class RegistryEntrySerializerTest {
         private lateinit var entry1: RegistryEntry.Nova<TestElement>
         private lateinit var novaSerializer: NovaRegistryEntrySerializer<TestElement>
         private lateinit var paperSerializer: PaperRegistryEntrySerializer<ItemType>
-        private lateinit var eitherSerializer: EitherRegistryEntrySerializer<TestElement, ItemType>
         
         @JvmStatic
         @BeforeAll
@@ -47,7 +47,6 @@ class RegistryEntrySerializerTest {
             
             novaSerializer = NovaRegistryEntrySerializer(novaRegistry)
             paperSerializer = PaperRegistryEntrySerializer(RegistryKey.ITEM)
-            eitherSerializer = EitherRegistryEntrySerializer(novaRegistry, RegistryKey.ITEM)
         }
         
         private fun registerElement(name: String): RegistryEntry.Nova<TestElement> {
@@ -90,34 +89,7 @@ class RegistryEntrySerializerTest {
         assertEquals(ItemTypeEntries.DIAMOND, entry)
     }
     
-    // --- Either ---
-    
-    @Test
-    fun `serialize RegistryEntry Either Nova`() {
-        val either = RegistryEntry.either(entry1, RegistryKey.ITEM)
-        val json = Json.encodeToString(eitherSerializer, either)
-        assertEquals(""""nova:element1"""", json)
-    }
-    
-    @Test
-    fun `deserialize RegistryEntry Either Nova`() {
-        val json = """"nova:element1""""
-        val entry = Json.decodeFromString(eitherSerializer, json)
-        assertEquals(RegistryEntry.either(entry1, RegistryKey.ITEM), entry)
-    }
-    
-    @Test
-    fun `serialize RegistryEntry Either Paper`() {
-        val either = RegistryEntry.either(novaRegistry, ItemTypeEntries.DIAMOND)
-        val json = Json.encodeToString(eitherSerializer, either)
-        assertEquals(""""minecraft:diamond"""", json)
-    }
-    
-    @Test
-    fun `deserialize RegistryEntry Either Paper`() {
-        val json = """"minecraft:diamond""""
-        val entry = Json.decodeFromString(eitherSerializer, json)
-        assertEquals(RegistryEntry.either(novaRegistry, ItemTypeEntries.DIAMOND), entry)
-    }
     
 }
+
+

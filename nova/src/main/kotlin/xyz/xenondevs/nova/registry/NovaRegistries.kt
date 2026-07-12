@@ -6,11 +6,9 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 import xyz.xenondevs.nova.util.novaKey
-import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterType
 import xyz.xenondevs.nova.world.item.Equipment
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.recipe.RecipeType
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
@@ -29,8 +27,6 @@ object NovaRegistries {
     internal var isFrozen: Boolean = false
         private set
     
-    internal val INTERNAL_BLOCK = createRegistry<NovaBlock>(novaKey("block"), reloadable = false)
-    internal val INTERNAL_ITEM = createRegistry<NovaItem>(novaKey("item"))
     internal val INTERNAL_EQUIPMENT = createRegistry<Equipment>(novaKey("equipment"))
     internal val INTERNAL_TOOL_TIER = createRegistry<ToolTier>(novaKey("tool_tier"))
     internal val INTERNAL_TOOL_CATEGORY = createRegistry<ToolCategory>(novaKey("tool_category"))
@@ -43,18 +39,6 @@ object NovaRegistries {
     internal val INTERNAL_WAILA_TOOL_ICON_PROVIDER = createRegistry<WailaToolIconProvider>(novaKey("waila_tool_icon_provider"))
     internal val INTERNAL_ITEM_FILTER_TYPE = createRegistry<ItemFilterType<*>>(novaKey("item_filter_type"))
     internal val INTERNAL_TOOLTIP_STYLE = createRegistry<TooltipStyle>(novaKey("tooltip_style"))
-    
-    /**
-     * Registry for all [NovaBlocks][NovaBlock].
-     */
-    @JvmField
-    val BLOCK: NovaRegistry<NovaBlock> = INTERNAL_BLOCK.unmodifiableView
-    
-    /**
-     * Registry for all [NovaItems][NovaItem].
-     */
-    @JvmField
-    val ITEM: NovaRegistry<NovaItem> = INTERNAL_ITEM.unmodifiableView
     
     /**
      * Registry for all [Equipments][Equipment].

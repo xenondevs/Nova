@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.channel
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.pollFirstWhere
 import xyz.xenondevs.nova.util.CubeFaceMap

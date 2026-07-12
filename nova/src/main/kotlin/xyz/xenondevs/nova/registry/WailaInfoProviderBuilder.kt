@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.registry
 
 import org.bukkit.Keyed
+import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
-import xyz.xenondevs.nova.world.BlockPos
 
 /**
  * A builder for [WailaInfoProvider].
@@ -29,7 +29,7 @@ sealed interface WailaInfoProviderBuilder<B : Keyed, S : Any> : RegistryEntryBui
      * Sets the actual functionality of the info provider.
      * The supplied lambda will be invoked when the given player looks at the given block state at the given position.
      */
-    fun infoProvider(getInfo: (player: Player, pos: BlockPos, blockState: S) -> WailaInfo)
+    fun infoProvider(getInfo: (player: Player, block: Block, blockState: S) -> WailaInfo)
     
     /**
      * Sets the actual functionality of the info provider.
@@ -38,7 +38,7 @@ sealed interface WailaInfoProviderBuilder<B : Keyed, S : Any> : RegistryEntryBui
      */
     fun infoProvider(
         base: RegistryEntry.Nova<WailaInfoProvider<B, S>>,
-        modifyInfo: (player: Player, pos: BlockPos, blockState: S, info: WailaInfo) -> WailaInfo
+        modifyInfo: (player: Player, block: Block, blockState: S, info: WailaInfo) -> WailaInfo
     )
     
 }

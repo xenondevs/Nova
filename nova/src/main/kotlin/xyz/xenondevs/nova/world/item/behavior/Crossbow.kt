@@ -21,7 +21,6 @@ import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.resources.builder.layout.item.ChargedType
-import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.setCustomModelDataStrings
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
@@ -31,6 +30,7 @@ import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.ItemAction
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
+import xyz.xenondevs.nova.world.item.itemType
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -244,7 +244,7 @@ class Crossbow(
     override fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {
         val projectiles = server.getData(DataComponentTypes.CHARGED_PROJECTILES)?.projectiles()
         if (projectiles.isNotNullOrEmpty()) {
-            client.setCustomModelDataStrings(customModelDataOffset, projectiles.map { ItemUtils.getId(it).toString() })
+            client.setCustomModelDataStrings(customModelDataOffset, projectiles.map { it.itemType.key.asString() })
         }
         
         return client

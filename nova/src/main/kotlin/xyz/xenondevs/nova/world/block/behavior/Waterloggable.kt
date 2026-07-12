@@ -1,74 +1,44 @@
 package xyz.xenondevs.nova.world.block.behavior
 
-import net.minecraft.world.level.block.state.properties.BlockStateProperties
-import org.bukkit.GameMode
-import org.bukkit.Material
-import org.bukkit.Sound
-import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.BlockInteract
-import xyz.xenondevs.nova.util.BlockUtils
+import org.bukkit.block.Block
+import org.bukkit.block.data.BlockData
+import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.nmsBlockState
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.InteractionResult
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
+import xyz.xenondevs.nova.util.serverLevel
+import xyz.xenondevs.nova.world.block.NovaBlockState
+import xyz.xenondevs.nova.world.block.NovaWaterloggingBridge
+import xyz.xenondevs.nova.world.block.blockType
+import xyz.xenondevs.nova.world.block.novaBlock
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
-import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.WATERLOGGED
-import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
-import xyz.xenondevs.nova.world.player.swingHandEventless
 
 /**
- * Allows water-logging blocks via right-clicking with buckets. Requires the [WATERLOGGED] property.
+ * Enables vanilla waterlogging mechanics for a block.
  */
 object Waterloggable : BlockBehavior {
     
-    override fun useItemOn(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult {
-        val player = ctx[BlockInteract.SOURCE_PLAYER]
-            ?: return InteractionResult.Pass
-        
-        val hand = ctx[BlockInteract.HELD_HAND]
-            ?: return InteractionResult.Pass
-        
-        val itemStack = player.inventory.getItem(hand)
-        val isWaterlogged = state.getOrThrow(WATERLOGGED)
-        
-        if (itemStack.type == Material.WATER_BUCKET) {
-            BlockUtils.updateBlockState(pos, state.with(WATERLOGGED, true))
-            if (player.gameMode != GameMode.CREATIVE) {
-                Bucketable.emptyBucketInHand(player, hand)
-            }
-            if (hasNoWaterloggingPrediction(state)) {
-                pos.playSound(Sound.ITEM_BUCKET_EMPTY, 1f, 1f)
-                player.swingHandEventless(hand)
-            }
-            return InteractionResult.Success()
-        } else if (isWaterlogged && itemStack.type == Material.BUCKET) {
-            BlockUtils.updateBlockState(pos, state.with(WATERLOGGED, false))
-            if (player.gameMode != GameMode.CREATIVE) {
-                Bucketable.fillBucketInHand(player, hand, FluidType.WATER)
-            }
-            if (hasNoWaterloggingPrediction(state)) {
-                pos.playSound(Sound.ITEM_BUCKET_FILL, 1f, 1f)
-                player.swingHandEventless(hand)
-            }
-            return InteractionResult.Success()
-        }
-        
-        return InteractionResult.Pass
-    }
+    override val stateProperties = setOf(WATERLOGGED)
     
-    override fun handleNeighborChanged(pos: BlockPos, state: NovaBlockState) {
-        (state.modelProvider as? DisplayEntityBlockModelProvider)?.updateWaterlogEntity(pos)
-    }
-    
-    private fun hasNoWaterloggingPrediction(state: NovaBlockState): Boolean {
-        val bs = when (val mp = state.modelProvider) {
-            is DisplayEntityBlockModelProvider -> mp.info.collider.nmsBlockState
-            is BackingStateBlockModelProvider -> mp.info.vanillaBlockState
-            is ModelLessBlockModelProvider -> mp.info.nmsBlockState
-        }
-        return !bs.hasProperty(BlockStateProperties.WATERLOGGED)
+    override fun updateShape(
+        block: Block,
+        state: NovaBlockState,
+        neighbor: Block,
+        neighborState: BlockData
+    ): NovaBlockState {
+        NovaWaterloggingBridge.scheduleWaterTickIfWaterlogged(
+            state.nmsBlockState,
+            block.world.serverLevel,
+            block.nmsPos
+        )
+        
+        if (state[WATERLOGGED] != true || neighbor.x != block.x || neighbor.y != block.y + 1 || neighbor.z != block.z)
+            return state
+        
+        val novaBlock = state.blockType.novaBlock ?: return state
+        (novaBlock.modelProviders.get()[state.nmsBlockState] as? DisplayEntityBlockModelProvider)
+            ?.updateWaterlogEntity(block)
+        
+        return state
     }
     
 }

@@ -56,7 +56,7 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
     override fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {
         val lore = ArrayList<Component>()
         lore += Component.translatable("item.nova.unknown_item_filter.description", NamedTextColor.RED)
-        lore += Component.text(server.retrieveData<Key>(ID_KEY).toString(), NamedTextColor.GRAY)
+        lore += Component.text(server.retrieveData<Key>(ID_KEY)?.asString() ?: "null", NamedTextColor.GRAY)
         lore += server.retrieveData<Compound>(DATA_KEY).toString()
             .lineSequence()
             .flatMap { it.chunkedSequence(100) }

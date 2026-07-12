@@ -383,6 +383,13 @@ internal class PacketEntityManager(private val world: World) {
             get(player.world).ccQueue += PlayerChunkChange(player, PlayerViewRegion(center, to))
         }
         
+        fun queueResendAll(player: Player) {
+            val manager = get(player.world)
+            val region = PlayerViewRegion(player.location.chunkSec, player.packetEntityRenderDistance)
+            manager.ccQueue += PlayerChunkChange(player, null)
+            manager.ccQueue += PlayerChunkChange(player, region)
+        }
+        
         fun queueMainThreadTask(run: () -> Unit) {
             mainThreadQueue += run
         }
@@ -462,4 +469,11 @@ internal class PacketEntityManager(private val world: World) {
  */
 fun initPacketEntityManager(plugin: JavaPlugin) {
     PacketEntityManager.init(plugin)
+}
+
+/**
+ * Refreshes all packet entities by despawning and respawning them.
+ */
+fun Player.refreshPacketEntities() {
+    PacketEntityManager.queueResendAll(this)
 }

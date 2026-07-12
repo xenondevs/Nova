@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.ui.menu.explorer.recipes
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.MutableProvider
@@ -11,6 +10,7 @@ import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.dsl.pagedGuisGui
 import xyz.xenondevs.invui.dsl.pagedItemsGui
@@ -20,7 +20,7 @@ import xyz.xenondevs.invui.gui.pageCountProvider
 import xyz.xenondevs.invui.gui.pageProvider
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
-import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.nova.registry.entries.ItemTypeEntries
 import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureAlignment
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
@@ -30,10 +30,9 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.component.adventure.move
-import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
-import xyz.xenondevs.nova.world.item.clientsideProvider
+import xyz.xenondevs.nova.world.item.itemType
 import xyz.xenondevs.nova.world.item.recipe.RecipeContainer
 import xyz.xenondevs.nova.world.item.recipe.RecipeRegistry
 import java.util.*
@@ -44,7 +43,7 @@ import kotlin.math.round
  * and returns whether the attempt was successful, i.e. if there were any recipes for the item.
  */
 fun Player.showRecipes(item: ItemStack): Boolean =
-    showRecipes(ItemUtils.getId(item).toString())
+    showRecipes(item.itemType.key.asString())
 
 /**
  * Tries to open the recipe explorer for the recipes for [id],
@@ -58,7 +57,7 @@ fun Player.showRecipes(id: String): Boolean =
  * and returns whether the attempt was successful, i.e. if there were any usages for the item.
  */
 fun Player.showUsages(item: ItemStack): Boolean =
-    showUsages(ItemUtils.getId(item).toString())
+    showUsages(item.itemType.key.asString())
 
 /**
  * Tries to open the recipe explorer for the usages for [id],
@@ -225,7 +224,7 @@ internal class RecipesMenu(
 }
 
 private fun backButton(): Item = item {
-    itemProvider by DefaultGuiItems.TP_ARROW_LEFT_ON.clientsideProvider
+    itemProvider by DefaultGuiItems.TP_ARROW_LEFT_ON
     onClick {
         player.playClickSound()
         RecipesMenu.popFromHistory(player)?.open() ?: ItemsMenu.open(player)
@@ -263,10 +262,10 @@ private fun itemInfoButton(info: String): Item = item {
 private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            provider(ItemProvider.EMPTY)
+            ItemTypeEntries.AIR
         else if (page > 0)
-            DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON_ALIGNED_RIGHT.clientsideProvider
-        else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF_ALIGNED_RIGHT.clientsideProvider
+            DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON_ALIGNED_RIGHT
+        else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF_ALIGNED_RIGHT
     }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() > 0) {
@@ -279,10 +278,10 @@ private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>
 private fun tabPageForwardItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            provider(ItemProvider.EMPTY)
+            ItemTypeEntries.AIR
         else if (page + 1 < pageCount)
-            DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON_ALIGNED_LEFT.clientsideProvider
-        else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF_ALIGNED_LEFT.clientsideProvider
+            DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON_ALIGNED_LEFT
+        else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF_ALIGNED_LEFT
     }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() < pageCount.get() - 1) {
@@ -295,8 +294,8 @@ private fun tabPageForwardItem(page: MutableProvider<Int>, pageCount: Provider<I
 private fun recipePageBackButton(page: MutableProvider<Int>): Item = item {
     itemProvider by page.map { page ->
         if (page > 0)
-            DefaultGuiItems.TP_ARROW_LEFT_BTN_ON.clientsideProvider
-        else DefaultGuiItems.TP_ARROW_LEFT_BTN_OFF.clientsideProvider
+            DefaultGuiItems.TP_ARROW_LEFT_BTN_ON
+        else DefaultGuiItems.TP_ARROW_LEFT_BTN_OFF
     }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() > 0) {
@@ -309,8 +308,8 @@ private fun recipePageBackButton(page: MutableProvider<Int>): Item = item {
 private fun recipePageForwardButton(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (page + 1 < pageCount)
-            DefaultGuiItems.TP_ARROW_RIGHT_BTN_ON.clientsideProvider
-        else DefaultGuiItems.TP_ARROW_RIGHT_BTN_OFF.clientsideProvider
+            DefaultGuiItems.TP_ARROW_RIGHT_BTN_ON
+        else DefaultGuiItems.TP_ARROW_RIGHT_BTN_OFF
     }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() < pageCount.get() - 1) {

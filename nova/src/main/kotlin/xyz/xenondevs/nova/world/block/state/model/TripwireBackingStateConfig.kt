@@ -44,6 +44,14 @@ internal class TripwireBackingStateConfig(
             .setValue(TripWireBlock.DISARMED, disarmed)
             .setValue(TripWireBlock.POWERED, powered)
     }
+    override val maskedBlockState: BlockState by blockType.map { 
+        it.nmsBlock.defaultBlockState
+            .setValue(TripWireBlock.NORTH, north)
+            .setValue(TripWireBlock.EAST, east)
+            .setValue(TripWireBlock.SOUTH, south)
+            .setValue(TripWireBlock.WEST, west)
+            .setValue(TripWireBlock.ATTACHED, type.attached)
+    }
     
 }
 

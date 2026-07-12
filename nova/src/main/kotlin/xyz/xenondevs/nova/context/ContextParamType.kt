@@ -29,7 +29,7 @@ open class ContextParamType<V : Any, I : ContextIntention<I>>(
         id.hashCode()
     
     override fun toString(): String =
-        id.toString()
+        id.asString()
     
 }
 

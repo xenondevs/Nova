@@ -31,22 +31,22 @@ internal class SpawnConditionsBuilderImpl(
     }
     
     override fun biome(priority: Int, biome: TypedKey<Biome>, vararg biomes: TypedKey<Biome>) {
-        val holderSet = listOf(biome, *biomes).toHolderSet(Registries.BIOME, biomeRegistry)
+        val holderSet = listOf(biome, *biomes).toHolderSet(biomeRegistry)
         conditions += PriorityProvider.Selector(BiomeCheck(holderSet), priority)
     }
     
     override fun biome(priority: Int, biome: TagKey<Biome>) {
-        val holderSet = biomeRegistry.getOrThrow(biome.toNmsTagKey(Registries.BIOME))
+        val holderSet = biomeRegistry.getOrThrow(biome.toNmsTagKey())
         conditions += PriorityProvider.Selector(BiomeCheck(holderSet), priority)
     }
     
     override fun structure(priority: Int, structure: TypedKey<*>, vararg structures: TypedKey<*>) {
-        val holderSet = listOf(structure, *structures).toHolderSet(Registries.STRUCTURE, structureRegistry)
+        val holderSet = listOf(structure, *structures).toHolderSet(structureRegistry)
         conditions += PriorityProvider.Selector(StructureCheck(holderSet), priority)
     }
     
     override fun structure(priority: Int, structure: TagKey<*>) {
-        val holderSet = structureRegistry.getOrThrow(structure.toNmsTagKey(Registries.STRUCTURE))
+        val holderSet = structureRegistry.getOrThrow(structure.toNmsTagKey())
         conditions += PriorityProvider.Selector(StructureCheck(holderSet), priority)
     }
     

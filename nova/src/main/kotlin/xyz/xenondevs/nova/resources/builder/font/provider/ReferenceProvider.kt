@@ -19,7 +19,7 @@ class ReferenceProvider(var id: ResourcePath<ResourceType.Font>) : FontProvider(
         get() = throw UnsupportedOperationException("Cannot retrieve charSizes from reference provider")
     
     override fun toJson() = super.toJson().apply {
-        addProperty("id", id.toString())
+        addProperty("id", id.asString())
     }
     
     companion object {

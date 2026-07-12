@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.playClickSound
+import xyz.xenondevs.nova.world.item.itemType
 
 fun createRecipeChoiceItem(recipeChoice: RecipeChoice): Item {
     return createRecipeChoiceItem(recipeChoice.getInputStacks().map { ItemWrapper(it) })
@@ -33,7 +34,7 @@ fun createRecipeChoiceItem(itemProviders: List<ItemProvider>): Item =
 internal fun handleRecipeChoiceItemClick(item: Item, click: Click) {
     val player = click.player
     val itemProvider = item.getItemProvider(player)
-    val id = ItemUtils.getId(itemProvider.get()).toString()
+    val id = itemProvider.get().itemType.key.asString()
     handleRecipeChoiceClick(id, click)
 }
 

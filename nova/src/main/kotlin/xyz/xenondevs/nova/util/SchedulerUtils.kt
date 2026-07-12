@@ -64,6 +64,7 @@ private fun checkSchedulerAvailability() {
 
 internal object AsyncExecutor {
     
+    @JvmField
     val SUPERVISOR = SupervisorJob()
     
 }

@@ -89,8 +89,8 @@ class Enchantable(
     override fun toString(itemStack: ItemStack): String {
         return "Enchantable(" +
             "enchantmentValue=$enchantmentValue, " +
-            "primaryEnchantments=${primaryEnchantments.joinToString { it.key.toString() }}, " +
-            "supportedEnchantments=${primaryEnchantments.joinToString { it.key.toString() }}" +
+            "primaryEnchantments=${primaryEnchantments.joinToString { it.key.asString() }}, " +
+            "supportedEnchantments=${primaryEnchantments.joinToString { it.key.asString() }}" +
             ")"
     }
     

@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.registry
 
 import org.bukkit.Keyed
+import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
-import xyz.xenondevs.nova.world.BlockPos
 
 internal class WailaInfoProviderBuilderImpl<B : Keyed, S : Any>(
     override val entry: RegistryEntry.Nova<WailaInfoProvider<B, S>>,
@@ -13,19 +13,19 @@ internal class WailaInfoProviderBuilderImpl<B : Keyed, S : Any>(
     override var blocks = emptyRegistryEntrySet<B>()
     override var priority = 0
     
-    private var infoGetter: (Player, BlockPos, S) -> WailaInfo = { _, _, _ -> throw NotImplementedError() }
+    private var infoGetter: (Player, Block, S) -> WailaInfo = { _, _, _ -> throw NotImplementedError() }
     
-    override fun infoProvider(getInfo: (player: Player, pos: BlockPos, blockState: S) -> WailaInfo) {
+    override fun infoProvider(getInfo: (player: Player, block: Block, blockState: S) -> WailaInfo) {
         infoGetter = getInfo
     }
     
     override fun infoProvider(
         base: RegistryEntry.Nova<WailaInfoProvider<B, S>>,
-        modifyInfo: (player: Player, pos: BlockPos, blockState: S, info: WailaInfo) -> WailaInfo
+        modifyInfo: (Player, Block, S, WailaInfo) -> WailaInfo
     ) {
-        infoGetter = { player, pos, state ->
-            val baseInfo = base.get().getInfo(player, pos, state)
-            modifyInfo(player, pos, state, baseInfo)
+        infoGetter = { player, block, state ->
+            val baseInfo = base.get().getInfo(player, block, state)
+            modifyInfo(player, block, state, baseInfo)
         }
     }
     

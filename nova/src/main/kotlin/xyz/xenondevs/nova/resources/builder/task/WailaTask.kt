@@ -275,7 +275,7 @@ class WailaTask(
                 try {
                     val file = builder.resolve("assets/nova/textures/waila_generated/${id.namespace()}/${id.value()}.png")
                     file.parent.createDirectories()
-                    renderer.renderModelToFile(path.toString(), file)
+                    renderer.renderModelToFile(path.asString(), file)
                     addEntry(id, ResourcePath(ResourceType.FontTexture, "nova", "waila_generated/${id.namespace()}/${id.value()}.png"), SIZE, ASCENT)
                     count++
                 } catch (e: Exception) {

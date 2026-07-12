@@ -16,6 +16,7 @@ internal abstract class BackingStateConfig internal constructor() {
     abstract val variantMap: Map<String, String>
     abstract val blockType: RegistryEntry.Paper<BlockType>
     abstract val vanillaBlockState: BlockState
+    abstract val maskedBlockState: BlockState
     
     override fun equals(other: Any?): Boolean {
         if (other !is BackingStateConfig)

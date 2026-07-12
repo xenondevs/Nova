@@ -1,3 +1,4 @@
+
 package xyz.xenondevs.nova.registry
 
 import io.papermc.paper.registry.RegistryKey
@@ -101,27 +102,6 @@ class RegistryEntrySetTest {
         assertFalse(null as RegistryEntry.Nova<TestElement>? in set)
     }
     
-    // --- Nova.Direct contains(Either) ---
-    
-    @Test
-    fun `Nova Direct contains Either entry whose key matches a contained Nova entry`() {
-        val set = registryEntrySetOf(novaEntry1, novaEntry2)
-        val either = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertTrue(either in set)
-    }
-    
-    @Test
-    fun `Nova Direct does not contain Either entry whose key is not in the set`() {
-        val set = registryEntrySetOf(novaEntry1, novaEntry2)
-        val either = RegistryEntry.either(novaEntry3, RegistryKey.ITEM)
-        assertFalse(either in set)
-    }
-    
-    @Test
-    fun `Nova Direct does not contain null Either entry`() {
-        val set = registryEntrySetOf(novaEntry1)
-        assertFalse(null as RegistryEntry.Either<TestElement, *>? in set)
-    }
     
     // --- Nova.Tag contains(Nova) ---
     
@@ -140,24 +120,6 @@ class RegistryEntrySetTest {
         assertFalse(null as RegistryEntry.Nova<TestElement>? in novaTag)
     }
     
-    // --- Nova.Tag contains(Either) ---
-    
-    @Test
-    fun `Nova Tag contains Either entry whose key matches a tagged Nova entry`() {
-        val either = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertTrue(either in novaTag)
-    }
-    
-    @Test
-    fun `Nova Tag does not contain Either entry whose key is not in the tag`() {
-        val either = RegistryEntry.either(novaEntry3, RegistryKey.ITEM)
-        assertFalse(either in novaTag)
-    }
-    
-    @Test
-    fun `Nova Tag does not contain null Either entry`() {
-        assertFalse(null as RegistryEntry.Either<TestElement, *>? in novaTag)
-    }
     
     // --- Paper.Direct contains(Paper) ---
     
@@ -179,27 +141,6 @@ class RegistryEntrySetTest {
         assertFalse(null as RegistryEntry.Paper<ItemType>? in set)
     }
     
-    // --- Paper.Direct contains(Either) ---
-    
-    @Test
-    fun `Paper Direct contains Either entry whose key matches a contained Paper entry`() {
-        val set = registryEntrySetOf(ItemTypeEntries.DIAMOND, ItemTypeEntries.EMERALD)
-        val either = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        assertTrue(either in set)
-    }
-    
-    @Test
-    fun `Paper Direct does not contain Either entry whose key is not in the set`() {
-        val set = registryEntrySetOf(ItemTypeEntries.DIAMOND, ItemTypeEntries.EMERALD)
-        val either = RegistryEntry.either(registry, ItemTypeEntries.GOLD_INGOT)
-        assertFalse(either in set)
-    }
-    
-    @Test
-    fun `Paper Direct does not contain null Either entry`() {
-        val set = registryEntrySetOf(ItemTypeEntries.DIAMOND)
-        assertFalse(null as RegistryEntry.Either<*, ItemType>? in set)
-    }
     
     // --- Paper.Tag contains(Paper) ---
     
@@ -219,175 +160,12 @@ class RegistryEntrySetTest {
         assertFalse(null as RegistryEntry.Paper<ItemType>? in ItemTypeTags.WOOL)
     }
     
-    // --- Paper.Tag contains(Either) ---
     
-    @Test
-    fun `Paper Tag contains Either entry whose key matches a tagged Paper entry`() {
-        val either = RegistryEntry.either(registry, ItemTypeEntries.WHITE_WOOL)
-        assertTrue(either in ItemTypeTags.WOOL)
-    }
     
-    @Test
-    fun `Paper Tag does not contain Either entry whose key is not in the tag`() {
-        val either = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        assertFalse(either in ItemTypeTags.WOOL)
-    }
     
-    @Test
-    fun `Paper Tag does not contain null Either entry`() {
-        assertFalse(null as RegistryEntry.Either<*, ItemType>? in ItemTypeTags.WOOL)
-    }
     
-    // --- Mixed.Direct contains(Either) ---
     
-    @Test
-    fun `Mixed Direct contains Either entry that is in the set`() {
-        val set = registryEntrySetOf(
-            registryEntrySetOf(novaEntry1),
-            registryEntrySetOf(ItemTypeEntries.DIAMOND)
-        )
-        val either = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertTrue(either in set)
-    }
     
-    @Test
-    fun `Mixed Direct does not contain Either entry that is not in the set`() {
-        val set = registryEntrySetOf(
-            registryEntrySetOf(novaEntry1),
-            registryEntrySetOf(ItemTypeEntries.DIAMOND)
-        )
-        val either = RegistryEntry.either(novaEntry3, RegistryKey.ITEM)
-        assertFalse(either in set)
-    }
-    
-    @Test
-    fun `Mixed Direct does not contain null Either entry`() {
-        val set = registryEntrySetOf(
-            registryEntrySetOf(novaEntry1),
-            emptyRegistryEntrySet(RegistryKey.ITEM)
-        )
-        assertFalse(null as RegistryEntry.Either<TestElement, ItemType>? in set)
-    }
-    
-    // --- Mixed.Direct contains(Nova) ---
-    
-    @Test
-    fun `Mixed Direct contains Nova entry that is in the set`() {
-        val set = registryEntrySetOf(
-            registryEntrySetOf(novaEntry1, novaEntry2),
-            emptyRegistryEntrySet(RegistryKey.ITEM)
-        )
-        assertTrue(novaEntry1 in set)
-    }
-    
-    @Test
-    fun `Mixed Direct does not contain Nova entry that is not in the set`() {
-        val set = registryEntrySetOf(
-            registryEntrySetOf(novaEntry1),
-            emptyRegistryEntrySet(RegistryKey.ITEM)
-        )
-        assertFalse(novaEntry3 in set)
-    }
-    
-    @Test
-    fun `Mixed Direct does not contain null Nova entry`() {
-        val set = registryEntrySetOf(
-            registryEntrySetOf(novaEntry1),
-            emptyRegistryEntrySet(RegistryKey.ITEM)
-        )
-        assertFalse(null as RegistryEntry.Nova<TestElement>? in set)
-    }
-    
-    // --- Mixed.Direct contains(Paper) ---
-    
-    @Test
-    fun `Mixed Direct contains Paper entry that is in the set`() {
-        val set = registryEntrySetOf(
-            emptyRegistryEntrySet(registry),
-            registryEntrySetOf(ItemTypeEntries.DIAMOND, ItemTypeEntries.EMERALD)
-        )
-        assertTrue(ItemTypeEntries.DIAMOND in set)
-    }
-    
-    @Test
-    fun `Mixed Direct does not contain Paper entry that is not in the set`() {
-        val set = registryEntrySetOf(
-            emptyRegistryEntrySet(registry),
-            registryEntrySetOf(ItemTypeEntries.DIAMOND)
-        )
-        assertFalse(ItemTypeEntries.GOLD_INGOT in set)
-    }
-    
-    @Test
-    fun `Mixed Direct does not contain null Paper entry`() {
-        val set = registryEntrySetOf(
-            emptyRegistryEntrySet(registry),
-            registryEntrySetOf(ItemTypeEntries.DIAMOND)
-        )
-        assertFalse(null as RegistryEntry.Paper<ItemType>? in set)
-    }
-    
-    // --- Mixed.Tag contains(Either) ---
-    
-    @Test
-    fun `Mixed Tag contains Either entry whose key matches a tagged entry`() {
-        val mixedTag = novaTag.asMixed(RegistryKey.ITEM)
-        val either = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertTrue(either in mixedTag)
-    }
-    
-    @Test
-    fun `Mixed Tag does not contain Either entry whose key is not in the tag`() {
-        val mixedTag = novaTag.asMixed(RegistryKey.ITEM)
-        val either = RegistryEntry.either(novaEntry3, RegistryKey.ITEM)
-        assertFalse(either in mixedTag)
-    }
-    
-    @Test
-    fun `Mixed Tag does not contain null Either entry`() {
-        val mixedTag = novaTag.asMixed(RegistryKey.ITEM)
-        assertFalse(null as RegistryEntry.Either<TestElement, ItemType>? in mixedTag)
-    }
-    
-    // --- Mixed.Tag contains(Nova) ---
-    
-    @Test
-    fun `Mixed Tag contains Nova entry that is in the tag`() {
-        val mixedTag = novaTag.asMixed(RegistryKey.ITEM)
-        assertTrue(novaEntry1 in mixedTag)
-    }
-    
-    @Test
-    fun `Mixed Tag does not contain Nova entry that is not in the tag`() {
-        val mixedTag = novaTag.asMixed(RegistryKey.ITEM)
-        assertFalse(novaEntry3 in mixedTag)
-    }
-    
-    @Test
-    fun `Mixed Tag does not contain null Nova entry`() {
-        val mixedTag = novaTag.asMixed(RegistryKey.ITEM)
-        assertFalse(null as RegistryEntry.Nova<TestElement>? in mixedTag)
-    }
-    
-    // --- Mixed.Tag contains(Paper) ---
-    
-    @Test
-    fun `Mixed Tag contains Paper entry that is in the tag`() {
-        val mixedTag = ItemTypeTags.WOOL.asMixed(registry)
-        assertTrue(ItemTypeEntries.WHITE_WOOL in mixedTag)
-    }
-    
-    @Test
-    fun `Mixed Tag does not contain Paper entry that is not in the tag`() {
-        val mixedTag = ItemTypeTags.WOOL.asMixed(registry)
-        assertFalse(ItemTypeEntries.DIAMOND in mixedTag)
-    }
-    
-    @Test
-    fun `Mixed Tag does not contain null Paper entry`() {
-        val mixedTag = ItemTypeTags.WOOL.asMixed(registry)
-        assertFalse(null as RegistryEntry.Paper<ItemType>? in mixedTag)
-    }
     
     // --- Paper.Direct from TypedKeys bootstrap behavior ---
     
@@ -437,29 +215,6 @@ class RegistryEntrySetTest {
         assertThrowsOrAborts<NoSuchElementException> { registryEntrySetOf(invalidTag) }
     }
     
-    // --- Mixed.Tag bootstrap behavior ---
-    
-    @Test
-    fun `registryEntrySetOf(Key, NovaRegistry, RegistryKey) during bootstrap with invalid tag does not throw`() {
-        TestRegistryContext.inBootstrapPhase = true
-        val invalidTag = key("test", "nonexistent_mixed_tag_bootstrap")
-        assertDoesNotThrow { registryEntrySetOf(invalidTag, registry, RegistryKey.ITEM) }
-    }
-    
-    @Test
-    fun `registryEntrySetOf(Key, NovaRegistry, RegistryKey) during bootstrap with invalid tag throws on resolution`() {
-        TestRegistryContext.inBootstrapPhase = true
-        val invalidTag = key("test", "nonexistent_mixed_tag_resolve")
-        val set = registryEntrySetOf(invalidTag, registry, RegistryKey.ITEM)
-        assertThrowsOrAborts<NoSuchElementException> { set.get() }
-    }
-    
-    @Test
-    fun `registryEntrySetOf(Key, NovaRegistry, RegistryKey) after bootstrap with invalid tag throws immediately`() {
-        TestRegistryContext.inBootstrapPhase = false
-        val invalidTag = key("test", "nonexistent_mixed_tag_post")
-        assertThrowsOrAborts<NoSuchElementException> { registryEntrySetOf(invalidTag, registry, RegistryKey.ITEM) }
-    }
     
     /**
      * Asserts that [block] throws [T]. If [block] throws a [TestAbortedException] instead
@@ -478,3 +233,4 @@ class RegistryEntrySetTest {
     }
     
 }
+

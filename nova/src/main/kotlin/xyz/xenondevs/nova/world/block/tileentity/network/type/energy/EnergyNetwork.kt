@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.energy
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.commons.provider.Provider

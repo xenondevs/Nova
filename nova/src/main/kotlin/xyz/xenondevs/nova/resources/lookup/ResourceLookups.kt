@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.registry.ProtoBlockState
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
@@ -14,7 +15,7 @@ import xyz.xenondevs.nova.resources.builder.task.FontChar
 import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.item.Equipment
 import kotlin.reflect.typeOf
@@ -27,15 +28,15 @@ internal object ResourceLookups {
     private val lookups = HashMap<String, ResourceLookup<*>>()
     
     /**
-     * Lookup for getting the relevant [BlockModelProvider] for every stringified [NovaBlockState].
+     * Lookup for getting the relevant [BlockModelProvider] for every [ProtoBlockState].
      */
-    val blockModelLookup: MutableProvider<Map<NovaBlockState, BlockModelProvider>> =
+    val blockModelLookup: MutableProvider<Map<ProtoBlockState, BlockModelProvider>> =
         resourceLookup("block_models", emptyMap())
     
     /**
-     * Map of stringified [NovaBlockState] to the relevant [BlockModelProvider].
+     * Map of [ProtoBlockState] to the relevant [BlockModelProvider].
      */
-    var blockModel: Map<NovaBlockState, BlockModelProvider>
+    var blockModel: Map<ProtoBlockState, BlockModelProvider>
         by blockModelLookup
     
     /**

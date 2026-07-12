@@ -29,6 +29,30 @@ sealed interface RegistryElementBuilder<out T : Any> {
          */
         fun build(): T
         
+        companion object {
+            
+            /**
+             * Creates an anonymous element builder for [entry] that creates an intermediary
+             * result in [prepare] which is then used to [build] the final element.
+             */
+            fun <T : NovaRegistryElement<T>, I : Any> anonymous(
+                entry: RegistryEntry.Nova<T>,
+                prepare: (RegistryEntry.Nova<T>) -> I,
+                build: (RegistryEntry.Nova<T>, I) -> T
+            ): Nova<T> = object : Nova<T> {
+                
+                private lateinit var prep: I
+                
+                override fun prepareBuild() {
+                    prep = prepare(entry)
+                }
+                
+                override fun build(): T = build(entry, prep)
+                
+            }
+            
+        }
+        
     }
     
     /**
@@ -46,6 +70,12 @@ sealed interface RegistryElementBuilder<out T : Any> {
          * Builds a set of tags that the resulting element should be added to.
          */
         fun buildTagSet(): Set<TagKey<*>> = emptySet()
+        
+    }
+    
+    interface RerunnableVanilla<out T : Any> : Vanilla<T> {
+        
+        fun reset()
         
     }
     

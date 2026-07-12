@@ -1,9 +1,8 @@
 package xyz.xenondevs.nova.registry
 
-import io.papermc.paper.registry.TypedKey
 import net.kyori.adventure.text.Component
 import org.bukkit.enchantments.Enchantment
-import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.world.item.behavior.Enchantable
 
 /**
@@ -82,42 +81,30 @@ sealed interface EnchantmentBuilder : RegistryEntryBuilder.Paper<Enchantment> {
     fun curse(curse: Boolean)
     
     /**
-     * Sets the items for which this enchantment can show up in the enchanting table.
+     * Sets the item types for which this enchantment can show up in the enchanting table (if [tableDiscoverable]).
+     * If unspecified, defaults to the set of item types defined in [enchants].
      *
-     * For your own custom items, prefer configuring the supported enchantments via
+     * For your own custom items, you can also configure the supported enchantments via the [Enchantable] item behavior.
+     */
+    fun enchantsPrimary(items: RegistryEntrySet.Paper<ItemType>)
+    
+    /**
+     * Sets the item types to which this enchantment can be applied to, for example, in an anvil.
+     *
+     * To have the enchanment appear in the enchanting table for some item types and only be applicable
+     * via the anvil for others, define [enchants] for all supported item types, then [enchantsPrimary]
+     * for all item types for which the enchantment is supposed to show up in the enchanting table
+     * and set [tableDiscoverable] to `true`. If you need no such distinction, only define the [enchants]
+     * item type set and they will be considered "primary" as well.
+     * 
+     * For your own custom items, you can also configure the supported enchantments via
      * the [Enchantable] item behavior.
      */
-    fun enchantsPrimary(canEnchant: (ItemStack) -> Boolean)
+    fun enchants(items: RegistryEntrySet.Paper<ItemType>)
     
     /**
-     * Sets the items to which this enchantment can be applied to, for example in an anvil.
-     *
-     * To have the enchantment appear in the enchanting table, use [enchantsPrimary].
-     *
-     * For your own custom items, prefer configuring the supported enchantments via
-     * the [Enchantable] item behavior.
+     * Sets the enchantments that are incompatible (exclusive) with this enchantment.
      */
-    fun enchants(canEnchant: (ItemStack) -> Boolean)
-    
-    /**
-     * Sets the compatibility of this enchantment with other enchantments.
-     *
-     * This option is exclusive with [compatibleWith] and [incompatibleWith].
-     */
-    fun compatibility(compatibility: (Enchantment) -> Boolean)
-    
-    /**
-     * Defines with which enchantments this enchantment is compatible. All other enchantments are incompatible.
-     *
-     * This option is exclusive with [compatibility] and [incompatibleWith].
-     */
-    fun compatibleWith(vararg enchantments: TypedKey<Enchantment>)
-    
-    /**
-     * Sets the compatibility of this enchantment with other enchantments.
-     *
-     * This option is exclusive with [compatibility] and [compatibleWith].
-     */
-    fun incompatibleWith(vararg enchantments: TypedKey<Enchantment>)
+    fun incompatibleWith(enchantments: RegistryEntrySet.Paper<Enchantment>)
     
 }

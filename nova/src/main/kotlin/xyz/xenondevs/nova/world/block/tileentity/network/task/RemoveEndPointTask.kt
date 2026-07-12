@@ -25,7 +25,7 @@ internal class RemoveEndPointTask(
     private inner class RemoveEndPointTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = node.pos.toString()
+        val pos: String = node.block.toString()
         
     }
     

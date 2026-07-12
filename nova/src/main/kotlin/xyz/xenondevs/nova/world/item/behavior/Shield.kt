@@ -7,7 +7,6 @@ import io.papermc.paper.datacomponent.item.BlocksAttacks
 import io.papermc.paper.datacomponent.item.blocksattacks.DamageReduction
 import io.papermc.paper.datacomponent.item.blocksattacks.ItemDamageFunction
 import io.papermc.paper.registry.set.RegistryKeySet
-import io.papermc.paper.registry.tag.TagKey
 import net.kyori.adventure.key.Key
 import org.bukkit.Registry
 import org.bukkit.Sound
@@ -66,8 +65,8 @@ fun Shield(
     Shield(
         cfg.entry(blockDelay, "block_delay"),
         cfg.entry(disableCooldownScale, "disable_cooldown_scale"),
-        cfg.optionalEntry<List<DamageReduction>>("damage_reductions").orElse(damageReductions),
-        cfg.optionalEntry<ItemDamageFunction>("item_damage").orElse(itemDamage),
+        cfg.entry(damageReductions, "damage_reductions"),
+        cfg.entry(itemDamage, "item_damage"),
         cfg.optionalEntry<RegistryKeySet<DamageType>>("bypassed_by").orElse(bypassedBy),
         cfg.optionalEntry<Key>("block_sound").orElse(blockSound),
         cfg.optionalEntry<Key>("disable_sound").orElse(disableSound)

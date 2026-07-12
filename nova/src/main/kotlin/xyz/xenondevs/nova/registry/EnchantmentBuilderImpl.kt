@@ -1,17 +1,17 @@
 package xyz.xenondevs.nova.registry
 
-import io.papermc.paper.registry.TypedKey
+import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.keys.tags.EnchantmentTagKeys
 import io.papermc.paper.registry.tag.TagKey
 import net.kyori.adventure.text.Component
-import net.minecraft.core.Holder
-import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponentMap
+import net.minecraft.core.registries.Registries
 import net.minecraft.resources.RegistryOps
-import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.enchantments.Enchantment
-import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
+import xyz.xenondevs.nova.util.lookupGetterOrThrow
+import xyz.xenondevs.nova.util.toHolderSet
 import xyz.xenondevs.nova.world.item.enchantment.CustomEnchantmentLogic
 import java.util.*
 import net.minecraft.world.item.enchantment.Enchantment as MojangEnchantment
@@ -28,9 +28,9 @@ internal class EnchantmentBuilderImpl(
     
     // custom logic
     private var tableLeveRequirement: (Int) -> IntRange = { val min = 1 + it * 10; min..(min + 5) }
-    private var compatibility: (Holder<MojangEnchantment>) -> Boolean = { true }
-    private var primaryItem: (ItemStack) -> Boolean = { false }
-    private var supportedItem: (ItemStack) -> Boolean = { false }
+    private var incompatibleWith: RegistryEntrySet.Paper<Enchantment> = emptyRegistryEntrySet(RegistryKey.ENCHANTMENT)
+    private var supportedItems: RegistryEntrySet.Paper<ItemType> = emptyRegistryEntrySet(RegistryKey.ITEM)
+    private var primaryItems: RegistryEntrySet.Paper<ItemType>? = null
     
     // tags
     private var isTableDiscoverable: Boolean = false
@@ -81,34 +81,27 @@ internal class EnchantmentBuilderImpl(
         this.isCurse = curse
     }
     
-    override fun enchantsPrimary(canEnchant: (ItemStack) -> Boolean) {
-        primaryItem = canEnchant
+    override fun enchantsPrimary(items: RegistryEntrySet.Paper<ItemType>) {
+        primaryItems = items
     }
     
-    override fun enchants(canEnchant: (ItemStack) -> Boolean) {
-        supportedItem = canEnchant
+    override fun enchants(items: RegistryEntrySet.Paper<ItemType>) {
+        supportedItems = items
     }
     
-    override fun compatibility(compatibility: (Enchantment) -> Boolean) {
-        this.compatibility = { compatibility(CraftEnchantment.minecraftHolderToBukkit(it)) }
-    }
-    
-    override fun compatibleWith(vararg enchantments: TypedKey<Enchantment>) {
-        val keySet = enchantments.mapTo(HashSet()) { it.key() }
-        this.compatibility = { CraftEnchantment.minecraftHolderToBukkit(it).key() in keySet }
-    }
-    
-    override fun incompatibleWith(vararg enchantments: TypedKey<Enchantment>) {
-        val keySet = enchantments.mapTo(HashSet()) { it.key() }
-        this.compatibility = { CraftEnchantment.minecraftHolderToBukkit(it).key() !in keySet }
+    override fun incompatibleWith(enchantments: RegistryEntrySet.Paper<Enchantment>) {
+        incompatibleWith = enchantments
     }
     
     override fun build(lookup: RegistryOps.RegistryInfoLookup): MojangEnchantment {
+        val itemRegistry = lookup.lookupGetterOrThrow(Registries.ITEM)
+        val enchRegistry = lookup.lookupGetterOrThrow(Registries.ENCHANTMENT)
+        
         val enchantment = MojangEnchantment(
             name.toNMSComponent(),
             MojangEnchantment.EnchantmentDefinition(
-                HolderSet.direct(),
-                Optional.empty(),
+                supportedItems.toHolderSet(itemRegistry),
+                Optional.ofNullable(primaryItems?.toHolderSet(itemRegistry)),
                 rarity,
                 maxLevel,
                 MojangEnchantment.Cost(0, 0),
@@ -116,13 +109,11 @@ internal class EnchantmentBuilderImpl(
                 anvilCost,
                 emptyList()
             ),
-            HolderSet.direct(),
+            incompatibleWith.toHolderSet(enchRegistry),
             DataComponentMap.EMPTY
         )
         
-        CustomEnchantmentLogic.customEnchantments[enchantment] = CustomEnchantmentLogic(
-            primaryItem, supportedItem, tableLeveRequirement, compatibility
-        )
+        CustomEnchantmentLogic.customEnchantments[enchantment] = CustomEnchantmentLogic(tableLeveRequirement)
         
         return enchantment
     }

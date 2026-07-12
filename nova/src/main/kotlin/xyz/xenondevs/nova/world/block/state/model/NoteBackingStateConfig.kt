@@ -34,6 +34,7 @@ internal data class NoteBackingStateConfig(
             .setValue(NoteBlock.NOTE, note)
             .setValue(NoteBlock.POWERED, powered)
     }
+    override val maskedBlockState: BlockState by blockType.map { it.nmsBlock.defaultBlockState }
     
     init {
         require(note in 0..24)

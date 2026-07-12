@@ -2,8 +2,6 @@
 
 package xyz.xenondevs.nova.context.intention
 
-import net.kyori.adventure.key.Key
-import org.bukkit.Registry
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
@@ -14,12 +12,8 @@ import xyz.xenondevs.nova.context.DefaultingContextParamType
 import xyz.xenondevs.nova.context.intention.HasHeldItem.Companion.HELD_HAND
 import xyz.xenondevs.nova.context.intention.HasHeldItem.Companion.HELD_ITEM_STACK
 import xyz.xenondevs.nova.context.intention.HasHeldItem.Companion.HELD_ITEM_TYPE
-import xyz.xenondevs.nova.context.intention.HasHeldItem.Companion.HELD_ITEM_TYPE_NOVA
-import xyz.xenondevs.nova.context.intention.HasHeldItem.Companion.HELD_ITEM_TYPE_VANILLA
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.novaKey
-import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.itemType
 
 /**
  * A [ContextIntention] that has parameters about an item being held during an interaction.
@@ -49,20 +43,8 @@ interface HasHeldItem<I : HasHeldItem<I>> : HasOptionalSource<I> {
      * The item type being held / used during the interaction as id.
      * Implicitly defaults to `minecraft:air`
      */
-    val HELD_ITEM_TYPE: DefaultingContextParamType<Key, I> // TODO: registry entry
+    val HELD_ITEM_TYPE: DefaultingContextParamType<ItemType, I>
         get() = heldItemType()
-    
-    /**
-     * The vanilla item type being held / used during the interaction.
-     */
-    val HELD_ITEM_TYPE_VANILLA: ContextParamType<ItemType, I>
-        get() = heldItemTypeVanilla()
-    
-    /**
-     * The Nova item type being held / used during the interaction.
-     */
-    val HELD_ITEM_TYPE_NOVA: ContextParamType<NovaItem, I>
-        get() = heldItemTypeNova()
     
     /**
      * The hand in which the item is held.
@@ -78,15 +60,9 @@ interface HasHeldItem<I : HasHeldItem<I>> : HasOptionalSource<I> {
             default = ItemStack.empty(),
             copy = ItemStack::clone
         )
-        private val HELD_ITEM_TYPE = DefaultingContextParamType<Key, Nothing>(
+        private val HELD_ITEM_TYPE = DefaultingContextParamType<ItemType, Nothing>(
             novaKey("held_item_type"),
-            default = Key.key("air")
-        )
-        private val HELD_ITEM_TYPE_VANILLA = ContextParamType<ItemType, Nothing>(
-            novaKey("held_item_type_vanilla")
-        )
-        private val HELD_ITEM_TYPE_NOVA = ContextParamType<NovaItem, Nothing>(
-            novaKey("held_item_type_nova")
+            default = ItemType.AIR
         )
         private val HELD_HAND = ContextParamType<EquipmentSlot, Nothing>(
             novaKey("held_hand"),
@@ -103,19 +79,7 @@ interface HasHeldItem<I : HasHeldItem<I>> : HasOptionalSource<I> {
          * Gets the param type for [HELD_ITEM_TYPE].
          */
         fun <I : HasHeldItem<I>> heldItemType() =
-            HELD_ITEM_TYPE as DefaultingContextParamType<Key, I>
-        
-        /**
-         * Gets the param type for [HELD_ITEM_TYPE_VANILLA].
-         */
-        fun <I : HasHeldItem<I>> heldItemTypeVanilla() =
-            HELD_ITEM_TYPE_VANILLA as ContextParamType<ItemType, I>
-        
-        /**
-         * Gets the param type for [HELD_ITEM_TYPE_NOVA].
-         */
-        fun <I : HasHeldItem<I>> heldItemTypeNova() =
-            HELD_ITEM_TYPE_NOVA as ContextParamType<NovaItem, I>
+            HELD_ITEM_TYPE as DefaultingContextParamType<ItemType, I>
         
         /**
          * Gets the param type for [HELD_HAND].
@@ -127,13 +91,9 @@ interface HasHeldItem<I : HasHeldItem<I>> : HasOptionalSource<I> {
          * Applies the default autofillers on [intention].
          */
         fun <I : HasHeldItem<I>> applyDefaults(intention: HasHeldItem<I>) = intention.apply {
-            addAutofiller(HELD_ITEM_STACK, Autofiller.from(HELD_ITEM_TYPE, ItemUtils::getItemStack))
+            addAutofiller(HELD_ITEM_STACK, Autofiller.from(HELD_ITEM_TYPE, ItemType::createItemStack))
             addAutofiller(HELD_ITEM_STACK, Autofiller.from(SOURCE_LIVING_ENTITY, HELD_HAND) { entity, hand -> entity.equipment?.getItem(hand) })
-            addAutofiller(HELD_ITEM_TYPE, Autofiller.from(HELD_ITEM_STACK, ItemUtils::getId))
-            addAutofiller(HELD_ITEM_TYPE, Autofiller.from(HELD_ITEM_TYPE_VANILLA, ItemType::key))
-            addAutofiller(HELD_ITEM_TYPE, Autofiller.from(HELD_ITEM_TYPE_NOVA, NovaItem::getKey))
-            addAutofiller(HELD_ITEM_TYPE_VANILLA, Autofiller.from(HELD_ITEM_TYPE, Registry.ITEM::get))
-            addAutofiller(HELD_ITEM_TYPE_NOVA, Autofiller.from(HELD_ITEM_TYPE, NovaRegistries.ITEM::getValue))
+            addAutofiller(HELD_ITEM_TYPE, Autofiller.from(HELD_ITEM_STACK, ItemStack::itemType))
         }
         
     }

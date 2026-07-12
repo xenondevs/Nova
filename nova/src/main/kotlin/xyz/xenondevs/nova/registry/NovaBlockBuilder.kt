@@ -1,31 +1,37 @@
 package xyz.xenondevs.nova.registry
 
+import org.bukkit.Color
+import org.bukkit.block.BlockType
+import org.bukkit.block.PistonMoveReaction
+import org.bukkit.block.data.BlockData
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.resources.builder.layout.block.BackingStateCategory
-import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelector
-import xyz.xenondevs.nova.resources.builder.layout.block.BlockStateSelector
+import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
+import xyz.xenondevs.nova.resources.builder.layout.block.BlockSelectorScope
 import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_MODEL_SELECTOR
 import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_STATE_SELECTOR
-import xyz.xenondevs.nova.resources.builder.layout.block.ItemDefinitionConfigurator
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder.Companion.DEFAULT_CONFIGURE_BLOCK_MODEL_SELECTOR
+import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
+import xyz.xenondevs.nova.world.block.FluidFlowMode
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.behavior.BlockDrops
-import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
-import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 
 /**
  * A builder for [NovaBlock].
  */
 @RegistryElementBuilderDsl
-sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, RegistryEntryBuilder.Nova<NovaBlock> {
+sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, RegistryEntryBuilder.Paper<BlockType> {
     
     /**
      * Sets the item type of this block. Used in, for example, block drops via [BlockDrops].
      * 
-     * If this is not set, defaults to the [NovaItem] that used this block to create it's [NovaItemBuilder] (in [Registrar.item]).
+     * If this is not set, defaults to the [ItemType] that used this block to create it's [NovaItemBuilder] (in [Registrar.item]).
      * Note that this only applies if the block is passed directly in the [Registrar.item] function, NOT if the block is defined via [NovaItemBuilder.block].
      */
-    fun item(item: RegistryEntry.Nova<NovaItem>)
+    fun item(item: RegistryEntry.Paper<ItemType>)
     
     /**
      * Sets the behaviors of this block to [behaviors].
@@ -35,7 +41,7 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
     /**
      * Adds the [stateProperties] to the properties of this block.
      */
-    fun stateProperties(vararg stateProperties: ScopedBlockStateProperty<*>)
+    fun stateProperties(vararg stateProperties: BlockStateProperty<*>)
     
     /**
      * Configures the backing state types of this block model via the given ([category], [categories]),
@@ -50,7 +56,7 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
      */
     fun stateBacked(
         category: BackingStateCategory, vararg categories: BackingStateCategory,
-        modelSelector: BlockModelSelector = DEFAULT_BLOCK_MODEL_SELECTOR
+        modelSelector: BlockModelSelectorScope.() -> ModelBuilder = DEFAULT_BLOCK_MODEL_SELECTOR
     ) = stateBacked(0, category, *categories, modelSelector = modelSelector)
     
     /**
@@ -71,7 +77,7 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
     fun stateBacked(
         priority: Int,
         category: BackingStateCategory, vararg categories: BackingStateCategory,
-        modelSelector: BlockModelSelector = DEFAULT_BLOCK_MODEL_SELECTOR
+        modelSelector: BlockModelSelectorScope.() -> ModelBuilder = DEFAULT_BLOCK_MODEL_SELECTOR
     )
     
     /**
@@ -88,8 +94,8 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
      * Exclusive with [stateBacked] and [modelLess].
      */
     fun entityBacked(
-        stateSelector: BlockStateSelector = DEFAULT_BLOCK_STATE_SELECTOR,
-        modelSelector: BlockModelSelector = DEFAULT_BLOCK_MODEL_SELECTOR
+        stateSelector: BlockSelectorScope.() -> BlockData = DEFAULT_BLOCK_STATE_SELECTOR,
+        modelSelector: BlockModelSelectorScope.() -> ModelBuilder = DEFAULT_BLOCK_MODEL_SELECTOR
     )
     
     /**
@@ -109,8 +115,8 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
      * * The item display entities can be accessed and updated at runtime.
      */
     fun entityItemBacked(
-        stateSelector: BlockStateSelector = DEFAULT_BLOCK_STATE_SELECTOR,
-        itemSelector: ItemDefinitionConfigurator = DEFAULT_CONFIGURE_BLOCK_MODEL_SELECTOR
+        stateSelector: BlockSelectorScope.() -> BlockData = DEFAULT_BLOCK_STATE_SELECTOR,
+        itemSelector: ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit = DEFAULT_CONFIGURE_BLOCK_MODEL_SELECTOR
     )
     
     /**
@@ -118,6 +124,64 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
      *
      * Exclusive with [stateBacked] and [entityBacked].
      */
-    fun modelLess(stateSelector: BlockStateSelector)
+    fun modelLess(stateSelector: BlockSelectorScope.() -> BlockData)
+    
+    /**
+     * Configures how pistons interact with this block.
+     * Defaults to [PistonMoveReaction.MOVE].
+     * Tile Entities can never be moved.
+     */
+    fun pistonReaction(pistonReaction: PistonMoveReaction)
+    
+    /**
+     * Configures the light level emitted by all states of this block.
+     * Must be between `0` and `15`.
+     */
+    fun lightEmission(level: Int) = lightEmission { level }
+    
+    /**
+     * Configures the emitted light level for each block state.
+     * Selected values must be between `0` and `15`.
+     */
+    fun lightEmission(selectLightEmission: BlockSelectorScope.() -> Int)
+    
+    /**
+     * Configures this block's resistance to explosions. Higher values make the block harder to destroy.
+     */
+    fun explosionResistance(explosionResistance: Float)
+    
+    /**
+     * Configures how this block interacts with vanilla fire.
+     *
+     * [igniteOdds] controls how easily fire spreads into nearby air, while [burnOdds] controls
+     * how easily existing fire consumes this block. These values are weights, not percentages.
+     * [ignitedByLava] controls whether lava can ignite fire next to this block.
+     *
+     * For reference, vanilla uses `5, 5` for logs, `5, 20` for planks, `30, 60` for leaves,
+     * and `60, 100` for grass and flowers.
+     */
+    fun flammable(igniteOdds: Int, burnOdds: Int, ignitedByLava: Boolean)
+    
+    /**
+     * Configures this block's color on maps.
+     * The closest color available in Minecraft's map palette is used.
+     */
+    fun mapColor(mapColor: Color)
+    
+    /**
+     * Configures how fluids flow into and out of all states of this block.
+     *
+     * Defaults to [FluidFlowMode.WATERLOG_IN_OUT] for blocks with the
+     * [Waterloggable] behavior and [FluidFlowMode.BLOCK] otherwise.
+     */
+    fun fluidFlowMode(mode: FluidFlowMode) = fluidFlowMode { mode }
+    
+    /**
+     * Configures how fluids flow into and out of each block state.
+     *
+     * Defaults to [FluidFlowMode.WATERLOG_IN_OUT] for blocks with the
+     * [Waterloggable] behavior and [FluidFlowMode.BLOCK] otherwise.
+     */
+    fun fluidFlowMode(selectFluidFlowMode: BlockSelectorScope.() -> FluidFlowMode)
     
 }

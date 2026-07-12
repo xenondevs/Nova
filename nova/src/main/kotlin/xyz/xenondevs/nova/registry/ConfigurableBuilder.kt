@@ -32,7 +32,7 @@ interface ConfigurableBuilder {
      * * `rawConfig(Key.key("my_addon", "my_cfg"))` -> `plugins/my_addon/configs/my_cfg.yml`
      */
     fun rawConfig(id: Key) {
-        rawConfig(id.toString())
+        rawConfig(id.asString())
     }
     
 }

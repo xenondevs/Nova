@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.util.data.getInputStacks
-import xyz.xenondevs.nova.util.item.ItemUtils.getId
+import xyz.xenondevs.nova.world.item.itemType
 import kotlin.reflect.full.isSuperclassOf
 
 @InternalInit(
@@ -71,7 +71,7 @@ object RecipeRegistry {
         // add all with bukkit registered recipes
         getBukkitRecipeSequence().forEach {
             val group = RecipeType.of(it)?.group ?: return@forEach
-            val itemKey = getId(it.result).toString()
+            val itemKey = it.result.itemType.key.asString()
             map.getOrPut(itemKey) { hashMapOf() }
                 .getOrPut(group) { mutableListOf() }
                 .add(RecipeContainer(it))
@@ -81,7 +81,7 @@ object RecipeRegistry {
         getCreationNovaRecipeSequence().forEach { recipe ->
             val group = RecipeType.of(recipe)?.group ?: return@forEach
             recipe.getAllResults().forEach { resultStack ->
-                val itemKey = getId(resultStack).toString()
+                val itemKey = resultStack.itemType.key.asString()
                 map.getOrPut(itemKey) { hashMapOf() }
                     .getOrPut(group) { mutableListOf() }
                     .add(RecipeContainer(recipe))
@@ -98,7 +98,7 @@ object RecipeRegistry {
         getBukkitRecipeSequence().forEach { recipe ->
             val group = RecipeType.of(recipe)?.group ?: return@forEach
             recipe.getInputStacks().forEach { inputStack ->
-                val itemKey = getId(inputStack).toString()
+                val itemKey = inputStack.itemType.key.asString()
                 map.getOrPut(itemKey) { hashMapOf() }
                     .getOrPut(group) { LinkedHashSet() }
                     .add(RecipeContainer(recipe))
@@ -109,7 +109,7 @@ object RecipeRegistry {
         getUsageNovaRecipeSequence().forEach { recipe ->
             val group = RecipeType.of(recipe)?.group ?: return@forEach
             recipe.getAllInputs().flatMap { it.getInputStacks() }.forEach { inputStack ->
-                val itemKey = getId(inputStack).toString()
+                val itemKey = inputStack.itemType.key.asString()
                 map.getOrPut(itemKey) { hashMapOf() }
                     .getOrPut(group) { LinkedHashSet() }
                     .add(RecipeContainer(recipe))
@@ -147,4 +147,3 @@ object RecipeRegistry {
     }
     
 }
-

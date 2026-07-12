@@ -1,3 +1,4 @@
+
 package xyz.xenondevs.nova.serialization.cbf
 
 import io.papermc.paper.registry.RegistryKey
@@ -25,7 +26,6 @@ class RegistryEntryBinarySerializerTest {
         private lateinit var entry1: RegistryEntry.Nova<TestElement>
         private lateinit var novaSerializer: NovaRegistryEntryBinarySerializer<TestElement>
         private lateinit var paperSerializer: PaperRegistryEntryBinarySerializer<ItemType>
-        private lateinit var eitherSerializer: EitherRegistryEntryBinarySerializer<TestElement, ItemType>
         
         @JvmStatic
         @BeforeAll
@@ -47,7 +47,6 @@ class RegistryEntryBinarySerializerTest {
             registry.freeze()
             novaSerializer = NovaRegistryEntryBinarySerializer(registry)
             paperSerializer = PaperRegistryEntryBinarySerializer(RegistryKey.ITEM)
-            eitherSerializer = EitherRegistryEntryBinarySerializer(registry, RegistryKey.ITEM)
         }
         
         private fun registerElement(name: String): RegistryEntry.Nova<TestElement> {
@@ -74,20 +73,6 @@ class RegistryEntryBinarySerializerTest {
         assertEquals(ItemTypeEntries.DIAMOND, deserialized)
     }
     
-    @Test
-    fun `round-trip RegistryEntry Either Nova`() {
-        val either = RegistryEntry.either(entry1, RegistryKey.ITEM)
-        val bytes = eitherSerializer.write(either)
-        val deserialized = eitherSerializer.read(bytes)!!
-        assertEquals(RegistryEntry.either(entry1, RegistryKey.ITEM), deserialized)
-    }
-    
-    @Test
-    fun `round-trip RegistryEntry Either Paper`() {
-        val either = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        val bytes = eitherSerializer.write(either)
-        val deserialized = eitherSerializer.read(bytes)!!
-        assertEquals(RegistryEntry.either(registry, ItemTypeEntries.DIAMOND), deserialized)
-    }
-    
 }
+
+

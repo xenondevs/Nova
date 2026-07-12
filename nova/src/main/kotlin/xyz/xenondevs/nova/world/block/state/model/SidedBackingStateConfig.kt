@@ -29,6 +29,7 @@ internal abstract class SidedBackingStateConfig(
             .setValue(BlockStateProperties.UP, BlockFace.UP in faces)
             .setValue(BlockStateProperties.DOWN, BlockFace.DOWN in faces)
     }
+    override val maskedBlockState: BlockState by blockType.map { it.nmsBlock.defaultBlockState }
     
     companion object {
         fun getIdOf(faces: Collection<BlockFace>): Int {

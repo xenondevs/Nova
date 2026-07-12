@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.ui.menu.sideconfig
 
+import xyz.xenondevs.nova.world.*
+
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.block.BlockFace
@@ -14,7 +16,6 @@ import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.nova.registry.RegistryEntry
-import xyz.xenondevs.nova.ui.menu.by
 import xyz.xenondevs.nova.ui.menu.item.TP_BUTTON_COLORS
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.CUBE_FACES
@@ -27,7 +28,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionT
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
-import xyz.xenondevs.nova.world.item.clientsideProvider
+import xyz.xenondevs.nova.world.item.itemProvider
 
 abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPointDataHolder<C>> internal constructor(
     endPoint: NetworkEndPoint,
@@ -91,7 +92,7 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
         if (containers.size <= 1)
             return
         
-        NetworkManager.queueWrite(endPoint.pos.chunkPos) { state ->
+        NetworkManager.queueWrite(endPoint.block.chunkPos) { state ->
             var containerConfig = holder.containerConfig
             var connectionConfig = holder.connectionConfig
             
@@ -163,10 +164,10 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
             currentMode, isSimpleConfiguration
         ) { currentMode, isSimpleConfiguration ->
             when (currentMode) {
-                SimplicityMode.SIMPLE_ONLY, SimplicityMode.ADVANCED_ONLY -> DefaultGuiItems.INVISIBLE_ITEM.clientsideProvider
-                SimplicityMode.ADVANCED if isSimpleConfiguration -> DefaultGuiItems.TP_SMALL_SIMPLE_MODE_BTN_ON.clientsideProvider
-                SimplicityMode.ADVANCED -> DefaultGuiItems.TP_SMALL_SIMPLE_MODE_BTN_OFF.clientsideProvider
-                else -> DefaultGuiItems.TP_SMALL_ADVANCED_MODE_BTN_ON.clientsideProvider
+                SimplicityMode.SIMPLE_ONLY, SimplicityMode.ADVANCED_ONLY -> DefaultGuiItems.INVISIBLE_ITEM.itemProvider
+                SimplicityMode.ADVANCED if isSimpleConfiguration -> DefaultGuiItems.TP_SMALL_SIMPLE_MODE_BTN_ON.itemProvider
+                SimplicityMode.ADVANCED -> DefaultGuiItems.TP_SMALL_SIMPLE_MODE_BTN_OFF.itemProvider
+                else -> DefaultGuiItems.TP_SMALL_ADVANCED_MODE_BTN_ON.itemProvider
             }
         }.flatten()
         

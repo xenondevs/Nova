@@ -8,19 +8,22 @@ import net.minecraft.tags.BlockTags
 import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.registry.entries.BlockTypeTags
 import xyz.xenondevs.nova.serialization.kotlinx.ToolCategoryEntrySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolCategoryEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolCategorySerializer
-import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
-import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.block.blockType
+import xyz.xenondevs.nova.world.block.getBehaviorOrNull
+import xyz.xenondevs.nova.world.block.isNova
 import xyz.xenondevs.nova.world.item.behavior.Tool
-import xyz.xenondevs.nova.world.pos
 
 /**
  * Serializable type alias for `RegistryEntry.Nova<ToolCategory>` using [ToolCategoryEntrySerializer].
@@ -40,7 +43,7 @@ open class ToolCategory internal constructor(
     override val entry: RegistryEntry.Nova<ToolCategory>,
 ) : NovaRegistryElement<ToolCategory> {
     
-    override fun toString(): String = key.toString()
+    override fun toString(): String = this@ToolCategory.key.asString()
     
     companion object {
         
@@ -99,25 +102,22 @@ open class ToolCategory internal constructor(
         }
         
         fun ofBlock(block: Block): Set<ToolCategory> {
-            val novaBlock = WorldDataManager.getBlockState(block.pos)?.block
-            if (novaBlock != null) {
-                val breakable = novaBlock.getBehaviorOrNull<Breakable>()
-                return breakable?.toolCategories ?: emptySet()
-            }
+            val type = block.blockType
+            if (type.isNova) 
+                return type.getBehaviorOrNull<Breakable>()?.toolCategories ?: emptySet()
             
-            val type = block.type
             val categories = HashSet<ToolCategory>()
-            if (Tag.MINEABLE_SHOVEL.isTagged(type))
+            if (type in BlockTypeTags.MINEABLE_SHOVEL)
                 categories.add(VanillaToolCategories.SHOVEL.get())
-            if (Tag.MINEABLE_PICKAXE.isTagged(type))
+            if (type in BlockTypeTags.MINEABLE_PICKAXE)
                 categories.add(VanillaToolCategories.PICKAXE.get())
-            if (Tag.MINEABLE_AXE.isTagged(type))
+            if (type in BlockTypeTags.MINEABLE_AXE)
                 categories.add(VanillaToolCategories.AXE.get())
-            if (Tag.MINEABLE_HOE.isTagged(type))
+            if (type in BlockTypeTags.MINEABLE_HOE)
                 categories.add(VanillaToolCategories.HOE.get())
-            if (type == Material.COBWEB || type == Material.BAMBOO_SAPLING || type == Material.BAMBOO)
+            if (type == BlockType.COBWEB || type == BlockType.BAMBOO_SAPLING || type == BlockType.BAMBOO)
                 categories.add(VanillaToolCategories.SWORD.get())
-            if (Tag.LEAVES.isTagged(type) || Tag.WOOL.isTagged(type) || type == Material.COBWEB)
+            if (type in BlockTypeTags.LEAVES || type in BlockTypeTags.WOOL || type == BlockType.COBWEB)
                 categories.add(VanillaToolCategories.SHEARS.get())
             
             return categories

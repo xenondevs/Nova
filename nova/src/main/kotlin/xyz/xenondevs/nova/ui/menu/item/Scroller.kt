@@ -3,23 +3,25 @@ package xyz.xenondevs.nova.ui.menu.item
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.BundleContents.bundleContents
 import io.papermc.paper.datacomponent.item.CustomModelData.customModelData
+import io.papermc.paper.datacomponent.item.PaperBundleContents
 import net.kyori.adventure.key.Key
-import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponents
-import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.Identifier
+import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.BundleContents
+import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.TooltipDisplay
-import org.bukkit.Tag
+import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
+import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.repeated
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.ClickDsl
 import xyz.xenondevs.invui.dsl.ItemDsl
@@ -41,18 +43,17 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.util.ItemUtils
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.nova.registry.entries.ItemTypeTags
 import xyz.xenondevs.nova.util.item.isNullOrEmpty
 import xyz.xenondevs.nova.util.toNmsTemplate
-import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
-import xyz.xenondevs.nova.world.item.clientsideProvider
+import xyz.xenondevs.nova.world.item.itemProvider
+import xyz.xenondevs.nova.world.item.itemType
 import xyz.xenondevs.nova.world.item.logic.PacketItems
 import java.util.*
 import kotlin.math.round
 import kotlin.random.Random
 import net.minecraft.network.chat.Component as MojangComponent
-import net.minecraft.world.item.Item as MojangItem
-import net.minecraft.world.item.ItemStack as MojangStack
 
 private const val SLOTS = 3
 private const val FIRST_SLOT = 0
@@ -60,6 +61,7 @@ private const val LAST_SLOT = SLOTS - 1
 private const val SLOT_SIZE = 16
 private const val STRETCHED_SLOT_SIZE = 18
 private val SCROLLABLE_BUNDLE_CONTENTS = BundleContents(listOfNotNull(ItemUtils.getPlaceholder().toNmsTemplate()).repeated(3))
+private val SCROLLABLE_BUNDLE_CONTENTS_PAPER = PaperBundleContents(SCROLLABLE_BUNDLE_CONTENTS)
 
 //<editor-fold desc="legacy scroller">
 /**
@@ -69,7 +71,7 @@ private val SCROLLABLE_BUNDLE_CONTENTS = BundleContents(listOfNotNull(ItemUtils.
  */
 context(windowDsl: WindowDsl, guiDsl: ScrollGuiDsl<*>)
 fun scrollerItem(
-    itemProvider: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLLER_VERTICAL.clientsideProvider,
+    itemProvider: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLLER_VERTICAL.itemProvider,
     lines: Int = 1,
     onClick: ClickDsl.() -> Unit = {}
 ): Item = scrollerItem(
@@ -90,7 +92,7 @@ fun scrollerItem(
     window: Provider<Window>,
     line: MutableProvider<Int>,
     maxLine: Provider<Int>,
-    itemProvider: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLLER_VERTICAL.clientsideProvider,
+    itemProvider: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLLER_VERTICAL.itemProvider,
     lines: Int = 1,
     onClick: ClickDsl.() -> Unit = {}
 ): Item = item {
@@ -141,10 +143,10 @@ fun scrollerItem(
 context(windowDsl: WindowDsl, guiDsl: ScrollGuiDsl<*>)
 fun scrollBar(
     offset: Int = 0,
-    verticalOn: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_VERTICAL.clientsideProvider,
-    verticalOff: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_VERTICAL_DISABLED.clientsideProvider,
-    horizontalOn: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_HORIZONTAL.clientsideProvider,
-    horizontalOff: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_HORIZONTAL_DISABLED.clientsideProvider,
+    verticalOn: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_VERTICAL.itemProvider,
+    verticalOff: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_VERTICAL_DISABLED.itemProvider,
+    horizontalOn: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_HORIZONTAL.itemProvider,
+    horizontalOff: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_HORIZONTAL_DISABLED.itemProvider,
     size: Provider<Int> = provider(15),
 ) = scrollBar(
     offset,
@@ -185,10 +187,10 @@ fun scrollBar(
     window: Provider<Window>,
     line: MutableProvider<Int>,
     maxLine: Provider<Int>,
-    verticalOn: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_VERTICAL.clientsideProvider,
-    verticalOff: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_VERTICAL_DISABLED.clientsideProvider,
-    horizontalOn: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_HORIZONTAL.clientsideProvider,
-    horizontalOff: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_HORIZONTAL_DISABLED.clientsideProvider,
+    verticalOn: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_VERTICAL.itemProvider,
+    verticalOff: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_VERTICAL_DISABLED.itemProvider,
+    horizontalOn: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_HORIZONTAL.itemProvider,
+    horizontalOff: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLL_BAR_HORIZONTAL_DISABLED.itemProvider,
     size: Provider<Int> = provider(15)
 ) = SlotElementSupplier { slots ->
     require(slots.size > 1) { "Scroll bar needs at least 2 slots" }
@@ -220,10 +222,12 @@ fun scrollBar(
         
         itemProvider by itemProvider {
             base by combinedProvider(maxLine, on, off) { maxLine, on, off ->
-                val original = (if (maxLine > 0) on.get() else off.get()).unwrap()
-                val result = asType(original, PacketItems.SCROLLABLE_ITEM_HOLDER)
-                result.set(DataComponents.BUNDLE_CONTENTS, SCROLLABLE_BUNDLE_CONTENTS)
-                result.asBukkitMirror()
+                val result = (if (maxLine > 0) on.get() else off.get()).clone()
+                result.editPersistentDataContainer { pdc ->
+                    pdc[PacketItems.SCROLL_SUPPORT_MARKER, PersistentDataType.BOOLEAN] = true
+                }
+                result.setData(DataComponentTypes.BUNDLE_CONTENTS, SCROLLABLE_BUNDLE_CONTENTS_PAPER)
+                result
             }
             data[DataComponentTypes.CUSTOM_MODEL_DATA] by combinedProvider(line, maxLine) { line, maxLine ->
                 val targetPx = if (maxLine > 0) {
@@ -293,26 +297,38 @@ private fun determineOrientation(slots: List<Slot>): ScrollGui.LineOrientation? 
  * 
  * @see installInventoryScrollSupport
  */
-val SCROLL_ENABLING_VISUALIZER: (ItemStack?) -> ItemProvider? = {
-    val original = it.unwrap()
-    if (!original.isEmpty && !original.typeHolder().value().isBundle()) {
-        val result = asType(original, PacketItems.SCROLLABLE_ITEM_HOLDER)
-        result.set(DataComponents.BUNDLE_CONTENTS, SCROLLABLE_BUNDLE_CONTENTS)
+val SCROLL_ENABLING_VISUALIZER: (ItemStack?) -> ItemProvider? = { original ->
+    if (!original.isNullOrEmpty() && !original.itemType.isBundle()) {
+        val result = original.clone()
+        result.editPersistentDataContainer { pdc ->
+            pdc[PacketItems.SCROLL_SUPPORT_MARKER, PersistentDataType.BOOLEAN] = true
+        }
+        result.setData(DataComponentTypes.BUNDLE_CONTENTS, SCROLLABLE_BUNDLE_CONTENTS_PAPER)
         // random break sound makes each item unique to ensure that scrolling definitely resets the client-side selected slot to -1
-        result.set(DataComponents.NOTE_BLOCK_SOUND, Identifier.withDefaultNamespace(Random.nextInt().toString()))
-        ItemWrapper(result.asBukkitMirror())
+        result.setData(DataComponentTypes.NOTE_BLOCK_SOUND, Key.key(Random.nextInt().toString()))
+        ItemWrapper(result)
     } else null
 }
 
 /**
  * Template patch for scrollable invisible items.
  */
-private val HIDDEN_EMPTY_TEMPLATE = DataComponentPatch.builder()
-    .set(DataComponents.ITEM_MODEL, Identifier.withDefaultNamespace("air"))
-    .set(DataComponents.ITEM_NAME, MojangComponent.empty())
-    .set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(true, Collections.emptySortedSet()))
-    .set(DataComponents.BUNDLE_CONTENTS, SCROLLABLE_BUNDLE_CONTENTS)
-    .build()
+private val HIDDEN_EMPTY_TEMPLATE = ItemStackTemplate(
+    Items.SHULKER_SHELL,
+    DataComponentPatch.builder()
+        .set(DataComponents.ITEM_MODEL, Identifier.withDefaultNamespace("air"))
+        .set(DataComponents.ITEM_NAME, MojangComponent.empty())
+        .set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(true, Collections.emptySortedSet()))
+        .set(DataComponents.BUNDLE_CONTENTS, SCROLLABLE_BUNDLE_CONTENTS)
+        .set(
+            DataComponents.CUSTOM_DATA,
+            CustomData.of(CompoundTag().apply {
+                put(CraftItemStack.PDC_CUSTOM_DATA_KEY, CompoundTag().apply {
+                    putBoolean(PacketItems.SCROLL_SUPPORT_MARKER.toString(), true)
+                })
+            }))
+        .build()
+)
 
 /**
  * A visualizer (for [Inventory.setVisualizer], [Window.setCursorVisualizer], [SlotElement.InventoryLink.visualizer])
@@ -325,7 +341,7 @@ private val HIDDEN_EMPTY_TEMPLATE = DataComponentPatch.builder()
  */
 val SCROLL_ENABLING_VISUALIZER_EMPTIES: (ItemStack?) -> ItemProvider? = {
     if (it.isNullOrEmpty()) {
-        val result = MojangStack(PacketItems.SCROLLABLE_ITEM_HOLDER, 1, HIDDEN_EMPTY_TEMPLATE)
+        val result = HIDDEN_EMPTY_TEMPLATE.create()
         result.set(DataComponents.NOTE_BLOCK_SOUND, Identifier.withDefaultNamespace(Random.nextInt().toString()))
         ItemWrapper(result.asBukkitMirror())
     } else SCROLL_ENABLING_VISUALIZER(it)
@@ -348,45 +364,25 @@ val SCROLL_ENABLING_VISUALIZER_EMPTIES: (ItemStack?) -> ItemProvider? = {
  * @see installItemScrollSupport
  */
 val SCROLLABLE_BASE: ItemStack
-    get() {
-        val result = MojangStack(PacketItems.SCROLLABLE_ITEM_HOLDER, 1)
-        result.set(DataComponents.BUNDLE_CONTENTS, SCROLLABLE_BUNDLE_CONTENTS)
-        result.set(DataComponents.NOTE_BLOCK_SOUND, Identifier.withDefaultNamespace(Random.nextInt().toString()))
-        return result.asBukkitMirror()
-    }
-
-/**
- * Faster version of [ItemUtils.asType] that uses NMS to reduce conversion overhead.
- * This is important as the visualizer is called frequently when scrolling.
- */
-private fun asType(original: MojangStack, targetType: Holder<MojangItem>): MojangStack {
-    if (original.isEmpty)
-        return MojangStack.EMPTY
-    
-    val result = MojangStack(targetType, original.count)
-    for (type in BuiltInRegistries.DATA_COMPONENT_TYPE) {
-        val data = original.getTyped(type)
-        if (data != null) {
-            result.set(data)
-        } else {
-            result.remove(type)
+    get() = ItemType.SHULKER_SHELL.createItemStack().apply {
+        editPersistentDataContainer { pdc ->
+            pdc[PacketItems.SCROLL_SUPPORT_MARKER, PersistentDataType.BOOLEAN] = true
         }
+        setData(DataComponentTypes.BUNDLE_CONTENTS, SCROLLABLE_BUNDLE_CONTENTS_PAPER)
+        setData(DataComponentTypes.NOTE_BLOCK_SOUND, Key.key(Random.nextInt().toString()))
     }
-    return result
-}
 
 /**
- * Tag-independently checks whether a [MojangItem] is a bundle.
+ * Tag-independently checks whether an [ItemType] is a bundle.
  * While Nova does not edit the tag server-side, another plugin may.
- * Additionally, this is probably slightly faster.
  */
-private fun MojangItem.isBundle(): Boolean =
-    this === Items.BUNDLE || this === Items.DYED_BUNDLE.white || this === Items.DYED_BUNDLE.orange
-        || this === Items.DYED_BUNDLE.magenta || this === Items.DYED_BUNDLE.lightBlue || this === Items.DYED_BUNDLE.yellow
-        || this === Items.DYED_BUNDLE.lime || this === Items.DYED_BUNDLE.pink || this === Items.DYED_BUNDLE.gray
-        || this === Items.DYED_BUNDLE.lightGray || this === Items.DYED_BUNDLE.cyan || this === Items.DYED_BUNDLE.purple
-        || this === Items.DYED_BUNDLE.blue || this === Items.DYED_BUNDLE.brown || this === Items.DYED_BUNDLE.green
-        || this === Items.DYED_BUNDLE.red || this === Items.DYED_BUNDLE.black
+private fun ItemType.isBundle(): Boolean =
+    this === ItemType.BUNDLE || this === ItemType.WHITE_BUNDLE || this === ItemType.ORANGE_BUNDLE
+        || this === ItemType.MAGENTA_BUNDLE || this === ItemType.LIGHT_BLUE_BUNDLE || this === ItemType.YELLOW_BUNDLE
+        || this === ItemType.LIME_BUNDLE || this === ItemType.PINK_BUNDLE || this === ItemType.GRAY_BUNDLE
+        || this === ItemType.LIGHT_GRAY_BUNDLE || this === ItemType.CYAN_BUNDLE || this === ItemType.PURPLE_BUNDLE
+        || this === ItemType.BLUE_BUNDLE || this === ItemType.BROWN_BUNDLE || this === ItemType.GREEN_BUNDLE
+        || this === ItemType.RED_BUNDLE || this === ItemType.BLACK_BUNDLE
 //</editor-fold>
 
 /**
@@ -407,7 +403,7 @@ fun installInventoryScrollSupport() {
         val se = gui.getSlotElement(guiSlot)
         if (se !is SlotElement.InventoryLink)
             return@onBundleSelect // only install scroll support on inventories
-        if (se.inventory[se.slot]?.type?.let(Tag.ITEMS_BUNDLES::isTagged) == true)
+        if (se.inventory[se.slot]?.itemType?.let(ItemTypeTags.BUNDLES::contains) == true)
             return@onBundleSelect // don't scroll gui when scrolling on actual bundle
         
         handleBundleScroll(

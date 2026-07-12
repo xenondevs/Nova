@@ -1,3 +1,4 @@
+
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import io.papermc.paper.registry.RegistryAccess
@@ -78,42 +79,3 @@ open class PaperRegistryEntrySerializer<T : Keyed>(
     
 }
 
-/**
- * Open base class for specialized [RegistryEntry.Either] serializers.
- *
- * In case an entry exists in both the Nova and Paper registry, the Nova registry takes precedence.
- */
-open class EitherRegistryEntrySerializer<N : NovaRegistryElement<N>, P : Keyed>(
-    /**
-     * The Nova registry this serializer is for.
-     */
-    val novaRegistry: NovaRegistry<N>,
-    /**
-     * The Paper registry this serializer is for.
-     */
-    val paperRegistryKey: RegistryKey<P>,
-    /**
-     * The registry access to retrieve the Paper registry from.
-     */
-    val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
-) : KSerializer<RegistryEntry.Either<N, P>> {
-    
-    final override val descriptor = PrimitiveSerialDescriptor(
-        "xyz.xenondevs.nova.EitherRegistryEntrySerializer.${novaRegistry.key.asString()}",
-        PrimitiveKind.STRING
-    )
-    
-    final override fun serialize(encoder: Encoder, value: RegistryEntry.Either<N, P>) {
-        encoder.encodeString(value.key.asString())
-    }
-    
-    final override fun deserialize(decoder: Decoder): RegistryEntry.Either<N, P> {
-        val key = KeySerializer.deserialize(decoder)
-        try {
-            return RegistryEntry.either(key, novaRegistry, paperRegistryKey, registryAccess)
-        } catch (e: NoSuchElementException) {
-            throw SerializationException(e.message, e)
-        }
-    }
-    
-}

@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.util.component2
 import xyz.xenondevs.nova.util.component3
 import xyz.xenondevs.nova.util.component4
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
-import xyz.xenondevs.nova.world.item.clientsideProvider
+import xyz.xenondevs.nova.world.item.itemProvider
 import java.awt.Color
 import java.util.*
 
@@ -104,7 +104,7 @@ object VisualRegion {
         viewerWhitelist by viewers
         location by from.clone().add(to).multiply(0.5)
         metadata {
-            itemStack by DefaultBlockOverlays.TRANSPARENT_BLOCK.clientsideProvider
+            itemStack by DefaultBlockOverlays.TRANSPARENT_BLOCK.itemProvider
             scale by Vector3f(
                 (to.x - from.x + lineWidth).toFloat(),
                 (to.y - from.y + lineWidth).toFloat(),

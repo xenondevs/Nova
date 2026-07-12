@@ -52,8 +52,6 @@ internal object CbfSerializers {
         Cbf.registerSerializer(Vector4fBinarySerializer)
         Cbf.registerSerializer(Vector4fcBinarySerializer)
         
-        Cbf.registerRegistrySerializers(NovaRegistries.BLOCK)
-        Cbf.registerRegistrySerializers(NovaRegistries.ITEM)
         Cbf.registerRegistrySerializers(NovaRegistries.EQUIPMENT)
         Cbf.registerRegistrySerializers(NovaRegistries.TOOL_TIER)
         Cbf.registerRegistrySerializers(NovaRegistries.TOOL_CATEGORY)

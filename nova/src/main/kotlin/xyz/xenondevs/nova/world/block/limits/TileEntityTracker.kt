@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.world.block.limits
 
 import net.kyori.adventure.key.Key
+import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
@@ -10,10 +12,9 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
+import xyz.xenondevs.nova.world.chunkPos
 import java.lang.Integer.max
 import java.util.*
 
@@ -39,25 +40,25 @@ internal object TileEntityTracker {
         PermanentStorage.store("block_chunk_counter", BLOCK_CHUNK_COUNTER)
     }
     
-    internal fun handlePlace(block: NovaTileEntityBlock, ctx: Context<BlockPlace>) {
+    internal fun handlePlace(block: BlockType, ctx: Context<BlockPlace>) {
         val sourceUuid = ctx[BlockPlace.SOURCE_UUID] ?: return
-        modifyCounters(sourceUuid, ctx[BlockPlace.BLOCK_POS], block.key, 1)
+        modifyCounters(sourceUuid, ctx[BlockPlace.BLOCK], block.key, 1)
     }
     
     internal fun handleBreak(tileEntity: TileEntity, ctx: Context<BlockBreak>) {
         val ownerUuid = tileEntity.ownerUuid
         if (ownerUuid != null)
-            modifyCounters(ownerUuid, ctx[BlockBreak.BLOCK_POS], tileEntity.block.key, -1)
+            modifyCounters(ownerUuid, ctx[BlockBreak.BLOCK], tileEntity.blockType.key, -1)
     }
     
-    private fun modifyCounters(player: UUID, pos: BlockPos, id: Key, add: Int) {
+    private fun modifyCounters(player: UUID, block: Block, id: Key, add: Int) {
         val playerMap = BLOCK_COUNTER.getOrPut(player, ::HashMap)
         playerMap[id] = max(0, (playerMap[id] ?: 0) + add)
         
-        val playerWorldMap = BLOCK_WORLD_COUNTER.getOrPut(player, ::HashMap).getOrPut(pos.world.uid, ::HashMap)
+        val playerWorldMap = BLOCK_WORLD_COUNTER.getOrPut(player, ::HashMap).getOrPut(block.world.uid, ::HashMap)
         playerWorldMap[id] = max(0, (playerWorldMap[id] ?: 0) + add)
         
-        val playerChunkMap = BLOCK_CHUNK_COUNTER.getOrPut(player, ::HashMap).getOrPut(pos.chunkPos, ::HashMap)
+        val playerChunkMap = BLOCK_CHUNK_COUNTER.getOrPut(player, ::HashMap).getOrPut(block.chunkPos, ::HashMap)
         playerChunkMap[id] = max(0, (playerChunkMap[id] ?: 0) + add)
     }
     

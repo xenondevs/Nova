@@ -1,12 +1,14 @@
 package xyz.xenondevs.nova.world.block.hitbox
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Player
 import org.joml.Vector3f
 import org.joml.Vector3fc
 import xyz.xenondevs.nova.util.toVector3f
-import xyz.xenondevs.nova.world.BlockPos
+import org.bukkit.block.Block
 import java.util.*
 import kotlin.math.floor
 
@@ -46,7 +48,7 @@ class VirtualHitbox internal constructor(
     
     internal val uuid = UUID.randomUUID() // region id for visualization
     
-    internal val blocks: Set<BlockPos> = getBlocksBetween(world, from, to)
+    internal val blocks: Set<Block> = getBlocksBetween(world, from, to)
     internal var qualifier: HitboxQualifier? = null
     
     constructor(center: Location, xWidth: Double, zWidth: Double, height: Double) : this(
@@ -66,8 +68,8 @@ class VirtualHitbox internal constructor(
     
 }
 
-private fun getBlocksBetween(world: World, from: Vector3fc, to: Vector3fc): Set<BlockPos> {
-    val blocks = HashSet<BlockPos>()
+private fun getBlocksBetween(world: World, from: Vector3fc, to: Vector3fc): Set<Block> {
+    val blocks = HashSet<Block>()
     
     val minX = floor(from.x()).toInt()
     val minY = floor(from.y()).toInt()
@@ -79,7 +81,7 @@ private fun getBlocksBetween(world: World, from: Vector3fc, to: Vector3fc): Set<
     for (x in minX..maxX) {
         for (y in minY..maxY) {
             for (z in minZ..maxZ) {
-                blocks += BlockPos(world, x, y, z)
+                blocks += world.getBlockAt(x, y, z)
             }
         }
     }

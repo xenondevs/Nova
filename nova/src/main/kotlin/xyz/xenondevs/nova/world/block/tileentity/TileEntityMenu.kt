@@ -22,7 +22,8 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.world.block.tileentity.TileEntityMenu.Companion.from
+import xyz.xenondevs.nova.util.toAABBd
+import xyz.xenondevs.nova.world.block.name
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -60,7 +61,7 @@ interface TileEntityMenu {
          * Any window opened under the menu will be automatically closed once the viewer is out of the interaction range with [bounds].
          */
         context(tileEntity: TileEntity)
-        fun none(bounds: AABBdc = tileEntity.pos.toAABBd()): TileEntityMenu = TileEntityMenuImpl(bounds)
+        fun none(bounds: AABBdc = tileEntity.block.toAABBd()): TileEntityMenu = TileEntityMenuImpl(bounds)
         
         /**
          * Create a new [TileEntityMenu] that uses [getWindow] to get the main 
@@ -69,7 +70,7 @@ interface TileEntityMenu {
          * Any window opened under the menu will be automatically closed once the viewer is out of the interaction range with [bounds].
          */
         context(tileEntity: TileEntity)
-        fun from(bounds: AABBdc = tileEntity.pos.toAABBd(), getWindow: (Player) -> Window): TileEntityMenu =
+        fun from(bounds: AABBdc = tileEntity.block.toAABBd(), getWindow: (Player) -> Window): TileEntityMenu =
             IndividualTileEntityMenuImpl(bounds, getWindow)
         
         /**
@@ -94,7 +95,7 @@ interface TileEntityMenu {
         context(tileEntity: TileEntity)
         fun window(
             texture: RegistryEntry.Nova<GuiTexture>? = null,
-            bounds: AABBdc = tileEntity.pos.toAABBd(),
+            bounds: AABBdc = tileEntity.block.toAABBd(),
             window: NormalSplitWindowDsl.() -> Unit
         ): TileEntityMenu = window(::window, texture, bounds, window)
         
@@ -121,14 +122,14 @@ interface TileEntityMenu {
         fun <T : WindowDsl> window(
             windowDsl: (Player, T.() -> Unit) -> Window,
             texture: RegistryEntry.Nova<GuiTexture>? = null,
-            bounds: AABBdc = tileEntity.pos.toAABBd(),
+            bounds: AABBdc = tileEntity.block.toAABBd(),
             window: T.() -> Unit
         ): TileEntityMenu = from(bounds) {
             windowDsl(it) {
                 if (texture != null) {
-                    title by texture.getTitle(tileEntity.block.name, locale)
+                    title by texture.getTitle(tileEntity.blockType.name, locale)
                 } else {
-                    title by tileEntity.block.name
+                    title by tileEntity.blockType.name
                 }
                 window()
             }
@@ -144,7 +145,7 @@ interface TileEntityMenu {
         context(tileEntity: TileEntity)
         fun cachedWindow(
             texture: RegistryEntry.Nova<GuiTexture>? = null,
-            bounds: AABBdc = tileEntity.pos.toAABBd(),
+            bounds: AABBdc = tileEntity.block.toAABBd(),
             expireAfterClose: Duration = 1.minutes,
             window: NormalSplitWindowDsl.() -> Unit
         ): TileEntityMenu = cachedWindow(::window, texture, bounds, expireAfterClose, window)
@@ -160,15 +161,15 @@ interface TileEntityMenu {
         fun <T : WindowDsl> cachedWindow(
             windowDsl: (Player, T.() -> Unit) -> Window,
             texture: RegistryEntry.Nova<GuiTexture>? = null,
-            bounds: AABBdc = tileEntity.pos.toAABBd(),
+            bounds: AABBdc = tileEntity.block.toAABBd(),
             expireAfterClose: Duration = 1.minutes,
             window: (T.() -> Unit),
         ): TileEntityMenu = CachedWindowTileEntityMenuImpl(bounds, expireAfterClose) {
             windowDsl(it) {
                 if (texture != null) {
-                    title by texture.getTitle(tileEntity.block.name, locale)
+                    title by texture.getTitle(tileEntity.blockType.name, locale)
                 } else {
-                    title by tileEntity.block.name
+                    title by tileEntity.blockType.name
                 }
                 window()
             }

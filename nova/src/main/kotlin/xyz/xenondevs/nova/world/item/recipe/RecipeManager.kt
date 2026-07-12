@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.ReflectionUtils
 import xyz.xenondevs.nova.util.data.key
 import xyz.xenondevs.nova.util.identifier
-import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.registerEvents
 import net.minecraft.world.item.crafting.Recipe as MojangRecipe

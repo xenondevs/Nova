@@ -18,14 +18,15 @@ import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.flatMapNonNull
 import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.orElseBy
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.config.optionalEntry
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.world.item.DataComponentMap
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
-import xyz.xenondevs.nova.world.item.mapToItemStack
+
+// TODO: serializer for consume effect
 
 /**
  * Creates a factory for [Consumable] behaviors using the given values, if not specified otherwise in the item's config.
@@ -72,12 +73,23 @@ fun Consumable(
     saturation: Float = 0f,
     canAlwaysEat: Boolean = false,
     consumeTime: Int = 32,
-    remains: RegistryEntry.Either<NovaItem, ItemType>? = null,
-    possibleEffects: Map<PotionEffect, Float> = emptyMap(),
+    remains: RegistryEntry.Paper<ItemType>? = null,
+    consumeEffects: Provider<List<ConsumeEffect>>,
     animation: ItemUseAnimation = ItemUseAnimation.EAT,
     sound: Key = SoundEventKeys.ENTITY_GENERIC_EAT,
     particles: Boolean = true
 ) = ItemBehaviorFactory { _, cfg ->
+    val legacyPossibleEffects = combinedProvider(
+        cfg.entry<List<PotionEffect>>(emptyList(), "effects"),
+        cfg.entry<List<ProbabilitySurrogate>>(emptyList(), "effects")
+    ) { effects, probabilities ->
+        effects.zip(probabilities.map { it.probability })
+            .takeUnlessEmpty()
+            ?.map { [potionEffect, probability] ->
+                ConsumeEffect.applyStatusEffects(listOf(potionEffect), probability)
+            }
+    }
+    
     Consumable(
         nutrition = cfg.entry(nutrition, "nutrition"),
         saturation = cfg.entry(saturation, "saturation"),
@@ -87,18 +99,13 @@ fun Consumable(
         animation = cfg.entry(animation, "animation"),
         sound = cfg.entry(sound, "sound"),
         
-        remains = cfg.optionalEntry<RegistryEntry.Either<NovaItem, ItemType>>("remains")
+        remains = cfg.optionalEntry<RegistryEntry.Paper<ItemType>>("remains")
             .orElse(remains)
-            .flatMapNonNull { it?.mapToItemStack() },
+            .flatMapNonNull { entry -> entry?.map { type -> type.createItemStack() } },
         
-        // hack: normal potion effect serialization + "probability" field
-        possibleEffects = combinedProvider(
-            cfg.entry<List<PotionEffect>>(emptyList(), "effects"),
-            cfg.entry<List<ProbabilitySurrogate>>(emptyList(), "effects")
-        ) { effects, probabilities -> 
-            effects.zip(probabilities.map { it.probability }).toMap()
-                .takeUnlessEmpty() ?: possibleEffects
-        }
+        consumeEffects = cfg.optionalEntry<List<ConsumeEffect>>("consume_effects")
+            .orElseBy(legacyPossibleEffects)
+            .orElseBy(consumeEffects)
     )
 }
 
@@ -124,7 +131,7 @@ class Consumable(
     canAlwaysEat: Provider<Boolean>,
     consumeTime: Provider<Int>,
     remains: Provider<ItemStack?>,
-    possibleEffects: Provider<Map<PotionEffect, Float>>,
+    consumeEffects: Provider<List<ConsumeEffect>>,
     animation: Provider<ItemUseAnimation>,
     sound: Provider<Key>,
     particles: Provider<Boolean>
@@ -156,9 +163,9 @@ class Consumable(
     val remains by remains
     
     /**
-     * The possible effects that consuming the item can apply.
+     * The effects that consuming the item can apply.
      */
-    val possibleEffects by possibleEffects
+    val consumeEffects by consumeEffects
     
     /**
      * The animation that is played when consuming the item.
@@ -187,16 +194,14 @@ class Consumable(
         }
         
         this[DataComponentTypes.CONSUMABLE] = combinedProvider(
-            consumeTime, animation, sound, particles, possibleEffects
-        ) { consumeTime, animation, sound, particles, possibleEffects ->
+            consumeTime, animation, sound, particles, consumeEffects
+        ) { consumeTime, animation, sound, particles, consumeEffects ->
             consumable()
                 .consumeSeconds(consumeTime / 20f)
                 .animation(animation)
                 .sound(sound)
                 .hasConsumeParticles(particles)
-                .addEffects(possibleEffects.map { [potionEffect, probability] ->
-                    ConsumeEffect.applyStatusEffects(listOf(potionEffect), probability)
-                })
+                .addEffects(consumeEffects)
                 .build()
         }
         
@@ -212,7 +217,7 @@ class Consumable(
             "canAlwaysEat=$canAlwaysEat, " +
             "consumeTime=$consumeTime, " +
             "remains=$remains, " +
-            "possibleEffects=$possibleEffects, " +
+            "consumeEffects=$consumeEffects, " +
             "animation=$animation, " +
             "sound=$sound, " +
             "particles=$particles" +

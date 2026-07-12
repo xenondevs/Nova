@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.ui.menu.sideconfig
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.invui.dsl.gui
 import xyz.xenondevs.nova.util.BlockSide

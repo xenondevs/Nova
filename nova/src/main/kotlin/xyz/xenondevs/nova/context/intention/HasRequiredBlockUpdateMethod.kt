@@ -4,34 +4,34 @@ package xyz.xenondevs.nova.context.intention
 
 import xyz.xenondevs.nova.context.ContextIntention
 import xyz.xenondevs.nova.context.DefaultingContextParamType
-import xyz.xenondevs.nova.context.intention.HasBlockUpdateMethod.Companion.BLOCK_UPDATE_METHOD
+import xyz.xenondevs.nova.context.intention.HasBlockUpdateFlags.Companion.BLOCK_UPDATE_FLAGS
 import xyz.xenondevs.nova.util.novaKey
-import xyz.xenondevs.nova.world.block.BlockUpdateMethod
+import xyz.xenondevs.nova.world.block.BlockUpdateFlags
 
 /**
- * A [ContextIntention] that has a [BlockUpdateMethod].
+ * A [ContextIntention] that has [BlockUpdateFlags].
  */
-interface HasBlockUpdateMethod<I : HasBlockUpdateMethod<I>> : ContextIntention<I> {
+interface HasBlockUpdateFlags<I : HasBlockUpdateFlags<I>> : ContextIntention<I> {
     
     /**
-     * The [BlockUpdateMethod] that is used.
+     * The [BlockUpdateFlags] that are used.
      */
-    val BLOCK_UPDATE_METHOD: DefaultingContextParamType<BlockUpdateMethod, I>
-        get() = blockUpdateMethod()
+    val BLOCK_UPDATE_FLAGS: DefaultingContextParamType<BlockUpdateFlags, I>
+        get() = blockUpdateFlags()
     
     @Suppress("UNCHECKED_CAST")
     companion object {
         
-        private val BLOCK_UPDATE_METHOD = DefaultingContextParamType<BlockUpdateMethod, Nothing>(
+        private val BLOCK_UPDATE_FLAGS = DefaultingContextParamType<BlockUpdateFlags, Nothing>(
             novaKey("block_update_method"),
-            BlockUpdateMethod.WITH_BLOCK_UPDATES
+            BlockUpdateFlags.ALL
         )
         
         /**
-         * Gets the param type for [BLOCK_UPDATE_METHOD].
+         * Gets the param type for [BLOCK_UPDATE_FLAGS].
          */
-        fun <I : HasBlockUpdateMethod<I>> blockUpdateMethod() =
-            BLOCK_UPDATE_METHOD as DefaultingContextParamType<BlockUpdateMethod, I>
+        fun <I : HasBlockUpdateFlags<I>> blockUpdateFlags() =
+            BLOCK_UPDATE_FLAGS as DefaultingContextParamType<BlockUpdateFlags, I>
         
     }
     

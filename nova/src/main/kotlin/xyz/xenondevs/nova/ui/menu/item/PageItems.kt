@@ -19,7 +19,7 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.ui.menu.LEGACY_NON_DSL_INVUI_DEPRECATION
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
-import xyz.xenondevs.nova.world.item.clientsideProvider
+import xyz.xenondevs.nova.world.item.itemProvider
 
 /**
  * A UI item for decrementing the [page][PagedGuiDsl.page] of the gui from the context on left-click.
@@ -27,8 +27,8 @@ import xyz.xenondevs.nova.world.item.clientsideProvider
  */
 context(dsl: PagedGuiDsl<*>)
 fun pageBackItem(
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_OFF.itemProvider
 ): Item = pageBackItem(dsl.page, on, off)
 
 /**
@@ -47,8 +47,8 @@ fun pageBackItem(
  */
 context(dsl: PagedGuiDsl<*>)
 fun pageForwardItem(
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_OFF.itemProvider
 ): Item = pageForwardItem(dsl.page, dsl.pageCount, on, off)
 
 /**
@@ -66,8 +66,8 @@ fun pageForwardItem(
  */
 fun pageBackItem(
     page: MutableProvider<Int>,
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_OFF.itemProvider
 ): Item = pageBackItem(
     page,
     combinedProvider(
@@ -98,8 +98,8 @@ fun pageBackItem(
 fun pageForwardItem(
     page: MutableProvider<Int>,
     pageCount: Provider<Int>,
-    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_ON.clientsideProvider,
-    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_OFF.clientsideProvider
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_ON.itemProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_OFF.itemProvider
 ): Item = pageForwardItem(
     page,
     pageCount,
@@ -130,8 +130,8 @@ fun pageForwardItem(
  */
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class PageBackItem(
-    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_ON.clientsideProvider,
-    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_OFF.clientsideProvider
+    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_ON.itemProvider,
+    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_OFF.itemProvider
 ) : AbstractPagedGuiBoundItem() {
     
     constructor(on: ItemProvider, off: ItemProvider) : this(provider(on), provider(off))
@@ -169,8 +169,8 @@ class PageBackItem(
  */
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class PageForwardItem(
-    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_ON.clientsideProvider,
-    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_OFF.clientsideProvider
+    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_ON.itemProvider,
+    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_OFF.itemProvider
 ) : AbstractPagedGuiBoundItem() {
     
     constructor(on: ItemProvider, off: ItemProvider) : this(provider(on), provider(off))

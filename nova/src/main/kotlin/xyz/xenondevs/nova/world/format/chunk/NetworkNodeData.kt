@@ -33,7 +33,7 @@ data class NetworkBridgeData(
     override val connections: MutableMap<NetworkType<*>, CubeFaceSet> = HashMap(),
     val networks: MutableMap<NetworkType<*>, UUID> = HashMap(),
     val supportedNetworkTypes: MutableSet<NetworkType<*>> = HashSet(),
-    val bridgeFaces: CubeFaceSet = CubeFaceSet.NONE // TODO mutable?
+    val bridgeFaces: CubeFaceSet = CubeFaceSet.NONE
 ) : NetworkNodeData {
     
     constructor(
@@ -53,7 +53,7 @@ data class NetworkBridgeData(
     )
     
     override fun write(writer: ByteWriter) {
-        writer.writeString(typeId.toString())
+        writer.writeString(typeId.asString())
         writer.writeUUID(owner)
         writer.writeNetworkTypeCubeFaceSetMap(connections)
         writer.writeNetworkTypeUUIDMap(networks)
@@ -130,7 +130,7 @@ private fun ByteReader.readNetworkTypeCubeFaceSetMap(): MutableMap<NetworkType<*
 private fun ByteWriter.writeNetworkTypeCubeFaceSetMap(map: Map<NetworkType<*>, CubeFaceSet>) {
     writeVarInt(map.size)
     for ([networkType, set] in map) {
-        writeString(networkType.key.toString())
+        writeString(networkType.key.asString())
         // FIXME !!!!!!!! LEGACY CONVERSION: BIT ORDER IS NOW REVERSED
         writeByte(set.data)
     }
@@ -153,7 +153,7 @@ private fun ByteReader.readNetworkTypeBlockFaceUUIDTable(): Table<NetworkType<*>
 private fun ByteWriter.writeNetworkTypeBlockFaceUUIDTable(table: Table<NetworkType<*>, BlockFace, UUID>) {
     writeVarInt(table.size())
     for ([networkType, face, uuid] in table) {
-        writeString(networkType.key.toString())
+        writeString(networkType.key.asString())
         writeByte(face.ordinal.toByte())
         writeUUID(uuid)
     }
@@ -162,7 +162,7 @@ private fun ByteWriter.writeNetworkTypeBlockFaceUUIDTable(table: Table<NetworkTy
 private fun ByteWriter.writeNetworkTypeUUIDMap(map: Map<NetworkType<*>, UUID>) {
     writeVarInt(map.size)
     for ([networkType, uuid] in map) {
-        writeString(networkType.key.toString())
+        writeString(networkType.key.asString())
         writeUUID(uuid)
     }
 }
@@ -183,7 +183,7 @@ private fun ByteReader.readNetworkTypeUUIDMap(): MutableMap<NetworkType<*>, UUID
 private fun ByteWriter.writeNetworkTypeSet(set: Set<NetworkType<*>>) {
     writeVarInt(set.size)
     for (networkType in set) {
-        writeString(networkType.key.toString())
+        writeString(networkType.key.asString())
     }
 }
 

@@ -4,10 +4,10 @@ package xyz.xenondevs.nova.registry
 
 import io.papermc.paper.registry.TypedKey
 import net.kyori.adventure.text.Component
+import org.bukkit.block.BlockType
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
-import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
  * A builder for [NovaItem].
  */
 @RegistryElementBuilderDsl
-sealed interface NovaItemBuilder : ConfigurableBuilder, NameableBuilder, RegistryEntryBuilder.Nova<NovaItem> {
+sealed interface NovaItemBuilder : ConfigurableBuilder, NameableBuilder, RegistryEntryBuilder.Paper<ItemType> {
     
     /**
      * Sets the block of this [NovaItem], making it placeable.
@@ -25,11 +25,8 @@ sealed interface NovaItemBuilder : ConfigurableBuilder, NameableBuilder, Registr
      * If you want to use a different model / name, call [modelDefinition] / [name] after this function.
      * 
      * Note that this function does not need to be called if the [NovaItemBuilder] was already created with a `block` parameter in [Registrar.item].
-     * If an item's block is defined with this function instead of directly in [Registrar.item], the corresponding block will not use this
-     * item as its [NovaBlock.item] automatically. Instead, you will need to set it manually via [NovaBlockBuilder.item].
-     * Unless you want this behavior, prefer using [Registrar.item] with an explicit block argument over this function.
      */
-    fun block(block: RegistryEntry.Nova<NovaBlock>)
+    fun block(block: RegistryEntry.Paper<BlockType>)
     
     /**
      * Sets the name of the item.
@@ -62,12 +59,6 @@ sealed interface NovaItemBuilder : ConfigurableBuilder, NameableBuilder, Registr
     /**
      * Sets the crafting remaining item to [item].
      */
-    @JvmName("craftingRemainingNovaItem")
-    fun craftingRemainingItem(item: RegistryEntry.Nova<NovaItem>)
-    
-    /**
-     * Sets the crafting remaining item to [item].
-     */
     @JvmName("craftingRemainingItemType")
     fun craftingRemainingItem(item: RegistryEntry.Paper<ItemType>)
     
@@ -79,7 +70,8 @@ sealed interface NovaItemBuilder : ConfigurableBuilder, NameableBuilder, Registr
     }
     
     /**
-     * Configures whether the item is hidden from the give command.
+     * Configures whether the item is hidden from the give and similar commands.
+     * Hidden items also do not have advanced tooltips (`/nova advancedTooltips`).
      *
      * Defaults to `false`.
      *

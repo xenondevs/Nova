@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.ui.menu
 
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.flatten
@@ -23,7 +24,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.Fl
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
-import xyz.xenondevs.nova.world.item.NovaItem
 
 private val DEFAULT_FLUID_BAR_ITEMS = mapOf(
     null to DefaultGuiItems.BAR_BLUE,
@@ -46,7 +46,7 @@ private val DEFAULT_TP_FLUID_BAR_ITEMS = mapOf(
 fun fluidBar(
     fluidHolder: FluidHolder,
     container: FluidContainer,
-    barTypes: Map<FluidType?, Provider<NovaItem>> = DEFAULT_TP_FLUID_BAR_ITEMS,
+    barTypes: Map<FluidType?, Provider<ItemType>> = DEFAULT_TP_FLUID_BAR_ITEMS,
     onClick: ClickDsl.() -> Unit = {}
 ): SlotElementSupplier = fluidBar(
     fluidHolder.containers[container]!!,
@@ -69,7 +69,7 @@ fun fluidBar(
     type: Provider<FluidType?>,
     amount: Provider<Long>,
     capacity: Provider<Long>,
-    barTypes: Map<FluidType?, Provider<NovaItem>> = DEFAULT_TP_FLUID_BAR_ITEMS,
+    barTypes: Map<FluidType?, Provider<ItemType>> = DEFAULT_TP_FLUID_BAR_ITEMS,
     onClick: ClickDsl.() -> Unit = {}
 ): SlotElementSupplier = fluidBar(type, amount, capacity, barTypes) {
     val cursor = player.itemOnCursor.takeUnlessEmpty()
@@ -108,7 +108,7 @@ fun fluidBar(
     type: Provider<FluidType?>,
     amount: Provider<Long>,
     capacity: Provider<Long>,
-    barTypes: Map<FluidType?, Provider<NovaItem>> = DEFAULT_TP_FLUID_BAR_ITEMS,
+    barTypes: Map<FluidType?, Provider<ItemType>> = DEFAULT_TP_FLUID_BAR_ITEMS,
     onClick: ClickDsl.() -> Unit = {}
 ): SlotElementSupplier = verticalBar(
     percentage = combinedProvider(
@@ -153,7 +153,7 @@ class FluidBar(
     private val capacity: Provider<Long>,
     private val type: Provider<FluidType?>,
     private val amount: Provider<Long>,
-    private val items: Map<FluidType?, Provider<NovaItem>> = DEFAULT_FLUID_BAR_ITEMS
+    private val items: Map<FluidType?, Provider<ItemType>> = DEFAULT_FLUID_BAR_ITEMS
 ) : VerticalBar(height) {
     
     private val allowedConnectionType = fluidHolder.containers[fluidContainer]!!
@@ -162,7 +162,7 @@ class FluidBar(
         height: Int,
         fluidHolder: FluidHolder,
         container: FluidContainer,
-        items: Map<FluidType?, Provider<NovaItem>> = DEFAULT_FLUID_BAR_ITEMS
+        items: Map<FluidType?, Provider<ItemType>> = DEFAULT_FLUID_BAR_ITEMS
     ) : this(
         height,
         fluidHolder,
@@ -222,7 +222,7 @@ class StaticFluidBar(
     private val capacity: Long,
     private val type: FluidType,
     private val amount: Long,
-    private val items: Map<FluidType?, Provider<NovaItem>> = DEFAULT_FLUID_BAR_ITEMS
+    private val items: Map<FluidType?, Provider<ItemType>> = DEFAULT_FLUID_BAR_ITEMS
 ) : VerticalBar(height) {
     
     override fun createBarItem(section: Int): Item = item {

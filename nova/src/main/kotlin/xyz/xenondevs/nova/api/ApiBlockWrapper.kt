@@ -6,14 +6,16 @@ import net.kyori.adventure.text.Component
 import xyz.xenondevs.nova.api.item.NovaItem
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.name
+import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.api.block.NovaBlock as INovaBlock
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 
 internal class ApiBlockWrapper(val block: NovaBlock) : INovaBlock {
     
     override fun getId(): INamespacedId = NamespacedId(block.key.namespace(), block.key.value())
-    override fun getItem(): NovaItem? = block.item?.get()?.let(::ApiItemWrapper)
-    override fun getName(): Component = block.name
-    override fun getPlaintextName(locale: String): String = block.name.toPlainText(locale)
+    override fun getItem(): NovaItem? = block.item?.get()?.novaItem?.let(::ApiItemWrapper)
+    override fun getName(): Component = block.entry.get().name
+    override fun getPlaintextName(locale: String): String = block.entry.get().name.toPlainText(locale)
     
 }

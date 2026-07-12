@@ -1,15 +1,17 @@
 package xyz.xenondevs.nova.ui.waila.info
 
+import xyz.xenondevs.nova.world.*
+
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.Keyed
+import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.serialization.kotlinx.WailaInfoProviderSerializer
-import xyz.xenondevs.nova.world.BlockPos
 
 data class WailaLine(val text: Component, val alignment: Alignment) {
     
@@ -23,6 +25,8 @@ data class WailaLine(val text: Component, val alignment: Alignment) {
 }
 
 data class WailaInfo(val icon: Key, val lines: List<WailaLine>)
+
+// TODO: can probably be simplified with unified block type
 
 /**
  * Provides the [WailaInfo] (icon and text) for a player looking at a block.
@@ -39,7 +43,7 @@ class WailaInfoProvider<out B : Keyed, in S : Any> internal constructor(
      * If multiple providers apply to the same block, the one with the highest priority will be chosen.
      */
     val priority: Int,
-    private val infoGetter: (player: Player, pos: BlockPos, blockState: S) -> WailaInfo
+    private val infoGetter: (player: Player, block: Block, blockState: S) -> WailaInfo
 ) : NovaRegistryElement<WailaInfoProvider<B, S>> {
-    fun getInfo(player: Player, pos: BlockPos, blockState: S): WailaInfo = infoGetter(player, pos, blockState)
+    fun getInfo(player: Player, block: Block, blockState: S): WailaInfo = infoGetter(player, block, blockState)
 }

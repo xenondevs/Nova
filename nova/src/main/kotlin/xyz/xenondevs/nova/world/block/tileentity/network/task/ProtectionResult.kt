@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.task
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.BlockFace
 
 internal class ProtectionResult(private val result: BooleanArray) {

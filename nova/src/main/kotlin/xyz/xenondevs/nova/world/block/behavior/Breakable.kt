@@ -45,8 +45,7 @@ fun Breakable(
     requiresToolForDrops: Boolean = true,
     breakParticles: Material? = null,
     showBreakAnimation: Boolean = true
-) = BlockBehaviorFactory {
-    val cfg = it.config
+) = BlockBehaviorFactory { _, cfg ->
     Breakable(
         cfg.entry(hardness, "hardness"),
         cfg.entry<RegistryEntrySet.Nova<ToolCategory>>(toolCategories, "tool_categories").flatten(),

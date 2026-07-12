@@ -37,14 +37,6 @@ fun SerializersModuleBuilder.contextualRegistryElementBasedSerializers() {
         NovaRegistryEntrySerializer(serializer.registry)
     }
     
-    contextual(RegistryEntry.Either::class) { serializers ->
-        val novaSerializer = serializers[0] as? NovaRegistryElementSerializer<*>
-            ?: throwSerializerTypeMismatch(RegistryEntry.Either::class, NovaRegistryElementSerializer::class, serializers[0]::class)
-        val paperSerializer = serializers[1] as? PaperRegistryElementSerializer<*>
-            ?: throwSerializerTypeMismatch(RegistryEntry.Either::class, PaperRegistryElementSerializer::class, serializers[1]::class)
-        EitherRegistryEntrySerializer(novaSerializer.registry, paperSerializer.registryKey, paperSerializer.registryAccess)
-    }
-    
     contextual(RegistryEntrySet.Paper::class) { serializers ->
         val serializer = serializers.single() as? PaperRegistryElementSerializer<*>
             ?: throwSerializerTypeMismatch(RegistryEntrySet.Paper::class, PaperRegistryElementSerializer::class, serializers.single()::class)
@@ -55,14 +47,6 @@ fun SerializersModuleBuilder.contextualRegistryElementBasedSerializers() {
         val serializer = serializers.single() as? NovaRegistryElementSerializer<*>
             ?: throwSerializerTypeMismatch(RegistryEntrySet.Paper::class, NovaRegistryElementSerializer::class, serializers.single()::class)
         NovaRegistryEntrySetSerializer(serializer.registry)
-    }
-    
-    contextual(RegistryEntrySet.Mixed::class) { serializers ->
-        val novaSerializer = serializers[0] as? NovaRegistryElementSerializer<*>
-            ?: throwSerializerTypeMismatch(RegistryEntrySet.Mixed::class, NovaRegistryElementSerializer::class, serializers[0]::class)
-        val paperSerializer = serializers[1] as? PaperRegistryElementSerializer<*>
-            ?: throwSerializerTypeMismatch(RegistryEntrySet.Mixed::class, PaperRegistryElementSerializer::class, serializers[1]::class)
-        MixedRegistryEntrySetSerializer(novaSerializer.registry, paperSerializer.registryKey, paperSerializer.registryAccess)
     }
     
     contextual(RegistryKeySet::class) { serializers ->

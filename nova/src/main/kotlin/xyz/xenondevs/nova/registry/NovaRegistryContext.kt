@@ -28,24 +28,6 @@ private sealed interface Tracked {
         override fun toString() = key.registryKey().key().asString() + "/" + key.asString()
     }
     
-    class EitherEntry<N : NovaRegistryElement<N>, T : Keyed>(
-        private val key: TypedKey<T>,
-        private val novaRegistry: NovaRegistry<N>,
-        private val registryAccess: RegistryAccess,
-        override val origin: Throwable?
-    ) : Tracked {
-        
-        override fun isBound(): Boolean =
-            novaRegistry.getOptional(key).get() != null ||
-                registryAccess.getRegistry(key.registryKey()).get(key) != null
-        
-        override fun toString(): String =
-            novaRegistry.key.asString() +
-                "|" + key.registryKey().key().asString() +
-                "/" + key.asString()
-        
-    }
-    
     class Tag<T : Keyed>(
         private val key: TagKey<T>,
         private val registryAccess: RegistryAccess,
@@ -53,24 +35,6 @@ private sealed interface Tracked {
     ) : Tracked {
         override fun isBound() = registryAccess.getRegistry(key.registryKey()).hasTag(key)
         override fun toString() = key.registryKey().key().asString() + "/#" + key.key().asString()
-    }
-    
-    class EitherTag<N : NovaRegistryElement<N>, T : Keyed>(
-        private val key: TagKey<T>,
-        private val novaRegistry: NovaRegistry<N>,
-        private val registryAccess: RegistryAccess,
-        override val origin: Throwable?
-    ) : Tracked {
-        
-        override fun isBound(): Boolean =
-            novaRegistry.getOptionalTag(key.key()).get() != null ||
-                registryAccess.getRegistry(key.registryKey()).hasTag(key)
-        
-        override fun toString(): String =
-            novaRegistry.key.asString() +
-                "|" + key.registryKey().key().asString() + 
-                "/#" + key.key().asString()
-    
     }
     
 }
@@ -131,16 +95,8 @@ internal class NovaRegistryContext : RegistryContext {
         trackedEntries += Tracked.Entry(key, registryAccess, if (IS_DEV_SERVER) Throwable() else null)
     }
     
-    override fun <N : NovaRegistryElement<N>, T : Keyed> trackUnresolvedEntry(key: TypedKey<T>, novaRegistry: NovaRegistry<N>, registryAccess: RegistryAccess) {
-        trackedEntries += Tracked.EitherEntry(key, novaRegistry, registryAccess, if (IS_DEV_SERVER) Throwable() else null)
-    }
-    
     override fun <T : Keyed> trackUnresolvedTag(key: TagKey<T>, registryAccess: RegistryAccess) {
         trackedEntries += Tracked.Tag(key, registryAccess, if (IS_DEV_SERVER) Throwable() else null)
-    }
-    
-    override fun <N : NovaRegistryElement<N>, T : Keyed> trackUnresolvedTag(key: TagKey<T>, novaRegistry: NovaRegistry<N>, registryAccess: RegistryAccess) {
-        trackedEntries += Tracked.EitherTag(key, novaRegistry, registryAccess, if (IS_DEV_SERVER) Throwable() else null)
     }
     
     override fun registerPostTagReloadListener(listener: () -> Unit) {

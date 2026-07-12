@@ -87,7 +87,7 @@ internal object NetworkDebugger {
     
     private fun showNetwork(color: Color, network: Network<*>, players: List<Player>) {
         for ((node, faces) in network.nodes.values) {
-            val receivers = players.filterInRange(node.pos.location, 64.0)
+            val receivers = players.filterInRange(node.block.location, 64.0)
             if (receivers.isEmpty())
                 continue
             
@@ -99,12 +99,12 @@ internal object NetworkDebugger {
     }
     
     private fun showNetworkBridge(bridge: NetworkBridge, color: Color, players: List<Player>) {
-        val particleLocation = bridge.pos.location.add(0.5, 0.5, 0.5)
+        val particleLocation = bridge.block.location.add(0.5, 0.5, 0.5)
         particle(ParticleTypes.DUST, particleLocation) { color(color) }.sendTo(players)
     }
     
     private fun showNetworkEndPoint(endPoint: NetworkEndPoint, face: BlockFace, color: Color, players: List<Player>) {
-        val particleLocation = endPoint.pos.location
+        val particleLocation = endPoint.block.location
             .add(0.5, 0.5, 0.5)
             .advance(face, 0.5)
         particle(ParticleTypes.DUST, particleLocation) { color(color) }.sendTo(players)

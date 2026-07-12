@@ -5,18 +5,18 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.component.CustomModelData
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import xyz.xenondevs.commons.provider.Provider
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.notifyWindows
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelCreationScope
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
-import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.clientsideProvider
+import xyz.xenondevs.nova.world.item.itemProvider
 import java.awt.image.BufferedImage
 import java.util.function.Supplier
 
@@ -31,12 +31,12 @@ import java.util.function.Supplier
  * @see ItemModelCreationScope.canvasModel
  */
 open class Canvas(
-    canvasItem: Provider<NovaItem>,
+    canvasItem: RegistryEntry.Paper<ItemType>,
     private val itemResolution: Int,
     private val image: BufferedImage
 ) : Supplier<Item> {
     
-    private val canvasItem = canvasItem.clientsideProvider
+    private val canvasItem = canvasItem.itemProvider
     private val items = ArrayList<Item>()
     private var supplierIndex = 0
     

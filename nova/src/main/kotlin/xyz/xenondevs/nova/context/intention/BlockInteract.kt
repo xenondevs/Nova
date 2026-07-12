@@ -1,15 +1,11 @@
 package xyz.xenondevs.nova.context.intention
 
+import org.bukkit.block.Block
 import xyz.xenondevs.nova.context.AbstractContextIntention
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
 import xyz.xenondevs.nova.context.DefaultingContextParamType
-import xyz.xenondevs.nova.context.intention.BlockInteract.BLOCK_POS
-import xyz.xenondevs.nova.context.intention.BlockInteract.BLOCK_STATE_NOVA
-import xyz.xenondevs.nova.context.intention.BlockInteract.BLOCK_STATE_VANILLA
-import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.novaKey
-
 
 /**
  * A [ContextIntention] for clicking on a block.
@@ -21,8 +17,8 @@ import xyz.xenondevs.nova.util.novaKey
  *
  * | Target | # | Source(s) | Notes |
  * |--------|---|-----------|-------|
- * | [BLOCK_STATE_NOVA] | +1. | [BLOCK_POS] | Only if Nova block |
- * | [BLOCK_STATE_VANILLA] | +1. | [BLOCK_POS] | Only if vanilla block |
+ * | [BLOCK_STATE_NOVA] | +1. | [BLOCK] | Only if Nova block |
+ * | [BLOCK_STATE] | +1. | [BLOCK] | Only if vanilla block |
  */
 object BlockInteract :
     AbstractContextIntention<BlockInteract>(),
@@ -48,8 +44,7 @@ object BlockInteract :
         HasOptionalBlockInteraction.applyDefaults(this)
         HasHeldItem.applyDefaults(this)
         
-        addAutofiller(BLOCK_STATE_NOVA, Autofiller.from(BLOCK_POS) { it.novaBlockState })
-        addAutofiller(BLOCK_STATE_VANILLA, Autofiller.from(BLOCK_POS) { if (it.block.id.namespace() == "minecraft") it.block.blockData else null })
+        addAutofiller(BLOCK_STATE, Autofiller.from(BLOCK, Block::getBlockData))
     }
     
 }

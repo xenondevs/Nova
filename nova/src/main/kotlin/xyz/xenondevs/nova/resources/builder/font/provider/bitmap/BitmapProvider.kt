@@ -61,7 +61,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider("bitmap")
     }
     
     override fun toJson() = super.toJson().apply {
-        addProperty("file", file.toString())
+        addProperty("file", file.asString())
         if (height != 8) addProperty("height", height)
         addProperty("ascent", ascent)
         add("chars", codePointGrid.toStringList().toJsonArray())

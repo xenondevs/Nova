@@ -14,11 +14,11 @@ import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
-import xyz.xenondevs.nova.util.nmsState
+import xyz.xenondevs.nova.util.nmsBlockState
+import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.ItemAction
-import xyz.xenondevs.nova.world.pos
 
 private val STRIPPABLES: Map<Block, Block> = mapOf(
     Blocks.OAK_WOOD to Blocks.STRIPPED_OAK_WOOD,
@@ -52,7 +52,7 @@ private val STRIPPABLES: Map<Block, Block> = mapOf(
 object Stripping : ItemBehavior {
     
     override fun useOnBlock(itemStack: ItemStack, block: org.bukkit.block.Block, ctx: Context<BlockInteract>): InteractionResult {
-        val result = stripBlock(block.nmsState, block.world.serverLevel, block.pos.nmsPos)
+        val result = stripBlock(block.nmsBlockState, block.world.serverLevel, block.nmsPos)
         return if (result)
             InteractionResult.Success(swing = true, action = ItemAction.Damage())
         else InteractionResult.Pass

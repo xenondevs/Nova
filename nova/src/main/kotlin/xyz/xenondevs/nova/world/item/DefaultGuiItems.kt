@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.item
 
+import org.bukkit.inventory.ItemType
 import org.joml.Vector3d
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -18,7 +19,6 @@ import xyz.xenondevs.nova.resources.builder.layout.item.RangeDispatchItemModelPr
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.task.TextureContent
 import xyz.xenondevs.nova.util.data.writeImage
-import xyz.xenondevs.nova.world.block.behavior.Waterloggable
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -335,7 +335,7 @@ private fun hiddenItem(
     name: String,
     localizedName: String? = null,
     vararg itemBehaviors: ItemBehaviorHolder
-): RegistryEntry.Nova<NovaItem> = item(name) {
+): RegistryEntry.Paper<ItemType> = item(name) {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -350,7 +350,7 @@ private fun hiddenItem(
     name: String,
     localizedName: String? = null,
     itemModelDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit
-): RegistryEntry.Nova<NovaItem> = item(name) {
+): RegistryEntry.Paper<ItemType> = item(name) {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -362,7 +362,7 @@ private fun guiItem(
     name: String,
     localizedName: String? = null,
     stretched: Boolean = false
-): RegistryEntry.Nova<NovaItem> = item("gui/opaque/$name") {
+): RegistryEntry.Paper<ItemType> = item("gui/opaque/$name") {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -376,7 +376,7 @@ private fun tpGuiItem(
     name: String,
     localizedName: String? = null,
     stretched: Boolean = false
-): RegistryEntry.Nova<NovaItem> = item("gui/transparent/$name") {
+): RegistryEntry.Paper<ItemType> = item("gui/transparent/$name") {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -390,7 +390,7 @@ private fun barGuiItem(
     name: String,
     color: Color,
     background: Boolean
-): RegistryEntry.Nova<NovaItem> = item(name) {
+): RegistryEntry.Paper<ItemType> = item(name) {
     name(null)
     hidden(true)
     modelDefinition {
@@ -414,7 +414,7 @@ private fun scrollBarItem(
     name: String,
     texture: ResourcePath<ResourceType.Texture>,
     vertical: Boolean = true
-): RegistryEntry.Nova<NovaItem> = item("gui/transparent/$name") {
+): RegistryEntry.Paper<ItemType> = item("gui/transparent/$name") {
     name(null)
     hidden(true)
     modelDefinition {
@@ -445,7 +445,7 @@ private fun disabledScrollBarItem(
     name: String,
     texture: ResourcePath<ResourceType.Texture>,
     vertical: Boolean
-): RegistryEntry.Nova<NovaItem> = item("gui/transparent/$name") {
+): RegistryEntry.Paper<ItemType> = item("gui/transparent/$name") {
     name(null)
     hidden(true)
     modelDefinition {

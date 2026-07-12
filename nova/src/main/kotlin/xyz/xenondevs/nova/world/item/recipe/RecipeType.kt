@@ -47,9 +47,9 @@ class RecipeType<T : Any> internal constructor(
     val deserializer: RecipeDeserializer<T>?
 ) : NovaRegistryElement<RecipeType<T>> {
     
-    val dirName get() = key.namespace() + "/" + key.value()
+    val dirName get() = this@RecipeType.key.namespace() + "/" + this@RecipeType.key.value()
     
-    override fun toString(): String = key.toString()
+    override fun toString(): String = this@RecipeType.key.asString()
     
     companion object {
         

@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.block.state.model
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.registry.entries.BlockTypeEntries
 

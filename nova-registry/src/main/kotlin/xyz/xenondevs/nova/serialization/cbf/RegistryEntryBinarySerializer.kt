@@ -1,3 +1,4 @@
+
 package xyz.xenondevs.nova.serialization.cbf
 
 import io.papermc.paper.registry.RegistryAccess
@@ -57,28 +58,3 @@ class PaperRegistryEntryBinarySerializer<T : Keyed>(
     
 }
 
-/**
- * A binary serializer for [RegistryEntry.Either] that serializes the entry by its key.
- *
- * In case an entry exists in both the Nova and Paper registry, the Nova registry takes precedence.
- */
-class EitherRegistryEntryBinarySerializer<N : NovaRegistryElement<N>, P : Keyed>(
-    private val novaRegistry: NovaRegistry<N>,
-    private val paperRegistry: RegistryKey<P>,
-    private val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
-) : UnversionedBinarySerializer<RegistryEntry.Either<N, P>>() {
-    
-    override fun readUnversioned(reader: ByteReader): RegistryEntry.Either<N, P> {
-        val key = Key.key(reader.readString())
-        return RegistryEntry.either(key, novaRegistry, paperRegistry, registryAccess)
-    }
-    
-    override fun writeUnversioned(obj: RegistryEntry.Either<N, P>, writer: ByteWriter) {
-        writer.writeString(obj.key.asString())
-    }
-    
-    override fun copyNonNull(obj: RegistryEntry.Either<N, P>): RegistryEntry.Either<N, P> {
-        return obj
-    }
-    
-}

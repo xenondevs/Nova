@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.resources.builder.task
 
 import kotlinx.serialization.json.Json
 import net.kyori.adventure.key.Key
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -10,7 +11,6 @@ import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
 import xyz.xenondevs.nova.util.toString
-import xyz.xenondevs.nova.world.item.NovaItem
 
 /**
  * Generates item model definitions.
@@ -128,7 +128,7 @@ class ItemModelContent(val builder: ResourcePackBuilder) : PackBuildData {
          * for [entry] using [configureDefinition].
          */
         fun request(
-            entry: RegistryEntry.Nova<NovaItem>,
+            entry: RegistryEntry.Paper<ItemType>,
             configureDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit
         ) {
             novaItemDefinitions[entry.key] = configureDefinition

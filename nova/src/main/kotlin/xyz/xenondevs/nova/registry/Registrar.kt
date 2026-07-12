@@ -43,7 +43,7 @@ import org.bukkit.entity.Frog
 import org.bukkit.entity.Pig
 import org.bukkit.entity.Player
 import org.bukkit.entity.Wolf
-import xyz.xenondevs.commons.provider.Provider
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.BOOTSTRAP_LIFECYCLE
 import xyz.xenondevs.nova.config.CONFIGS
@@ -61,9 +61,7 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 import xyz.xenondevs.nova.util.Identifier
-import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.TileEntityConstructor
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkGroup
@@ -81,7 +79,6 @@ import xyz.xenondevs.nova.world.generation.builder.BiomeInjectionBuilder
 import xyz.xenondevs.nova.world.generation.builder.DimensionTypeBuilder
 import xyz.xenondevs.nova.world.generation.builder.PlacedFeatureBuilder
 import xyz.xenondevs.nova.world.item.Equipment
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.world.item.recipe.NovaRecipe
@@ -112,7 +109,7 @@ internal object NovaRegistrar : Registrar() {
  * Provides access to registration functions for things in registries.
  */
 abstract class Registrar internal constructor() : Namespaced {
-
+    
     fun <T : NovaRegistryElement<T>> registry(name: String, reloadable: Boolean = NovaRegistries.RELOADABLE): MutableNovaRegistry<T> =
         NovaRegistries.createRegistry(key(this, name), reloadable)
     
@@ -147,17 +144,17 @@ abstract class Registrar internal constructor() : Namespaced {
     //</editor-fold>
     
     //<editor-fold desc="blocks">
-    fun tileEntity(name: String, constructor: TileEntityConstructor, tileEntity: NovaTileEntityBlockBuilder.() -> Unit): RegistryEntry.Nova<NovaBlock> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_BLOCK, key(this, name), { NovaTileEntityBlockBuilderImpl(it, constructor) }, tileEntity)
+    fun tileEntity(name: String, constructor: TileEntityConstructor, tileEntity: NovaTileEntityBlockBuilder.() -> Unit): RegistryEntry.Paper<BlockType> =
+        RegistryLoader.enqueueVanilla(RegistryKey.BLOCK, key(this, name), { NovaTileEntityBlockBuilderImpl(it, constructor) }, tileEntity)
     
-    fun block(name: String, block: NovaBlockBuilder.() -> Unit): RegistryEntry.Nova<NovaBlock> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_BLOCK, key(this, name), ::NovaBlockBuilderImpl, block)
+    fun block(name: String, block: NovaBlockBuilder.() -> Unit): RegistryEntry.Paper<BlockType> =
+        RegistryLoader.enqueueVanilla(RegistryKey.BLOCK, key(this, name), ::NovaBlockBuilderImpl, block)
     
-    fun blockTag(name: String, configure: TagBuilder.Nova<NovaBlock>.() -> Unit): RegistryEntrySet.Nova.Tag<NovaBlock> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_BLOCK, key(this, name), configure)
+    fun blockTag(name: String, configure: TagBuilder.Paper<BlockType>.() -> Unit): RegistryEntrySet.Paper.Tag<BlockType> =
+        tag(name, RegistryKey.BLOCK, configure)
     
-    fun blockTag(tag: RegistryEntrySet.Nova.Tag<NovaBlock>, configure: TagBuilder.Nova<NovaBlock>.() -> Unit): RegistryEntrySet.Nova.Tag<NovaBlock> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_BLOCK, tag.tagKey, configure)
+    fun blockTag(tag: RegistryEntrySet.Paper.Tag<BlockType>, configure: TagBuilder.Paper<BlockType>.() -> Unit): RegistryEntrySet.Paper.Tag<BlockType> =
+        tag(tag, configure)
     //</editor-fold>
     
     //<editor-fold desc="enchantments">
@@ -217,7 +214,7 @@ abstract class Registrar internal constructor() : Namespaced {
         registerEquipment(name) { AnimatedEquipmentLayoutBuilder(namespace(), it).apply(layout).build() }
     
     private fun registerEquipment(name: String, makeLayout: (ResourcePackBuilder) -> EquipmentLayout): RegistryEntry.Nova<Equipment> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_EQUIPMENT, key(this, name)) { Equipment(it, EquipmentTask.request(it, makeLayout)) }
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_EQUIPMENT, key(this, name), { EquipmentTask.request(it, makeLayout) }, { entry, layout -> Equipment(entry, layout) })
     
     fun equipmentTag(name: String, configure: TagBuilder.Nova<Equipment>.() -> Unit): RegistryEntrySet.Nova.Tag<Equipment> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_EQUIPMENT, key(this, name), configure)
@@ -249,12 +246,12 @@ abstract class Registrar internal constructor() : Namespaced {
     //</editor-fold>
     
     //<editor-fold desc="items">
-    fun item(name: String, item: NovaItemBuilder.() -> Unit): RegistryEntry.Nova<NovaItem> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_ITEM, key(this, name), ::NovaItemBuilderImpl, item)
+    fun item(name: String, item: NovaItemBuilder.() -> Unit): RegistryEntry.Paper<ItemType> =
+        RegistryLoader.enqueueVanilla(RegistryKey.ITEM, key(this, name), ::NovaItemBuilderImpl, item)
     
-    fun item(block: RegistryEntry.Nova<NovaBlock>, name: String = block.key.value(), item: NovaItemBuilder.() -> Unit): RegistryEntry.Nova<NovaItem> {
+    fun item(block: RegistryEntry.Paper<BlockType>, name: String = block.key.value(), item: NovaItemBuilder.() -> Unit): RegistryEntry.Paper<ItemType> {
         require(block.key.namespace() == namespace()) { "The block must be from the same addon (block is from ${block.key.namespace()})!" }
-        return RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_ITEM, key(this, name), { NovaItemBuilderImpl.fromBlock(it, block) }, item)
+        return RegistryLoader.enqueueVanilla(RegistryKey.ITEM, key(this, name), ::NovaItemBuilderImpl) { block(block); item() }
     }
     
     fun registerItem(
@@ -262,40 +259,40 @@ abstract class Registrar internal constructor() : Namespaced {
         vararg behaviors: ItemBehaviorHolder,
         localizedName: String? = null,
         isHidden: Boolean = false
-    ): RegistryEntry.Nova<NovaItem> = item(name) {
+    ): RegistryEntry.Paper<ItemType> = item(name) {
         behaviors(*behaviors)
         localizedName?.let(::localizedName)
         hidden(isHidden)
     }
     
     fun registerItem(
-        block: RegistryEntry.Nova<NovaBlock>,
+        block: RegistryEntry.Paper<BlockType>,
         vararg behaviors: ItemBehaviorHolder,
         localizedName: String? = null,
         isHidden: Boolean = false
-    ): RegistryEntry.Nova<NovaItem> = item(block) {
+    ): RegistryEntry.Paper<ItemType> = item(block) {
         behaviors(*behaviors)
         localizedName?.let(::localizedName)
         hidden(isHidden)
     }
     
     fun registerItem(
-        block: RegistryEntry.Nova<NovaBlock>,
+        block: RegistryEntry.Paper<BlockType>,
         name: String,
         vararg behaviors: ItemBehaviorHolder,
         localizedName: String? = null,
         isHidden: Boolean = false
-    ): RegistryEntry.Nova<NovaItem> = item(block, name) {
+    ): RegistryEntry.Paper<ItemType> = item(block, name) {
         behaviors(*behaviors)
         localizedName?.let(::localizedName)
         hidden(isHidden)
     }
     
-    fun itemTag(name: String, configure: TagBuilder.Nova<NovaItem>.() -> Unit): RegistryEntrySet.Nova.Tag<NovaItem> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_ITEM, key(this, name), configure)
+    fun itemTag(name: String, configure: TagBuilder.Paper<ItemType>.() -> Unit): RegistryEntrySet.Paper.Tag<ItemType> =
+        tag(name, RegistryKey.ITEM, configure)
     
-    fun itemTag(tag: RegistryEntrySet.Nova.Tag<NovaItem>, configure: TagBuilder.Nova<NovaItem>.() -> Unit): RegistryEntrySet.Nova.Tag<NovaItem> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_ITEM, tag.tagKey, configure)
+    fun itemTag(tag: RegistryEntrySet.Paper.Tag<ItemType>, configure: TagBuilder.Paper<ItemType>.() -> Unit): RegistryEntrySet.Paper.Tag<ItemType> =
+        tag(tag, configure)
     //</editor-fold>
     
     //<editor-fold desc="network types">
@@ -359,10 +356,12 @@ abstract class Registrar internal constructor() : Namespaced {
      * `textures/gui/sprites/tooltip/<name>_frame.png`. Their mcmeta can be configured via [meta].
      */
     fun tooltipStyle(name: String, meta: TooltipStyleLayoutBuilder.() -> Unit): RegistryEntry.Nova<TooltipStyle> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOLTIP_STYLE, key(this, name)) { entry ->
-            TooltipStyleTask.request(entry) { TooltipStyleLayoutBuilder(entry.key, it).apply(meta).build() }
-            TooltipStyle(entry)
-        }
+        RegistryLoader.enqueueNova(
+            NovaRegistries.INTERNAL_TOOLTIP_STYLE,
+            key(this, name),
+            { entry -> TooltipStyleTask.request(entry) { TooltipStyleLayoutBuilder(entry.key, it).apply(meta).build() } },
+            { entry, _ -> TooltipStyle(entry) }
+        )
     
     fun tooltipStyleTag(name: String, configure: TagBuilder.Nova<TooltipStyle>.() -> Unit): RegistryEntrySet.Nova.Tag<TooltipStyle> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_TOOLTIP_STYLE, key(this, name), configure)
@@ -381,16 +380,6 @@ abstract class Registrar internal constructor() : Namespaced {
         name: String,
         wailaInfoProvider: WailaInfoProviderBuilder<BlockType, S>.() -> Unit
     ): RegistryEntry.Nova<WailaInfoProvider<BlockType, S>> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_WAILA_INFO_PROVIDER, key(this, name), ::WailaInfoProviderBuilderImpl, wailaInfoProvider)
-    
-    /**
-     * Registers a new [WailaInfoProvider] for Nova blocks with the specified [name] after configuring it with [wailaInfoProvider].
-     */
-    @JvmName("wailaInfoProviderNova")
-    fun wailaInfoProvider(
-        name: String,
-        wailaInfoProvider: WailaInfoProviderBuilder<NovaBlock, NovaBlockState>.() -> Unit
-    ): RegistryEntry.Nova<WailaInfoProvider<NovaBlock, NovaBlockState>> =
         RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_WAILA_INFO_PROVIDER, key(this, name), ::WailaInfoProviderBuilderImpl, wailaInfoProvider)
     
     /**

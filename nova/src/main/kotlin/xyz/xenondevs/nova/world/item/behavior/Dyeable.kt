@@ -10,7 +10,9 @@ import org.bukkit.event.block.CauldronLevelChangeEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
+import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.nmsEntity
+import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.InteractionResult
 
@@ -21,16 +23,16 @@ import xyz.xenondevs.nova.world.InteractionResult
 object Dyeable : ItemBehavior {
     
     override fun useOnBlock(itemStack: ItemStack, block: Block, ctx: Context<BlockInteract>): InteractionResult {
-        val clickedPos = ctx[BlockInteract.BLOCK_POS]
+        val clickedBlock = ctx[BlockInteract.BLOCK]
+        val blockType = ctx[BlockInteract.BLOCK_TYPE]
         val entity = ctx[BlockInteract.SOURCE_ENTITY] ?: return InteractionResult.Pass
-        val blockType = ctx[BlockInteract.BLOCK_TYPE_VANILLA] ?: return InteractionResult.Pass
         if (
             blockType == BlockType.CAULDRON
             && itemStack.hasData(DataComponentTypes.DYED_COLOR)
             && LayeredCauldronBlock.lowerFillLevel(
-                clickedPos.nmsBlockState,
-                clickedPos.world.serverLevel,
-                clickedPos.nmsPos,
+                clickedBlock.nmsBlockState,
+                clickedBlock.world.serverLevel,
+                clickedBlock.nmsPos,
                 entity.nmsEntity,
                 CauldronLevelChangeEvent.ChangeReason.ARMOR_WASH
             )

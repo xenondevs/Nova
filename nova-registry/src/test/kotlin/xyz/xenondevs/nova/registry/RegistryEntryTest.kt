@@ -1,3 +1,4 @@
+
 package xyz.xenondevs.nova.registry
 
 import io.papermc.paper.registry.RegistryAccess
@@ -154,159 +155,8 @@ class RegistryEntryTest {
         assertNotEquals(ItemTypeEntries.DIAMOND, ItemTypeEntries.EMERALD)
     }
     
-    // --- Either == Either ---
     
-    @Test
-    fun `Either entries with same registries and key are equal`() {
-        val either1 = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        val either2 = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertEquals(either1, either2)
-    }
     
-    @Test
-    fun `Either entries with different keys are not equal`() {
-        val either1 = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        val either2 = RegistryEntry.either(novaEntry2, RegistryKey.ITEM)
-        assertNotEquals(either1, either2)
-    }
-    
-    @Test
-    fun `Either entries with different nova registries are not equal`() {
-        val otherRegistry = MutableNovaRegistry<TestElement>(key("nova", "equality_test_other"), false)
-        val otherEntry = otherRegistry[key("nova", "element1")]
-        val either1 = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        val either2 = RegistryEntry.either(otherEntry, RegistryKey.ITEM)
-        assertNotEquals(either1, either2)
-    }
-    
-    @Test
-    fun `Either entries with different paper registries are not equal`() {
-        val either1 = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        val either2 = RegistryEntry.either(novaEntry1, RegistryKey.BLOCK)
-        assertNotEquals<Any>(either1, either2)
-    }
-    
-    @Test
-    fun `Either paper entries with same registries and key are equal`() {
-        val either1 = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        val either2 = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        assertEquals(either1, either2)
-    }
-    
-    @Test
-    fun `Either paper entries with different keys are not equal`() {
-        val either1 = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        val either2 = RegistryEntry.either(registry, ItemTypeEntries.EMERALD)
-        assertNotEquals(either1, either2)
-    }
-    
-    @Test
-    fun `Either nova and Either paper with same key and registries are equal`() {
-        val eitherNova = RegistryEntry.either(novaEntryDiamond, RegistryKey.ITEM)
-        val eitherPaper = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        assertEquals(eitherNova, eitherPaper)
-    }
-    
-    @Test
-    fun `Either nova and Either paper with same key but different registries are not equal`() {
-        val otherRegistry = MutableNovaRegistry<TestElement>(key("nova", "equality_test_other"), false)
-        val otherEntry = otherRegistry[key("minecraft", "diamond")]
-        val eitherNova = RegistryEntry.either(otherEntry, RegistryKey.ITEM)
-        val eitherPaper = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        assertNotEquals(eitherNova, eitherPaper)
-    }
-    
-    @Test
-    fun `Either of is equal to Either nova with same key and registries`() {
-        val eitherOf = RegistryEntry.either(novaEntry1.key, registry, RegistryKey.ITEM)
-        val eitherNova = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertEquals(eitherOf, eitherNova)
-    }
-    
-    @Test
-    fun `Either of is equal to Either paper with same key and registries`() {
-        val eitherOf = RegistryEntry.either(ItemTypeEntries.DIAMOND.key, registry, RegistryKey.ITEM)
-        val eitherPaper = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        assertEquals(eitherOf, eitherPaper)
-    }
-    
-    @Test
-    fun `Either of is equal to corresponding Nova entry`() {
-        val eitherOf = RegistryEntry.either(novaEntry1.key, registry, RegistryKey.ITEM)
-        assertEquals<Any>(eitherOf, novaEntry1)
-    }
-    
-    @Test
-    fun `Either of is equal to corresponding Paper entry`() {
-        val eitherOf = RegistryEntry.either(ItemTypeEntries.DIAMOND.key, registry, RegistryKey.ITEM)
-        assertEquals<Any>(eitherOf, ItemTypeEntries.DIAMOND)
-    }
-    
-    @Test
-    fun `Either of with different key is not equal to Nova entry`() {
-        val eitherOf = RegistryEntry.either(novaEntry2.key, registry, RegistryKey.ITEM)
-        assertNotEquals<Any>(eitherOf, novaEntry1)
-    }
-    
-    @Test
-    fun `Either of with different key is not equal to Paper entry`() {
-        val eitherOf = RegistryEntry.either(ItemTypeEntries.DIAMOND.key, registry, RegistryKey.ITEM)
-        assertNotEquals<Any>(eitherOf, ItemTypeEntries.EMERALD)
-    }
-    
-    // --- Either == Nova (symmetric) ---
-    
-    @Test
-    fun `Either from nova is equal to the corresponding Nova entry`() {
-        val either = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertEquals<Any>(either, novaEntry1)
-    }
-    
-    @Test
-    fun `Nova entry is equal to the corresponding Either from nova`() {
-        val either = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertEquals<Any>(novaEntry1, either)
-    }
-    
-    @Test
-    fun `Either from nova is not equal to a Nova entry with different key`() {
-        val either = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertNotEquals<Any>(either, novaEntry2)
-    }
-    
-    @Test
-    fun `Either from nova is not equal to a Nova entry from different registry`() {
-        val otherRegistry = MutableNovaRegistry<TestElement>(key("nova", "equality_test_other"), false)
-        val otherEntry = otherRegistry[key("nova", "element1")]
-        val either = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertNotEquals<Any>(either, otherEntry)
-    }
-    
-    // --- Either == Paper (symmetric) ---
-    
-    @Test
-    fun `Either from paper is equal to the corresponding Paper entry`() {
-        val either = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        assertEquals<Any>(either, ItemTypeEntries.DIAMOND)
-    }
-    
-    @Test
-    fun `Paper entry is equal to the corresponding Either from paper`() {
-        val either = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        assertEquals<Any>(ItemTypeEntries.DIAMOND, either)
-    }
-    
-    @Test
-    fun `Either from paper is not equal to a Paper entry with different key`() {
-        val either = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        assertNotEquals<Any>(either, ItemTypeEntries.EMERALD)
-    }
-    
-    @Test
-    fun `Either from paper is not equal to a Paper entry from different registry`() {
-        val either = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertNotEquals<Any>(either, ItemTypeEntries.DIAMOND)
-    }
     
     // --- Nova != Paper ---
     
@@ -323,16 +173,6 @@ class RegistryEntryTest {
         assertEquals(novaEntry1.hashCode(), sameEntry.hashCode())
     }
     
-    @Test
-    fun `Either and corresponding Nova entry have same hashCode`() {
-        val either = RegistryEntry.either(novaEntry1, RegistryKey.ITEM)
-        assertEquals(either.hashCode(), novaEntry1.hashCode())
-    }
-    
-    @Test
-    fun `Either and corresponding Paper entry have same hashCode`() {
-        val either = RegistryEntry.either(registry, ItemTypeEntries.DIAMOND)
-        assertEquals(either.hashCode(), ItemTypeEntries.DIAMOND.hashCode())
-    }
-    
 }
+
+

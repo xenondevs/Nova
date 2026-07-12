@@ -3,58 +3,59 @@ package xyz.xenondevs.nova.world.item
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.TooltipDisplay
 import io.papermc.paper.registry.RegistryKey
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.collections.mapValuesNotNull
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.flattenIterables
-import xyz.xenondevs.commons.provider.orElseBy
+import xyz.xenondevs.commons.provider.mapEach
+import xyz.xenondevs.commons.provider.orElseLazily
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.name
 import xyz.xenondevs.nova.config.CONFIGS
 import xyz.xenondevs.nova.config.optionalEntry
-import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.alias.ItemTypeEntry
+import xyz.xenondevs.nova.registry.alias.ItemTypeEntrySet
 import xyz.xenondevs.nova.registry.emptyRegistryEntrySet
 import xyz.xenondevs.nova.registry.entries.ItemTypeEntries
-import xyz.xenondevs.nova.registry.mapEach
 import xyz.xenondevs.nova.serialization.kotlinx.ComponentAsMiniMessage
 import xyz.xenondevs.nova.serialization.kotlinx.ValueOrList
+import xyz.xenondevs.nova.ui.menu.advancedTooltips
 import xyz.xenondevs.nova.ui.menu.item.scrollableItemProvider
-import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import java.util.*
 
 internal object ItemCategories {
     
     val categories: Provider<List<ItemCategory>> = CONFIGS["nova:item_categories"]
-        .optionalEntry<List<@Contextual ItemCategory.Custom>>(emptyList())
-        .orElseBy(getDefaultItemCategories())
+        .optionalEntry<List<ItemCategory.Custom>>(emptyList())
+        .orElseLazily { getDefaultItemCategories() }
     val obtainableItems: Provider<List<CategorizedItem>> = categories
         .flatMap { category -> combinedProvider(category.map(ItemCategory::categorizedItems)) }
         .flattenIterables()
     
-    private fun getDefaultItemCategories(): Provider<List<ItemCategory>> {
+    private fun getDefaultItemCategories(): List<ItemCategory> {
         val addonNamesById = AddonBootstrapper.addons.associate { it.namespace() to Component.text(it.name) }
-        return NovaRegistries.ITEM.entrySet.map { items ->
-            items
-                .groupBy { it.key.namespace() }
-                .mapValuesNotNull { [namespace, items] ->
-                    val name = addonNamesById[namespace]
-                    val visibleItems = items.filterNot(NovaItem::isHidden)
-                    if (name != null && visibleItems.isNotEmpty())
-                        ItemCategory.Default(name, visibleItems)
-                    else null
-                }
-                .toSortedMap().values.toList()
-        }
+        return Registry.ITEM
+            .filter { it.isNova }
+            .groupBy { it.key.namespace() }
+            .mapValuesNotNull { [namespace, items] ->
+                val name = addonNamesById[namespace]
+                val visibleItems = items.filterNot(ItemType::isHidden)
+                if (name != null && visibleItems.isNotEmpty())
+                    ItemCategory.Default(name, visibleItems)
+                else null
+            }
+            .toSortedMap().values.toList()
     }
     
 }
@@ -66,10 +67,10 @@ internal sealed interface ItemCategory {
     
     @Serializable
     class Custom(
-        val icon: EitherItemTypeEntry = ItemTypeEntries.AIR.asEither(),
+        val icon: ItemTypeEntry = ItemTypeEntries.AIR,
         val name: ComponentAsMiniMessage = Component.empty(),
         val description: ValueOrList<ComponentAsMiniMessage> = emptyList(),
-        val items: MixedItemTypeEntrySet = emptyRegistryEntrySet(NovaRegistries.ITEM, RegistryKey.ITEM)
+        val items: ItemTypeEntrySet = emptyRegistryEntrySet(RegistryKey.ITEM)
     ) : ItemCategory {
         
         @Transient
@@ -79,25 +80,24 @@ internal sealed interface ItemCategory {
             data[DataComponentTypes.TOOLTIP_DISPLAY] by TooltipDisplay.tooltipDisplay()
                 .hiddenComponents(Registry.DATA_COMPONENT_TYPE.toSet())
                 .build()
+            advancedTooltips by false
         }
         
         @Transient
-        override val categorizedItems = items.mapEach(
-            { CategorizedItem(it.key, it.createItemStack(), it.name ?: Component.empty()) },
-            { CategorizedItem(it.key, it.createItemStack(), it.getDefaultData(DataComponentTypes.ITEM_NAME) ?: Component.empty()) }
-        )
+        override val categorizedItems = items.mapEach { CategorizedItem(it.key, it.createItemStack(), it.name) }
         
     }
     
     class Default(
         private val name: Component,
-        content: List<NovaItem>
+        content: List<ItemType>
     ) : ItemCategory {
-        override val iconProvider = itemProvider(content[0]) { 
+        override val iconProvider = itemProvider(content[0]) {
             name by this@Default.name
             lore by emptyList()
+            advancedTooltips by false
         }
-        override val categorizedItems = provider(content.map { CategorizedItem(it.key, it.createItemStack(), it.name ?: Component.empty()) })
+        override val categorizedItems = provider(content.map { CategorizedItem(it.key, it.createItemStack(), it.name) })
     }
     
 }

@@ -123,7 +123,7 @@ internal object VanillaGuiTextureInjector : PacketListener {
         var guiTexture: FontChar? = null
         for (el in title.elements()) {
             val font = el.style.font()
-            if (el is StyledElement.CodePoint && font?.toString()?.startsWith("nova:gui_") == true) {
+            if (el is StyledElement.CodePoint && font?.asString()?.startsWith("nova:gui_") == true) {
                 guiTexture = FontChar(font, el.codePoint)
                 break
             }

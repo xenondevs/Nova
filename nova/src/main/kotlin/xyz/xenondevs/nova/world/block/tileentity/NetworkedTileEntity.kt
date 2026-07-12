@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.world.block.tileentity
 
+import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
@@ -14,8 +15,7 @@ import xyz.xenondevs.nova.util.BlockSideMap
 import xyz.xenondevs.nova.util.BlockSideSet
 import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.CubeFaceSet
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
@@ -35,10 +35,10 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.Net
 import java.util.*
 
 abstract class NetworkedTileEntity(
-    pos: BlockPos,
+    block: Block,
     blockState: NovaBlockState,
     data: Compound
-) : TileEntity(pos, blockState, data), NetworkEndPoint {
+) : TileEntity(block, blockState, data), NetworkEndPoint {
     
     @Volatile
     final override var isValid = false
@@ -64,7 +64,7 @@ abstract class NetworkedTileEntity(
         blockedSides: BlockSideSet,
         defaultConnectionConfig: BlockSideMap<NetworkConnectionType> = BlockSideMap(allowedConnectionType)
     ): DefaultEnergyHolder {
-        val front = blockState[DefaultBlockStateProperties.FACING] ?: BlockFace.NORTH
+        val front = DefaultBlockStateProperties.FACING_PROPERTIES.firstNotNullOfOrNull { blockState[it] } ?: BlockFace.NORTH
         return storedEnergyHolder(
             maxEnergy,
             allowedConnectionType,
@@ -125,7 +125,7 @@ abstract class NetworkedTileEntity(
         defaultInventoryConfig: BlockSideMap<VirtualInventory?>? = null,
         defaultConnectionConfig: BlockSideMap<NetworkConnectionType>? = null,
     ): DefaultItemHolder {
-        val front = blockState[DefaultBlockStateProperties.FACING] ?: BlockFace.NORTH
+        val front = DefaultBlockStateProperties.FACING_PROPERTIES.firstNotNullOfOrNull { blockState[it] } ?: BlockFace.NORTH
         return storedItemHolder(
             inventory,
             inventories = inventories,
@@ -205,7 +205,7 @@ abstract class NetworkedTileEntity(
         defaultInventoryConfig: BlockSideMap<NetworkedInventory?> = BlockSideMap(inventory.first),
         defaultConnectionConfig: BlockSideMap<NetworkConnectionType>? = null
     ): DefaultItemHolder {
-        val front = blockState[DefaultBlockStateProperties.FACING] ?: BlockFace.NORTH
+        val front = DefaultBlockStateProperties.FACING_PROPERTIES.firstNotNullOfOrNull { blockState[it] } ?: BlockFace.NORTH
         return storedItemHolder(
             inventory,
             inventories = inventories,
@@ -286,7 +286,7 @@ abstract class NetworkedTileEntity(
         defaultContainerConfig: BlockSideMap<NetworkedFluidContainer?> = BlockSideMap(container.first),
         defaultConnectionConfig: BlockSideMap<NetworkConnectionType>? = null
     ): DefaultFluidHolder {
-        val front = blockState[DefaultBlockStateProperties.FACING] ?: BlockFace.NORTH
+        val front = DefaultBlockStateProperties.FACING_PROPERTIES.firstNotNullOfOrNull { blockState[it] } ?: BlockFace.NORTH
         return storedFluidHolder(
             container,
             containers = containers,

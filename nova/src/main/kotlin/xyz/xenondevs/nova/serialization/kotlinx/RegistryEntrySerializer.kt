@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.serialization.kotlinx
 
-import io.papermc.paper.registry.RegistryKey
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -10,8 +9,6 @@ import kotlinx.serialization.encoding.Encoder
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.level.block.Block
-import org.bukkit.block.BlockType
-import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
@@ -19,11 +16,9 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 import xyz.xenondevs.nova.util.getValue
-import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterType
 import xyz.xenondevs.nova.world.item.Equipment
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.recipe.RecipeType
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
@@ -52,16 +47,6 @@ internal abstract class NmsRegistryEntrySerializer<T : Any>(val registry: Regist
 }
 
 //<editor-fold desc="nova element serializers">
-/**
- * Serializer for [NovaBlock], serializes by [NovaBlock.key] in the format of `namespace:value`.
- */
-object NovaBlockSerializer : NovaRegistryElementSerializer<NovaBlock>(NovaRegistries.BLOCK)
-
-/**
- * Serializer for [NovaItem], serializes by [NovaItem.key] in the format of `namespace:value`.
- */
-object NovaItemSerializer : NovaRegistryElementSerializer<NovaItem>(NovaRegistries.ITEM)
-
 /**
  * Serializer for [Equipment], serializes by [Equipment.key] in the format of `namespace:value`.
  */
@@ -125,16 +110,6 @@ object TooltipStyleSerializer : NovaRegistryElementSerializer<TooltipStyle>(Nova
 
 //<editor-fold desc="nova entry serializers">
 /**
- * Serializer for [RegistryEntry.Nova] of [NovaBlock], serialized by [RegistryEntry.key] in the format of `namespace:value`.
- */
-object NovaBlockEntrySerializer : NovaRegistryEntrySerializer<NovaBlock>(NovaRegistries.BLOCK)
-
-/**
- * Serializer for [RegistryEntry.Nova] of [NovaItem], serialized by [RegistryEntry.key] in the format of `namespace:value`.
- */
-object NovaItemEntrySerializer : NovaRegistryEntrySerializer<NovaItem>(NovaRegistries.ITEM)
-
-/**
  * Serializer for [RegistryEntry.Nova] of [Equipment], serialized by [RegistryEntry.key] in the format of `namespace:value`.
  */
 object EquipmentEntrySerializer : NovaRegistryEntrySerializer<Equipment>(NovaRegistries.EQUIPMENT)
@@ -197,16 +172,6 @@ object TooltipStyleEntrySerializer : NovaRegistryEntrySerializer<TooltipStyle>(N
 
 //<editor-fold desc="nova entry set serializers">
 /**
- * Serializer for [RegistryEntrySet.Nova] of [NovaBlock].
- */
-object NovaBlockEntrySetSerializer : NovaRegistryEntrySetSerializer<NovaBlock>(NovaRegistries.BLOCK)
-
-/**
- * Serializer for [RegistryEntrySet.Nova] of [NovaItem].
- */
-object NovaItemEntrySetSerializer : NovaRegistryEntrySetSerializer<NovaItem>(NovaRegistries.ITEM)
-
-/**
  * Serializer for [RegistryEntrySet.Nova] of [Equipment].
  */
 object EquipmentEntrySetSerializer : NovaRegistryEntrySetSerializer<Equipment>(NovaRegistries.EQUIPMENT)
@@ -265,26 +230,4 @@ object ItemFilterTypeEntrySetSerializer : NovaRegistryEntrySetSerializer<ItemFil
  * Serializer for [RegistryEntrySet.Nova] of [TooltipStyle].
  */
 object TooltipStyleEntrySetSerializer : NovaRegistryEntrySetSerializer<TooltipStyle>(NovaRegistries.TOOLTIP_STYLE)
-//</editor-fold>
-
-//<editor-fold desc="either / mixed serializers">
-/**
- * Serializer for [RegistryEntry.Either] of [NovaItem] and [ItemType].
- */
-object ItemTypeEitherEntrySerializer : EitherRegistryEntrySerializer<NovaItem, ItemType>(NovaRegistries.ITEM, RegistryKey.ITEM)
-
-/**
- * Serializer for [RegistryEntry.Either] of [NovaBlock] and [BlockType].
- */
-object BlockTypeEitherEntrySerializer : EitherRegistryEntrySerializer<NovaBlock, BlockType>(NovaRegistries.BLOCK, RegistryKey.BLOCK)
-
-/**
- * Serializer for [RegistryEntrySet.Mixed] of [NovaItem] and [ItemType].
- */
-object ItemTypeMixedEntrySetSerializer : MixedRegistryEntrySetSerializer<NovaItem, ItemType>(NovaRegistries.ITEM, RegistryKey.ITEM)
-
-/**
- * Serializer for [RegistryEntrySet.Mixed] of [NovaBlock] and [BlockType].
- */
-object BlockTypeMixedEntrySetSerializer : MixedRegistryEntrySetSerializer<NovaBlock, BlockType>(NovaRegistries.BLOCK, RegistryKey.BLOCK)
 //</editor-fold>

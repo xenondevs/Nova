@@ -6,11 +6,13 @@ import net.minecraft.network.protocol.Packet
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockDestructionPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockEntityDataPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockEventPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockUpdatePacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBossEventPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetDataPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundCommandsPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundLevelChunkWithLightPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundLevelEventPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundMerchantOffersPacketEvent
@@ -53,11 +55,13 @@ internal object PacketEventManager {
         // handwritten events for non-record packets
         registerEventType(::ClientboundUpdateTagsPacketEvent)
         registerPlayerEventType(::ClientboundBlockDestructionPacketEvent)
+        registerPlayerEventType(::ClientboundBlockEntityDataPacketEvent)
         registerPlayerEventType(::ClientboundBlockEventPacketEvent)
         registerPlayerEventType(::ClientboundBlockUpdatePacketEvent)
         registerPlayerEventType(::ClientboundBossEventPacketEvent)
         registerPlayerEventType(::ClientboundContainerSetDataPacketEvent)
         registerPlayerEventType(::ClientboundContainerSetSlotPacketEvent)
+        registerPlayerEventType(::ClientboundCommandsPacketEvent)
         registerPlayerEventType(::ClientboundLevelChunkWithLightPacketEvent)
         registerPlayerEventType(::ClientboundLevelEventPacketEvent)
         registerPlayerEventType(::ClientboundMerchantOffersPacketEvent)

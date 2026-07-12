@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
 import net.minecraft.tags.BlockTags
-import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
@@ -14,13 +13,16 @@ import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.bootstrapFlatMap
+import xyz.xenondevs.nova.registry.entries.BlockTypeTags
 import xyz.xenondevs.nova.serialization.kotlinx.ToolTierEntrySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolTierEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolTierSerializer
-import xyz.xenondevs.nova.util.item.novaItem
-import xyz.xenondevs.nova.util.novaBlock
+import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
+import xyz.xenondevs.nova.world.block.blockType
+import xyz.xenondevs.nova.world.block.getBehaviorOrNull
+import xyz.xenondevs.nova.world.block.isNova
 import xyz.xenondevs.nova.world.item.behavior.Tool
 
 /**
@@ -49,10 +51,10 @@ class ToolTier(
         val levelCompare = levelValue.get().compareTo(other.levelValue.get())
         if (levelCompare != 0)
             return levelCompare
-        return key.compareTo(other.key)
+        return this@ToolTier.key.compareTo(other.key)
     }
     
-    override fun toString(): String = key.toString()
+    override fun toString(): String = this@ToolTier.key.asString()
     
     companion object {
         
@@ -61,15 +63,14 @@ class ToolTier(
          * This method works for both vanilla and Nova blocks.
          */
         fun ofBlock(block: Block): ToolTier {
-            val novaBlock = block.novaBlock
-            if (novaBlock != null)
-                return novaBlock.getBehaviorOrNull<Breakable>()?.toolTier ?: VanillaToolTiers.WOOD.get()
+            val type = block.blockType
+            if (type.isNova)
+                return type.getBehaviorOrNull<Breakable>()?.toolTier ?: VanillaToolTiers.WOOD.get()
             
-            val material = block.type
-            return when {
-                Tag.NEEDS_STONE_TOOL.isTagged(material) -> VanillaToolTiers.STONE
-                Tag.NEEDS_IRON_TOOL.isTagged(material) -> VanillaToolTiers.IRON
-                Tag.NEEDS_DIAMOND_TOOL.isTagged(material) -> VanillaToolTiers.DIAMOND
+            return when (type) {
+                in BlockTypeTags.NEEDS_STONE_TOOL -> VanillaToolTiers.STONE
+                in BlockTypeTags.NEEDS_IRON_TOOL -> VanillaToolTiers.IRON
+                in BlockTypeTags.NEEDS_DIAMOND_TOOL -> VanillaToolTiers.DIAMOND
                 else -> VanillaToolTiers.WOOD
             }.get()
         }

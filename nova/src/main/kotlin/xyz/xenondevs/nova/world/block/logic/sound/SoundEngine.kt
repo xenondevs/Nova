@@ -42,7 +42,7 @@ internal object SoundEngine : Listener, PacketListener {
     }
     
     fun overridesSound(sound: Sound): Boolean {
-        return overridesSound(sound.key.toString())
+        return overridesSound(sound.key.asString())
     }
     
     @JvmStatic

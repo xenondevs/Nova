@@ -29,6 +29,8 @@ internal abstract class LeavesBackingStateConfig(
             .setValue(LeavesBlock.WATERLOGGED, waterlogged)
     }
     
+    override val maskedBlockState: BlockState by blockType.map { it.nmsBlock.defaultBlockState }
+    
 }
 
 internal abstract class LeavesBackingStateConfigType<T : LeavesBackingStateConfig>(

@@ -187,6 +187,6 @@ fun interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
     /**
      * Creates a new [ItemBehavior] for [entry] configured by [config].
      */
-    fun create(entry: RegistryEntry.Nova<NovaItem>, config: ConfigProvider): T
+    fun create(entry: RegistryEntry.Paper<ItemType>, config: ConfigProvider): T
     
 }

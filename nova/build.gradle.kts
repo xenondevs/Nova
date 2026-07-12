@@ -44,13 +44,23 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotlin.test.junit)
     testRuntimeOnly(libs.junit.platformLauncher)
+    
+    compileOnly("xyz.xenondevs.origami:origami:0.5.0")
 }
 
 origami {
     runServer {
-        workingDirectory.set(layout.dir(providers.gradleProperty("serverDir").map(::File)))
+        // prefer DCEVM capabilities over AOT cache
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = JavaLanguageVersion.of(25)
+            vendor = JvmVendorSpec.JETBRAINS
+        }
+        workingDirectory = layout.dir(providers.gradleProperty("serverDir").map(::File))
         plugins.from(tasks.named<Zip>("loaderJar").flatMap { it.archiveFile })
         jvmArgs.addAll(
+            // DCEVM
+            "-XX:+AllowEnhancedClassRedefinition",
+            // other
             "-XX:+EnableDynamicAgentLoading",
             "--enable-native-access=ALL-UNNAMED",
             "-DNovaDev",
@@ -75,9 +85,9 @@ loaderJar {
     gameVersion = mcVersion
     merge.from(tasks.named<Jar>("origamiJar").flatMap { it.archiveFile })
     val projectJars = listOf(
-        ":nova-api", 
-        ":nova-config", 
-        ":nova-network", 
+        ":nova-api",
+        ":nova-config",
+        ":nova-network",
         ":nova-packet-entity",
         ":nova-registry",
     ).map { projectName -> project(projectName).tasks.withType<Jar>().matching { it.name == "jar" } }

@@ -1,3 +1,4 @@
+
 package xyz.xenondevs.nova.serialization.cbf
 
 import io.papermc.paper.registry.RegistryKey
@@ -34,7 +35,6 @@ class RegistryEntrySetBinarySerializerTest {
         private lateinit var tag: RegistryEntrySet.Nova.Tag<TestElement>
         private lateinit var novaSerializer: NovaRegistryEntrySetBinarySerializer<TestElement>
         private lateinit var paperSerializer: PaperRegistryEntrySetBinarySerializer<ItemType>
-        private lateinit var mixedSerializer: MixedRegistryEntrySetBinarySerializer<TestElement, ItemType>
         
         @JvmStatic
         @BeforeAll
@@ -63,7 +63,6 @@ class RegistryEntrySetBinarySerializerTest {
             
             novaSerializer = NovaRegistryEntrySetBinarySerializer(registry)
             paperSerializer = PaperRegistryEntrySetBinarySerializer(RegistryKey.ITEM)
-            mixedSerializer = MixedRegistryEntrySetBinarySerializer(registry, RegistryKey.ITEM)
         }
         
         private fun registerElement(name: String): RegistryEntry.Nova<TestElement> {
@@ -167,71 +166,7 @@ class RegistryEntrySetBinarySerializerTest {
         assertEquals(registryEntrySetOf(RegistryKey.ITEM), deserialized)
     }
     
-    // --- Mixed ---
-    
-    @Test
-    fun `round-trip RegistryEntrySet Mixed Direct (single nova)`() {
-        val mixed = registryEntrySetOf(
-            registryEntrySetOf(entry1),
-            emptyRegistryEntrySet(RegistryKey.ITEM)
-        )
-        val bytes = mixedSerializer.write(mixed)
-        val deserialized = mixedSerializer.read(bytes)!!
-        
-        assertIs<RegistryEntrySet.Mixed.Direct<TestElement, ItemType>>(deserialized)
-        assertEquals(mixed, deserialized)
-    }
-    
-    @Test
-    fun `round-trip RegistryEntrySet Mixed Direct (single paper)`() {
-        val mixed = registryEntrySetOf(
-            emptyRegistryEntrySet(registry),
-            registryEntrySetOf(ItemTypeEntries.DIAMOND)
-        )
-        val bytes = mixedSerializer.write(mixed)
-        val deserialized = mixedSerializer.read(bytes)!!
-        
-        assertIs<RegistryEntrySet.Mixed.Direct<TestElement, ItemType>>(deserialized)
-        assertEquals(mixed, deserialized)
-    }
-    
-    @Test
-    fun `round-trip RegistryEntrySet Mixed Direct (one nova, one paper)`() {
-        val mixed = registryEntrySetOf(
-            registryEntrySetOf(entry1),
-            registryEntrySetOf(ItemTypeEntries.DIAMOND)
-        )
-        val bytes = mixedSerializer.write(mixed)
-        val deserialized = mixedSerializer.read(bytes)!!
-        
-        assertIs<RegistryEntrySet.Mixed.Direct<TestElement, ItemType>>(deserialized)
-        assertEquals(mixed, deserialized)
-    }
-    
-    @Test
-    fun `round-trip RegistryEntrySet Mixed Direct (multi nova)`() {
-        val mixed = registryEntrySetOf(
-            registryEntrySetOf(entry1, entry2),
-            emptyRegistryEntrySet(RegistryKey.ITEM)
-        )
-        val bytes = mixedSerializer.write(mixed)
-        val deserialized = mixedSerializer.read(bytes)!!
-        
-        assertIs<RegistryEntrySet.Mixed.Direct<TestElement, ItemType>>(deserialized)
-        assertEquals(mixed, deserialized)
-    }
-    
-    @Test
-    fun `round-trip RegistryEntrySet Mixed Direct (multi paper)`() {
-        val mixed = registryEntrySetOf(
-            emptyRegistryEntrySet(registry),
-            registryEntrySetOf(ItemTypeEntries.DIAMOND, ItemTypeEntries.EMERALD)
-        )
-        val bytes = mixedSerializer.write(mixed)
-        val deserialized = mixedSerializer.read(bytes)!!
-        
-        assertIs<RegistryEntrySet.Mixed.Direct<TestElement, ItemType>>(deserialized)
-        assertEquals(mixed, deserialized)
-    }
     
 }
+
+

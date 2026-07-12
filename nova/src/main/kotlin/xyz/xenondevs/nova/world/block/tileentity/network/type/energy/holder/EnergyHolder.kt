@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.CubeFaceSet
