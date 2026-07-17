@@ -32,6 +32,18 @@ internal abstract class VanillaTileEntity internal constructor(
         
         CHEST(::VanillaChestTileEntity, setOf(Material.CHEST)),
         TRAPPED_CHEST(::VanillaChestTileEntity, setOf(Material.TRAPPED_CHEST)),
+        // Copper chests reuse the vanilla minecraft:chest block entity and the same
+        // type/facing blockstates, so VanillaChestTileEntity handles them verbatim
+        // (double-chest merging included). All 8 oxidation + waxed variants.
+        COPPER_CHEST(
+            ::VanillaChestTileEntity,
+            setOf(
+                Material.COPPER_CHEST, Material.EXPOSED_COPPER_CHEST,
+                Material.WEATHERED_COPPER_CHEST, Material.OXIDIZED_COPPER_CHEST,
+                Material.WAXED_COPPER_CHEST, Material.WAXED_EXPOSED_COPPER_CHEST,
+                Material.WAXED_WEATHERED_COPPER_CHEST, Material.WAXED_OXIDIZED_COPPER_CHEST
+            )
+        ),
         FURNACE(::VanillaFurnaceTileEntity, setOf(Material.FURNACE)),
         BLAST_FURNACE(::VanillaFurnaceTileEntity, setOf(Material.BLAST_FURNACE)),
         SMOKER(::VanillaFurnaceTileEntity, setOf(Material.SMOKER)),
