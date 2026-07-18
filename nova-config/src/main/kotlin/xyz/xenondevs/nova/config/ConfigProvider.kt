@@ -2,7 +2,9 @@ package xyz.xenondevs.nova.config
 
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 import net.kyori.adventure.key.Key
+import xyz.xenondevs.commons.provider.NULL_PROVIDER
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.UnstableProviderApi
 import xyz.xenondevs.commons.provider.provider
@@ -409,5 +411,19 @@ interface ConfigProvider : Provider<JsonElement> {
      * whose value will be null if no entry exists or could not be deserialized due to [SerializationException].
      */
     fun <T : Any> strongOptionalEntry(type: KType, vararg paths: List<String>): Provider<T?>
+    
+    /**
+     * An empty [ConfigProvider] that only returns default or empty optional entries.
+     * Uses `nova:empty_config_provider` as the config id.
+     */
+    object Empty : ConfigProvider, Provider<JsonElement> by provider(JsonObject(emptyMap())) {
+        override val configId = Key.key("nova", "empty_config_provider")
+        override fun node(path: List<String>) = Empty
+        override fun <T : Any> entry(type: KType, default: Provider<T>, vararg paths: List<String>) = default
+        override fun <T : Any> optionalEntry(type: KType, vararg paths: List<String>) = NULL_PROVIDER
+        override fun strongNode(path: List<String>) = Empty
+        override fun <T : Any> strongEntry(type: KType, default: Provider<T>, vararg paths: List<String>) = default
+        override fun <T : Any> strongOptionalEntry(type: KType, vararg paths: List<String>) = NULL_PROVIDER
+    }
     
 }
