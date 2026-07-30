@@ -32,6 +32,15 @@ internal abstract class VanillaTileEntity internal constructor(
         
         CHEST(::VanillaChestTileEntity, setOf(Material.CHEST)),
         TRAPPED_CHEST(::VanillaChestTileEntity, setOf(Material.TRAPPED_CHEST)),
+        COPPER_CHEST(
+            ::VanillaChestTileEntity,
+            setOf(
+                Material.COPPER_CHEST, Material.EXPOSED_COPPER_CHEST,
+                Material.WEATHERED_COPPER_CHEST, Material.OXIDIZED_COPPER_CHEST,
+                Material.WAXED_COPPER_CHEST, Material.WAXED_EXPOSED_COPPER_CHEST,
+                Material.WAXED_WEATHERED_COPPER_CHEST, Material.WAXED_OXIDIZED_COPPER_CHEST
+            )
+        ),
         FURNACE(::VanillaFurnaceTileEntity, setOf(Material.FURNACE)),
         BLAST_FURNACE(::VanillaFurnaceTileEntity, setOf(Material.BLAST_FURNACE)),
         SMOKER(::VanillaFurnaceTileEntity, setOf(Material.SMOKER)),
