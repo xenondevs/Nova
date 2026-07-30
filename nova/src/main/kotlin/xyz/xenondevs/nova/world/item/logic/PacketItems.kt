@@ -176,10 +176,10 @@ internal object PacketItems : Listener, PacketListener {
             ClientboundRecipeBookAddPacket.Entry(
                 RecipeDisplayEntry(
                     contents.id,
-                    getClientSideRecipeDisplay(contents.display),
+                    getClientSideRecipeDisplay(event.player, contents.display),
                     contents.group,
                     contents.category,
-                    getClientSideIngredientList(contents.craftingRequirements)
+                    getClientSideIngredientList(event.player, contents.craftingRequirements)
                 ),
                 entry.notification(),
                 entry.highlight()
@@ -189,7 +189,7 @@ internal object PacketItems : Listener, PacketListener {
     
     @PacketHandler
     private fun handlePlaceGhostRecipe(event: ClientboundPlaceGhostRecipePacketEvent) {
-        event.recipeDisplay = getClientSideRecipeDisplay(event.recipeDisplay)
+        event.recipeDisplay = getClientSideRecipeDisplay(event.player, event.recipeDisplay)
     }
     
     @PacketHandler
@@ -225,9 +225,9 @@ internal object PacketItems : Listener, PacketListener {
         event.stonecutterRecipes = SelectableRecipe.SingleInputSet(
             event.stonecutterRecipes.entries().map { entry ->
                 SelectableRecipe.SingleInputEntry(
-                    getClientSideIngredient(entry.input()),
+                    getClientSideIngredient(event.player, entry.input()),
                     SelectableRecipe(
-                        getClientSideSlotDisplay(entry.recipe().optionDisplay()),
+                        getClientSideSlotDisplay(event.player, entry.recipe().optionDisplay()),
                         entry.recipe().recipe()
                     )
                 )
@@ -238,53 +238,53 @@ internal object PacketItems : Listener, PacketListener {
     //</editor-fold>
     
     //<editor-fold desc="server-side recipe -> client-side recipe">
-    private fun getClientSideIngredientList(optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
-        optList.map { ingredientList -> ingredientList.map(::getClientSideIngredient) }
+    private fun getClientSideIngredientList(player: Player, optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
+        optList.map { ingredientList -> ingredientList.map { getClientSideIngredient(player, it) } }
     
-    private fun getClientSideIngredient(ingredient: Ingredient): Ingredient {
+    private fun getClientSideIngredient(player: Player, ingredient: Ingredient): Ingredient {
         val itemStacks = ingredient.itemStacks()
         if (itemStacks != null) {
-            return Ingredient.ofStacks(itemStacks.map { getClientSideStack(null, it, false) })
+            return Ingredient.ofStacks(itemStacks.map { getClientSideStack(player, it, false) })
         } else {
             return ingredient
         }
     }
     
-    private fun getClientSideRecipeDisplay(display: RecipeDisplay): RecipeDisplay = when (display) {
+    private fun getClientSideRecipeDisplay(player: Player, display: RecipeDisplay): RecipeDisplay = when (display) {
         is FurnaceRecipeDisplay -> FurnaceRecipeDisplay(
-            getClientSideSlotDisplay(display.ingredient),
-            getClientSideSlotDisplay(display.fuel),
-            getClientSideSlotDisplay(display.result),
-            getClientSideSlotDisplay(display.craftingStation),
+            getClientSideSlotDisplay(player, display.ingredient),
+            getClientSideSlotDisplay(player, display.fuel),
+            getClientSideSlotDisplay(player, display.result),
+            getClientSideSlotDisplay(player, display.craftingStation),
             display.duration,
             display.experience
         )
         
         is ShapedCraftingRecipeDisplay -> ShapedCraftingRecipeDisplay(
             display.width, display.height,
-            display.ingredients.map(::getClientSideSlotDisplay),
-            getClientSideSlotDisplay(display.result),
-            getClientSideSlotDisplay(display.craftingStation)
+            display.ingredients.map { getClientSideSlotDisplay(player, it) },
+            getClientSideSlotDisplay(player, display.result),
+            getClientSideSlotDisplay(player, display.craftingStation)
         )
         
         is ShapelessCraftingRecipeDisplay -> ShapelessCraftingRecipeDisplay(
-            display.ingredients.map(::getClientSideSlotDisplay),
-            getClientSideSlotDisplay(display.result),
-            getClientSideSlotDisplay(display.craftingStation)
+            display.ingredients.map { getClientSideSlotDisplay(player, it) },
+            getClientSideSlotDisplay(player, display.result),
+            getClientSideSlotDisplay(player, display.craftingStation)
         )
         
         is SmithingRecipeDisplay -> SmithingRecipeDisplay(
-            getClientSideSlotDisplay(display.template),
-            getClientSideSlotDisplay(display.base),
-            getClientSideSlotDisplay(display.addition),
-            getClientSideSlotDisplay(display.result),
-            getClientSideSlotDisplay(display.craftingStation)
+            getClientSideSlotDisplay(player, display.template),
+            getClientSideSlotDisplay(player, display.base),
+            getClientSideSlotDisplay(player, display.addition),
+            getClientSideSlotDisplay(player, display.result),
+            getClientSideSlotDisplay(player, display.craftingStation)
         )
         
         is StonecutterRecipeDisplay -> StonecutterRecipeDisplay(
-            getClientSideSlotDisplay(display.input),
-            getClientSideSlotDisplay(display.result),
-            getClientSideSlotDisplay(display.craftingStation)
+            getClientSideSlotDisplay(player, display.input),
+            getClientSideSlotDisplay(player, display.result),
+            getClientSideSlotDisplay(player, display.craftingStation)
         )
         
         else -> {
@@ -293,38 +293,38 @@ internal object PacketItems : Listener, PacketListener {
         }
     }
     
-    private fun getClientSideSlotDisplay(display: SlotDisplay): SlotDisplay = when (display) {
+    private fun getClientSideSlotDisplay(player: Player, display: SlotDisplay): SlotDisplay = when (display) {
         is SlotDisplay.Composite -> SlotDisplay.Composite(
-            display.contents.map(::getClientSideSlotDisplay)
+            display.contents.map { getClientSideSlotDisplay(player, it) }
         )
         
         is SlotDisplay.ItemStackSlotDisplay -> SlotDisplay.ItemStackSlotDisplay(
-            ItemStackTemplate.fromNonEmptyStack(getClientSideNovaStack(null, display.stack.create(), false))
+            ItemStackTemplate.fromNonEmptyStack(getClientSideNovaStack(player, display.stack.create(), false))
         )
         
         is SlotDisplay.SmithingTrimDemoSlotDisplay -> SlotDisplay.SmithingTrimDemoSlotDisplay(
-            getClientSideSlotDisplay(display.base),
-            getClientSideSlotDisplay(display.material),
+            getClientSideSlotDisplay(player, display.base),
+            getClientSideSlotDisplay(player, display.material),
             display.pattern
         )
         
         is SlotDisplay.WithRemainder -> SlotDisplay.WithRemainder(
-            getClientSideSlotDisplay(display.input),
-            getClientSideSlotDisplay(display.remainder)
+            getClientSideSlotDisplay(player, display.input),
+            getClientSideSlotDisplay(player, display.remainder)
         )
         
         is SlotDisplay.WithAnyPotion -> SlotDisplay.WithAnyPotion(
-            getClientSideSlotDisplay(display.display)
+            getClientSideSlotDisplay(player, display.display)
         )
         
         is SlotDisplay.OnlyWithComponent -> SlotDisplay.OnlyWithComponent(
-            getClientSideSlotDisplay(display.source),
+            getClientSideSlotDisplay(player, display.source),
             display.component
         )
         
         is SlotDisplay.DyedSlotDemo -> SlotDisplay.DyedSlotDemo(
-            getClientSideSlotDisplay(display.dye),
-            getClientSideSlotDisplay(display.target),
+            getClientSideSlotDisplay(player, display.dye),
+            getClientSideSlotDisplay(player, display.target),
         )
         
         is SlotDisplay.AnyFuel,
