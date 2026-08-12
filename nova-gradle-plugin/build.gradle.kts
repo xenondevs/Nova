@@ -6,6 +6,7 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.kotlin.plugin)
     implementation(libs.bundles.xenondevs.commons)
     implementation(libs.bundles.minecraft.assets)
     implementation(libs.bytebase)
@@ -22,29 +23,10 @@ gradlePlugin {
     }
 }
 
-val generateVersionsClass = tasks.register("generateVersionsClass") {
-    val generatedSrcDir = layout.buildDirectory.dir("generatedSrc")
-    
-    inputs.property("nova", provider { version })
-    inputs.property("paper", libs.versions.paper)
-    outputs.dir(generatedSrcDir)
-    
-    doLast {
-        val src = generatedSrcDir.get().asFile.resolve("xyz/xenondevs/novagradle/Versions.kt")
-        src.parentFile.mkdirs()
-        src.writeText(
-            """
-            package xyz.xenondevs.novagradle
-            
-            internal object Versions {
-                const val NOVA = "$version"
-                const val NOVA_RELEASE = "${Regex("""^(\d+.\d+).*$""").matchEntire(version.toString())!!.groupValues[1]}"
-                const val PAPER = "${libs.versions.paper.get()}"
-                const val PAPER_API_VERSION = "${libs.versions.paper.get().substring(0, 4)}"
-            }
-            """.trimIndent()
-        )
-    }
+val generateVersionsClass = tasks.register<GenerateVersionsClassTask>("generateVersionsClass") {
+    novaVersion.set(version.toString())
+    paperVersion.set(libs.versions.paper)
+    outputDirectory.set(layout.buildDirectory.dir("generatedSrc"))
 }
 
 kotlin {

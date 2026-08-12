@@ -127,7 +127,21 @@ abstract class AddonExtension @Inject constructor(
      * Defaults to `<name>-<version>+Nova-<novaRelease>.jar` (e.g. `MyAddon-1.0.0+Nova-0.21.jar`).
      */
     val fileName: Property<String> = objects.property<String>()
-        .convention(name.zip(version) { name, version -> "$name-$version+Nova-${Versions.NOVA_RELEASE}.jar"})
+        .convention(name.zip(version) { name, version -> "$name-$version+Nova-${Versions.NOVA_RELEASE}.jar" })
+    
+    /**
+     * Whether the `addonJar` output should be added to Origami's run-server plugins.
+     * Defaults to true.
+     */
+    val addAddonJarToServerPlugins: Property<Boolean> = objects.property<Boolean>()
+        .convention(true)
+    
+    /**
+     * Whether Nova development mode should be enabled for Origami run-server tasks.
+     * Adds the `-DNovaDev` JVM argument when enabled. Defaults to true.
+     */
+    val novaDev: Property<Boolean> = objects.property<Boolean>()
+        .convention(true)
     
     /**
      * Creates a dependency on a plugin named [name] in both the [Stage.BOOTSTRAP] and [Stage.SERVER] stages.

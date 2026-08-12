@@ -5,6 +5,8 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.RegularFile
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.named
@@ -30,32 +32,55 @@ private val MAVEN_CENTRAL_URLS = setOf(
     "http://repo1.maven.org/maven2",
     "https://repo.maven.apache.org/maven2",
     "http://repo.maven.apache.org/maven2"
-);
+)
 
 internal class NovaGradlePlugin : Plugin<Project> {
     
     override fun apply(project: Project) {
+        project.pluginManager.apply("org.jetbrains.kotlin.jvm")
+        project.pluginManager.apply("java-library")
+        project.pluginManager.apply("xyz.xenondevs.origami")
         val addonExt = project.extensions.create<AddonExtension>("addon")
-        configureOrigami(project, addonExt)
-        createAddonJar(project, addonExt)
+        val addonJar = createAddonJar(project, addonExt)
+        configureOrigami(project, addonExt, addonJar)
         createGenWailaTextures(project, addonExt)
         createGenLangFiles(project)
     }
     
-    private fun configureOrigami(project: Project, ext: AddonExtension) {
-        project.pluginManager.apply("xyz.xenondevs.origami")
+    private fun configureOrigami(project: Project, ext: AddonExtension, addonJar: TaskProvider<Jar>) {
+        val nova = project.configurations.detachedConfiguration(
+            project.dependencyFactory.create("xyz.xenondevs.nova:nova:${Versions.NOVA}")
+        )
+        val novaLoader = project.configurations.detachedConfiguration(
+            project.dependencyFactory.create("xyz.xenondevs.nova:nova:${Versions.NOVA}:loader")
+        ).apply {
+            isTransitive = false
+        }
+        val emptyFiles = project.providers.provider { emptyList<RegularFile>() }
+        val runServerAddonJar = ext.addAddonJarToServerPlugins.flatMap { enabled ->
+            if (enabled) addonJar.map { listOf(it.archiveFile.get()) }
+            else emptyFiles
+        }
         project.extensions.configure<OrigamiExtension>("origami") {
             devBundleVersion.set(Versions.PAPER)
             pluginId.set(ext.name.map { it.lowercase() })
-            transitiveAccessWidenerSources.from(
-                project.configurations.detachedConfiguration(
-                    project.dependencyFactory.create("xyz.xenondevs.nova:nova:${Versions.NOVA}")
+            transitiveAccessWidenerSources.from(nova)
+            runServer {
+                plugins.from(novaLoader, runServerAddonJar)
+                jvmArgs.addAll(
+                    "-XX:+EnableDynamicAgentLoading",
+                    "--enable-native-access=ALL-UNNAMED",
+                    "-Dorigami.agent.loaded=true" // bypass agent check in NovaBootstrapper
                 )
-            )
+                jvmArgs.addAll(ext.novaDev.map { enabled ->
+                    if (enabled) listOf("-DNovaDev")
+                    else emptyList()
+                })
+            }
         }
     }
     
-    private fun createAddonJar(project: Project, ext: AddonExtension) {
+    private fun createAddonJar(project: Project, ext: AddonExtension): TaskProvider<Jar> {
         val libraryLoaderApiCfg = project.configurations.register("libraryLoaderApi") {
             isCanBeDeclared = true
             isCanBeResolved = false
@@ -122,7 +147,7 @@ internal class NovaGradlePlugin : Plugin<Project> {
             output.set(project.layout.buildDirectory.dir("nova/addon"))
         }
         
-        project.tasks.register<Jar>("addonJar") {
+        return project.tasks.register<Jar>("addonJar") {
             group = NOVA_TASK_GROUP
             
             archiveFileName.set(ext.fileName)
@@ -138,18 +163,26 @@ internal class NovaGradlePlugin : Plugin<Project> {
     
     private fun createGenWailaTextures(project: Project, addonExt: AddonExtension) {
         val wailaExt = project.extensions.create<GenerateWailaTexturesExtension>("generateWailaTextures")
+        val novaArtifact = project.configurations.detachedConfiguration(
+            project.dependencyFactory.create("xyz.xenondevs.nova:nova:${Versions.NOVA}")
+        ).apply {
+            isTransitive = false
+        }
         
         project.tasks.register<GenerateWailaTexturesTask>("generateWailaTextures") {
             group = NOVA_TASK_GROUP
             resourcesDir.set(wailaExt.resourcesDir.orElse(project.layout.projectDirectory.dir("src/main/resources/")))
             addonId.set(addonExt.name.map { it.lowercase() })
-            filter.set(wailaExt.filter.orElse { true })
+            filter.set(wailaExt.filter.orElse(".*"))
+            this.novaArtifact.from(novaArtifact)
+            mcAssetsDir.set(project.layout.buildDirectory.dir("mcassets"))
         }
     }
     
     private fun createGenLangFiles(project: Project) {
         project.tasks.register<GenerateLanguageFilesTask>("generateLanguageFiles") {
             group = NOVA_TASK_GROUP
+            languageDirectory.set(project.layout.projectDirectory.dir("src/main/resources/assets/lang/"))
         }
     }
     

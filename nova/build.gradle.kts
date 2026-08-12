@@ -47,36 +47,48 @@ sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
 origami {
     paperDevBundle(libs.versions.paper.get())
     librariesDirectory = "lib"
+    
+    runServer {
+        workingDirectory.set(layout.dir(providers.gradleProperty("serverDir").map(::File)))
+        plugins.from(tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output })
+        jvmArgs.addAll(
+            "-XX:+EnableDynamicAgentLoading",
+            "--enable-native-access=ALL-UNNAMED",
+            "-DNovaDev",
+            "-Dorigami.agent.loaded=true" // bypass agent check in NovaBootstrapper
+        )
+        
+        // note: including Nova's libraries does not yield any improvement, rudimentary tests:
+        // with novaLoader on application classpath: record+build: 241s exec: ~8.3 - 10s
+        // w/o novaLoader on application classpath: record+build: 103s exec: ~8s
+    }
 }
 
-val mcVersion = libs.versions.paper.map { 
+val mcVersion = libs.versions.paper.map {
     val versionRegex = Regex("""(\d+\.\d+(?:\.\d+)?(?:-(?:rc|pre|snapshot)-\d+)?).*""")
     versionRegex.matchEntire(it)!!.groupValues[1]
 }
 
+val novaApiJar = project(":nova-api").tasks.withType<Jar>().matching { it.name == "jar" }
+val hookJars = rootProject.subprojects
+    .filter { it.name.startsWith("nova-hook-") }
+    .map { hook -> hook.tasks.withType<Jar>().matching { it.name == "jar" } }
+
 loaderJar {
     gameVersion = mcVersion
     novaInput = tasks.named<Jar>("origamiJar").flatMap { it.archiveFile }
-    input.from(
-        project.provider { project(":nova-api").tasks.named<Jar>("jar").map { it.archiveFile } } ,
-        project.provider {
-            rootProject.subprojects
-                .filter { it.name.startsWith("nova-hook-") }
-                .map { hook -> hook.tasks.named<Jar>("jar").map { it.archiveFile } }
-        }
-    )
+    input.from(novaApiJar, hookJars)
 }
+
+val resourceProperties = mapOf(
+    "version" to version.toString(),
+    "apiVersion" to libs.versions.paper.get().substring(0, 4)
+)
 
 tasks {
     withType<ProcessResources> {
-        inputs.property("version", provider { version })
-        inputs.property("apiVersion", libs.versions.paper)
-        filesMatching("paper-plugin.yml") {
-            expand(buildMap {
-                put("version", version)
-                put("apiVersion", libs.versions.paper.get().substring(0, 4))
-            })
-        }
+        inputs.properties(resourceProperties)
+        filesMatching("paper-plugin.yml", ExpandPropertiesAction(resourceProperties))
     }
     test {
         environment("MINECRAFT_VERSION", mcVersion.get())
@@ -112,6 +124,10 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
+            artifact(tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output }) {
+                classifier = "loader"
+                extension = "jar"
+            }
         }
     }
 }

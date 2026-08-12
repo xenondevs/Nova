@@ -2,10 +2,13 @@ package xyz.xenondevs.novagradle.task
 
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.LocalState
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
@@ -13,7 +16,6 @@ import org.gradle.work.DisableCachingByDefault
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.novagradle.util.AddonResourcePack
-import xyz.xenondevs.novagradle.util.TaskUtils
 import xyz.xenondevs.renderer.MinecraftModelRenderer
 import xyz.xenondevs.renderer.model.resource.ZipResourcePack
 import java.io.File
@@ -28,13 +30,20 @@ internal abstract class GenerateWailaTexturesTask : DefaultTask() {
     @get:InputDirectory
     abstract val resourcesDir: DirectoryProperty
     
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val novaArtifact: ConfigurableFileCollection
+    
+    @get:LocalState
+    abstract val mcAssetsDir: DirectoryProperty
+    
     @get:Input
-    abstract val filter: Property<(File) -> Boolean>
+    abstract val filter: Property<String>
     
     @TaskAction
     fun run() {
         // download minecraft models and textures
-        val mcAssetsDir = File(project.layout.buildDirectory.get().asFile, "mcassets")
+        val mcAssetsDir = mcAssetsDir.get().asFile
         if (!mcAssetsDir.exists()) {
             runBlocking {
                 MinecraftAssetsDownloader(outputDirectory = mcAssetsDir.toPath(), mode = ExtractionMode.MOJANG_API_CLIENT).downloadAssets()
@@ -50,7 +59,7 @@ internal abstract class GenerateWailaTexturesTask : DefaultTask() {
         )
         
         // add nova resource pack
-        renderer.loader.resourcePacks += ZipResourcePack(TaskUtils.findNovaArtifact(project).file.toPath())
+        renderer.loader.resourcePacks += ZipResourcePack(novaArtifact.singleFile.toPath())
         
         // add addon resource pack
         renderer.loader.resourcePacks += AddonResourcePack(resourcesDir.get().asFile, addonId.get())
@@ -58,6 +67,7 @@ internal abstract class GenerateWailaTexturesTask : DefaultTask() {
         // render block models
         val wailaTexturesDir = resourcesDir.dir("assets/textures/waila/").get().asFile.apply(File::mkdirs)
         val blockModelsDir = resourcesDir.dir("assets/models/block").get().asFile
+        val filter = Regex(filter.get())
         blockModelsDir.walkTopDown()
             .filter { it.isFile && it.extension == "json" }
             .forEach { file ->
@@ -70,14 +80,14 @@ internal abstract class GenerateWailaTexturesTask : DefaultTask() {
                     .substringBeforeLast('.') + ".png"
                 val textureFile = File(wailaTexturesDir, textureName)
                 
-                if (textureFile.exists() || !filter.get().invoke(textureFile))
+                if (textureFile.exists() || !filter.matches(textureName))
                     return@forEach
                 
-                println("Rendering model for $modelName")
+                logger.lifecycle("Rendering model for {}", modelName)
                 try {
                     renderer.renderModelToFile("${addonId.get()}:$modelName", textureFile)
                 } catch (e: Exception) {
-                    println("Failed to render model $modelName: ${e.message}")
+                    logger.error("Failed to render model {}: {}", modelName, e.message)
                 }
             }
     }
