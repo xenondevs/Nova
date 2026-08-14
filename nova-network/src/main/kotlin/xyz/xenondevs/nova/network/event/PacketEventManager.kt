@@ -5,27 +5,117 @@ package xyz.xenondevs.nova.network.event
 import net.minecraft.network.protocol.Packet
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundAddEntityPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundAnimatePacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockDestructionPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockEntityDataPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockEventPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockUpdatePacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBossEventPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundBundleDelimiterPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundBundlePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundChunkBatchStartPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundClearDialogPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundClearTitlesPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundCommandsPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerClosePacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetDataPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
-import xyz.xenondevs.nova.network.event.clientbound.ClientboundCommandsPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundEntityEventPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundFinishConfigurationPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundGameEventPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundHelloPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundInitializeBorderPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundKeepAlivePacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundLevelChunkWithLightPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundLevelEventPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundLevelParticlesPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundLightUpdatePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundLoginCompressionPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundLowDiskSpaceWarningPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundMerchantOffersPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundMountScreenOpenPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundMoveEntityPosPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundMoveEntityPosRotPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundMoveEntityRotPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundOpenBookPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundOpenScreenPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundOpenSignEditorPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundPingPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlayerAbilitiesPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlayerCombatEndPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlayerCombatEnterPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlayerInfoUpdatePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlayerLookAtPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundProjectilePowerPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundRemoveEntitiesPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundResetChatPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundRotateHeadPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSectionBlocksUpdatePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSelectAdvancementsTabPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetBorderCenterPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetBorderLerpSizePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetBorderSizePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetBorderWarningDelayPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetBorderWarningDistancePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetCameraPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetChunkCacheCenterPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetChunkCacheRadiusPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetDisplayObjectivePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEntityLinkPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEquipmentPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetExperiencePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetHealthPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetObjectivePacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetPassengersPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetPlayerTeamPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetTitlesAnimationPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundEntityPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundStartConfigurationPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundStopSoundPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundTagQueryPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundTakeItemEntityPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAdvancementsPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAttributesPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateMobEffectPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateTagsPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundAcceptTeleportationPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundBlockEntityTagQueryPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundClientCommandPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundCommandSuggestionPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundConfigurationAcknowledgedPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClosePacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundEntityTagQueryPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundFinishConfigurationPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundJigsawGeneratePacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundKeepAlivePacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundKeyPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundLockDifficultyPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundLoginAcknowledgedPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundMovePlayerPosPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundMovePlayerPosRotPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundMovePlayerRotPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundMovePlayerStatusOnlyPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPaddleBoatPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPingRequestPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerAbilitiesPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerCommandPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPongPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundRecipeBookChangeSettingsPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundRenameItemPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundSeenAdvancementsPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundSelectTradePacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCarriedItemPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCommandBlockPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCommandMinecartPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetJigsawBlockPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetStructureBlockPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundSignUpdatePacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundStatusRequestPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSwingPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundTeleportToEntityPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundUseItemOnPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundUseItemPacketEvent
 import java.lang.invoke.MethodHandle
@@ -53,27 +143,117 @@ internal object PacketEventManager {
         registerGeneratedPacketEvents()
         
         // handwritten events for non-record packets
-        registerEventType(::ClientboundUpdateTagsPacketEvent)
+        registerPlayerEventType(::ClientboundAddEntityPacketEvent)
+        registerPlayerEventType(::ClientboundAnimatePacketEvent)
         registerPlayerEventType(::ClientboundBlockDestructionPacketEvent)
         registerPlayerEventType(::ClientboundBlockEntityDataPacketEvent)
         registerPlayerEventType(::ClientboundBlockEventPacketEvent)
         registerPlayerEventType(::ClientboundBlockUpdatePacketEvent)
         registerPlayerEventType(::ClientboundBossEventPacketEvent)
+        registerPlayerEventType(::ClientboundBundleDelimiterPacketEvent)
+        registerPlayerEventType(::ClientboundBundlePacketEvent)
+        registerPlayerEventType(::ClientboundChunkBatchStartPacketEvent)
+        registerEventType(::ClientboundClearDialogPacketEvent)
+        registerPlayerEventType(::ClientboundClearTitlesPacketEvent)
+        registerPlayerEventType(::ClientboundCommandsPacketEvent)
+        registerPlayerEventType(::ClientboundContainerClosePacketEvent)
         registerPlayerEventType(::ClientboundContainerSetDataPacketEvent)
         registerPlayerEventType(::ClientboundContainerSetSlotPacketEvent)
-        registerPlayerEventType(::ClientboundCommandsPacketEvent)
+        registerPlayerEventType(::ClientboundEntityEventPacketEvent)
+        registerEventType(::ClientboundFinishConfigurationPacketEvent)
+        registerPlayerEventType(::ClientboundGameEventPacketEvent)
+        registerEventType(::ClientboundHelloPacketEvent)
+        registerPlayerEventType(::ClientboundInitializeBorderPacketEvent)
+        registerEventType(::ClientboundKeepAlivePacketEvent)
         registerPlayerEventType(::ClientboundLevelChunkWithLightPacketEvent)
         registerPlayerEventType(::ClientboundLevelEventPacketEvent)
+        registerPlayerEventType(::ClientboundLevelParticlesPacketEvent)
+        registerPlayerEventType(::ClientboundLightUpdatePacketEvent)
+        registerEventType(::ClientboundLoginCompressionPacketEvent)
+        registerPlayerEventType(::ClientboundLowDiskSpaceWarningPacketEvent)
         registerPlayerEventType(::ClientboundMerchantOffersPacketEvent)
+        registerPlayerEventType(::ClientboundMountScreenOpenPacketEvent)
+        registerPlayerEventType(::ClientboundMoveEntityPosPacketEvent)
+        registerPlayerEventType(::ClientboundMoveEntityPosRotPacketEvent)
+        registerPlayerEventType(::ClientboundMoveEntityRotPacketEvent)
+        registerPlayerEventType(::ClientboundOpenBookPacketEvent)
         registerPlayerEventType(::ClientboundOpenScreenPacketEvent)
+        registerPlayerEventType(::ClientboundOpenSignEditorPacketEvent)
+        registerEventType(::ClientboundPingPacketEvent)
+        registerPlayerEventType(::ClientboundPlayerAbilitiesPacketEvent)
+        registerPlayerEventType(::ClientboundPlayerCombatEndPacketEvent)
+        registerPlayerEventType(::ClientboundPlayerCombatEnterPacketEvent)
+        registerPlayerEventType(::ClientboundPlayerInfoUpdatePacketEvent)
+        registerPlayerEventType(::ClientboundPlayerLookAtPacketEvent)
+        registerPlayerEventType(::ClientboundProjectilePowerPacketEvent)
+        registerPlayerEventType(::ClientboundRemoveEntitiesPacketEvent)
+        registerEventType(::ClientboundResetChatPacketEvent)
+        registerPlayerEventType(::ClientboundRotateHeadPacketEvent)
+        registerPlayerEventType(::ClientboundSectionBlocksUpdatePacketEvent)
+        registerPlayerEventType(::ClientboundSelectAdvancementsTabPacketEvent)
+        registerPlayerEventType(::ClientboundSetBorderCenterPacketEvent)
+        registerPlayerEventType(::ClientboundSetBorderLerpSizePacketEvent)
+        registerPlayerEventType(::ClientboundSetBorderSizePacketEvent)
+        registerPlayerEventType(::ClientboundSetBorderWarningDelayPacketEvent)
+        registerPlayerEventType(::ClientboundSetBorderWarningDistancePacketEvent)
+        registerPlayerEventType(::ClientboundSetCameraPacketEvent)
+        registerPlayerEventType(::ClientboundSetChunkCacheCenterPacketEvent)
+        registerPlayerEventType(::ClientboundSetChunkCacheRadiusPacketEvent)
+        registerPlayerEventType(::ClientboundSetDisplayObjectivePacketEvent)
+        registerPlayerEventType(::ClientboundSetEntityLinkPacketEvent)
         registerPlayerEventType(::ClientboundSetEquipmentPacketEvent)
+        registerPlayerEventType(::ClientboundSetExperiencePacketEvent)
+        registerPlayerEventType(::ClientboundSetHealthPacketEvent)
+        registerPlayerEventType(::ClientboundSetObjectivePacketEvent)
         registerPlayerEventType(::ClientboundSetPassengersPacketEvent)
+        registerPlayerEventType(::ClientboundSetPlayerTeamPacketEvent)
+        registerPlayerEventType(::ClientboundSetTitlesAnimationPacketEvent)
         registerPlayerEventType(::ClientboundSoundEntityPacketEvent)
         registerPlayerEventType(::ClientboundSoundPacketEvent)
+        registerPlayerEventType(::ClientboundStartConfigurationPacketEvent)
+        registerPlayerEventType(::ClientboundStopSoundPacketEvent)
+        registerPlayerEventType(::ClientboundTagQueryPacketEvent)
+        registerPlayerEventType(::ClientboundTakeItemEntityPacketEvent)
         registerPlayerEventType(::ClientboundUpdateAdvancementsPacketEvent)
         registerPlayerEventType(::ClientboundUpdateAttributesPacketEvent)
+        registerPlayerEventType(::ClientboundUpdateMobEffectPacketEvent)
+        registerEventType(::ClientboundUpdateTagsPacketEvent)
+        registerPlayerEventType(::ServerboundAcceptTeleportationPacketEvent)
+        registerPlayerEventType(::ServerboundBlockEntityTagQueryPacketEvent)
+        registerPlayerEventType(::ServerboundClientCommandPacketEvent)
+        registerPlayerEventType(::ServerboundCommandSuggestionPacketEvent)
+        registerPlayerEventType(::ServerboundConfigurationAcknowledgedPacketEvent)
+        registerPlayerEventType(::ServerboundContainerClosePacketEvent)
+        registerPlayerEventType(::ServerboundEntityTagQueryPacketEvent)
+        registerEventType(::ServerboundFinishConfigurationPacketEvent)
+        registerPlayerEventType(::ServerboundJigsawGeneratePacketEvent)
+        registerEventType(::ServerboundKeepAlivePacketEvent)
+        registerEventType(::ServerboundKeyPacketEvent)
+        registerPlayerEventType(::ServerboundLockDifficultyPacketEvent)
+        registerEventType(::ServerboundLoginAcknowledgedPacketEvent)
+        registerPlayerEventType(::ServerboundMovePlayerPosPacketEvent)
+        registerPlayerEventType(::ServerboundMovePlayerPosRotPacketEvent)
+        registerPlayerEventType(::ServerboundMovePlayerRotPacketEvent)
+        registerPlayerEventType(::ServerboundMovePlayerStatusOnlyPacketEvent)
+        registerPlayerEventType(::ServerboundPaddleBoatPacketEvent)
+        registerEventType(::ServerboundPingRequestPacketEvent)
+        registerPlayerEventType(::ServerboundPlayerAbilitiesPacketEvent)
         registerPlayerEventType(::ServerboundPlayerActionPacketEvent)
+        registerPlayerEventType(::ServerboundPlayerCommandPacketEvent)
+        registerEventType(::ServerboundPongPacketEvent)
+        registerPlayerEventType(::ServerboundRecipeBookChangeSettingsPacketEvent)
+        registerPlayerEventType(::ServerboundRenameItemPacketEvent)
+        registerPlayerEventType(::ServerboundSeenAdvancementsPacketEvent)
+        registerPlayerEventType(::ServerboundSelectTradePacketEvent)
+        registerPlayerEventType(::ServerboundSetCarriedItemPacketEvent)
+        registerPlayerEventType(::ServerboundSetCommandBlockPacketEvent)
+        registerPlayerEventType(::ServerboundSetCommandMinecartPacketEvent)
+        registerPlayerEventType(::ServerboundSetJigsawBlockPacketEvent)
+        registerPlayerEventType(::ServerboundSetStructureBlockPacketEvent)
+        registerPlayerEventType(::ServerboundSignUpdatePacketEvent)
+        registerEventType(::ServerboundStatusRequestPacketEvent)
         registerPlayerEventType(::ServerboundSwingPacketEvent)
+        registerPlayerEventType(::ServerboundTeleportToEntityPacketEvent)
         registerPlayerEventType(::ServerboundUseItemOnPacketEvent)
         registerPlayerEventType(::ServerboundUseItemPacketEvent)
     }

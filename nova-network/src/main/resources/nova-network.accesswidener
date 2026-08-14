@@ -8,5 +8,31 @@ transitive-accessible field net/minecraft/network/protocol/game/ClientboundBossE
 transitive-accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket operation Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;
 transitive-accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation
 transitive-accessible class net/minecraft/network/protocol/game/ClientboundTrackedWaypointPacket$Operation
+transitive-accessible class net/minecraft/network/protocol/game/ClientboundCommandsPacket$Entry
+
+accessible field net/minecraft/network/protocol/login/ServerboundKeyPacket keybytes [B
+accessible field net/minecraft/network/protocol/login/ServerboundKeyPacket encryptedChallenge [B
+accessible field net/minecraft/network/protocol/game/ClientboundCommandsPacket rootIndex I
+accessible field net/minecraft/network/protocol/game/ClientboundCommandsPacket entries Ljava/util/List;
+accessible field net/minecraft/network/protocol/game/ClientboundEntityEventPacket entityId I
+accessible method net/minecraft/network/protocol/game/ClientboundLightUpdatePacketData write (Lnet/minecraft/network/FriendlyByteBuf;)V
+accessible field net/minecraft/network/protocol/game/ClientboundPlayerCombatEndPacket duration I
+accessible field net/minecraft/network/protocol/game/ClientboundSetCameraPacket cameraId I
+accessible field net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket method I
+accessible method net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket <init> (Ljava/lang/String;ILjava/util/Optional;Ljava/util/Collection;)V
+accessible field net/minecraft/network/protocol/game/ClientboundMoveEntityPacket entityId I
+accessible field net/minecraft/network/protocol/game/ClientboundPlayerLookAtPacket x D
+accessible field net/minecraft/network/protocol/game/ClientboundPlayerLookAtPacket y D
+accessible field net/minecraft/network/protocol/game/ClientboundPlayerLookAtPacket z D
+accessible field net/minecraft/network/protocol/game/ClientboundPlayerLookAtPacket entity I
+accessible field net/minecraft/network/protocol/game/ClientboundPlayerLookAtPacket toAnchor Lnet/minecraft/commands/arguments/EntityAnchorArgument$Anchor;
+accessible field net/minecraft/network/protocol/game/ClientboundPlayerLookAtPacket atEntity Z
+accessible field net/minecraft/network/protocol/game/ClientboundRotateHeadPacket entityId I
+accessible field net/minecraft/network/protocol/game/ClientboundSetEquipmentPacket sanitize Z
+accessible field net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket sectionPos Lnet/minecraft/core/SectionPos;
+accessible field net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket positions [S
+accessible field net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket states [Lnet/minecraft/world/level/block/state/BlockState;
+accessible field net/minecraft/network/protocol/game/ServerboundSetCommandMinecartPacket entity I
+accessible field net/minecraft/network/protocol/game/ServerboundTeleportToEntityPacket uuid Ljava/util/UUID;
 
 accessible class net/minecraft/network/PacketProcessor$ListenerAndPacket

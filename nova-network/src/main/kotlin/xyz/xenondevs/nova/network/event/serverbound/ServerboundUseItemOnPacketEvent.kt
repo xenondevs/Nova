@@ -16,19 +16,25 @@ class ServerboundUseItemOnPacketEvent(
             field = value
             changed = true
         }
+    
     var hitResult: BlockHitResult = packet.hitResult
         set(value) {
             field = value
             changed = true
         }
+    
     var sequence: Int = packet.sequence
         set(value) {
             field = value
             changed = true
         }
     
+    private val timestamp = packet.timestamp
+    
     override fun buildChangedPacket(): ServerboundUseItemOnPacket {
-        return ServerboundUseItemOnPacket(hand, hitResult, sequence)
+        return ServerboundUseItemOnPacket(hand, hitResult, sequence).also {
+            it.timestamp = timestamp
+        }
     }
     
 }

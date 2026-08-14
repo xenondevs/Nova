@@ -14,24 +14,31 @@ class ServerboundUseItemPacketEvent(
             field = value
             changed = true
         }
+    
     var sequence = packet.sequence
         set(value) {
             field = value
             changed = true
         }
+    
     var xRot = packet.xRot
         set(value) {
             field = value
             changed = true
         }
+    
     var yRot = packet.yRot
         set(value) {
             field = value
             changed = true
         }
     
+    private val timestamp = packet.timestamp
+    
     override fun buildChangedPacket(): ServerboundUseItemPacket {
-        return ServerboundUseItemPacket(hand, sequence, xRot, yRot)
+        return ServerboundUseItemPacket(hand, sequence, yRot, xRot).also {
+            it.timestamp = timestamp
+        }
     }
     
 }

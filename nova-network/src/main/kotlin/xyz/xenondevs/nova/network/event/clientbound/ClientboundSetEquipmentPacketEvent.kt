@@ -13,7 +13,18 @@ class ClientboundSetEquipmentPacketEvent(
 ) : PlayerPacketEvent<ClientboundSetEquipmentPacket>(player, packet) {
     
     var entity: Int = packet.entity
+        set(value) {
+            field = value
+            changed = true
+        }
+    
     var slots: List<Pair<EquipmentSlot, ItemStack>> = packet.slots
+        set(value) {
+            field = value
+            changed = true
+        }
+    
+    var sanitize: Boolean = packet.sanitize
         set(value) {
             field = value
             changed = true
@@ -22,7 +33,8 @@ class ClientboundSetEquipmentPacketEvent(
     override fun buildChangedPacket(): ClientboundSetEquipmentPacket {
         return ClientboundSetEquipmentPacket(
             entity,
-            slots
+            slots,
+            sanitize
         )
     }
     
