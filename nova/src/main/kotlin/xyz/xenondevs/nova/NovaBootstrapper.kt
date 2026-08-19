@@ -13,6 +13,7 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.plugin.java.JavaPlugin
+import xyz.xenondevs.bytebase.INSTRUMENTATION
 import xyz.xenondevs.commons.version.ClosedVersionRange
 import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.nova.config.NovaConfigBackend
@@ -99,6 +100,9 @@ internal class NovaBootstrapper : PluginBootstrap {
     private fun init() {
         try {
             if (IS_DEV_SERVER) {
+                // ByteBase needs to attach agent first
+                INSTRUMENTATION
+                
                 DebugProbes.install()
                 DebugProbes.enableCreationStackTraces = true
             }
