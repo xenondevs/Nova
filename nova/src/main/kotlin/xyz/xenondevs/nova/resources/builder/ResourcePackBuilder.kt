@@ -26,7 +26,6 @@ import xyz.xenondevs.nova.resources.ResourcePackManager
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourceFilter.Type
-import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder.Companion.configure
 import xyz.xenondevs.nova.resources.builder.task.AtlasTask
 import xyz.xenondevs.nova.resources.builder.task.BlockModelTask
 import xyz.xenondevs.nova.resources.builder.task.BlockStateContent
@@ -66,6 +65,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 import kotlin.time.measureTime
 
 private val EXTRACTION_MODE by MAIN_CONFIG.entry<String>("resource_pack", "generation", "minecraft_assets_source").map {
@@ -324,8 +324,8 @@ class ResourcePackBuilder internal constructor(
                     logger.info("Running ${postProcessors.size} post-processor(s)...")
                     bin = postProcessors.fold(bin) { b, p -> p.process(b) }
                 }
-                logTaskTimes()
             }
+            logTaskTimes()
             return bin
         }
     }
@@ -362,11 +362,11 @@ class ResourcePackBuilder internal constructor(
     }
     
     private fun logTaskTimes() {
-        logger.info("Resource pack built in ${totalTime}:")
+        logger.info("Resource pack built in ${totalTime.toString(SECONDS, 1)}:")
         taskTimes.entries.asSequence()
             .sortedByDescending { it.value }
             .take(5)
-            .forEach { [task, time] -> logger.info("  ${task::class.simpleNestedName}: $time") }
+            .forEach { [task, time] -> logger.info("  ${task::class.simpleNestedName}: ${time.toString(SECONDS, 1)}") }
     }
     
     /**
