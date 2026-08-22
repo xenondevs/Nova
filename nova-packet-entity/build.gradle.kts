@@ -8,8 +8,9 @@ plugins {
 
 dependencies {
     api(libs.commons.provider.dsl)
-    implementation(libs.bundles.kotlin)
-    implementation(project(":nova-network"))
+    api(project(":nova-interaction"))
+    api(project(":nova-network"))
+    api(libs.bundles.kotlin)
     implementation(libs.commons.collections)
     ksp(project(":nova-ksp:processor:packet-entity"))
 }

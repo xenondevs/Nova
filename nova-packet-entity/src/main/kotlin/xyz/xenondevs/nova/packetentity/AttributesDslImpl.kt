@@ -68,8 +68,8 @@ internal class PacketEntityAttributes {
     }
     
     fun unobserve() {
-        for (entry in entries) {
-            entry.value.unobserve()
+        for ((value) in entries) {
+            value.unobserve()
         }
     }
     

@@ -2,8 +2,6 @@
 
 package xyz.xenondevs.nova.world.block.hitbox
 
-import xyz.xenondevs.nova.world.*
-
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.BlockFace
@@ -48,7 +46,10 @@ abstract class Hitbox<L, R> internal constructor(
     }
     
     /**
-     * Adds a handler to this [Hitbox] that is called when a player left-clicks the hitbox
+     * Adds a handler to this [Hitbox] that is called when a player left-clicks the hitbox.
+     *
+     * The handler is invoked only when protection integrations allow the player to use the block
+     * at the hit position.
      */
     fun addLeftClickHandler(handler: L) {
         leftClickHandlers += handler
@@ -56,6 +57,9 @@ abstract class Hitbox<L, R> internal constructor(
     
     /**
      * Adds a handler to this [Hitbox] that is called when a player right-clicks the hitbox.
+     *
+     * The handler is invoked only when protection integrations allow the player to use the block
+     * at the hit position.
      */
     fun addRightClickHandler(handler: R) {
         rightClickHandlers += handler

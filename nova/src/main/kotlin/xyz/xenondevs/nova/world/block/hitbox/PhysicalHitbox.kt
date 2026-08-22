@@ -2,12 +2,24 @@ package xyz.xenondevs.nova.world.block.hitbox
 
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.attribute.Attribute
+import org.bukkit.entity.Player
+import org.joml.Intersectionf
+import org.joml.Vector2f
 import org.joml.Vector3f
 import org.joml.Vector3fc
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.packetentity.packetInteraction
 import xyz.xenondevs.nova.util.toLocation
 import xyz.xenondevs.nova.util.toVector3f
+import xyz.xenondevs.nova.world.InteractionResult
 
+/**
+ * Creates a hitbox backed by a client-side interaction entity.
+ *
+ * Click handlers are invoked only when protection integrations allow the player to use the block
+ * at the hit position.
+ */
 @Suppress("DuplicatedCode")
 fun PhysicalHitbox(from: Location, to: Location): PhysicalHitbox {
     require(from.world != null && from.world == to.world) { "from and to must be in the same world" }
@@ -32,6 +44,12 @@ fun PhysicalHitbox(from: Location, to: Location): PhysicalHitbox {
     )
 }
 
+/**
+ * A hitbox backed by a client-side interaction entity.
+ *
+ * Click handlers are invoked only when protection integrations allow the player to use the block
+ * at the hit position.
+ */
 class PhysicalHitbox internal constructor(
     world: World,
     baseCenter: Vector3fc, center: Vector3fc,
@@ -52,12 +70,60 @@ class PhysicalHitbox internal constructor(
         height.toFloat()
     )
     
-    internal fun createInteractionEntity() = packetInteraction { 
+    internal fun createInteractionEntity() = packetInteraction {
         location by centerLocation
-        metadata { 
+        metadata {
             width by xWidth // xWidth == zWidth in PhysicalHitbox
             height by this@PhysicalHitbox.height
         }
+        onAttack {
+            val hitLocation = findHitLocation(player)
+                ?: return@onAttack
+            if (!canUseBlock(player, hitLocation))
+                return@onAttack
+            
+            leftClickHandlers.forEach { it(player) }
+        }
+        onInteract {
+            val hitLocation = Vector3f(
+                interactLocation.x().toFloat(),
+                interactLocation.y().toFloat(),
+                interactLocation.z().toFloat()
+            )
+            if (!canUseBlock(player, hitLocation))
+                return@onInteract InteractionResult.Pass
+            
+            rightClickHandlers.forEach { it(player, hitLocation) }
+            InteractionResult.Success()
+        }
+    }
+    
+    private fun findHitLocation(player: Player): Vector3f? {
+        val eye = player.eyeLocation
+        val direction = eye.direction
+        val origin = Vector3f(eye.x.toFloat(), eye.y.toFloat(), eye.z.toFloat())
+        val directionVector = Vector3f(direction.x.toFloat(), direction.y.toFloat(), direction.z.toFloat()).normalize()
+        val distances = Vector2f()
+        if (!Intersectionf.intersectRayAab(origin, directionVector, from, to, distances))
+            return null
+        
+        val distance = if (distances.x >= 0f) distances.x else distances.y
+        val interactionRange = player.getAttribute(Attribute.ENTITY_INTERACTION_RANGE)!!.value.toFloat()
+        if (distance !in 0f..interactionRange)
+            return null
+        
+        return Vector3f(directionVector)
+            .mul(distance)
+            .add(origin)
+            .sub(baseCenter)
+    }
+    
+    private fun canUseBlock(player: Player, hitLocation: Vector3f): Boolean {
+        val block = Vector3f(baseCenter)
+            .add(hitLocation)
+            .toLocation(world)
+            .block
+        return ProtectionManager.canUseBlock(player, player.inventory.itemInMainHand, block)
     }
     
 }

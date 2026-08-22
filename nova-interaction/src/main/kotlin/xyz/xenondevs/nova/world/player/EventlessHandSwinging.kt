@@ -2,23 +2,20 @@ package xyz.xenondevs.nova.world.player
 
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket
 import net.minecraft.world.InteractionHand
+import org.bukkit.Bukkit
+import org.bukkit.craftbukkit.CraftWorld
+import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.EquipmentSlot
-import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
+import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSwingPacketEvent
-import xyz.xenondevs.nova.util.decrementIfGreaterThanZero
-import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.serverLevel
-import xyz.xenondevs.nova.util.serverPlayer
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -29,9 +26,10 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 fun LivingEntity.swingMainHandEventless() {
     if (this is Player) {
+        val serverPlayer = (this as CraftPlayer).handle
         val packet = ClientboundAnimatePacket(serverPlayer, 0)
         EventlessHandSwinging.registerDrop(this, true)
-        world.serverLevel.chunkSource.sendToTrackingPlayersAndSelf(serverPlayer, packet)
+        (world as CraftWorld).handle.chunkSource.sendToTrackingPlayersAndSelf(serverPlayer, packet)
     } else {
         swingMainHand()
     }
@@ -43,9 +41,10 @@ fun LivingEntity.swingMainHandEventless() {
  */
 fun LivingEntity.swingOffHandEventless() {
     if (this is Player) {
+        val serverPlayer = (this as CraftPlayer).handle
         val packet = ClientboundAnimatePacket(serverPlayer, 3)
         EventlessHandSwinging.registerDrop(this, false)
-        world.serverLevel.chunkSource.sendToTrackingPlayersAndSelf(serverPlayer, packet)
+        (world as CraftWorld).handle.chunkSource.sendToTrackingPlayersAndSelf(serverPlayer, packet)
     } else {
         swingOffHand()
     }
@@ -54,7 +53,7 @@ fun LivingEntity.swingOffHandEventless() {
 /**
  * Lets the [player][this] swing their [hand] without triggering any server-side
  * interaction related events.
- * 
+ *
  * @throws IllegalArgumentException if the [hand] is not [EquipmentSlot.HAND] or [EquipmentSlot.OFF_HAND]
  */
 fun LivingEntity.swingHandEventless(hand: EquipmentSlot) {
@@ -65,15 +64,16 @@ fun LivingEntity.swingHandEventless(hand: EquipmentSlot) {
     }
 }
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
-internal object EventlessHandSwinging : PacketListener, Listener {
+private object EventlessHandSwinging : PacketListener, Listener {
     
     private val toDrop = ConcurrentHashMap<UUID, Pair<AtomicInteger, AtomicInteger>>()
     
-    @InitFun
-    private fun init() {
+    init {
         registerPacketListener()
-        registerEvents()
+        Bukkit.getPluginManager().registerEvents(
+            this,
+            JavaPlugin.getProvidingPlugin(EventlessHandSwinging::class.java)
+        )
     }
     
     @PacketHandler
@@ -100,4 +100,14 @@ internal object EventlessHandSwinging : PacketListener, Listener {
         toDrop.remove(event.player.uniqueId)
     }
     
+}
+
+private fun AtomicInteger.decrementIfGreaterThanZero(): Boolean {
+    while (true) {
+        val current = get()
+        if (current <= 0)
+            return false
+        if (compareAndSet(current, current - 1))
+            return true
+    }
 }

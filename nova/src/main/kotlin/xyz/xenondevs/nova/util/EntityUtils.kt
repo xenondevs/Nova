@@ -68,24 +68,6 @@ fun BukkitLivingEntity.damageItemInOffHand(damage: Int = 1): Boolean =
     damageItemInHand(BukkitEquipmentSlot.OFF_HAND, damage)
 
 /**
- * Damages the item in the specified [hand] by [damage] amount
- * as if the entity caused it and returns whether the item broke.
- */
-fun BukkitLivingEntity.damageItemInHand(hand: BukkitEquipmentSlot, damage: Int = 1): Boolean {
-    if (damage <= 0)
-        return false
-    
-    val itemInHand = nmsEntity.getItemInHand(hand.nmsInteractionHand)
-    var broken = false
-    itemInHand.hurtAndBreak(damage, world.serverLevel, nmsEntity, {
-        nmsEntity.onEquippedItemBroken(it, hand.nmsEquipmentSlot)
-        broken = true
-    }, true)
-    
-    return broken
-}
-
-/**
  * Damages the tool in the [entity's][BukkitLivingEntity] main hand as if they've broken a block.
  */
 fun BukkitLivingEntity.damageToolBreakBlock() = damageToolInMainHand(Damageable::itemDamageOnBreakBlock, VanillaToolCategory::itemDamageOnBreakBlock)

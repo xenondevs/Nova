@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.util
 
-import xyz.xenondevs.nova.world.*
-
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
@@ -243,14 +241,26 @@ object BlockFaceUtils {
     /**
      * Determines the block closest block face of [block] to the given [location].
      */
-    fun determineBlockFace(block: Block, location: Location): BlockFace {
-        val result = listOf(
-            Axis.X to location.x - (block.x + 0.5),
-            Axis.Y to location.y - (block.y + 0.5),
-            Axis.Z to location.z - (block.z + 0.5)
-        ).sortedByDescending { it.second.absoluteValue }[0]
+    fun determineBlockFace(block: Block, location: Location): BlockFace =
+        determineBlockFace(
+            location.x - (block.x + 0.5),
+            location.y - (block.y + 0.5),
+            location.z - (block.z + 0.5)
+        )
+    
+    /**
+     * Determines the closest block face for a position relative to the center of a cube at `(0, 0, 0)`.
+     */
+    fun determineBlockFace(relativeX: Double, relativeY: Double, relativeZ: Double): BlockFace {
+        val x = relativeX.absoluteValue
+        val y = relativeY.absoluteValue
+        val z = relativeZ.absoluteValue
         
-        return toFace(result.first, result.second >= 0)
+        return when {
+            x >= y && x >= z -> toFace(Axis.X, relativeX >= 0.0)
+            y >= z -> toFace(Axis.Y, relativeY >= 0.0)
+            else -> toFace(Axis.Z, relativeZ >= 0.0)
+        }
     }
     
     /**

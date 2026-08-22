@@ -31,6 +31,7 @@ import xyz.xenondevs.nova.util.toResourceKey
 import xyz.xenondevs.nova.world.block.FluidFlowMode
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
+import xyz.xenondevs.nova.world.block.ColliderCube
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorFactory
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
@@ -175,16 +176,18 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     
     override fun entityBacked(
         stateSelector: BlockSelectorScope.() -> BlockData,
+        extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>,
         modelSelector: BlockModelSelectorScope.() -> ModelBuilder
     ) {
-        layout = BlockModelLayout.SimpleEntityBacked(stateSelector, modelSelector)
+        layout = BlockModelLayout.SimpleEntityBacked(stateSelector, extraColliderSelector, modelSelector)
     }
     
     override fun entityItemBacked(
         stateSelector: BlockSelectorScope.() -> BlockData,
+        extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>,
         itemSelector: ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit
     ) {
-        layout = BlockModelLayout.ItemEntityBacked(stateSelector, itemSelector)
+        layout = BlockModelLayout.ItemEntityBacked(stateSelector, extraColliderSelector, itemSelector)
     }
     
     override fun modelLess(stateSelector: BlockSelectorScope.() -> BlockData) {

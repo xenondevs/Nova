@@ -35,7 +35,7 @@ import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.itemTypeOrNull
-import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityModelProviderManager
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.FluidContainer
 import xyz.xenondevs.nova.world.chunkPos
@@ -102,7 +102,7 @@ abstract class TileEntity(
      * The [PacketItemDisplay(s)][PacketItemDisplay] used to display the model of this [TileEntity], if it is entity-backed.
      */
     val displayEntities: List<PacketItemDisplay>?
-        get() = DisplayEntityBlockModelProvider.entities[block]
+        get() = DisplayEntityModelProviderManager.getDisplayEntities(block)
     
     /**
      * Whether this [TileEntity] is enabled.

@@ -4,10 +4,18 @@ import io.papermc.paper.datacomponent.DataComponentTypes
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
+import net.minecraft.world.InteractionHand
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Fluid
+import org.bukkit.Location
+import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Display.Brightness
@@ -17,41 +25,51 @@ import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
+import org.joml.Intersectiond
 import org.joml.Matrix4f
 import org.joml.Matrix4fc
+import org.joml.Vector2d
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.item.ItemBuilder
-import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.network.packetHandler
 import xyz.xenondevs.nova.packetentity.ItemDisplayMetadata
+import xyz.xenondevs.nova.packetentity.PacketBlockDisplay
+import xyz.xenondevs.nova.packetentity.PacketEntityPassengersDsl
+import xyz.xenondevs.nova.packetentity.PacketEntityVisibility
 import xyz.xenondevs.nova.packetentity.PacketItemDisplay
+import xyz.xenondevs.nova.packetentity.isGlowing
+import xyz.xenondevs.nova.packetentity.isInvisible
+import xyz.xenondevs.nova.packetentity.packetBlockDisplay
 import xyz.xenondevs.nova.packetentity.packetItemDisplay
 import xyz.xenondevs.nova.packetentity.transform
 import xyz.xenondevs.nova.serialization.kotlinx.DisplayEntityBlockModelDataSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.Matrix4fcAsArraySerializer
+import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.item.requiresLight
 import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.nmsBlockState
+import xyz.xenondevs.nova.util.nmsDirection
 import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.block.ColliderCube
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.world.pos
 import java.awt.Color
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 @Serializable(DisplayEntityBlockModelDataSerializer::class)
 internal class DisplayEntityBlockModelData(
     val waterlogged: Boolean,
     val models: List<Model>,
-    val colliderProvider: Provider<BlockData>
+    val colliderProvider: Provider<BlockData>,
+    val extraColliders: List<ColliderCube>
 ) {
     
     val collider: BlockData by colliderProvider
@@ -81,86 +99,11 @@ internal class DisplayEntityBlockModelData(
 @SerialName("entity_backed")
 internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModelData) : BlockModelProvider {
     
-    @Suppress("unused")
-    @InternalInit(stage = InternalInitStage.POST_WORLD)
-    companion object : Listener {
-        
-        val entities = ConcurrentHashMap<Block, List<PacketItemDisplay>>()
-        private val blocksByChunk = HashMap<ChunkPos, MutableSet<Block>>()
-        
-        @InitFun
-        private fun init() {
-            registerEvents()
-            Bukkit.getWorlds()
-                .asSequence()
-                .flatMap { it.loadedChunks.asSequence() }
-                .forEach(::loadChunk)
-        }
-        
-        @DisableFun
-        private fun disable() {
-            entities.values.flatten().forEach(PacketItemDisplay::despawn)
-            entities.clear()
-            blocksByChunk.clear()
-        }
-        
-        @EventHandler
-        private fun handleChunkLoad(event: ChunkLoadEvent) {
-            loadChunk(event.chunk)
-        }
-        
-        @EventHandler
-        private fun handleChunkUnload(event: ChunkUnloadEvent) {
-            blocksByChunk.remove(event.chunk.pos)
-                ?.forEach { block -> entities.remove(block)?.forEach(PacketItemDisplay::despawn) }
-        }
-        
-        private fun loadChunk(chunk: Chunk) {
-            val levelChunk = chunk.levelChunk
-            val providerMaps = IdentityHashMap<NovaBlock, Map<BlockState, BlockModelProvider>>()
-            
-            fun getProvider(state: BlockState): DisplayEntityBlockModelProvider? {
-                val block = state.block as? NovaBlock
-                    ?: return null
-                val providers = providerMaps.getOrPut(block) { block.modelProviders.get() }
-                return providers[state] as? DisplayEntityBlockModelProvider
-            }
-            
-            val blockX = chunk.x shl 4
-            val blockZ = chunk.z shl 4
-            for (sectionIndex in levelChunk.sections.indices) {
-                val chunkSection = levelChunk.sections[sectionIndex]
-                if (!chunkSection.maybeHas { getProvider(it) != null })
-                    continue
-                
-                val blockY = levelChunk.getSectionYFromSectionIndex(sectionIndex) shl 4
-                for (y in 0..<16) for (z in 0..<16) for (x in 0..<16) {
-                    val provider = getProvider(chunkSection.getBlockState(x, y, z))
-                        ?: continue
-                    provider.load(chunk.world.getBlockAt(blockX + x, blockY + y, blockZ + z))
-                }
-            }
-        }
-        
-        private fun track(block: Block) {
-            blocksByChunk.getOrPut(block.chunkPos) { HashSet() }.add(block)
-        }
-        
-        private fun untrack(block: Block) {
-            val chunkPos = block.chunkPos
-            val blocks = blocksByChunk[chunkPos] ?: return
-            blocks.remove(block)
-            if (blocks.isEmpty())
-                blocksByChunk.remove(chunkPos)
-        }
-        
-    }
-    
     override val clientsideBlockState: BlockState
         get() = info.collider.nmsBlockState
     
     override fun load(block: Block) {
-        if (entities.containsKey(block)) {
+        if (DisplayEntityModelProviderManager.hasEntities(block)) {
             replace(block, this)
             return
         }
@@ -169,13 +112,11 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         if (info.waterlogged)
             models += createWaterlogDisplay(block)
         
-        entities[block] = models
-        track(block)
+        DisplayEntityModelProviderManager.setEntities(block, models, createColliderEntities(block))
     }
     
     override fun unload(block: Block) {
-        entities.remove(block)?.forEach(PacketItemDisplay::despawn)
-        untrack(block)
+        DisplayEntityModelProviderManager.remove(block)
     }
     
     override fun replace(block: Block, previous: BlockModelProvider) {
@@ -185,7 +126,7 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         }
         
         // re-use as many existing entities as possible
-        val prevEntities = entities[block] ?: emptyList()
+        val prevEntities = DisplayEntityModelProviderManager.getDisplayEntities(block).orEmpty()
         val newEntities = ArrayList<PacketItemDisplay>()
         
         var i = 0
@@ -203,12 +144,22 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         for (j in i..<prevEntities.size)
             prevEntities[j].despawn()
         
-        entities[block] = newEntities
-        track(block)
+        val prevColliderEntities = DisplayEntityModelProviderManager.getColliderEntities(block).orEmpty()
+        val newColliderEntities = if (previous.info.extraColliders == info.extraColliders) {
+            prevColliderEntities
+        } else {
+            prevColliderEntities.forEach(PacketBlockDisplay::despawn)
+            createColliderEntities(block)
+        }
+        
+        DisplayEntityModelProviderManager.setEntities(block, newEntities, newColliderEntities)
     }
     
     fun updateWaterlogEntity(block: Block) {
-        entities[block]?.lastOrNull()?.metadata?.let { setWaterlogMetadata(it, block) }
+        DisplayEntityModelProviderManager.getDisplayEntities(block)
+            ?.lastOrNull()
+            ?.metadata
+            ?.let { setWaterlogMetadata(it, block) }
     }
     
     private fun createDisplay(block: Block, model: DisplayEntityBlockModelData.Model) = packetItemDisplay {
@@ -223,6 +174,91 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
     }.apply {
         setWaterlogMetadata(metadata, pos)
         spawn()
+    }
+    
+    private fun createColliderEntities(block: Block): List<PacketBlockDisplay> =
+        info.extraColliders.map { cube ->
+            val colliderPosition = block.location.add(cube.centerX, cube.minY, cube.centerZ)
+            packetBlockDisplay {
+                location by colliderPosition
+                visibility = PacketEntityVisibility.NEAR
+                metadata {
+                    isInvisible by true
+                    viewRange by 0f
+                }
+                passengers {
+                    colliderShulker(block, colliderPosition, cube)
+                }
+            }.apply { spawn() }
+        }
+    
+    private fun PacketEntityPassengersDsl.colliderShulker(
+        block: Block,
+        colliderPosition: Location,
+        cube: ColliderCube
+    ) = shulker {
+        attributes[Attribute.SCALE] by cube.size
+        
+        metadata {
+            isGlowing by DisplayEntityModelProviderManager.colliderOutlinesEnabled
+            isInvisible by true
+        }
+        
+        onAttackAsync { event ->
+            event.isCancelled = true
+            
+            val player = event.player
+            val eye = player.eyeLocation
+            val direction = eye.direction
+            val distances = Vector2d()
+            val hit = Intersectiond.intersectRayAab(
+                eye.x, eye.y, eye.z,
+                direction.x, direction.y, direction.z,
+                block.x + cube.minX, block.y + cube.minY, block.z + cube.minZ,
+                block.x + cube.maxX, block.y + cube.maxY, block.z + cube.maxZ,
+                distances
+            )
+            if (!hit)
+                return@onAttackAsync
+            
+            val distance = if (distances.x >= 0.0) distances.x else distances.y
+            val hitDirection = BlockFaceUtils.determineBlockFace(
+                eye.x + direction.x * distance - block.x - cube.centerX,
+                eye.y + direction.y * distance - block.y - cube.centerY,
+                eye.z + direction.z * distance - block.z - cube.centerZ
+            ).nmsDirection
+            
+            val packet = ServerboundPlayerActionPacket(START_DESTROY_BLOCK, block.nmsPos, hitDirection, 0)
+            player.packetHandler?.injectIncoming(packet)
+        }
+        
+        onInteractAsync { event ->
+            event.isCancelled = true
+            // Only main hand packet is relevant. This starts the consistent use loop.
+            if (event.hand != InteractionHand.MAIN_HAND)
+                return@onInteractAsync
+            
+            val player = event.player
+            val relativeHit = event.location
+            val hitLocation = Vec3(
+                colliderPosition.x + relativeHit.x(),
+                colliderPosition.y + relativeHit.y(),
+                colliderPosition.z + relativeHit.z()
+            )
+            val hitResult = BlockHitResult(
+                hitLocation,
+                BlockFaceUtils.determineBlockFace(
+                    relativeHit.x(),
+                    relativeHit.y() - cube.size / 2.0,
+                    relativeHit.z()
+                ).nmsDirection,
+                block.nmsPos,
+                false
+            )
+            val packet = ServerboundUseItemOnPacket(InteractionHand.MAIN_HAND, hitResult, 0)
+            packet.timestamp = System.currentTimeMillis()
+            player.packetHandler?.injectIncoming(packet)
+        }
     }
     
     private fun setWaterlogMetadata(data: ItemDisplayMetadata, pos: Block) {
@@ -243,6 +279,108 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         
         data.itemStack = model.itemStack
         data.transform = model.transform
+    }
+    
+}
+
+@Suppress("unused")
+@InternalInit(stage = InternalInitStage.POST_WORLD)
+internal object DisplayEntityModelProviderManager : Listener {
+    
+    private class Entities(
+        val displayEntities: List<PacketItemDisplay>,
+        val colliderEntities: List<PacketBlockDisplay>
+    ) {
+        
+        fun despawn() {
+            displayEntities.forEach(PacketItemDisplay::despawn)
+            colliderEntities.forEach(PacketBlockDisplay::despawn)
+        }
+        
+    }
+    
+    private val entitiesByChunk = HashMap<ChunkPos, HashMap<Block, Entities>>()
+    
+    var colliderOutlinesEnabled = false
+        set(value) {
+            field = value
+            entitiesByChunk.values.asSequence()
+                .flatMap { it.values }
+                .flatMap { it.colliderEntities }
+                .flatMap { it.passengers }
+                .forEach { it.metadata.isGlowing = value }
+        }
+    
+    @InitFun
+    private fun init() {
+        registerEvents()
+        Bukkit.getWorlds().asSequence()
+            .flatMap { it.loadedChunks.asSequence() }
+            .forEach(::loadChunk)
+    }
+    
+    @EventHandler
+    private fun handleChunkLoad(event: ChunkLoadEvent) {
+        loadChunk(event.chunk)
+    }
+    
+    @EventHandler
+    private fun handleChunkUnload(event: ChunkUnloadEvent) {
+        entitiesByChunk.remove(event.chunk.pos)
+            ?.values
+            ?.forEach(Entities::despawn)
+    }
+    
+    private fun loadChunk(chunk: Chunk) {
+        val levelChunk = chunk.levelChunk
+        val providerMaps = HashMap<NovaBlock, Map<BlockState, BlockModelProvider>>()
+        
+        fun getProvider(state: BlockState): DisplayEntityBlockModelProvider? {
+            val block = state.block as? NovaBlock
+                ?: return null
+            val providers = providerMaps.getOrPut(block) { block.modelProviders.get() }
+            return providers[state] as? DisplayEntityBlockModelProvider
+        }
+        
+        val blockX = chunk.x shl 4
+        val blockZ = chunk.z shl 4
+        for (sectionIndex in levelChunk.sections.indices) {
+            val chunkSection = levelChunk.sections[sectionIndex]
+            if (!chunkSection.maybeHas { getProvider(it) != null })
+                continue
+            
+            val blockY = levelChunk.getSectionYFromSectionIndex(sectionIndex) shl 4
+            for (y in 0..<16) for (z in 0..<16) for (x in 0..<16) {
+                val provider = getProvider(chunkSection.getBlockState(x, y, z))
+                    ?: continue
+                provider.load(chunk.world.getBlockAt(blockX + x, blockY + y, blockZ + z))
+            }
+        }
+    }
+    
+    fun hasEntities(block: Block): Boolean =
+        entitiesByChunk[block.chunkPos]?.containsKey(block) == true
+    
+    fun getDisplayEntities(block: Block): List<PacketItemDisplay>? =
+        entitiesByChunk[block.chunkPos]?.get(block)?.displayEntities
+    
+    fun getColliderEntities(block: Block): List<PacketBlockDisplay>? =
+        entitiesByChunk[block.chunkPos]?.get(block)?.colliderEntities
+    
+    fun setEntities(
+        block: Block,
+        displayEntities: List<PacketItemDisplay>,
+        colliderEntities: List<PacketBlockDisplay>
+    ) {
+        entitiesByChunk.getOrPut(block.chunkPos, ::HashMap)[block] = Entities(displayEntities, colliderEntities)
+    }
+    
+    fun remove(block: Block) {
+        val chunkPos = block.chunkPos
+        val blocks = entitiesByChunk[chunkPos] ?: return
+        blocks.remove(block)?.despawn()
+        if (blocks.isEmpty())
+            entitiesByChunk.remove(chunkPos)
     }
     
 }

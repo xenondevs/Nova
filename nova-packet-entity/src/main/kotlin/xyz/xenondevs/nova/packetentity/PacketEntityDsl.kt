@@ -2,20 +2,35 @@ package xyz.xenondevs.nova.packetentity
 
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
 import org.joml.Vector3dc
 import xyz.xenondevs.commons.provider.dsl.DslProperty
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.world.InteractionResult
 import java.util.*
 
 /**
- * DSL scope available inside [PacketEntityDsl.onInteract] handlers.
+ * DSL scope available inside [PacketEntityDsl.onAttack] handlers.
  *
  * ```kotlin
  * packetInteraction {
- *     onInteract {
- *         player.sendMessage("Clicked at $interactLocation")
+ *     onAttack {
+ *         player.sendMessage("Attacked")
  *     }
  * }
  * ```
+ */
+@PacketEntityDslMarker
+sealed interface AttackDsl {
+    
+    /** The player that attacked the packet entity. */
+    val player: Player
+    
+}
+
+/**
+ * DSL scope available inside [PacketEntityDsl.onInteract] handlers.
  */
 @PacketEntityDslMarker
 sealed interface InteractDsl {
@@ -23,7 +38,12 @@ sealed interface InteractDsl {
     /** The player that interacted with the packet entity. */
     val player: Player
     
-    /** The interaction position sent by the client, relative to the interacted entity. */
+    /** The hand used to interact with the packet entity. */
+    val hand: EquipmentSlot
+    
+    /**
+     * The interaction position sent by the client, relative to the interacted entity's position,
+     */
     val interactLocation: Vector3dc
     
 }
@@ -70,13 +90,13 @@ sealed interface DespawnDsl {
  */
 @PacketEntityDslMarker
 sealed interface PacketEntityDsl<M : EntityMetadataDsl> {
-   
+    
     /**
-     * The level-of-detail range used to decide which players can see this entity.
+     * The visibility of this entity.
      *
-     * Defaults to [PacketEntityLod.ALL].
+     * Defaults to [PacketEntityVisibility.STANDARD].
      */
-    var lod: PacketEntityLod
+    var visibility: PacketEntityVisibility
     
     /**
      * Whether location changes emit movement packets.
@@ -158,9 +178,24 @@ sealed interface PacketEntityDsl<M : EntityMetadataDsl> {
     fun onDespawn(handler: DespawnDsl.() -> Unit)
     
     /**
-     * Registers a handler called when a player interacts with this entity.
+     * Registers a handler called on the main server thread when a player attacks this entity (left click).
      */
-    fun onInteract(handler: InteractDsl.() -> Unit)
+    fun onAttack(handler: AttackDsl.() -> Unit)
+    
+    /**
+     * Registers a handler called on the player's Netty event-loop thread when they attack this entity (left click).
+     */
+    fun onAttackAsync(handler: (ServerboundAttackPacketEvent) -> Unit)
+    
+    /**
+     * Registers a handler called on the main server thread when a player interacts with this entity (right click).
+     */
+    fun onInteract(handler: InteractDsl.() -> InteractionResult)
+    
+    /**
+     * Registers a handler called on the player's Netty event-loop thread when they interact with this entity (right click).
+     */
+    fun onInteractAsync(handler: (ServerboundInteractPacketEvent) -> Unit)
     
 }
 
@@ -209,9 +244,25 @@ sealed interface PassengerPacketEntityDsl<M : EntityMetadataDsl> {
     fun passengers(passengers: PacketEntityPassengersDsl.() -> Unit)
     
     /**
-     * Registers a handler that is called when a player interacts with this passenger.
+     * Registers a handler called on the main server thread when a player attacks this passenger.
      */
-    fun onInteract(handler: InteractDsl.() -> Unit)
+    fun onAttack(handler: AttackDsl.() -> Unit)
+    
+    /**
+     * Registers a handler called on the player's Netty event-loop thread when they attack this passenger.
+     */
+    fun onAttackAsync(handler: (ServerboundAttackPacketEvent) -> Unit)
+    
+    /**
+     * Registers a handler called on the main server thread when a player interacts with this passenger.
+     */
+    fun onInteract(handler: InteractDsl.() -> InteractionResult)
+    
+    /**
+     * Registers a handler called on the player's Netty event-loop thread when they interact with this
+     * passenger.
+     */
+    fun onInteractAsync(handler: (ServerboundInteractPacketEvent) -> Unit)
     
 }
 

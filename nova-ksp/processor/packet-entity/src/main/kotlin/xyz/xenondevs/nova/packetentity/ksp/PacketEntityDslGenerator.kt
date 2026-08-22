@@ -31,7 +31,7 @@ private val PACKET_ENTITY_PASSENGERS_DSL_IMPL = ClassName(GENERATED_PACKAGE, "Pa
 private val UNIT = ClassName("kotlin", "Unit")
 
 internal class PacketEntityDslGenerator(private val codeGenerator: CodeGenerator) {
-
+    
     fun generate(analysisResult: AnalysisResult) {
         val fileSpec = FileSpec.builder(GENERATED_PACKAGE, "PacketEntityDslFunctions")
             .addAnnotation(
@@ -39,7 +39,7 @@ internal class PacketEntityDslGenerator(private val codeGenerator: CodeGenerator
                     .addMember("%S, %S", "unused", "UNCHECKED_CAST")
                     .build()
             )
-
+        
         for ([_, classData] in analysisResult.entityData) {
             val entityTypeFieldName = analysisResult.entityTypes[classData.className] ?: continue
             fileSpec.addTypeAlias(buildPacketEntityTypeAlias(classData))
@@ -47,10 +47,10 @@ internal class PacketEntityDslGenerator(private val codeGenerator: CodeGenerator
         }
         
         fileSpec.addType(buildPacketEntityPassengersDsl(analysisResult))
-
+        
         fileSpec.build().writeTo(codeGenerator, Dependencies(false))
     }
-
+    
     private fun buildFunction(classData: EntityClassData, entityTypeFieldName: String): FunSpec {
         val functionName = toFunctionName(classData.className)
         val packetEntityType = ClassName(GENERATED_PACKAGE, toPacketEntityName(classData.className))
@@ -61,7 +61,7 @@ internal class PacketEntityDslGenerator(private val codeGenerator: CodeGenerator
         val metadataViewImpl = ClassName(GENERATED_PACKAGE, "${toMetadataName(classData.className)}Impl")
         val dslType = PACKET_ENTITY_DSL.parameterizedBy(metadataInterface)
         val implType = PACKET_ENTITY_DSL_IMPL.parameterizedBy(metadataInterface)
-
+        
         return FunSpec.builder(functionName)
             .addParameter(functionName, LambdaTypeName.get(receiver = dslType, returnType = UNIT))
             .returns(packetEntityType)
@@ -72,7 +72,7 @@ internal class PacketEntityDslGenerator(private val codeGenerator: CodeGenerator
             .addStatement("return %T(%T.%L, packetEntityState, %T(metadataState))", PACKET_ENTITY_IMPL.parameterizedBy(metadataInterfaceView), ENTITY_TYPES, entityTypeFieldName, metadataViewImpl)
             .build()
     }
-
+    
     private fun buildPacketEntityTypeAlias(classData: EntityClassData): TypeAliasSpec {
         val metadataInterface = ClassName(GENERATED_PACKAGE, toMetadataName(classData.className))
         return TypeAliasSpec.builder(

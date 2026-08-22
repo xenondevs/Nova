@@ -2,14 +2,47 @@ package xyz.xenondevs.nova.packetentity
 
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.world.InteractionResult
 import java.util.*
 
 /**
- * A packet-only entity that is spawned, updated, and removed by sending packets to players.
+ * A [PacketEntity] or a passenger of a [PacketEntity].
  *
- * Packet entities do not exist as Bukkit entities in the world. They are tracked by the
- * packet-entity manager and become visible to players based on their [location], [lod],
- * [viewerWhitelist], and [viewerBlacklist].
+ * @param M the metadata API type for this entity.
+ */
+sealed interface PacketEntityNode<M : EntityMetadata> {
+    
+    /**
+     * The entity id used in packets for this entity.
+     */
+    val id: Int
+    
+    /**
+     * The UUID used in packets for this entity.
+     */
+    val uuid: UUID
+    
+    /**
+     * The mutable metadata of this entity.
+     */
+    val metadata: M
+    
+    /**
+     * The mutable equipment of this node.
+     */
+    val equipment: PacketEntityEquipment
+    
+    /**
+     * The direct passengers mounted on this entity.
+     */
+    val passengers: List<PacketEntityNode<*>>
+    
+}
+
+/**
+ * A packet-only entity that is spawned, updated, and removed by sending packets to players.
  *
  * ```kotlin
  * val display = packetItemDisplay {
@@ -24,38 +57,12 @@ import java.util.*
  *
  * @param M the metadata API type for this entity.
  */
-sealed interface PacketEntity<M : EntityMetadata> {
+sealed interface PacketEntity<M : EntityMetadata> : PacketEntityNode<M> {
     
     /**
-     * The entity id used in packets for this entity.
+     * The visibility of this entity.
      */
-    val id: Int
-    
-    /**
-     * The UUID used in packets for this entity.
-     */
-    val uuid: UUID
-    
-    /**
-     * The mutable metadata of this entity.
-     *
-     * Changes made through this object are flushed to visible players automatically after the
-     * entity has been [spawned][spawn].
-     */
-    val metadata: M
-    
-    /**
-     * The mutable equipment of this entity.
-     *
-     * Changes made through this object are flushed to visible players automatically after the
-     * entity has been [spawned][spawn].
-     */
-    val equipment: PacketEntityEquipment
-    
-    /**
-     * The level-of-detail range used to decide which players can see this entity.
-     */
-    val lod: PacketEntityLod
+    val visibility: PacketEntityVisibility
     
     /**
      * Handlers that are called on the main thread whenever this entity becomes visible to a player.
@@ -68,9 +75,24 @@ sealed interface PacketEntity<M : EntityMetadata> {
     val despawnHandlers: MutableList<(Player) -> Unit>
     
     /**
-     * Handlers that are called on the main thread when a player interacts with this entity.
+     * Handlers that are called on the main thread when a player attacks this entity (left click).
      */
-    val interactHandlers: MutableList<InteractDsl.() -> Unit>
+    val attackHandlers: MutableList<AttackDsl.() -> Unit>
+    
+    /**
+     * Handlers that are called on the player's Netty event-loop thread when they attack this entity (left click).
+     */
+    val attackAsyncHandlers: MutableList<(ServerboundAttackPacketEvent) -> Unit>
+    
+    /**
+     * Handlers that are called on the main thread when a player interacts with this entity (right click).
+     */
+    val interactHandlers: MutableList<InteractDsl.() -> InteractionResult>
+    
+    /**
+     * Handlers that are called on the player's Netty event-loop thread when they interact with this entity (right click).
+     */
+    val interactAsyncHandlers: MutableList<(ServerboundInteractPacketEvent) -> Unit>
     
     /**
      * The entity location.
@@ -96,12 +118,12 @@ sealed interface PacketEntity<M : EntityMetadata> {
     var viewerBlacklist: Set<UUID>
     
     /**
-     * Starts tracking this entity and sends spawn packets to players that can currently see it.
+     * Spawns the entity, making it visible for players.
      */
     fun spawn()
     
     /**
-     * Stops tracking this entity and sends remove packets to players that can currently see it.
+     * Despawns the entity, making it invisible to players.
      */
     fun despawn()
     
@@ -119,24 +141,17 @@ sealed interface PacketEntity<M : EntityMetadata> {
 }
 
 /**
- * The level-of-detail (LOD) range used by packet entities. 
- * The LOD determines the range in which a packet entity is visible for players.
- * It can be used to show different packet entities at different ranges or hide certain packet entities earlier.
- * 
- * For example, invisible shulker entities (used for colliders) can be despawned once the player is not in an adjacent chunk and can't possibly touch
- * them anymore. For such a case, a [NEAR] LOD works well.
- * 
- * By default, packet entities use the [ALL] LOD.
+ * The visibility of a packet entity.
  */
-enum class PacketEntityLod(internal val range: IntRange) {
+enum class PacketEntityVisibility(
+    internal val range: IntRange,
+    internal val cellShift: Int
+) {
     
-    /** Visible in all chunk sections that are in render distance. */
-    ALL(0..MAX_PACKET_ENTITY_RENDER_DISTANCE),
+    /** Visible in all 16x16x16-block chunk sections within the player's packet-entity render distance. */
+    STANDARD(0..MAX_PACKET_ENTITY_RENDER_DISTANCE, 4),
     
-    /** Visible in the same and adjacent chunk sections. */
-    NEAR(0..1),
-    
-    /** Visible in all chunk sections that are in render distance outside [NEAR]. */
-    FAR(2..MAX_PACKET_ENTITY_RENDER_DISTANCE)
+    /** Visible in the same and adjacent 2x2x2-block cells. */
+    NEAR(0..1, 1)
     
 }

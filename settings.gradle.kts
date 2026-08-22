@@ -4,6 +4,7 @@ rootProject.name = "nova"
 include("nova")
 include("nova-api")
 include("nova-config")
+include("nova-interaction")
 include("nova-network")
 include("nova-packet-entity")
 include("nova-registry")

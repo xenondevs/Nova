@@ -10,9 +10,11 @@ import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockSelectorScope
 import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_MODEL_SELECTOR
 import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_STATE_SELECTOR
+import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_EXTRA_COLLIDER_SELECTOR
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder.Companion.DEFAULT_CONFIGURE_BLOCK_MODEL_SELECTOR
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
+import xyz.xenondevs.nova.world.block.ColliderCube
 import xyz.xenondevs.nova.world.block.FluidFlowMode
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
@@ -81,7 +83,7 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
     )
     
     /**
-     * Configures the model and hitbox type of this entity-based block model via [stateSelector] and [modelSelector] respectively.
+     * Configures the model and hitbox type of this entity-based block model via [modelSelector], [stateSelector] and [extraColliderSelector] respectively.
      *
      * Entity-backed custom block models are less performant than state-backed models, but a lot more flexible:
      *
@@ -95,11 +97,12 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
      */
     fun entityBacked(
         stateSelector: BlockSelectorScope.() -> BlockData = DEFAULT_BLOCK_STATE_SELECTOR,
+        extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube> = DEFAULT_EXTRA_COLLIDER_SELECTOR,
         modelSelector: BlockModelSelectorScope.() -> ModelBuilder = DEFAULT_BLOCK_MODEL_SELECTOR
     )
     
     /**
-     * Configures the model and hitbox type of this entity-based block model via [stateSelector] and [itemSelector] respectively.
+     * Configures the model and hitbox/collider of this entity-based block model via [itemSelector], [stateSelector] and [extraColliderSelector] respectively.
      *
      * Entity-backed custom block models based on custom item definitions are less performant than state-backed models, but a lot more flexible.
      * In contrast to [entityBacked], models defined via custom item definitions cannot benefit from display entity transformations, as some
@@ -116,6 +119,7 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
      */
     fun entityItemBacked(
         stateSelector: BlockSelectorScope.() -> BlockData = DEFAULT_BLOCK_STATE_SELECTOR,
+        extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube> = DEFAULT_EXTRA_COLLIDER_SELECTOR,
         itemSelector: ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit = DEFAULT_CONFIGURE_BLOCK_MODEL_SELECTOR
     )
     

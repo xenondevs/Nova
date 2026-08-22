@@ -1,11 +1,18 @@
 package xyz.xenondevs.nova.packetentity
 
 import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
 import org.joml.Vector3dc
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.world.InteractionResult
 import java.util.*
+
+internal class AttackDslImpl(override val player: Player) : AttackDsl
 
 internal class InteractDslImpl(
     override val player: Player,
+    override val hand: EquipmentSlot,
     override val interactLocation: Vector3dc
 ) : InteractDsl
 
@@ -19,7 +26,10 @@ internal open class PacketEntityState<M : EntityMetadataState>(val metadata: M) 
     val equipment = PacketEntityEquipmentState()
     val components: List<ReactiveDataValue<*>> = buildList(metadata::addComponents)
     val passengers = ArrayList<PacketEntityPassengerData<*>>()
-    val interactHandlers = ArrayList<InteractDsl.() -> Unit>()
+    val attackHandlers = ArrayList<AttackDsl.() -> Unit>()
+    val attackAsyncHandlers = ArrayList<(ServerboundAttackPacketEvent) -> Unit>()
+    val interactHandlers = ArrayList<InteractDsl.() -> InteractionResult>()
+    val interactAsyncHandlers = ArrayList<(ServerboundInteractPacketEvent) -> Unit>()
     
     fun observe(
         attributesObserver: () -> Unit,
@@ -52,7 +62,7 @@ internal open class PacketEntityState<M : EntityMetadataState>(val metadata: M) 
 
 internal class PacketEntityRootState<M : EntityMetadataState>(metadata: M) : PacketEntityState<M>(metadata) {
     
-    var lod: PacketEntityLod = PacketEntityLod.ALL
+    var visibility: PacketEntityVisibility = PacketEntityVisibility.STANDARD
     var sendMovementPackets: Boolean = true
     val location = DefaultEntityValue(org.bukkit.Location(null, 0.0, 0.0, 0.0))
     val viewerWhitelist = DefaultEntityValue<Set<UUID>?>(null)
@@ -97,8 +107,20 @@ internal abstract class PacketEntityDslBase<M : EntityMetadataDsl>(
         PacketEntityPassengersDslImpl(packetState).passengers()
     }
     
-    open fun onInteract(handler: InteractDsl.() -> Unit) {
+    open fun onAttack(handler: AttackDsl.() -> Unit) {
+        packetState.attackHandlers += handler
+    }
+    
+    open fun onAttackAsync(handler: (ServerboundAttackPacketEvent) -> Unit) {
+        packetState.attackAsyncHandlers += handler
+    }
+    
+    open fun onInteract(handler: InteractDsl.() -> InteractionResult) {
         packetState.interactHandlers += handler
+    }
+    
+    open fun onInteractAsync(handler: (ServerboundInteractPacketEvent) -> Unit) {
+        packetState.interactAsyncHandlers += handler
     }
     
 }
@@ -108,7 +130,7 @@ internal class PacketEntityDslImpl<M : EntityMetadataDsl>(
     metadataDsl: M
 ) : PacketEntityDslBase<M>(rootState, metadataDsl), PacketEntityDsl<M> {
     
-    override var lod by rootState::lod
+    override var visibility by rootState::visibility
     override var sendMovementPackets by rootState::sendMovementPackets
     override val location get() = rootState.location
     override val attributes get() = super.attributes
@@ -133,18 +155,6 @@ internal class PassengerPacketEntityDslImpl<M : EntityMetadataDsl>(
     
     override val attributes get() = super.attributes
     override val equipment get() = super.equipment
-    
-    override fun equipment(equipment: EquipmentDsl.() -> Unit) =
-        super.equipment(equipment)
-    
-    override fun metadata(metadata: M.() -> Unit) =
-        super.metadata(metadata)
-    
-    override fun passengers(passengers: PacketEntityPassengersDsl.() -> Unit) =
-        super.passengers(passengers)
-    
-    override fun onInteract(handler: InteractDsl.() -> Unit) =
-        super.onInteract(handler)
     
 }
 

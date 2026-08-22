@@ -1,5 +1,3 @@
-@file:OptIn(UnstableProviderApi::class)
-
 package xyz.xenondevs.nova.packetentity
 
 import io.papermc.paper.adventure.PaperAdventure
@@ -82,7 +80,6 @@ import org.joml.Vector3fc
 import org.joml.Vector3i
 import org.joml.Vector3ic
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.UnstableProviderApi
 import xyz.xenondevs.commons.provider.dsl.DslProperty
 import java.util.*
 import kotlin.jvm.optionals.getOrNull

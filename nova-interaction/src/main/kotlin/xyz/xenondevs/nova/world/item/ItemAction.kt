@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.addToInventoryPrioritizedOrDrop
 import xyz.xenondevs.nova.util.damageItemInHand
 import xyz.xenondevs.nova.util.item.damage
-import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
 private val ItemStack.useRemainder: ItemStack?
     get() = getData(DataComponentTypes.USE_REMAINDER)?.transformInto()
@@ -54,7 +53,7 @@ interface ItemAction {
         
         override fun apply(world: World, itemStack: ItemStack): List<ItemStack> {
             return listOfNotNull(
-                itemStack.clone().also { it.amount -= decrement }.takeUnlessEmpty(),
+                itemStack.clone().also { it.amount -= decrement }.takeUnless { it.isEmpty },
                 itemStack.useRemainder?.apply { amount = decrement }
             )
         }

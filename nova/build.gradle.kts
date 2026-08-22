@@ -20,6 +20,7 @@ dependencies {
     api(origamiLibs.mixin)
     api(origamiLibs.mixinextras)
     api(project(":nova-config"))
+    api(project(":nova-interaction"))
     api(project(":nova-network"))
     api(project(":nova-packet-entity"))
     api(project(":nova-registry"))
@@ -87,6 +88,7 @@ loaderJar {
     val projectJars = listOf(
         ":nova-api",
         ":nova-config",
+        ":nova-interaction",
         ":nova-network",
         ":nova-packet-entity",
         ":nova-registry",

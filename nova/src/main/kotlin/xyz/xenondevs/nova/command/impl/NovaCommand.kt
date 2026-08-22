@@ -30,6 +30,7 @@ import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemType
 import org.joml.Matrix4f
+import org.joml.Vector3d
 import org.joml.Vector3f
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
@@ -84,6 +85,7 @@ import xyz.xenondevs.nova.world.block.novaTileEntities
 import xyz.xenondevs.nova.world.block.novaTileEntity
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityModelProviderManager
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
@@ -151,6 +153,8 @@ internal object NovaCommand : Command() {
             .then(literal("showHitboxes")
                 .requiresPlayer()
                 .executes0(::toggleHitboxDebugging))
+            .then(literal("showEntityColliders")
+                .executes0(::toggleEntityColliderDebugging))
             .then(literal("showItemTags")
                 .requiresPlayer()
                 .executes0(::showItemTagsMenu))
@@ -469,15 +473,32 @@ internal object NovaCommand : Command() {
                 if (info.waterlogged) {
                     modelComponents += createModelComponent(DefaultBlockOverlays.WATERLOGGED.key, Matrix4f())
                 }
+                val colliderComponents = info.extraColliders.map { cube ->
+                    Component.translatable(
+                        "command.nova.show_block_model_data.display_entity.extra_collider",
+                        NamedTextColor.GRAY,
+                        Component.text(Vector3d(cube.minX, cube.minY, cube.minZ).toString(format), NamedTextColor.AQUA),
+                        Component.text(format.format(cube.size), NamedTextColor.AQUA)
+                    )
+                }
                 
-                Component.translatable(
-                    "command.nova.show_block_model_data.display_entity",
-                    NamedTextColor.GRAY,
-                    Component.text(blockState.asString, NamedTextColor.AQUA),
-                    info.collider.blockType.name.color(NamedTextColor.AQUA),
-                    Component.text(modelComponents.size),
-                    Component.join(JoinConfiguration.newlines(), modelComponents)
-                )
+                Component.text()
+                    .append(Component.translatable(
+                        "command.nova.show_block_model_data.display_entity",
+                        NamedTextColor.GRAY,
+                        Component.text(blockState.asString, NamedTextColor.AQUA),
+                        info.collider.blockType.name.color(NamedTextColor.AQUA),
+                        Component.text(modelComponents.size),
+                        Component.join(JoinConfiguration.newlines(), modelComponents)
+                    ))
+                    .appendNewline()
+                    .append(Component.translatable(
+                        "command.nova.show_block_model_data.display_entity.extra_colliders",
+                        NamedTextColor.GRAY,
+                        Component.text(colliderComponents.size, NamedTextColor.AQUA),
+                        Component.join(JoinConfiguration.newlines(), colliderComponents)
+                    ))
+                    .build()
             }
         }
         ctx.source.sender.sendMessage(message)
@@ -757,6 +778,16 @@ internal object NovaCommand : Command() {
         
         ctx.source.sender.sendMessage(Component.translatable(
             "command.nova.hitbox_debug",
+            NamedTextColor.GRAY
+        ))
+    }
+    
+    private fun toggleEntityColliderDebugging(ctx: CommandContext<CommandSourceStack>) {
+        val enabled = !DisplayEntityModelProviderManager.colliderOutlinesEnabled
+        DisplayEntityModelProviderManager.colliderOutlinesEnabled = enabled
+        
+        ctx.source.sender.sendMessage(Component.translatable(
+            "command.nova.entity_collider_debug.${if (enabled) "on" else "off"}",
             NamedTextColor.GRAY
         ))
     }

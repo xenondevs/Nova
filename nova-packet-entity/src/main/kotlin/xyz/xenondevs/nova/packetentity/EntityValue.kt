@@ -1,9 +1,6 @@
-@file:OptIn(UnstableProviderApi::class)
-
 package xyz.xenondevs.nova.packetentity
 
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.UnstableProviderApi
 import xyz.xenondevs.commons.provider.dsl.DslProperty
 import kotlin.reflect.KProperty
 

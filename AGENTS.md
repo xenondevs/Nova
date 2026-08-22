@@ -9,6 +9,7 @@ Nova uses [Origami](https://github.com/xenondevs/origami), an access-widener and
 - `nova/`: Main runtime and Paper plugin; contains most framework, addon, UI, world, item, and block implementation code.
 - `nova-api/`: Legacy API module from before Nova was a modding framework. Offers a stable API for external plugins. Not used by addons.
 - `nova-config/`: Configuration loading, storage, and YAML/JSON conversion (configurations are in YAML but deserialized via kotlinx.serialization.json).
+- `nova-interaction/`: Shared interaction results, item actions, and eventless hand-swing handling used by the main runtime and packet entities.
 - `nova-network/`: Packet events and other packet utilities.
 - `nova-packet-entity/`: Reactive packet-based entities.
 - `nova-registry/`: Registry and tag abstractions shared by the framework.

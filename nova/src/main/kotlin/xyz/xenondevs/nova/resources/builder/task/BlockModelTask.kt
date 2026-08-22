@@ -129,9 +129,10 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
             } else {
                 builder.logger.warn("No more block states for $blockState with layout $layout, falling back to display entity")
                 val data = DisplayEntityBlockModelData(
-                    blockState[WATERLOGGED] == true, 
-                    assignModelToItem(modelBuilder), 
-                    provider { DEFAULT_BLOCK_STATE_SELECTOR(scope) }
+                    blockState[WATERLOGGED] == true,
+                    assignModelToItem(modelBuilder),
+                    provider { DEFAULT_BLOCK_STATE_SELECTOR(scope) },
+                    emptyList()
                 )
                 lookup[blockState] = DisplayEntityBlockModelProvider(data)
                 soundOverridesContent.useBlockData(data.colliderProvider)
@@ -147,7 +148,8 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
             val data = DisplayEntityBlockModelData(
                 blockState[WATERLOGGED] == true,
                 models,
-                provider { layout.stateSelector(scope) }
+                provider { layout.stateSelector(scope) },
+                layout.extraColliderSelector(scope)
             )
             lookup[blockState] = DisplayEntityBlockModelProvider(data)
             soundOverridesContent.useBlockData(data.colliderProvider)

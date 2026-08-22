@@ -26,6 +26,7 @@ import net.minecraft.world.level.material.Fluids
 import net.minecraft.world.level.redstone.Orientation
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
 import org.bukkit.Chunk
 import org.bukkit.block.BlockType
@@ -70,6 +71,7 @@ import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.item.createItemStack
@@ -252,6 +254,22 @@ internal open class NovaBlock(
             .associateTo(IdentityHashMap()) { [protoState, model] -> protoState.toBlockState(defaultBlockState) to model }
     }
     
+    private val extraColliderShapes: Provider<Map<NmsBlockState, VoxelShape>> = modelProviders.map { providers ->
+        providers.mapValuesTo(IdentityHashMap()) { entry ->
+            (entry.value as? DisplayEntityBlockModelProvider)
+                ?.info
+                ?.extraColliders
+                .orEmpty()
+                .map { collider ->
+                    Shapes.box(
+                        collider.minX, collider.minY, collider.minZ,
+                        collider.maxX, collider.maxY, collider.maxZ
+                    )
+                }
+                .let { shapes -> Shapes.or(Shapes.empty(), *shapes.toTypedArray()) }
+        }
+    }
+    
     private val _clientsideBlockStates: Provider<Map<NmsBlockState, NmsBlockState>> =
         modelProviders.map { it.mapValues { [_, mp] -> mp.clientsideBlockState } }
     
@@ -263,7 +281,7 @@ internal open class NovaBlock(
         registerDefaultState(stateProperties.fold(defaultBlockState) { state, prop -> state.setValue(prop, prop.defaultValue) })
         
         // Vanilla initializes these caches before Nova's blocks are registered.
-        stateDefinition.possibleStates.forEach { it.initCache() }
+        //stateDefinition.possibleStates.forEach { it.initCache() } fixme
         
         val flammable = flammable.get()
         (Blocks.FIRE as FireBlock).setFlammable(this, flammable.igniteOdds, flammable.burnOdds)
@@ -276,10 +294,21 @@ internal open class NovaBlock(
     }
     
     override fun getShape(state: NmsBlockState, level: BlockGetter, pos: NmsBlockPos, context: CollisionContext): VoxelShape =
-        modelProviders.get()[state]!!.clientsideBlockState.getShape(level, pos, context)
+        withExtraColliders(
+            state,
+            modelProviders.get()[state]!!.clientsideBlockState.getShape(level, pos, context)
+        )
     
     override fun getCollisionShape(state: NmsBlockState, level: BlockGetter, pos: NmsBlockPos, context: CollisionContext): VoxelShape =
-        modelProviders.get()[state]!!.clientsideBlockState.getCollisionShape(level, pos, context)
+        withExtraColliders(
+            state,
+            modelProviders.get()[state]!!.clientsideBlockState.getCollisionShape(level, pos, context)
+        )
+    
+    private fun withExtraColliders(state: NmsBlockState, shape: VoxelShape): VoxelShape {
+        val extraColliderShape = extraColliderShapes.get()[state]!!
+        return if (extraColliderShape.isEmpty) shape else Shapes.or(shape, extraColliderShape)
+    }
     
     override fun getOcclusionShape(state: NmsBlockState): VoxelShape =
         modelProviders.get()[state]!!.clientsideBlockState.occlusionShape

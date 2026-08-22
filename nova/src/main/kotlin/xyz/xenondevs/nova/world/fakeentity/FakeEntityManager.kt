@@ -28,7 +28,9 @@ import java.util.concurrent.CopyOnWriteArrayList
 @Deprecated(FAKE_ENTITY_DEPRECATION, ReplaceWith("packetEntityRenderDistance"))
 var Player.fakeEntityRenderDistance: Int
     get() = packetEntityRenderDistance
-    set(value) { packetEntityRenderDistance = value }
+    set(value) {
+        packetEntityRenderDistance = value
+    }
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,

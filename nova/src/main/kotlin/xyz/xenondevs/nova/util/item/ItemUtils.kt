@@ -28,7 +28,6 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.Tag
-import org.bukkit.World
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
@@ -38,7 +37,6 @@ import xyz.xenondevs.nova.serialization.cbf.NAMESPACED_COMPOUND_DEPRECATION
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.data.getByteArrayOrNull
-import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.isNova
 import xyz.xenondevs.nova.world.item.itemType
@@ -50,7 +48,6 @@ import xyz.xenondevs.nova.world.item.recipe.ItemTypeTest
 import xyz.xenondevs.nova.world.item.recipe.NovaNameTest
 import xyz.xenondevs.nova.world.item.recipe.TagTest
 import java.util.*
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.contracts.contract
 import kotlin.math.max
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -103,19 +100,6 @@ fun ItemStack?.isNotNullOrEmpty(): Boolean {
 
 internal fun <T : Any> MojangStack.update(type: DataComponentType<T>, action: (T) -> T): T? =
     get(type)?.let { set(type, action(it)) }
-
-/**
- * Damages the [this][ItemStack] by [amount] and returns the resulting [ItemStack],
- * which may be `null` if the item broke.
- */
-fun ItemStack.damage(amount: Int, world: World): ItemStack? {
-    val nms = unwrap()
-    val ref = AtomicReference(nms)
-    nms.hurtAndBreak(amount, world.serverLevel, null) {
-        ref.set(MojangStack.EMPTY)
-    }
-    return ref.get().asBukkitMirror().takeUnlessEmpty()
-}
 
 internal fun ItemStack.clientsideCopy(): ItemStack =
     PacketItems.getClientSideStack(null, unwrap(), true).asBukkitMirror()
@@ -235,7 +219,7 @@ object ItemUtils {
      * If the [itemStack] has a custom display name, that will be returned. Otherwise, the localized name will be returned.
      */
     fun getName(itemStack: ItemStack): Component =
-         itemStack.getData(DataComponentTypes.CUSTOM_NAME) ?: itemStack.itemType.name
+        itemStack.getData(DataComponentTypes.CUSTOM_NAME) ?: itemStack.itemType.name
     
     /**
      * Converts the given string to an [ItemStack].

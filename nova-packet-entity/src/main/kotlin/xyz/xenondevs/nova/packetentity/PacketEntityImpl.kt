@@ -19,9 +19,13 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.craftbukkit.CraftWorld
 import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
 import org.joml.Vector3dc
 import xyz.xenondevs.commons.collections.mapToIntArray
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
 import xyz.xenondevs.nova.network.packet.ClientboundSetPassengersPacket
+import xyz.xenondevs.nova.world.InteractionResult
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -32,22 +36,26 @@ private const val DIRTY_EQUIPMENT = 1 shl 1
 private const val DIRTY_VIEWERS = 1 shl 2
 private const val DIRTY_ATTRIBUTES = 1 shl 3
 
-internal open class PacketEntityNode<M : EntityMetadata>(
+internal open class PacketEntityNodeImpl<M : EntityMetadata>(
     private val type: EntityType<*>,
     protected val state: PacketEntityState<*>,
-    val metadata: M,
+    final override val metadata: M,
     world: World
-) {
+) : PacketEntityNode<M> {
     
-    val id: Int = (world as CraftWorld).handle.nextEntityId
-    val uuid: UUID = UUID.randomUUID()
-    val equipment: PacketEntityEquipment = PacketEntityEquipmentImpl(state.equipment)
-    private val passengers = state.passengers.map { it.createNode(world) }
+    final override val id: Int = (world as CraftWorld).handle.nextEntityId
+    final override val uuid: UUID = UUID.randomUUID()
+    final override val equipment: PacketEntityEquipment = PacketEntityEquipmentImpl(state.equipment)
+    private val passengerNodes = state.passengers.map { it.createNode(world) }
+    final override val passengers: List<PacketEntityNode<*>> = passengerNodes
+    private val attackHandlers = state.attackHandlers
+    private val attackAsyncHandlers = state.attackAsyncHandlers
     private val interactHandlers = state.interactHandlers
-    val graphEntities: List<PacketEntityNode<*>> = buildList {
+    private val interactAsyncHandlers = state.interactAsyncHandlers
+    val graphEntities: List<PacketEntityNodeImpl<*>> = buildList {
         collectGraphEntities(this)
     }
-    private val passengerIds = passengers.mapToIntArray(PacketEntityNode<*>::id)
+    private val passengerIds = passengerNodes.mapToIntArray(PacketEntityNodeImpl<*>::id)
     val passengersPacket: ClientboundSetPassengersPacket = ClientboundSetPassengersPacket(id, passengerIds)
     
     private val dirtyFlags = AtomicInteger(0)
@@ -70,7 +78,7 @@ internal open class PacketEntityNode<M : EntityMetadata>(
             equipmentObserver = { if (markDirty(DIRTY_EQUIPMENT)) root.queueFlush() },
             metadataObserver = { if (markMetadataDirty(it)) root.queueFlush() }
         )
-        passengers.forEach { it.observe(root) }
+        passengerNodes.forEach { it.observe(root) }
     }
     
     open fun unobserve() {
@@ -79,7 +87,7 @@ internal open class PacketEntityNode<M : EntityMetadata>(
         
         observed = false
         state.unobserve()
-        passengers.forEach { it.unobserve() }
+        passengerNodes.forEach { it.unobserve() }
     }
     
     protected fun markDirty(flag: Int): Boolean {
@@ -157,23 +165,66 @@ internal open class PacketEntityNode<M : EntityMetadata>(
             add(fullMetadataPacket)
         }
     
-    private fun collectGraphEntities(entities: MutableList<PacketEntityNode<*>>) {
-        passengers.forEach { it.collectGraphEntities(entities) }
+    private fun collectGraphEntities(entities: MutableList<PacketEntityNodeImpl<*>>) {
+        passengerNodes.forEach { it.collectGraphEntities(entities) }
         entities += this
     }
     
-    fun runInteractHandlers(player: Player, interactLocation: Vector3dc) {
-        if (interactHandlers.isEmpty())
+    fun runAttackHandlers(player: Player) {
+        if (attackHandlers.isEmpty())
             return
         
-        PacketEntityManager.queueMainThreadTask {
-            val dsl = InteractDslImpl(player, interactLocation)
-            for (handler in interactHandlers) {
-                try {
-                    dsl.handler()
-                } catch (e: Exception) {
-                    PacketEntityManager.logger.error("Exception in PacketEntity interact handler", e)
-                }
+        val dsl = AttackDslImpl(player)
+        for (handler in attackHandlers) {
+            try {
+                dsl.handler()
+            } catch (e: Exception) {
+                PacketEntityManager.logger.error("Exception in PacketEntity attack handler", e)
+            }
+        }
+    }
+    
+    fun runAttackAsyncHandlers(event: ServerboundAttackPacketEvent) {
+        if (attackAsyncHandlers.isEmpty())
+            return
+        
+        for (handler in attackAsyncHandlers) {
+            try {
+                handler(event)
+            } catch (e: Exception) {
+                PacketEntityManager.logger.error("Exception in async PacketEntity attack handler", e)
+            }
+        }
+    }
+    
+    fun runInteractHandlers(player: Player, hand: EquipmentSlot, interactLocation: Vector3dc): InteractionResult {
+        if (interactHandlers.isEmpty())
+            return InteractionResult.Pass
+        
+        val dsl = InteractDslImpl(player, hand, interactLocation)
+        for (handler in interactHandlers) {
+            val result = try {
+                dsl.handler()
+            } catch (e: Exception) {
+                PacketEntityManager.logger.error("Exception in PacketEntity interact handler", e)
+                InteractionResult.Pass
+            }
+            if (result !is InteractionResult.Pass)
+                return result
+        }
+        
+        return InteractionResult.Pass
+    }
+    
+    fun runInteractAsyncHandlers(event: ServerboundInteractPacketEvent) {
+        if (interactAsyncHandlers.isEmpty())
+            return
+        
+        for (handler in interactAsyncHandlers) {
+            try {
+                handler(event)
+            } catch (e: Exception) {
+                PacketEntityManager.logger.error("Exception in async PacketEntity interact handler", e)
             }
         }
     }
@@ -186,8 +237,8 @@ internal class PacketEntityPassengerData<M : EntityMetadata>(
     private val metadata: M
 ) {
     
-    fun createNode(world: World): PacketEntityNode<M> =
-        PacketEntityNode(type, state, metadata, world)
+    fun createNode(world: World): PacketEntityNodeImpl<M> =
+        PacketEntityNodeImpl(type, state, metadata, world)
     
 }
 
@@ -195,12 +246,15 @@ internal class PacketEntityImpl<M : EntityMetadata>(
     type: EntityType<*>,
     private val rootState: PacketEntityRootState<*>,
     metadata: M
-) : PacketEntityNode<M>(type, rootState, metadata, rootState.location.get().world), PacketEntity<M> {
+) : PacketEntityNodeImpl<M>(type, rootState, metadata, rootState.location.get().world), PacketEntity<M> {
     
-    override val lod: PacketEntityLod = rootState.lod
+    override val visibility: PacketEntityVisibility = rootState.visibility
     override val spawnHandlers: MutableList<(Player) -> Unit> = rootState.spawnHandlers
     override val despawnHandlers: MutableList<(Player) -> Unit> = rootState.despawnHandlers
-    override val interactHandlers: MutableList<InteractDsl.() -> Unit> = rootState.interactHandlers
+    override val attackHandlers: MutableList<AttackDsl.() -> Unit> = rootState.attackHandlers
+    override val attackAsyncHandlers: MutableList<(ServerboundAttackPacketEvent) -> Unit> = rootState.attackAsyncHandlers
+    override val interactHandlers: MutableList<InteractDsl.() -> InteractionResult> = rootState.interactHandlers
+    override val interactAsyncHandlers: MutableList<(ServerboundInteractPacketEvent) -> Unit> = rootState.interactAsyncHandlers
     override var location by rootState.location
     override var viewerWhitelist by rootState.viewerWhitelist
     override var viewerBlacklist by rootState.viewerBlacklist
@@ -214,7 +268,7 @@ internal class PacketEntityImpl<M : EntityMetadata>(
     private val manager: PacketEntityManager
     private var rootObserved = false
     val graphRemovePacket: ClientboundRemoveEntitiesPacket =
-        ClientboundRemoveEntitiesPacket(*graphEntities.mapToIntArray(PacketEntityNode<*>::id))
+        ClientboundRemoveEntitiesPacket(*graphEntities.mapToIntArray(PacketEntityNodeImpl<*>::id))
     
     val spawnBundlePacket: ClientboundBundlePacket
         get() = ClientboundBundlePacket(graphSpawnPackets)
