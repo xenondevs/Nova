@@ -1,4 +1,4 @@
-<code_scheme name="Xenondevs" version="173">
+<code_scheme name="xenondevs" version="173">
     <option name="FORMATTER_TAGS_ENABLED" value="true"/>
     <JSON>
         <option name="ARRAY_WRAPPING" value="0"/>
@@ -19,6 +19,7 @@
     </JetCodeStyleSettings>
     <Markdown>
         <option name="WRAP_TEXT_IF_LONG" value="false"/>
+        <option name="WRAP_TEXT_INSIDE_BLOCKQUOTES" value="false"/>
     </Markdown>
     <XML>
         <option name="XML_TEXT_WRAP" value="0"/>
@@ -54,18 +55,6 @@
         <indentOptions>
             <option name="CONTINUATION_INDENT_SIZE" value="4"/>
             <option name="KEEP_INDENTS_ON_EMPTY_LINES" value="true"/>
-        </indentOptions>
-    </codeStyleSettings>
-    <codeStyleSettings language="protobuf">
-        <indentOptions>
-            <option name="INDENT_SIZE" value="4"/>
-            <option name="TAB_SIZE" value="4"/>
-        </indentOptions>
-    </codeStyleSettings>
-    <codeStyleSettings language="prototext">
-        <indentOptions>
-            <option name="INDENT_SIZE" value="4"/>
-            <option name="TAB_SIZE" value="4"/>
         </indentOptions>
     </codeStyleSettings>
 </code_scheme>
