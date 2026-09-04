@@ -11,3 +11,6 @@ NovaRuleSet:
   KeyToString:
     active: true
     severity: error
+  TypedKeyAsKey:
+    active: true
+    severity: error

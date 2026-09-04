@@ -14,7 +14,8 @@ class NovaRuleSetProvider : RuleSetProvider {
         mapOf(
             RuleName("RegistryEntryComparison") to ::RegistryEntryComparisonRule,
             RuleName("MaterialUsage") to ::MaterialUsageRule,
-            RuleName("KeyToString") to ::KeyToStringRule
+            RuleName("KeyToString") to ::KeyToStringRule,
+            RuleName("TypedKeyAsKey") to ::TypedKeyAsKeyRule
         )
     )
     
