@@ -25,6 +25,7 @@ Nova uses [Origami](https://github.com/xenondevs/origami), an access-widener and
 
 ## General
 
+* On Windows systems, stale Gradle daemons can prevent origami installation due to open file handles. If you encounter this, verify that the daemon process is not actually doing any work, then kill it and retry the build.
 * Prefer adding an accesswidener entry over using reflection to access server internals.
 * Create transitive access widener entries if and only if the type will be part of a public API consumed by addons.
 * Default to private visibility, then protected or internal. Use public visibility only if it's API intended to be consumed by addons.
