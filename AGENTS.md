@@ -29,6 +29,7 @@ Nova uses [Origami](https://github.com/xenondevs/origami), an access-widener and
 * Prefer adding an accesswidener entry over using reflection to access server internals.
 * Create transitive access widener entries if and only if the type will be part of a public API consumed by addons.
 * Default to private visibility, then protected or internal. Use public visibility only if it's API intended to be consumed by addons.
+* This project uses Kotlin's new name-based destructuring syntax. This means that what was previously `val (a, b) = pair` is now `val [a, b] = pair` (position-based destructuring) or `val (first, second) = pair` (name-based destructuring).
 
 ### Mixin Guidelines
 
