@@ -30,11 +30,13 @@ class NovaRegistryProcessor(
         resolver.getDeclarationsFromPackage("io.papermc.paper.registry.keys")
             .filterIsInstance<KSClassDeclaration>()
             .filter { it.simpleName.asString().endsWith("Keys") }
+            .filterNot { it.isMinecraftExperimental }
             .forEach { entriesGenerator.generateEntriesFile(it) }
         
         val tagKeysDeclarations = resolver.getDeclarationsFromPackage("io.papermc.paper.registry.keys.tags")
             .filterIsInstance<KSClassDeclaration>()
             .filter { it.simpleName.asString().endsWith("TagKeys") }
+            .filterNot { it.isMinecraftExperimental }
             .toList()
         tagKeysDeclarations.forEach { entriesGenerator.generateEntrySetsFile(it) }
         tagExtensionsGenerator.generateTagExtensions(tagKeysDeclarations)
