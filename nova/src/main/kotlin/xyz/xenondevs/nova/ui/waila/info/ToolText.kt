@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.ui.waila.info
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.ShadowColor
 import org.bukkit.GameMode
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
@@ -11,19 +12,19 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.tags
-import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
+import xyz.xenondevs.nova.resources.builder.task.TextureIconContent
+import xyz.xenondevs.nova.ui.overlay.MovedFonts
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.world.block.blockType
 
 private val CHECK_MARK = Component.text("✔", NamedTextColor.GREEN)
 private val CROSS = Component.text("❌", NamedTextColor.RED)
 
-object ToolLine {
+internal object ToolText {
     
-    fun getToolLine(player: Player, block: Block): WailaLine {
+    fun getToolText(player: Player, block: Block): Component {
         val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
-        return getToolLine(
+        return getToolText(
             player,
             block.blockType.tags.get(),
             block.blockType.hardness.toDouble(),
@@ -31,9 +32,9 @@ object ToolLine {
         )
     }
     
-    fun getCustomItemServiceToolLine(player: Player, block: Block): WailaLine {
+    fun getCustomItemServiceToolText(player: Player, block: Block): Component {
         val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
-        return getToolLine(
+        return getToolText(
             player,
             emptySet(),
             1.0,
@@ -41,44 +42,35 @@ object ToolLine {
         )
     }
     
-    fun getToolLine(
+    fun getToolText(
         player: Player,
         tags: Set<RegistryEntrySet.Paper.Tag<BlockType>>,
         hardness: Double,
         correctToolForDrops: Boolean?
-    ): WailaLine {
+    ): Component {
         val builder = Component.text()
-        if (hardness < 0) {
-            return WailaLine(
-                builder
-                    .append(Component.translatable("waila.nova.required_tool.unbreakable", NamedTextColor.RED))
-                    .build(),
-                Alignment.CENTERED
-            )
+        
+        // unbreakable
+        if (hardness < 0)
+            return builder.append(CROSS).build()
+        
+        if (player.gameMode == GameMode.CREATIVE || correctToolForDrops == true) {
+            builder.append(CHECK_MARK)
+        } else if (correctToolForDrops != null) {
+            builder.append(CROSS)
         }
         
-        fun appendCanBreak() {
-            builder.append(Component.space())
-            if (player.gameMode == GameMode.CREATIVE || correctToolForDrops == true) {
-                builder.append(CHECK_MARK)
-            } else if (correctToolForDrops != null) {
-                builder.append(CROSS)
-            }
-        }
-        
-        val toolIcons = NovaRegistries.WAILA_TOOL_ICON_PROVIDER.entrySet.get()
+        NovaRegistries.WAILA_TOOL_ICON_PROVIDER.entrySet.get()
             .flatMapTo(LinkedHashSet()) { it.getIcon(tags) }
-            .map { ResourceLookups.textureIcon.getValue(it).component }
+            .mapNotNull { 
+                TextureIconContent.getIcon(it)
+                    ?.component
+                    ?.shadowColor(ShadowColor.none())
+                    ?.let { c -> MovedFonts.moveVertically(c, 1) }
+            }
+            .forEach(builder::append)
         
-        if (toolIcons.isEmpty()) {
-            appendCanBreak()
-        } else {
-            builder.append(Component.translatable("waila.nova.required_tool", NamedTextColor.GRAY))
-            toolIcons.forEach(builder::append)
-            appendCanBreak()
-        }
-        
-        return WailaLine(builder.build(), Alignment.CENTERED)
+        return builder.build()
     }
     
 }

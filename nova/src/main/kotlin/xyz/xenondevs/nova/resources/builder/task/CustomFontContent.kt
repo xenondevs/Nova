@@ -39,7 +39,7 @@ abstract class CustomFontContent internal constructor(
             val id = ResourcePath.of(ResourceType.Font, fontNameTemplate.format(++currentFontNum))
             val font = Font(id)
             fontContent += font
-            if (generateMovedVariants) movedFontContent.requestMovedFonts(id, 1..19)
+            if (generateMovedVariants) movedFontContent.requestMovedFonts(id, 1..20)
             this.currentFont = font
         }
         

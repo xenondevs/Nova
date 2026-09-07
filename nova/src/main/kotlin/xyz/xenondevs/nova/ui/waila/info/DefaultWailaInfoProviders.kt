@@ -6,6 +6,8 @@ import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.ShadowColor
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.Ageable
 import org.bukkit.block.data.BlockData
@@ -38,8 +40,8 @@ import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.registry.entries.BlockTypeTags
 import xyz.xenondevs.nova.registry.registryEntrySetOf
 import xyz.xenondevs.nova.registry.typedKey
-import xyz.xenondevs.nova.world.block.DefaultBlockTags
-import xyz.xenondevs.nova.world.block.NovaBlockState
+import xyz.xenondevs.nova.util.capitalizeAll
+import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.isNovaTileEntity
 import xyz.xenondevs.nova.world.block.name
@@ -56,60 +58,58 @@ object DefaultWailaInfoProviders {
     
     // TODO waila icon by block state
     
-    val DEFAULT_VANILLA = wailaInfoProvider("default_vanilla") {
+    val DEFAULT = wailaInfoProvider("default") {
         priority = -1
         blocks = registryEntrySetOf(RegistryKey.BLOCK)
         infoProvider { player, block, blockState ->
-            val mainBlockType = getMainBlockType(blockState)
+            val blockType = getMainBlockType(blockState)
             
             val lines = buildList {
-                this += WailaLine(mainBlockType.name, WailaLine.Alignment.CENTERED)
+                this += WailaLine(
+                    Component.text()
+                        .append(blockType.name)
+                        .append(Component.text(" "))
+                        .append(ToolText.getToolText(player, block))
+                        .build(),
+                    WailaLine.Alignment.LEFT
+                )
                 
                 this += WailaLine(
-                    Component.text(
-                        "minecraft:${blockState.material.name.lowercase()}",
-                        NamedTextColor.DARK_GRAY
-                    ),
-                    WailaLine.Alignment.CENTERED
+                    Component.text()
+                        .move(1) // to adjust for italic
+                        .append(Component.text(
+                            blockType.key.namespace
+                                .replace('_', ' ')
+                                .replace('-', ' ')
+                                .capitalizeAll(),
+                            NamedTextColor.BLUE,
+                            TextDecoration.ITALIC
+                        ))
+                        .shadowColor(ShadowColor.none())
+                        .build(),
+                    WailaLine.Alignment.LEFT
                 )
-                this += ToolLine.getToolLine(player, block)
-            }
-            
-            return@infoProvider WailaInfo(mainBlockType.key, lines)
-        }
-    }
-    
-    val DEFAULT_NOVA = wailaInfoProvider<NovaBlockState>("default_nova") {
-        priority = -1
-        blocks = DefaultBlockTags.NOVA
-        infoProvider { player, block, blockState ->
-            val blockType = blockState.blockType
-            val key = blockType.key
-            
-            val lines = ArrayList<WailaLine>()
-            lines += WailaLine(blockType.name, WailaLine.Alignment.CENTERED)
-            lines += WailaLine(Component.text(key.asString(), NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
-            lines += ToolLine.getToolLine(player, block)
-            
-            if (blockType.isNovaTileEntity) {
-                val tileEntity = block.novaTileEntity
-                if (tileEntity is NetworkedTileEntity) {
-                    val energyHolder = tileEntity.holders.firstInstanceOfOrNull<DefaultEnergyHolder>()
-                    if (energyHolder != null) {
-                        lines += EnergyHolderLine.getEnergyBarLine(energyHolder)
-                        lines += EnergyHolderLine.getEnergyAmountLine(energyHolder)
-                        lines += EnergyHolderLine.getEnergyDeltaLine(energyHolder)
+                
+                if (blockType.isNovaTileEntity) {
+                    val tileEntity = block.novaTileEntity
+                    if (tileEntity is NetworkedTileEntity) {
+                        val energyHolder = tileEntity.holders.firstInstanceOfOrNull<DefaultEnergyHolder>()
+                        if (energyHolder != null) {
+                            this += EnergyHolderLine.getEnergyBarLine(energyHolder)
+                            this += EnergyHolderLine.getEnergyAmountLine(energyHolder)
+                            this += EnergyHolderLine.getEnergyDeltaLine(energyHolder)
+                        }
                     }
                 }
             }
             
-            return@infoProvider WailaInfo(key, lines)
+            return@infoProvider WailaInfo(blockType.key, lines)
         }
     }
     
     val DEFAULT_TOOL_ICON = wailaToolIconProvider("default_tool_icon") {
         iconProvider { tags ->
-            buildSet { 
+            buildSet {
                 if (BlockTypeTags.SHEARS_MINOR_BREAKING_SPEED in tags || BlockTypeTags.SHEARS_MAJOR_BREAKING_SPEED in tags || BlockTypeTags.SHEARS_EXTREME_BREAKING_SPEED in tags)
                     add(Key.key("item/shears"))
                 if (BlockTypeTags.SWORD_EFFICIENT in tags || BlockTypeTags.SWORD_INSTANTLY_MINES in tags)
@@ -139,14 +139,14 @@ object DefaultWailaInfoProviders {
     init {
         wailaInfoProvider<Brushable>("brushable") {
             blocks = registryEntrySetOf(BlockTypeKeys.SUSPICIOUS_SAND, BlockTypeKeys.SUSPICIOUS_GRAVEL)
-            infoProvider(DEFAULT_VANILLA) { _, _, blockState, info ->
+            infoProvider(DEFAULT) { _, _, blockState, info ->
                 info.copy(icon = Key.key("${blockState.material.name.lowercase()}_${blockState.dusted}"))
             }
         }
         
         wailaInfoProvider<Cake>("brushable") {
             blocks = registryEntrySetOf(BlockTypeKeys.CAKE)
-            infoProvider(DEFAULT_VANILLA) { _, _, cake, info ->
+            infoProvider(DEFAULT) { _, _, cake, info ->
                 val bites = cake.bites
                 info.copy(icon = Key.key(if (bites == 0) "cake" else "cake_slice$bites"))
             }
@@ -154,14 +154,14 @@ object DefaultWailaInfoProviders {
         
         wailaInfoProvider<Campfire>("brushable") {
             blocks = registryEntrySetOf(BlockTypeKeys.CAMPFIRE, BlockTypeKeys.SOUL_CAMPFIRE)
-            infoProvider(DEFAULT_VANILLA) { _, _, campfire, info ->
+            infoProvider(DEFAULT) { _, _, campfire, info ->
                 info.copy(icon = Key.key(if (campfire.isLit) campfire.material.name.lowercase() else "campfire_off"))
             }
         }
         
         wailaInfoProvider<Candle>("brushable") {
             blocks = registryEntrySetOf(BlockTypeTagKeys.CANDLES)
-            infoProvider(DEFAULT_VANILLA) { _, _, candle, info ->
+            infoProvider(DEFAULT) { _, _, candle, info ->
                 val name = candle.material.name.lowercase()
                 val amount = when (candle.candles) {
                     1 -> "one_candle"
@@ -176,7 +176,7 @@ object DefaultWailaInfoProviders {
         
         wailaInfoProvider<Levelled>("cauldron") {
             blocks = registryEntrySetOf(BlockTypeKeys.WATER_CAULDRON, BlockTypeKeys.POWDER_SNOW_CAULDRON)
-            infoProvider(DEFAULT_VANILLA) { _, _, cauldron, info ->
+            infoProvider(DEFAULT) { _, _, cauldron, info ->
                 val level = when (cauldron.level) {
                     1 -> "level1"
                     2 -> "level2"
@@ -189,14 +189,14 @@ object DefaultWailaInfoProviders {
         
         wailaInfoProvider<Cocoa>("cocoa") {
             blocks = registryEntrySetOf(BlockTypeKeys.COCOA)
-            infoProvider(DEFAULT_VANILLA) { _, _, cocoa, info ->
+            infoProvider(DEFAULT) { _, _, cocoa, info ->
                 info.copy(icon = Key.key("cocoa_stage${cocoa.age}"))
             }
         }
         
         wailaInfoProvider<Comparator>("comparator") {
             blocks = registryEntrySetOf(BlockTypeKeys.COMPARATOR)
-            infoProvider(DEFAULT_VANILLA) { _, _, comparator, info ->
+            infoProvider(DEFAULT) { _, _, comparator, info ->
                 info.copy(
                     icon = Key.key(
                         "comparator"
@@ -209,7 +209,7 @@ object DefaultWailaInfoProviders {
         
         wailaInfoProvider<Ageable>("crop") {
             blocks = registryEntrySetOf(MAX_TEXTURE_STAGES.keys)
-            infoProvider(DEFAULT_VANILLA) { _, _, crop, info ->
+            infoProvider(DEFAULT) { _, _, crop, info ->
                 val maxTexStage = MAX_TEXTURE_STAGES[crop.material.asBlockType()!!.typedKey]!!
                 val stage = ((crop.age / crop.maximumAge.toDouble()) * maxTexStage).roundToInt()
                 info.copy(icon = Key.key(crop.material.name.lowercase() + "_stage$stage"))
@@ -218,7 +218,7 @@ object DefaultWailaInfoProviders {
         
         wailaInfoProvider<DaylightDetector>("daylight_detector") {
             blocks = registryEntrySetOf(BlockTypeKeys.DAYLIGHT_DETECTOR)
-            infoProvider(DEFAULT_VANILLA) { _, _, detector, info ->
+            infoProvider(DEFAULT) { _, _, detector, info ->
                 if (detector.isInverted)
                     info.copy(icon = Key.key("daylight_detector_inverted"))
                 else info
@@ -227,21 +227,21 @@ object DefaultWailaInfoProviders {
         
         wailaInfoProvider<DriedGhast>("dried_ghast") {
             blocks = registryEntrySetOf(BlockTypeKeys.DRIED_GHAST)
-            infoProvider(DEFAULT_VANILLA) { _, _, driedGhast, info ->
+            infoProvider(DEFAULT) { _, _, driedGhast, info ->
                 info.copy(icon = Key.key("dried_ghast_hydration_${driedGhast.hydration}"))
             }
         }
         
         wailaInfoProvider<Hatchable>("hatchable") {
             blocks = registryEntrySetOf(BlockTypeKeys.SNIFFER_EGG)
-            infoProvider(DEFAULT_VANILLA) { _, _, hatchable, info ->
+            infoProvider(DEFAULT) { _, _, hatchable, info ->
                 info.copy(icon = Key.key("${hatchable.material.name.lowercase()}_${hatchable.hatch}"))
             }
         }
         
         wailaInfoProvider<Lantern>("lantern") {
             blocks = registryEntrySetOf(BlockTypeTagKeys.LANTERNS)
-            infoProvider(DEFAULT_VANILLA) { _, _, lantern, info ->
+            infoProvider(DEFAULT) { _, _, lantern, info ->
                 if (lantern.isHanging)
                     info.copy(icon = Key.key(lantern.material.name.lowercase() + "_hanging"))
                 else info
@@ -250,7 +250,7 @@ object DefaultWailaInfoProviders {
         
         wailaInfoProvider<Lightable>("redstone_lamp") {
             blocks = registryEntrySetOf(BlockTypeKeys.REDSTONE_LAMP)
-            infoProvider(DEFAULT_VANILLA) { _, _, lightable, info ->
+            infoProvider(DEFAULT) { _, _, lightable, info ->
                 if (lightable.isLit)
                     info.copy(icon = Key.key("redstone_lamp_on"))
                 else info
@@ -259,14 +259,14 @@ object DefaultWailaInfoProviders {
         
         wailaInfoProvider<RedstoneRail>("redstone_rail") {
             blocks = registryEntrySetOf(BlockTypeKeys.ACTIVATOR_RAIL, BlockTypeKeys.DETECTOR_RAIL, BlockTypeKeys.POWERED_RAIL)
-            infoProvider(DEFAULT_VANILLA) { _, _, rail, info ->
+            infoProvider(DEFAULT) { _, _, rail, info ->
                 info.copy(icon = Key.key(rail.material.name.lowercase() + if (rail.isPowered) "_on" else ""))
             }
         }
         
         wailaInfoProvider<Repeater>("repeater") {
             blocks = registryEntrySetOf(BlockTypeKeys.REPEATER)
-            infoProvider(DEFAULT_VANILLA) { _, _, repeater, info ->
+            infoProvider(DEFAULT) { _, _, repeater, info ->
                 info.copy(
                     icon = Key.key(
                         "repeater_${repeater.delay}tick"
@@ -279,14 +279,14 @@ object DefaultWailaInfoProviders {
         
         wailaInfoProvider<RespawnAnchor>("respawn_anchor") {
             blocks = registryEntrySetOf(BlockTypeKeys.RESPAWN_ANCHOR)
-            infoProvider(DEFAULT_VANILLA) { _, _, anchor, info ->
+            infoProvider(DEFAULT) { _, _, anchor, info ->
                 info.copy(icon = Key.key("respawn_anchor_${anchor.charges}"))
             }
         }
         
         wailaInfoProvider<SeaPickle>("sea_pickle") {
             blocks = registryEntrySetOf(BlockTypeKeys.SEA_PICKLE)
-            infoProvider(DEFAULT_VANILLA) { _, _, pickle, info ->
+            infoProvider(DEFAULT) { _, _, pickle, info ->
                 fun getSeaPickleName(): String {
                     val amount = pickle.pickles
                     if (amount > 1) {
@@ -309,7 +309,7 @@ object DefaultWailaInfoProviders {
         
         wailaInfoProvider<TestBlock>("test_block") {
             blocks = registryEntrySetOf(BlockTypeKeys.TEST_BLOCK)
-            infoProvider(DEFAULT_VANILLA) { _, _, testBlock, info ->
+            infoProvider(DEFAULT) { _, _, testBlock, info ->
                 info.copy(icon = Key.key("test_block_${testBlock.mode.name.lowercase()}"))
             }
         }

@@ -116,6 +116,18 @@ internal object ResourceLookups {
         by wailaDataLookup
     
     /**
+     * Lookup for WAILA background characters.
+     */
+    val wailaBackgroundLookup: MutableProvider<List<List<FontChar>>> =
+        resourceLookup("waila_background_lookup", emptyList())
+    
+    /**
+     * WAILA background characters indexed by height and part.
+     */
+    var wailaBackground: List<List<FontChar>>
+        by wailaBackgroundLookup
+    
+    /**
      * Lookup for texture icons.
      */
     val textureIconLookup: MutableProvider<Map<Key, FontChar>> =
@@ -185,7 +197,7 @@ internal object ResourceLookups {
         for (lookup in lookups.values) {
             try {
                 lookup.load()
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 // clear invalid lookups and force pack rebuild on the next startup
                 lookups.values.forEach(ResourceLookup<*>::remove)
                 PermanentStorage.remove(ResourceGeneration.RESOURCES_HASH)

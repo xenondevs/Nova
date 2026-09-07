@@ -197,7 +197,12 @@ internal object NovaCommand : Command() {
             .then(literal("on")
                 .executes0 { toggleWaila(it, true) })
             .then(literal("off")
-                .executes0 { toggleWaila(it, false) }))
+                .executes0 { toggleWaila(it, false) })
+            .then(literal("background")
+                .then(literal("on")
+                    .executes0 { toggleWailaBackground(it, true) })
+                .then(literal("off")
+                    .executes0 { toggleWailaBackground(it, false) })))
         .then(literal("renderDistance")
             .requiresPlayer()
             .requiresPermission("nova.command.renderDistance")
@@ -328,6 +333,14 @@ internal object NovaCommand : Command() {
         } else {
             ctx.source.sender.sendMessage(Component.translatable("command.nova.waila.already_$onOff", NamedTextColor.RED))
         }
+    }
+    
+    private fun toggleWailaBackground(ctx: CommandContext<CommandSourceStack>, state: Boolean) {
+        val changed = WailaManager.toggleBackground(ctx.player, state)
+        val onOff = if (state) "on" else "off"
+        val result = if (changed) onOff else "already_$onOff"
+        val color = if (changed) NamedTextColor.GRAY else NamedTextColor.RED
+        ctx.source.sender.sendMessage(Component.translatable("command.nova.waila.background.$result", color))
     }
     
     private fun giveTo(ctx: CommandContext<CommandSourceStack>) =

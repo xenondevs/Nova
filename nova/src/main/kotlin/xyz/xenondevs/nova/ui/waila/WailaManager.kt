@@ -23,9 +23,13 @@ import xyz.xenondevs.nova.util.unregisterEvents
 import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
 
 private val WAILA_ENABLED_KEY = NamespacedKey("nova", "waila")
+private val WAILA_BACKGROUND_ENABLED_KEY = NamespacedKey("nova", "waila_background")
 
 private val Player.isWailaEnabled: Boolean
     get() = persistentDataContainer.get<Boolean>(WAILA_ENABLED_KEY) != false
+
+private val Player.isWailaBackgroundEnabled: Boolean
+    get() = persistentDataContainer.get<Boolean>(WAILA_BACKGROUND_ENABLED_KEY) != false
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -74,16 +78,25 @@ internal object WailaManager : Listener, IWailaManager {
             if (player in overlays)
                 return false
             
-            dataContainer.set(WAILA_ENABLED_KEY, true)
+            dataContainer[WAILA_ENABLED_KEY] = true
             addWailaOverlay(player)
         } else {
             if (player !in overlays)
                 return false
             
-            dataContainer.set(WAILA_ENABLED_KEY, false)
+            dataContainer[WAILA_ENABLED_KEY] = false
             removeWailaOverlay(player)
         }
         
+        return true
+    }
+    
+    fun toggleBackground(player: Player, state: Boolean): Boolean {
+        if (player.isWailaBackgroundEnabled == state)
+            return false
+        
+        player.persistentDataContainer[WAILA_BACKGROUND_ENABLED_KEY] = state
+        overlays[player]?.backgroundEnabled = state
         return true
     }
     
@@ -93,7 +106,7 @@ internal object WailaManager : Listener, IWailaManager {
     }
     
     private fun addWailaOverlay(player: Player) {
-        overlays[player] = Waila(player)
+        overlays[player] = Waila(player, player.isWailaBackgroundEnabled)
     }
     
     private fun removeWailaOverlay(player: Player) {

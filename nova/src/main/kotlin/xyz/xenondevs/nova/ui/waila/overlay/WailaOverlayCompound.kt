@@ -36,7 +36,7 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
     private val lineOverlays = Array(10, ::WailaLineOverlay)
     
     @Suppress("DEPRECATION")
-    fun update(icon: Key, lines: List<WailaLine>) {
+    fun update(icon: Key, lines: List<WailaLine>, backgroundEnabled: Boolean) {
         require(lines.size <= 10) { "Waila text can't be longer than 10 lines" }
         
         // reset line overlays
@@ -44,7 +44,12 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
         overlays += imageOverlay
         
         val iconChar = ResourceLookups.wailaData[icon]
-        val [beginX, centerX] = imageOverlay.update(iconChar, lines.size, lines.maxOf { CharSizes.calculateComponentWidth(it.text, player.locale) })
+        val [beginX, centerX] = imageOverlay.update(
+            iconChar,
+            lines.size,
+            (lines.maxOf { CharSizes.calculateComponentWidth(it.text, player.locale) } - 1f).coerceAtLeast(0f),
+            backgroundEnabled
+        )
         
         // re-add line overlays
         lineOverlays.forEachIndexed { idx, overlay ->

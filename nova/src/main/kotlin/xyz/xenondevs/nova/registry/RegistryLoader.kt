@@ -286,8 +286,10 @@ object RegistryLoader {
         check(!RegistryContext.isInBootstrapPhase) // re-running is not for bootstrap phase
         
         vanillaRerunnableBuilders[registry]?.forEach { [key, builder] ->
+            val factory = vanillaBuilderFactories[registry]?.get(key)
+                ?: return@forEach
+            factory as BuilderFactory.Vanilla<Keyed, Any, RegistryElementBuilder.RerunnableVanilla<Keyed, Any>>
             builder.reset()
-            val factory = vanillaBuilderFactories[registry]?.get(key) as BuilderFactory.Vanilla<Keyed, Any, RegistryElementBuilder.RerunnableVanilla<Keyed, Any>>
             factory.runBuilder(builder)
             builder.prepareBuild()
         }
@@ -295,8 +297,11 @@ object RegistryLoader {
     //</editor-fold>
     
     //<editor-fold desc="lifecycle impl vanilla">
-    private fun <API : Keyed, NMS : Any> prepareVanillaBuilders(registryKey: RegistryKey<API>, factories: Map<Key, BuilderFactory.Vanilla<API, NMS, *>>) {
-        val factories = factories.toMutableMap()
+    private fun <API : Keyed, NMS : Any> prepareVanillaBuilders(
+        registryKey: RegistryKey<API>,
+        registeredFactories: Map<Key, BuilderFactory.Vanilla<API, NMS, *>>
+    ) {
+        val factories = registeredFactories.toMutableMap()
         val registryResourceKey = registryKey.toResourceKey<NMS>()
         
         // add factory for unknown elements
@@ -315,7 +320,7 @@ object RegistryLoader {
             val entry = RegistryEntry.paper(TypedKey.create(registryKey, key))
             val builder = factory.createAndConfigure(entry)
             builders += builder
-            if (builder is RegistryElementBuilder.RerunnableVanilla<*, *>)
+            if (key in registeredFactories && builder is RegistryElementBuilder.RerunnableVanilla<*, *>)
                 rerunnableBuilders[key] = builder
             
             // enqueue build & registration (on nms registry freeze)
