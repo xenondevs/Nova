@@ -64,7 +64,7 @@ class MovedFontContent : PackBuildData {
             fun getBitmapFont(id: ResourcePath<ResourceType.Font>): Font {
                 return bitmapFonts.getOrPut(id) {
                     val font = fontContent.mergedFonts[id]
-                        ?: throw IllegalStateException("Font $id does not exist or is not loaded in FontContent")
+                        ?: throw IllegalStateException("Font ${id.asString()} does not exist or is not loaded in FontContent")
                     
                     BitmapFontGenerator(builder, font).generateBitmapFont()
                 }

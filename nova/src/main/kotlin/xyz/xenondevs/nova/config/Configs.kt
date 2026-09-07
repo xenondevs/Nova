@@ -108,7 +108,7 @@ internal object NovaConfigBackend : ConfigBackend {
                 return JsonObject(emptyMap())
             }
         } catch (e: Exception) {
-            LOGGER.error("Failed to load config '$id': ${e.message}")
+            LOGGER.error("Failed to load config '${id.asString()}': ${e.message}")
             return null
         }
     }
@@ -121,7 +121,7 @@ internal object NovaConfigBackend : ConfigBackend {
     }
     
     override fun onError(id: Key, path: List<String>, exception: SerializationException) {
-        LOGGER.error("Failed to read '${path.joinToString(" > ")}' in config '$id': ${exception.message}")
+        LOGGER.error("Failed to read '${path.joinToString(" > ")}' in config '${id.asString()}': ${exception.message}")
     }
     
     override fun postReload() {

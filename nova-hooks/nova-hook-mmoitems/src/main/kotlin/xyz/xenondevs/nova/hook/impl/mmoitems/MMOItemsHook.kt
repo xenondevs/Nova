@@ -6,9 +6,9 @@ import net.Indyuce.mmoitems.api.Type
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 import net.Indyuce.mmoitems.MMOItems as MMOItemsPlugin
 
@@ -27,7 +28,7 @@ internal object MMOItemsHook : CustomItemService {
     
     override fun removeBlock(block: Block, breakEffects: Boolean): Boolean {
         if (MMO_ITEMS.customBlocks.getFromBlock(block.blockData).isEmpty) return false
-        block.type = Material.AIR
+        block.blockType = BlockType.AIR
         return true
     }
     

@@ -80,21 +80,21 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
                     ?: return@forEach
                 
                 if (bsd.multipart.isNotEmpty()) {
-                    builder.logger.warn("Block state file $bsdId contains multipart block states, which are not supported. " +
+                    builder.logger.warn("Block state file ${bsdId.asString()} contains multipart block states, which are not supported. " +
                         "Block states defined in this file will be ignored and potentially overwritten.")
                     return@forEach
                 }
                 
                 for ([variant, models] in bsd.variants) {
                     if (variant.properties.keys != type.properties) {
-                        builder.logger.warn("Variant '$variant' in block state file $bsdId does not specify all properties explicitly " +
+                        builder.logger.warn("Variant '$variant' in block state file ${bsdId.asString()} does not specify all properties explicitly " +
                             "(got ${variant.properties.keys}, expected ${type.properties}). " +
                             "This variant will be ignored and potentially overwritten.")
                         continue
                     }
                     
                     if (models.size != 1) {
-                        builder.logger.warn("Variant '$variant' in block state file $bsdId has ${models.size} models, " +
+                        builder.logger.warn("Variant '$variant' in block state file ${bsdId.asString()} has ${models.size} models, " +
                             "but only one is supported. This variant will be ignored and potentially overwritten.")
                         continue
                     }

@@ -709,7 +709,7 @@ internal open class NovaBlock(
         try {
             return run()
         } catch (t: Throwable) {
-            LOGGER.error("Failed to $name for $key", t)
+            LOGGER.error("Failed to $name for ${key.asString()}", t)
         }
         return fallback
     }
@@ -719,7 +719,7 @@ internal open class NovaBlock(
         try {
             return run()
         } catch (t: Throwable) {
-            LOGGER.error("Failed to $name for $key", t)
+            LOGGER.error("Failed to $name for ${key.asString()}", t)
         }
         return lazyFallback()
     }

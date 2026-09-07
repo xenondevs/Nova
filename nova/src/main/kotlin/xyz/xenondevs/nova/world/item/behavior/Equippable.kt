@@ -81,14 +81,14 @@ fun Equippable(
     armor: Double = 0.0,
     armorToughness: Double = 0.0,
     knockbackResistance: Double = 0.0,
-    equipSound: Key = SoundEventKeys.ITEM_ARMOR_EQUIP_GENERIC,
+    equipSound: Key = SoundEventKeys.ITEM_ARMOR_EQUIP_GENERIC.key(),
     allowedEntities: RegistryEntrySet.Paper<EntityType>? = null,
     dispensable: Boolean = true,
     swappable: Boolean = true,
     damageOnHurt: Boolean = true,
     equipOnInteract: Boolean = true,
     canBeSheared: Boolean = false,
-    shearingSound: Key = SoundEventKeys.ITEM_SHEARS_SNIP
+    shearingSound: Key = SoundEventKeys.ITEM_SHEARS_SNIP.key()
 ) = ItemBehaviorFactory { _, cfg ->
     Equippable(
         equipment ?: NULL_PROVIDER,

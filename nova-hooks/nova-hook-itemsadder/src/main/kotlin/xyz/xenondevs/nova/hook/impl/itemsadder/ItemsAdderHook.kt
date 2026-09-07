@@ -8,8 +8,8 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.util.broadcastBreakEvent
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
+import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 
 @Hook(plugins = ["ItemsAdder"], loadListener = ItemsAdderLoadListener::class)
@@ -35,7 +36,7 @@ internal object ItemsAdderHook : CustomItemService {
         val customCrop = CustomCrop.byAlreadyPlaced(block)
         if (customCrop != null) {
             if (breakEffects) block.broadcastBreakEvent()
-            block.type = Material.AIR
+            block.blockType = BlockType.AIR
             return true
         }
         

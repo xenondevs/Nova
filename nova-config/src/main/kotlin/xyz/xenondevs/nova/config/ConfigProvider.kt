@@ -357,7 +357,7 @@ fun <T : Any> ConfigProvider.strongEntryOrElse(type: KType, default: Provider<T>
 
 @PublishedApi
 internal fun ConfigProvider.missingEntryMessage(vararg paths: List<String>): String =
-    "Missing config entry ${paths.joinToString(" or ") { "'${it.joinToString(" > ")}'" }} in '$configId'"
+    "Missing config entry ${paths.joinToString(" or ") { "'${it.joinToString(" > ")}'" }} in '${configId.asString()}'"
 
 @PublishedApi
 internal fun Array<out Array<String>>.toLists(): Array<List<String>> =

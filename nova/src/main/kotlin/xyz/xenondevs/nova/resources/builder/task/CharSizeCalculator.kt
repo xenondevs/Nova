@@ -48,7 +48,7 @@ class CharSizeCalculator(private val builder: ResourcePackBuilder) : PackTask {
                     
                     if (provider is ReferenceProvider) {
                         val referencedTable = CharSizes.getTable(provider.id)
-                            ?: throw IllegalStateException("Referenced font ${provider.id} has no char size table")
+                            ?: throw IllegalStateException("Referenced font ${provider.id.asString()} has no char size table")
                         table.merge(referencedTable)
                     } else {
                         table.merge(provider.charSizes)
@@ -57,7 +57,7 @@ class CharSizeCalculator(private val builder: ResourcePackBuilder) : PackTask {
                 
                 CharSizes.storeTable(id, table)
             } catch (t: Throwable) {
-                builder.logger.error("Failed to calculate char sizes for font ${font.id}", t)
+                builder.logger.error("Failed to calculate char sizes for font ${font.id.asString()}", t)
             }
         }
         

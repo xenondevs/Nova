@@ -202,7 +202,7 @@ class ResourcePackBuilder internal constructor(
          * @throws IllegalArgumentException If [id] is already in use.
          */
         fun register(id: Key, configure: ResourcePackConfiguration.() -> Unit) {
-            require(id !in configurations) { "Id $id is already in use" }
+            require(id !in configurations) { "Id ${id.asString()} is already in use" }
             configurations[id] = ResourcePackConfiguration(id).apply(configure)
         }
         
@@ -212,7 +212,7 @@ class ResourcePackBuilder internal constructor(
          */
         fun configure(id: Key, configure: ResourcePackConfiguration.() -> Unit) {
             val configuration = configurations[id]
-            requireNotNull(configuration) { "No ResourcePackBuilderFactory registered for id $id" }
+            requireNotNull(configuration) { "No ResourcePackBuilderFactory registered for id ${id.asString()}" }
             configuration.configure()
         }
         
@@ -222,7 +222,7 @@ class ResourcePackBuilder internal constructor(
          */
         internal fun createBuilder(id: Key, extraListener: Audience? = null): ResourcePackBuilder {
             val configuration = configurations[id]
-            requireNotNull(configuration) { "No ResourcePackBuilderFactory registered for id $id" }
+            requireNotNull(configuration) { "No ResourcePackBuilderFactory registered for id ${id.asString()}" }
             return configuration.create(extraListener)
         }
         
@@ -293,7 +293,7 @@ class ResourcePackBuilder internal constructor(
     lateinit var assetPacks: List<AssetPack> private set
     
     internal suspend fun build(): ByteArray {
-        logger.info("Building resource pack $id")
+        logger.info("Building resource pack ${id.asString()}")
         buildPackPreWorld()
         return buildPackPostWorld()
     }

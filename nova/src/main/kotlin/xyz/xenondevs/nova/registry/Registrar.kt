@@ -45,10 +45,7 @@ import org.bukkit.entity.Pig
 import org.bukkit.entity.Player
 import org.bukkit.entity.Wolf
 import org.bukkit.inventory.ItemType
-import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.BOOTSTRAP_LIFECYCLE
-import xyz.xenondevs.nova.config.CONFIGS
-import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayoutBuilder
 import xyz.xenondevs.nova.resources.builder.layout.equipment.EquipmentLayout

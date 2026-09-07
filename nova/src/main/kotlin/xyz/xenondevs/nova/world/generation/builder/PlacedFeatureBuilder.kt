@@ -390,9 +390,9 @@ class PlacedFeatureBuilder internal constructor(
      * Builds a [PlacedFeature] instance from the current state of this builder.
      */
     override fun build(): PlacedFeature {
-        requireNotNull(configuredFeature) { "No configured feature was set for placed feature $id" }
+        requireNotNull(configuredFeature) { "No configured feature was set for placed feature ${id.asString()}" }
         if (modifiers.isEmpty())
-            LOGGER.warn("Placed feature $id has no placement modifiers!")
+            LOGGER.warn("Placed feature ${id.asString()} has no placement modifiers!")
         
         return PlacedFeature(configuredFeature!!, modifiers)
     }

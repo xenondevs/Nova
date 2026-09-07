@@ -21,7 +21,7 @@ abstract class LegacyRegistryElementBuilder<T : Any> internal constructor(
     
     internal open fun register(): T {
         if (id in registry)
-            throw IllegalStateException("Tried to register duplicate element $id in $registry")
+            throw IllegalStateException("Tried to register duplicate element ${id.asString()} in $registry")
         
         val element = build()
         val holder = registry.register(id, element)

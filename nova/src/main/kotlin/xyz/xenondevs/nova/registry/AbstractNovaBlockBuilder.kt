@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.registry
 
 import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
@@ -106,7 +107,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         _explosionResistance, _flammable, _mapColor
     ) { hardness, requiresToolForDrops, pistonReaction, selectLightEmission, explosionResistance, flammable, mapColor ->
         Properties.of()
-            .setId(entry.key.toResourceKey())
+            .setId(TypedKey.create(entry.registry, entry.key).toResourceKey())
             .pushReaction(pistonReaction.nmsPushReaction)
             .explosionResistance(explosionResistance)
             .mapColor(mapColor.toNmsMapColor())

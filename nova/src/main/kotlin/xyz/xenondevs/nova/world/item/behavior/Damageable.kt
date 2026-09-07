@@ -46,7 +46,7 @@ fun Damageable(
     itemDamageOnAttackEntity: Int = 1,
     itemDamageOnBreakBlock: Int = 1,
     repairIngredient: RecipeChoice? = null,
-    breakSound: Key = SoundEventKeys.ENTITY_ITEM_BREAK
+    breakSound: Key = SoundEventKeys.ENTITY_ITEM_BREAK.key()
 ) = ItemBehaviorFactory { _, cfg ->
     Damageable(
         cfg.entry(maxDurability, listOf("max_durability"), listOf("durability")),
@@ -126,7 +126,7 @@ class Damageable(
             "itemDamageOnAttackEntity=$itemDamageOnAttackEntity, " +
             "itemDamageOnBreakBlock=$itemDamageOnBreakBlock, " +
             "repairIngredient=$repairIngredient" +
-            "breakSound=$breakSoundKey" +
+            "breakSound=${breakSoundKey.asString()}" +
             ")"
     }
     

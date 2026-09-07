@@ -82,7 +82,7 @@ class Font(
     fun mapReferences(fonts: Iterable<Font>): Set<Font> {
         return providers.asSequence()
             .filterIsInstance<ReferenceProvider>()
-            .mapTo(HashSet()) { ref -> fonts.firstOrNull { ref.id == it.id } ?: throw IllegalArgumentException("Referenced font ${ref.id} not found") }
+            .mapTo(HashSet()) { ref -> fonts.firstOrNull { ref.id == it.id } ?: throw IllegalArgumentException("Referenced font ${ref.id.asString()} not found") }
     }
     
     /**
@@ -93,7 +93,7 @@ class Font(
         for (provider in providers) {
             if (provider is ReferenceProvider) {
                 val font = fonts.firstOrNull { it.id == provider.id }
-                    ?: throw IllegalArgumentException("Referenced font ${provider.id} not found")
+                    ?: throw IllegalArgumentException("Referenced font ${provider.id.asString()} not found")
                 codePoints.addAll(font.getCodePoints(fonts))
             } else {
                 codePoints.addAll(provider.codePoints)

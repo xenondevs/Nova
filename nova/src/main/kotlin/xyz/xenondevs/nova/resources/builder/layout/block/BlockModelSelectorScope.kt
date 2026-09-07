@@ -57,9 +57,9 @@ class BlockModelSelectorScope internal constructor(
      * with parent `minecraft:block/cube_all` and `"all": "namespace:block/name"`.
      */
     override val defaultModel: ModelBuilder by lazy {
-        modelContent[ResourcePath(ResourceType.Model, id.namespace(), "block/${id.value()}")]
+        modelContent[ResourcePath(ResourceType.Model, id.key().namespace(), "block/${id.key().value()}")]
             ?.let(::ModelBuilder)
-            ?: createCubeModel(ResourcePath(ResourceType.Texture, id.namespace(), "block/${id.value()}"))
+            ?: createCubeModel(ResourcePath(ResourceType.Texture, id.key().namespace(), "block/${id.key().value()}"))
     }
     
     /**
@@ -68,13 +68,13 @@ class BlockModelSelectorScope internal constructor(
     override fun getModel(path: ResourcePath<ResourceType.Model>): ModelBuilder =
         modelContent[path]
             ?.let(::ModelBuilder)
-            ?: throw IllegalArgumentException("Model $path does not exist")
+            ?: throw IllegalArgumentException("Model ${path.asString()} does not exist")
     
     /**
      * Gets the model under the given [path] after or throws an exception if it does not exist.
      */
     override fun getModel(path: String): ModelBuilder =
-        getModel(ResourcePath.of(ResourceType.Model, path, id.namespace()))
+        getModel(ResourcePath.of(ResourceType.Model, path, id.key().namespace()))
     
     /**
      * Rotates the builder based on the built-in facing and axis [BlockStateProperties][BlockStateProperty].
@@ -110,7 +110,7 @@ class BlockModelSelectorScope internal constructor(
     // TODO: utility methods to generate cube models from textures
     
     fun createCubeModel(all: String): ModelBuilder =
-        createCubeModel(ResourcePath.of(ResourceType.Texture, all, id.namespace()))
+        createCubeModel(ResourcePath.of(ResourceType.Texture, all, id.key().namespace()))
     
     fun createCubeModel(all: ResourcePath<ResourceType.Texture>): ModelBuilder = ModelBuilder(
         Model(

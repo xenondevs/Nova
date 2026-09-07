@@ -17,7 +17,7 @@ object KeySerializer : KSerializer<Key> {
     override val descriptor = PrimitiveSerialDescriptor("xyz.xenondevs.nova.KeySerializer", PrimitiveKind.STRING)
     
     override fun serialize(encoder: Encoder, value: Key) {
-        encoder.encodeString(value.toString())
+        encoder.encodeString(value.asString())
     }
     
     override fun deserialize(decoder: Decoder): Key {

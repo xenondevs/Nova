@@ -86,7 +86,7 @@ internal class TagExtensionsGenerator(private val codeGenerator: CodeGenerator) 
                     .addKdoc("Gets the tags that contain this [%T] entry.", valueClassName)
                     .getter(
                         FunSpec.getterBuilder()
-                            .addStatement("return %N[this.key.key()]", elementLookup)
+                            .addStatement("return %N[this.key]", elementLookup)
                             .build()
                     )
                     .build()

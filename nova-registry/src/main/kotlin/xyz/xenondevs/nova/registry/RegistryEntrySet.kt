@@ -1,4 +1,3 @@
-
 @file:OptIn(UnstableProviderApi::class)
 
 package xyz.xenondevs.nova.registry
@@ -81,8 +80,8 @@ fun <T : Keyed> registryEntrySetOf(
     val elementSet = elements.toSet()
     require(elementSet.isNotEmpty()) { "Elements cannot be empty" }
     
-    val registry = elementSet.first().key.registryKey()
-    require(elementSet.all { it.key.registryKey() == registry }) { "All entries must belong to the same registry" }
+    val registry = elementSet.first().registry
+    require(elementSet.all { it.registry == registry }) { "All entries must belong to the same registry" }
     
     return PaperDirectRegistryEntrySet(registry, elementSet)
 }
@@ -96,8 +95,8 @@ fun <T : Keyed> registryEntrySetOf(
     element: RegistryEntry.Paper<T>,
     vararg elements: RegistryEntry.Paper<T>
 ): RegistryEntrySet.Paper.Direct<T> {
-    val registry = element.key.registryKey()
-    require(elements.all { it.key.registryKey() == registry }) { "All entries must belong to the same registry" }
+    val registry = element.registry
+    require(elements.all { it.registry == registry }) { "All entries must belong to the same registry" }
     return PaperDirectRegistryEntrySet(registry, setOf(element, *elements))
 }
 
@@ -201,7 +200,7 @@ sealed interface RegistryEntrySet<out T : Keyed> : Provider<Set<T>> {
      * Checks whether [value] is part of this set.
      * Requires resolving this set and as such this function may not be called before registry freeze.
      */
-    operator fun contains(value: @UnsafeVariance T): Boolean = 
+    operator fun contains(value: @UnsafeVariance T): Boolean =
         value in get()
     
     /**
@@ -355,7 +354,7 @@ private class PaperDirectRegistryEntrySet<T : Keyed>(
 ) : RegistryEntrySet.Paper.Direct<T>, Provider<Set<T>> by values {
     
     override fun toRegistryKeySet(registryAccess: RegistryAccess): RegistryKeySet<T> =
-        RegistrySet.keySet(registry, entries.map { it.key })
+        RegistrySet.keySet(registry, entries.map { TypedKey.create(registry, it.key) })
     
     override fun contains(entry: RegistryEntry.Paper<T>?): Boolean =
         entry != null && entry in entries
@@ -465,4 +464,3 @@ internal class NovaTagRegistryEntrySet<T : NovaRegistryElement<T>>(
     override fun toString() = "${registry.key.asString()}/#${tagKey.asString()}"
     
 }
-

@@ -60,7 +60,7 @@ class Cooldown(
     }
     
     override fun toString(itemStack: ItemStack): String {
-        return "Cooldown(cooldown=$cooldown, group=$group)"
+        return "Cooldown(cooldown=$cooldown, group=${group.asString()})"
     }
     
 }

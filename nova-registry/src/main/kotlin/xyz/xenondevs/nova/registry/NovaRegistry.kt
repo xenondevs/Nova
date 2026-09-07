@@ -85,7 +85,7 @@ interface NovaRegistry<out T : NovaRegistryElement<T>> {
      * @throws IllegalStateException If this method is called before registries are frozen (i.e. during bootstrap).
      */
     fun getValueOrThrow(key: Key): T = getValue(key)
-        ?: throw NoSuchElementException("No element found for key $key")
+        ?: throw NoSuchElementException("No element found for key ${key.asString()}")
     
     /**
      * Gets all entries with the given [name], ignoring their namespace.

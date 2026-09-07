@@ -291,7 +291,7 @@ class WailaTask(
                     addEntry(id, ResourcePath(ResourceType.FontTexture, "nova", "waila_generated/${id.namespace()}/${id.value()}.png"), SIZE, ASCENT)
                     count++
                 } catch (e: Exception) {
-                    builder.logger.warn("Failed to render $id ($path) ", e)
+                    builder.logger.warn("Failed to render ${id.asString()} (${path.asString()}) ", e)
                 }
             }
         } catch (e: Exception) {

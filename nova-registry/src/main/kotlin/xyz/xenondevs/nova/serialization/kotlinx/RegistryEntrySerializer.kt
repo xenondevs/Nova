@@ -1,4 +1,3 @@
-
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import io.papermc.paper.registry.RegistryAccess
@@ -78,4 +77,3 @@ open class PaperRegistryEntrySerializer<T : Keyed>(
     }
     
 }
-

@@ -75,7 +75,7 @@ class ResourcePackConfiguration internal constructor(
     /**
      * The logger used for the resource pack build process.
      */
-    var logger: Logger = ComponentLogger.logger("Nova >> $id")
+    var logger: Logger = ComponentLogger.logger("Nova >> ${id.asString()}")
     
     /**
      * Registers a [PackBuildData] to be present during the resource pack build process.

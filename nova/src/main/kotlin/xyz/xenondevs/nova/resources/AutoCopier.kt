@@ -28,7 +28,7 @@ internal object AutoCopier {
                     destPath.writeBytes(bin)
                 }
             } catch (e: Exception) {
-                LOGGER.warn("Failed to copy resource pack file '$id' to destination '$destination'.", e)
+                LOGGER.warn("Failed to copy resource pack file '${id.asString()}' to destination '$destination'.", e)
             }
         }
     }

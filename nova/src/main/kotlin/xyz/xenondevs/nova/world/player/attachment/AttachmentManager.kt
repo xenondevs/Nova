@@ -139,7 +139,7 @@ object AttachmentManager : Listener, PacketListener {
             val type = ATTACHMENT_TYPE.getValue(it)
             if (type != null) {
                 addAttachment(player, type)
-            } else LOGGER.error("Unknown attachment type $it on player ${player.name}")
+            } else LOGGER.error("Unknown attachment type ${it.asString()} on player ${player.name}")
         }
     }
     

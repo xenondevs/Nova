@@ -30,13 +30,13 @@ open class NovaRegistryElementSerializer<T : NovaRegistryElement<T>>(
     )
     
     final override fun serialize(encoder: Encoder, value: T) {
-        encoder.encodeString(value.key.toString())
+        encoder.encodeString(value.key.asString())
     }
     
     final override fun deserialize(decoder: Decoder): T {
         val key = KeySerializer.deserialize(decoder)
         return registry.getValue(key)
-            ?: throw SerializationException("No element under $key in registry ${registry.key.asString()}")
+            ?: throw SerializationException("No element under ${key.asString()} in registry ${registry.key.asString()}")
     }
     
 }
@@ -70,7 +70,7 @@ open class PaperRegistryElementSerializer<T : Keyed>(
     final override fun deserialize(decoder: Decoder): T {
         val key = KeySerializer.deserialize(decoder)
         return registry.get(key)
-            ?: throw SerializationException("No element under $key in registry ${registryKey.key().asString()}")
+            ?: throw SerializationException("No element under ${key.asString()} in registry ${registryKey.key().asString()}")
     }
     
 }

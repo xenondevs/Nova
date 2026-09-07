@@ -714,12 +714,14 @@ fun <T : Any> RegistryKeySet<*>.toHolderSet(registry: HolderGetter<T>): HolderSe
 }
 
 fun <T : Any> RegistryEntry.Paper<*>.toHolder(registry: HolderGetter<T>): Holder.Reference<T> =
-    registry.getOrThrow(key.toResourceKey())
+    registry.getOrThrow(ResourceKey.create(this.registry.toResourceKey(), key.toIdentifier()))
 
 fun <T : Any> RegistryEntrySet.Paper<*>.toHolderSet(registry: HolderGetter<T>): HolderSet<T> {
     return when (this) {
         is RegistryEntrySet.Paper.Tag<*> -> registry.getOrThrow(tagKey.toNmsTagKey())
-        is RegistryEntrySet.Paper.Direct<*> -> HolderSet.direct(entries.map { registry.getOrThrow(it.key.toResourceKey()) })
+        is RegistryEntrySet.Paper.Direct<*> -> HolderSet.direct(entries.map {
+            registry.getOrThrow(ResourceKey.create(this.registry.toResourceKey(), it.key.toIdentifier()))
+        })
     }
 }
 

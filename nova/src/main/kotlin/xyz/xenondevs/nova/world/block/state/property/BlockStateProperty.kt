@@ -130,7 +130,7 @@ class IntProperty private constructor(
     
     init {
         require(defaultValue in nmsProperty.possibleValues) {
-            "Default value $defaultValue is not valid for property $id"
+            "Default value $defaultValue is not valid for property ${id.asString()}"
         }
     }
     
@@ -190,7 +190,7 @@ class EnumProperty<E : Enum<E>> private constructor(
     
     init {
         require(defaultValue in nmsProperty.possibleValues) {
-            "Default value $defaultValue is not valid for property $id"
+            "Default value $defaultValue is not valid for property ${id.asString()}"
         }
     }
     

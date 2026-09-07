@@ -75,7 +75,7 @@ internal object AutoUploadManager {
         val url = selectedService?.upload(getPackUuid(id), bin)
         if (url != null) {
             uploadedPacks[id] = UploadedPack(bin, url)
-            LOGGER.info("Resource pack $id available at $url")
+            LOGGER.info("Resource pack ${id.asString()} available at $url")
         }
         return url
     }

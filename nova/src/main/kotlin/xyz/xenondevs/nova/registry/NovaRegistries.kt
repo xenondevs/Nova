@@ -110,7 +110,7 @@ object NovaRegistries {
     ): MutableNovaRegistry<T> {
         val registry = MutableNovaRegistry(key, reloadable, unknownEntryFactory)
         if (registries.putIfAbsent(key, registry) != null)
-            throw IllegalArgumentException("Registry key $key is already in use")
+            throw IllegalArgumentException("Registry key ${key.asString()} is already in use")
         return registry
     }
     

@@ -47,7 +47,7 @@ class ItemModelSelectorScope internal constructor(
      */
     override fun getModel(path: ResourcePath<ResourceType.Model>): ModelBuilder =
         modelContent[path]?.let(::ModelBuilder)
-            ?: throw IllegalArgumentException("Model $path does not exist")
+            ?: throw IllegalArgumentException("Model ${path.asString()} does not exist")
     
     /**
      * Gets the model under the given [path] or throws an exception if it does not exist.

@@ -5,7 +5,6 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.crafting.RecipeHolder
 import net.minecraft.world.item.crafting.RecipeInput
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -169,7 +168,7 @@ object RecipeManager : Listener, PacketListener {
         var requiresContainer = ResourceKey.create(Registries.RECIPE, recipe.key.identifier) in registeredVanillaRecipes.keys
         if (!requiresContainer && event.inventory.contents.any { it?.novaItem != null }) {
             // prevent non-Nova recipes from using Nova items
-            event.inventory.result = ItemStack(Material.AIR)
+            event.inventory.result = ItemStack.empty()
             requiresContainer = true
         }
         

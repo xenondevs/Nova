@@ -54,8 +54,8 @@ internal abstract class AbstractEntityVariantBuilder<T : Keyed, NMS : Any, L : E
     
     override fun texture(modelType: M, texture: LB.() -> Unit) {
         this.modelType = modelType
-        EntityVariantTask.queueVariantAssetGeneration(registryKey.key(), id) {
-            makeLayoutBuilder(id.namespace(), it)
+        EntityVariantTask.queueVariantAssetGeneration(registryKey.key(), id.key()) {
+            makeLayoutBuilder(id.key().namespace(), it)
                 .apply(texture)
                 .build()
         }
@@ -68,7 +68,7 @@ internal abstract class AbstractEntityVariantBuilder<T : Keyed, NMS : Any, L : E
     @Suppress("UNCHECKED_CAST")
     override fun build(lookup: RegistryOps.RegistryInfoLookup): NMS {
         val layout = ResourceLookups.entityVariantAssets[registryKey.key() to id]
-            ?: throw IllegalStateException("Missing variant assets for $id in lookup")
+            ?: throw IllegalStateException("Missing variant assets for ${id.key().asString()} in lookup")
         val spawnConditions = configureSpawnConditions?.let { SpawnConditionsBuilderImpl(lookup).apply(it).build() }
         val variant = build(modelType, layout as L, spawnConditions ?: SpawnPrioritySelectors.EMPTY)
         return variant

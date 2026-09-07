@@ -76,7 +76,7 @@ fun Consumable(
     remains: RegistryEntry.Paper<ItemType>? = null,
     consumeEffects: Provider<List<ConsumeEffect>>,
     animation: ItemUseAnimation = ItemUseAnimation.EAT,
-    sound: Key = SoundEventKeys.ENTITY_GENERIC_EAT,
+    sound: Key = SoundEventKeys.ENTITY_GENERIC_EAT.key(),
     particles: Boolean = true
 ) = ItemBehaviorFactory { _, cfg ->
     val legacyPossibleEffects = combinedProvider(
@@ -219,7 +219,7 @@ class Consumable(
             "remains=$remains, " +
             "consumeEffects=$consumeEffects, " +
             "animation=$animation, " +
-            "sound=$sound, " +
+            "sound=${sound.asString()}, " +
             "particles=$particles" +
             ")"
     }

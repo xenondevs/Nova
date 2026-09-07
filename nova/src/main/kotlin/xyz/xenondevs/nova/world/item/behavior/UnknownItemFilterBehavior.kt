@@ -68,7 +68,7 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
     
     override fun toString(itemStack: ItemStack): String {
         return "UnknownItemFilterBehavior(" +
-            "id=${itemStack.novaCompound?.get<Key>(ID_KEY)}, " +
+            "id=${itemStack.novaCompound?.get<Key>(ID_KEY)?.asString()}, " +
             "data=${itemStack.novaCompound?.get<Compound>(DATA_KEY)})" +
             ")"
     }

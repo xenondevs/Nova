@@ -31,11 +31,6 @@ sealed interface RegistryEntry<out T : Keyed> : Provider<T>, Comparable<Registry
     sealed interface Paper<out T : Keyed> : RegistryEntry<T> {
         
         /**
-         * The typed key of the registry entry.
-         */
-        override val key: TypedKey<@UnsafeVariance T>
-        
-        /**
          * The registry key of the registry entry.
          */
         val registry: RegistryKey<@UnsafeVariance T>
@@ -71,7 +66,7 @@ sealed interface RegistryEntry<out T : Keyed> : Provider<T>, Comparable<Registry
         ): Paper<T> {
             fun resolve(): T {
                 return registryAccess.getRegistry(key.registryKey()).get(key)
-                    ?: throw NoSuchElementException("No element under ${key.asString()} in registry ${key.registryKey().key().asString()}")
+                    ?: throw NoSuchElementException("No element under ${key.key().asString()} in registry ${key.registryKey().key().asString()}")
             }
             
             if (RegistryContext.isInBootstrapPhase) {
@@ -133,29 +128,33 @@ fun <T, R> Provider<T>.bootstrapFlatMap(transform: (T) -> Provider<R>): Provider
 fun <T> Provider<Provider<T>>.bootstrapFlatten(): Provider<T> = bootstrapFlatMap { it }
 
 private fun comparisonRegistryKey(entry: RegistryEntry<*>): Key = when (entry) {
-    is RegistryEntry.Paper -> entry.key.registryKey().key()
+    is RegistryEntry.Paper -> entry.registry.key()
     is RegistryEntry.Nova -> entry.registry.key
 }
 
 private class PaperRegistryEntry<T : Keyed>(
-    override val key: TypedKey<T>,
+    typedKey: TypedKey<T>,
     override val delegate: Provider<T>
 ) : RegistryEntry.Paper<T>, Provider<T> by delegate {
     
-    override val registry: RegistryKey<T>
-        get() = key.registryKey()
+    override val key: Key = typedKey.key()
+    override val registry: RegistryKey<T> = typedKey.registryKey()
     
     override fun equals(other: Any?): Boolean {
         return other === this ||
             (other is RegistryEntry.Paper<*>
                 && other.registry == registry
-                && symmetricKeyEquals(other.key, key))
+                && other.key == key)
     }
     
-    override fun hashCode(): Int = symmetricKeyHashCode(key)
+    override fun hashCode(): Int {
+        var result = registry.hashCode()
+        result = 31 * result + key.hashCode()
+        return result
+    }
     
     override fun compareTo(other: RegistryEntry<T>): Int {
-        val registryComparison = key.registryKey().key().compareTo(comparisonRegistryKey(other))
+        val registryComparison = registry.key().compareTo(comparisonRegistryKey(other))
         if (registryComparison != 0)
             return registryComparison
         return key.compareTo(other.key)
@@ -175,10 +174,14 @@ internal class NovaRegistryEntry<T : NovaRegistryElement<T>>(
         return other === this ||
             (other is RegistryEntry.Nova<*>
                 && other.registry == registry
-                && symmetricKeyEquals(other.key, key))
+                && other.key == key)
     }
     
-    override fun hashCode(): Int = symmetricKeyHashCode(key)
+    override fun hashCode(): Int {
+        var result = registry.hashCode()
+        result = 31 * result + key.hashCode()
+        return result
+    }
     
     override fun compareTo(other: RegistryEntry<T>): Int {
         val registryComparison = registry.key.compareTo(comparisonRegistryKey(other))
@@ -189,17 +192,4 @@ internal class NovaRegistryEntry<T : NovaRegistryElement<T>>(
     
     override fun toString(): String = "${registry.key.asString()}/${key.asString()}"
     
-}
-
-// https://github.com/PaperMC/Paper/issues/13678
-private fun symmetricKeyEquals(a: Key, b: Key): Boolean {
-    if (a is TypedKey<*> && b is TypedKey<*> && a.registryKey() != b.registryKey())
-        return false
-    return a.namespace() == b.namespace() && a.value() == b.value()
-}
-
-private fun symmetricKeyHashCode(key: Key): Int {
-    var result = key.namespace().hashCode()
-    result = 31 * result + key.value().hashCode()
-    return result
 }

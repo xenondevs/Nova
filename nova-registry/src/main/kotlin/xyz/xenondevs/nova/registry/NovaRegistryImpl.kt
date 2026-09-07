@@ -47,8 +47,8 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
     
     final override operator fun set(key: Key, value: T): Unit = lock.withLock {
         checkNotFrozen()
-        require(key !in entryByKey) { "$key is already registered" }
-        require(value !in keyByEntry) { "$value is already registered with key ${keyByEntry[value]}" }
+        require(key !in entryByKey) { "${key.asString()} is already registered" }
+        require(value !in keyByEntry) { "$value is already registered with key ${keyByEntry.getValue(value).asString()}" }
         
         entryByKey[key] = value
         keyByEntry[value] = key
@@ -65,7 +65,7 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
     final override fun set(tagKey: Key, entries: Provider<Set<NovaTagEntry<T>>>): Unit = lock.withLock {
         checkNotFrozen()
         require(tagKey != key) { "Tag key cannot match registry key, as that is reserved for the entrySet tag" }
-        require(tagKey !in unflattenedTagEntriesByKey) { "Tag $tagKey is already registered" }
+        require(tagKey !in unflattenedTagEntriesByKey) { "Tag ${tagKey.asString()} is already registered" }
         
         unflattenedTagEntriesByKey[tagKey] = entries
     }
@@ -94,7 +94,7 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
     
     final override fun get(key: Key): RegistryEntry.Nova<T> = lock.withLock {
         if (isFrozen) {
-            require(key in entryByKey) { "Cannot create entry for unregistered key $key after freezing" }
+            require(key in entryByKey) { "Cannot create entry for unregistered key ${key.asString()} after freezing" }
             return entries[key]!!
         } else {
             return entries.getOrPut(key) {
@@ -110,12 +110,12 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
     
     final override fun getTag(key: Key): RegistryEntrySet.Nova.Tag<T> = lock.withLock {
         if (isFrozen) {
-            require(key in tagsByKey) { "Cannot create tag entry set for unregistered tag key $key after freezing" }
+            require(key in tagsByKey) { "Cannot create tag entry set for unregistered tag key ${key.asString()} after freezing" }
             return tagsByKey[key]!!
         } else {
             return tagsByKey.getOrPut(key) {
                 val entries = tagProviders.map { tags ->
-                    tags[key] ?: throw NoSuchElementException("No tag found for key $key")
+                    tags[key] ?: throw NoSuchElementException("No tag found for key ${key.asString()}")
                 }
                 NovaTagRegistryEntrySet(this, key, entries)
             }
@@ -206,7 +206,7 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
                     is NovaTagEntry.Tag<*> -> {
                         val referencedTagKey = entry.tag.tagKey
                         if (referencedTagKey !in definitions)
-                            throw NoSuchElementException("No tag found for key $referencedTagKey")
+                            throw NoSuchElementException("No tag found for key ${referencedTagKey.asString()}")
                         dependentsByTag.getOrPut(referencedTagKey, ::LinkedHashSet) += tagKey
                     }
                 }
@@ -270,7 +270,7 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
     
     final override fun hashCode() = key.hashCode()
     final override fun equals(other: Any?) = other === this || other is NovaRegistry<*> && key == other.key
-    final override fun toString() = "NovaRegistry(key = $key)"
+    final override fun toString() = "NovaRegistry(key = ${key.asString()})"
     
 }
 
@@ -374,5 +374,5 @@ private class UnmodifiableNovaRegistry<T : NovaRegistryElement<T>>(
 ) : NovaRegistry<T> by mutableRegistry {
     override fun hashCode() = key.hashCode()
     override fun equals(other: Any?) = other === this || other is NovaRegistry<*> && key == other.key
-    override fun toString() = "NovaRegistry(key = $key)"
+    override fun toString() = "NovaRegistry(key = ${key.asString()})"
 }

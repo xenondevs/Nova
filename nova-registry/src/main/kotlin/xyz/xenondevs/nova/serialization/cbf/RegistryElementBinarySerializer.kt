@@ -49,7 +49,7 @@ class PaperRegistryElementBinarySerializer<T : Keyed>(
     }
     
     override fun writeUnversioned(obj: T, writer: ByteWriter) {
-        writer.writeString(obj.key().toString())
+        writer.writeString(obj.key().asString())
     }
     
     override fun copyNonNull(obj: T): T {
@@ -57,4 +57,3 @@ class PaperRegistryElementBinarySerializer<T : Keyed>(
     }
     
 }
-

@@ -140,7 +140,7 @@ object DefaultWailaInfoProviders {
         wailaInfoProvider<Brushable>("brushable") {
             blocks = registryEntrySetOf(BlockTypeKeys.SUSPICIOUS_SAND, BlockTypeKeys.SUSPICIOUS_GRAVEL)
             infoProvider(DEFAULT) { _, _, blockState, info ->
-                info.copy(icon = Key.key("${blockState.material.name.lowercase()}_${blockState.dusted}"))
+                info.copy(icon = Key.key("${blockState.blockType.key().value()}_${blockState.dusted}"))
             }
         }
         
@@ -155,14 +155,14 @@ object DefaultWailaInfoProviders {
         wailaInfoProvider<Campfire>("brushable") {
             blocks = registryEntrySetOf(BlockTypeKeys.CAMPFIRE, BlockTypeKeys.SOUL_CAMPFIRE)
             infoProvider(DEFAULT) { _, _, campfire, info ->
-                info.copy(icon = Key.key(if (campfire.isLit) campfire.material.name.lowercase() else "campfire_off"))
+                info.copy(icon = Key.key(if (campfire.isLit) campfire.blockType.key().value() else "campfire_off"))
             }
         }
         
         wailaInfoProvider<Candle>("brushable") {
             blocks = registryEntrySetOf(BlockTypeTagKeys.CANDLES)
             infoProvider(DEFAULT) { _, _, candle, info ->
-                val name = candle.material.name.lowercase()
+                val name = candle.blockType.key().value()
                 val amount = when (candle.candles) {
                     1 -> "one_candle"
                     2 -> "two_candles"
@@ -183,7 +183,7 @@ object DefaultWailaInfoProviders {
                     3 -> "full"
                     else -> throw IllegalStateException("Cauldron level is not 1, 2 or 3")
                 }
-                info.copy(icon = Key.key(cauldron.material.name.lowercase() + "_$level"))
+                info.copy(icon = Key.key(cauldron.blockType.key().value() + "_$level"))
             }
         }
         
@@ -210,9 +210,9 @@ object DefaultWailaInfoProviders {
         wailaInfoProvider<Ageable>("crop") {
             blocks = registryEntrySetOf(MAX_TEXTURE_STAGES.keys)
             infoProvider(DEFAULT) { _, _, crop, info ->
-                val maxTexStage = MAX_TEXTURE_STAGES[crop.material.asBlockType()!!.typedKey]!!
+                val maxTexStage = MAX_TEXTURE_STAGES[crop.blockType.typedKey]!!
                 val stage = ((crop.age / crop.maximumAge.toDouble()) * maxTexStage).roundToInt()
-                info.copy(icon = Key.key(crop.material.name.lowercase() + "_stage$stage"))
+                info.copy(icon = Key.key(crop.blockType.key().value() + "_stage$stage"))
             }
         }
         
@@ -235,7 +235,7 @@ object DefaultWailaInfoProviders {
         wailaInfoProvider<Hatchable>("hatchable") {
             blocks = registryEntrySetOf(BlockTypeKeys.SNIFFER_EGG)
             infoProvider(DEFAULT) { _, _, hatchable, info ->
-                info.copy(icon = Key.key("${hatchable.material.name.lowercase()}_${hatchable.hatch}"))
+                info.copy(icon = Key.key("${hatchable.blockType.key().value()}_${hatchable.hatch}"))
             }
         }
         
@@ -243,7 +243,7 @@ object DefaultWailaInfoProviders {
             blocks = registryEntrySetOf(BlockTypeTagKeys.LANTERNS)
             infoProvider(DEFAULT) { _, _, lantern, info ->
                 if (lantern.isHanging)
-                    info.copy(icon = Key.key(lantern.material.name.lowercase() + "_hanging"))
+                    info.copy(icon = Key.key(lantern.blockType.key().value() + "_hanging"))
                 else info
             }
         }
@@ -260,7 +260,7 @@ object DefaultWailaInfoProviders {
         wailaInfoProvider<RedstoneRail>("redstone_rail") {
             blocks = registryEntrySetOf(BlockTypeKeys.ACTIVATOR_RAIL, BlockTypeKeys.DETECTOR_RAIL, BlockTypeKeys.POWERED_RAIL)
             infoProvider(DEFAULT) { _, _, rail, info ->
-                info.copy(icon = Key.key(rail.material.name.lowercase() + if (rail.isPowered) "_on" else ""))
+                info.copy(icon = Key.key(rail.blockType.key().value() + if (rail.isPowered) "_on" else ""))
             }
         }
         

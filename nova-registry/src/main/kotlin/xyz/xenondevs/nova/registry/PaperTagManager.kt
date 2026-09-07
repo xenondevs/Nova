@@ -125,7 +125,7 @@ internal fun <T : Keyed> keyToTagLookup(
     val source = PaperTagManager.getAllTags(registry).map { allTags ->
         val map = HashMap<Key, HashSet<RegistryEntrySet.Paper.Tag<T>>>()
         for (tag in allTags) for (entry in tag.entries.get()) {
-            map.getOrPut(entry.key.key(), ::HashSet) += tag
+            map.getOrPut(entry.key, ::HashSet) += tag
         }
         map
     }

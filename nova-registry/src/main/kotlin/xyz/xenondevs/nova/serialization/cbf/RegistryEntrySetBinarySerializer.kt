@@ -1,4 +1,3 @@
-
 package xyz.xenondevs.nova.serialization.cbf
 
 import io.papermc.paper.registry.RegistryAccess
@@ -118,4 +117,3 @@ class PaperRegistryEntrySetBinarySerializer<T : Keyed>(
     override fun copy(obj: RegistryEntrySet.Paper<T>?): RegistryEntrySet.Paper<T>? = obj
     
 }
-

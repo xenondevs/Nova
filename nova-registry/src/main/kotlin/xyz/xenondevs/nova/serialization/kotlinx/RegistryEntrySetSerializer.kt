@@ -1,4 +1,3 @@
-
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import io.papermc.paper.registry.RegistryAccess
@@ -140,7 +139,7 @@ private class BackingPaperRegistryElementSerializer<T : Keyed>(
     
     override fun serialize(encoder: Encoder, value: RegistryEntrySet.Paper<T>) {
         when (value) {
-            is RegistryEntrySet.Paper.Direct<T> -> delegate.serialize(encoder, value.entries.map { it.key.key().asString() })
+            is RegistryEntrySet.Paper.Direct<T> -> delegate.serialize(encoder, value.entries.map { it.key.asString() })
             is RegistryEntrySet.Paper.Tag<T> -> delegate.serialize(encoder, listOf("#${value.tagKey.key().asString()}"))
         }
     }
@@ -161,4 +160,3 @@ private class BackingPaperRegistryElementSerializer<T : Keyed>(
     }
     
 }
-

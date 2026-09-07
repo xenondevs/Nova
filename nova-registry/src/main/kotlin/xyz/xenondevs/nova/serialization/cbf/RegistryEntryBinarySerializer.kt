@@ -1,4 +1,3 @@
-
 package xyz.xenondevs.nova.serialization.cbf
 
 import io.papermc.paper.registry.RegistryAccess
@@ -57,4 +56,3 @@ class PaperRegistryEntryBinarySerializer<T : Keyed>(
     }
     
 }
-

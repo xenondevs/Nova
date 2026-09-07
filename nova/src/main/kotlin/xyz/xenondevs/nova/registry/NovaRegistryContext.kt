@@ -28,7 +28,7 @@ private sealed interface Tracked {
         override val origin: Throwable?
     ) : Tracked {
         override fun isBound() = registryAccess.getRegistry(key.registryKey()).get(key) != null
-        override fun toString() = key.registryKey().key().asString() + "/" + key.asString()
+        override fun toString() = key.registryKey().key().asString() + "/" + key.key().asString()
     }
     
     class Tag<T : Keyed>(

@@ -337,7 +337,7 @@ object RegistryLoader {
                 for ([entry, tagsDefinedInBuilder] in tagsPerEntry) {
                     for (tag in tagsDefinedInBuilder) {
                         require(tag.registry == registryKey) { "Cannot add $entry to tag $tag from another registry" }
-                        getOrPut(tag.tagKey, ::LinkedHashSet) += TagEntry.valueEntry(entry.key, true)
+                        getOrPut(tag.tagKey, ::LinkedHashSet) += TagEntry.valueEntry(TypedKey.create(registryKey, entry.key), true)
                     }
                 }
             }
@@ -404,7 +404,7 @@ object RegistryLoader {
     }
     
     private fun requireKnownNovaRegistry(registry: MutableNovaRegistry<*>) {
-        require(registry in NovaRegistries.registries.values) { "Registry ${registry.key} is not a known Nova registry." }
+        require(registry in NovaRegistries.registries.values) { "Registry ${registry.key.asString()} is not a known Nova registry." }
     }
     
     private fun checkFrozen() {

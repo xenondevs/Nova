@@ -6,6 +6,7 @@ import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
 import io.papermc.paper.tag.PreFlattenTagRegistrar
 import io.papermc.paper.tag.TagEntry
@@ -72,7 +73,7 @@ private class PaperTagBuilder<T : Keyed>(
     override fun add(entries: Provider<Iterable<RegistryEntry.Paper<T>>>) {
         addOperation(
             entries.map { values ->
-                values.mapToSet { TagEntry.valueEntry(it.key, true) }
+                values.mapToSet { TagEntry.valueEntry(TypedKey.create(tag.registryKey(), it.key), true) }
             },
             PaperTagOperation<T>::Add
         )
@@ -82,7 +83,7 @@ private class PaperTagBuilder<T : Keyed>(
     override fun remove(entries: Provider<Iterable<RegistryEntry.Paper<T>>>) {
         addOperation(
             entries.map { values ->
-                values.mapToSet { TagEntry.valueEntry(it.key, true) }
+                values.mapToSet { TagEntry.valueEntry(TypedKey.create(tag.registryKey(), it.key), true) }
             },
             PaperTagOperation<T>::Remove
         )
