@@ -65,7 +65,7 @@ Use the agent's standard filesystem tools only for paths outside the project or 
 
 #### Verify & reformat
 
-Inspect affected files with an IDE diagnostics or problems capability and fix warnings introduced by the change. Run the relevant tests and fix failures before declaring the task complete; unrelated pre-existing warnings or failures may be reported without being changed. Do not run the "build-project" or "run configuration" IDE-tools for this, but call Gradle directly.
+Inspect affected files with an IDE diagnostics or problems capability and fix warnings introduced by the change. Run the relevant tests and fix failures before declaring the task complete; unrelated pre-existing warnings or failures may be reported without being changed. Also consider compiler warnings. Note that not all compiler warnings will surface as an IDE diagnostic due to nova-compiler-plugin. Do not run the "build-project" or "run configuration" IDE-tools for this, but call Gradle directly.
 
 As a last step, after verifying code changes, use the formatting tool to reformat affected code.
 Note: Nova uses "keep indents on empty lines".
