@@ -1,12 +1,18 @@
 package xyz.xenondevs.nova.registry
 
 import net.kyori.adventure.key.Key
+import xyz.xenondevs.commons.provider.Provider
 
 /**
- * Creates a new, possibly [reloadable], [MutableNovaRegistry] identified by [key].
+ * Creates a new, possibly [reloadable], [MutableNovaRegistry] identified by [key]
+ * that may use [unknownEntryFactory] to create values for unregistered keys.
  */
-fun <T : NovaRegistryElement<T>> MutableNovaRegistry(key: Key, reloadable: Boolean): MutableNovaRegistry<T> =
-    if (reloadable) ReloadableNovaRegistry(key) else StableNovaRegistry(key)
+fun <T : NovaRegistryElement<T>> MutableNovaRegistry(
+    key: Key,
+    reloadable: Boolean,
+    unknownEntryFactory: ((RegistryEntry.Nova<T>) -> T)? = null
+): MutableNovaRegistry<T> =
+    if (reloadable) ReloadableNovaRegistry(key, unknownEntryFactory) else StableNovaRegistry(key, unknownEntryFactory)
 
 /**
  * A mutable [NovaRegistry] that allows registering entries and tags via [set].
@@ -37,14 +43,24 @@ interface MutableNovaRegistry<T : NovaRegistryElement<T>> : NovaRegistry<T> {
     operator fun set(key: Key, value: T)
     
     /**
-     * Registers a tag of [entries] under [tagKey].
+     * Marks [key] as having been registered previously.
+     * If an unknown-entry factory is configured, it will be used to create values for unregistered
+     * known keys. Does nothing otherwise.
+     *
+     * @throws IllegalStateException If the registry is frozen.
+     */
+    fun setKnown(key: Key)
+    
+    /**
+     * Registers a tag of [entries] under [tagKey]. Changes to [entries] are reflected in the tag
+     * and in all tags that include it.
      * 
      * @throws IllegalStateException If the registry is frozen.
      * @throws IllegalArgumentException If [tagKey] matches [key], as [key] is reserved for [entrySet].
      * @throws IllegalArgumentException If a tag with key [tagKey] is already registered.
-     * @throws IllegalArgumentException If any of the entries in [entries] does not belong to this registry.
+     * @throws IllegalArgumentException When [entries] is resolved and an entry does not belong to this registry.
      */
-    operator fun set(tagKey: Key, entries: Set<NovaTagEntry<T>>)
+    operator fun set(tagKey: Key, entries: Provider<Set<NovaTagEntry<T>>>)
     
     /**
      * Freezes the registry.
@@ -58,15 +74,16 @@ interface MutableNovaRegistry<T : NovaRegistryElement<T>> : NovaRegistry<T> {
      */
     fun freeze()
     
+    // fixme: not fully atomic
     /**
      * Atomically reloads the registry by:
      * 1. Resetting the registry to an empty state, i.e. clearing all entries and tags.
      * 2. Applying [configure] to the registry.
      * 3. [Freezing][freeze] the registry.
      * 
-     * Note that reloading needs to re-register all entries and tags that existed previously,
-     * as they already have [registry entries][RegistryEntry] and [registry entry sets][RegistryEntrySet]
-     * pointing to them.
+     * Entries that existed before the reload but are not re-registered are created through the
+     * unknown-entry factory. The reload fails if no such factory is configured. Previously registered
+     * tags that are not re-registered are retained with empty contents.
      * 
      * @throws UnsupportedOperationException If the registry is [not reloadable][isReloadable].
      * @throws IllegalStateException If the registry is not frozen.

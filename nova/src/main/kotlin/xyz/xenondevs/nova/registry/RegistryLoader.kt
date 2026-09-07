@@ -5,10 +5,13 @@ package xyz.xenondevs.nova.registry
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
+import io.papermc.paper.tag.TagEntry
 import net.kyori.adventure.key.Key
 import org.bukkit.Keyed
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.bytebase.INSTRUMENTATION
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.nova.BOOTSTRAP_LIFECYCLE
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
@@ -28,7 +31,7 @@ import xyz.xenondevs.nova.util.toResourceKey
 import java.lang.instrument.ClassFileTransformer
 import java.security.ProtectionDomain
 
-private sealed interface BuilderFactory<E : RegistryEntry<*>, B : RegistryElementBuilder<*>> {
+private sealed interface BuilderFactory<E : RegistryEntry<*>, B : RegistryElementBuilder<E>> {
     
     val makeBuilder: (E) -> B
     val runBuilder: (B) -> Unit
@@ -47,11 +50,11 @@ private sealed interface BuilderFactory<E : RegistryEntry<*>, B : RegistryElemen
         }
     }
     
-    data class Vanilla<P : Keyed, V : Any, B : RegistryElementBuilder.Vanilla<P, V>>(
-        override val makeBuilder: (RegistryEntry.Paper<P>) -> B,
+    data class Vanilla<API : Keyed, NMS : Any, B : RegistryElementBuilder.Vanilla<API, NMS>>(
+        override val makeBuilder: (RegistryEntry.Paper<API>) -> B,
         override val runBuilder: B.() -> Unit
-    ) : BuilderFactory<RegistryEntry.Paper<P>, B> {
-        override fun createAndConfigure(e: RegistryEntry.Paper<P>): B {
+    ) : BuilderFactory<RegistryEntry.Paper<API>, B> {
+        override fun createAndConfigure(e: RegistryEntry.Paper<API>): B {
             val builder = makeBuilder(e)
             if (builder is RegistryElementBuilder.RerunnableVanilla<*, *>)
                 builder.reset()
@@ -62,7 +65,6 @@ private sealed interface BuilderFactory<E : RegistryEntry<*>, B : RegistryElemen
     }
     
 }
-
 
 /**
  * Accepts and queues registrations for both Nova- and Vanilla registries.
@@ -84,7 +86,6 @@ private sealed interface BuilderFactory<E : RegistryEntry<*>, B : RegistryElemen
 object RegistryLoader {
     
     private val novaBuilderFactories: MutableMap<MutableNovaRegistry<*>, MutableMap<Key, BuilderFactory.Nova<*, *>>> = HashMap()
-    private val novaUnknownBuilderFactory: MutableMap<MutableNovaRegistry<*>, BuilderFactory.Nova<*, *>> = HashMap()
     private var novaBuilders: MutableMap<MutableNovaRegistry<*>, Map<Key, RegistryElementBuilder.Nova<*>>> = HashMap()
     private val novaTagConfigurations: MutableMap<MutableNovaRegistry<*>, MutableMap<Key, MutableList<TagBuilder.Nova<*>.() -> Unit>>> = HashMap()
     
@@ -92,6 +93,7 @@ object RegistryLoader {
     private val vanillaUnknownBuilderFactory: MutableMap<RegistryKey<*>, BuilderFactory.Vanilla<*, *, *>> = HashMap()
     private val vanillaRerunnableBuilders: MutableMap<RegistryKey<*>, MutableMap<Key, RegistryElementBuilder.RerunnableVanilla<*, *>>> = HashMap()
     
+    //<editor-fold desc="registrations">
     /**
      * Enqueues the creation and registration of an [R] in [registry] under [key] by first
      * creating builder via [makeBuilder] and then running it via [runBuilder].
@@ -143,12 +145,12 @@ object RegistryLoader {
      * Enqueues the creation and registration of an entry in the Vanilla registry [registry] under [key] by first
      * creating a builder via [makeBuilder] and then running it via [runBuilder].
      */
-    fun <T : Keyed, NMS : Any, B : RegistryElementBuilder.Vanilla<T, NMS>> enqueueVanilla(
-        registry: RegistryKey<T>,
+    fun <API : Keyed, NMS : Any, B : RegistryElementBuilder.Vanilla<API, NMS>> enqueueVanilla(
+        registry: RegistryKey<API>,
         key: Key,
-        makeBuilder: (RegistryEntry.Paper<T>) -> B,
+        makeBuilder: (RegistryEntry.Paper<API>) -> B,
         runBuilder: B.() -> Unit
-    ): RegistryEntry.Paper<T> {
+    ): RegistryEntry.Paper<API> {
         checkFrozen()
         vanillaBuilderFactories.getOrPut(registry, ::LinkedHashMap)[key] = BuilderFactory.Vanilla(makeBuilder, runBuilder)
         return RegistryEntry.paper(TypedKey.create(registry, key))
@@ -177,32 +179,18 @@ object RegistryLoader {
      * which will be invoked for all keys that were registered during a previous iteration but are missing now. 
      * If no unknown builder factory is registered for a registry, missing keys will be ignored.
      */
-    fun <T : NovaRegistryElement<T>, B : RegistryElementBuilder.Nova<T>> registerNovaUnknown(
-        registry: MutableNovaRegistry<T>,
-        makeBuilder: (RegistryEntry.Nova<T>) -> B,
-        runBuilder: B.() -> Unit
-    ) {
-        checkFrozen()
-        requireKnownNovaRegistry(registry)
-        require(registry !in novaUnknownBuilderFactory) { "Registry $registry already has an unknown builder registered." }
-        novaUnknownBuilderFactory[registry] = BuilderFactory.Nova(makeBuilder, runBuilder)
-    }
-    
-    /**    
-     * Registers a [builder factory][makeBuilder] and [builder configuration][runBuilder] for unknown elements of [registry],
-     * which will be invoked for all keys that were registered during a previous iteration but are missing now. 
-     * If no unknown builder factory is registered for a registry, missing keys will be ignored.
-     */
-    fun <T : Keyed, NMS : Any, B : RegistryElementBuilder.Vanilla<T, NMS>> registerVanillaUnknown(
-        registry: RegistryKey<T>,
-        makeBuilder: (RegistryEntry.Paper<T>) -> B,
+    fun <API : Keyed, NMS : Any, B : RegistryElementBuilder.Vanilla<API, NMS>> registerVanillaUnknown(
+        registry: RegistryKey<API>,
+        makeBuilder: (RegistryEntry.Paper<API>) -> B,
         runBuilder: B.() -> Unit
     ) {
         checkFrozen()
         require(registry !in vanillaUnknownBuilderFactory) { "Registry $registry already has an unknown builder registered." }
         vanillaUnknownBuilderFactory[registry] = BuilderFactory.Vanilla(makeBuilder, runBuilder)
     }
+    //</editor-fold>
     
+    //<editor-fold desc="lifecycle">
     @InitFun(runBefore = [ResourceGeneration.PreWorld::class])
     private fun prepareBuilders() {
         // prepare nova builders by creating and configuring them
@@ -212,52 +200,9 @@ object RegistryLoader {
         
         for ([registryKey, factories] in vanillaBuilderFactories) {
             registryKey as RegistryKey<Keyed>
-            val factories = factories.toMutableMap()
-            val registryResourceKey = registryKey.toResourceKey<Any>()
-            
-            // add factory for unknown elements
-            val unknownBuilderFactory = vanillaUnknownBuilderFactory[registryKey]
-            if (unknownBuilderFactory != null) {
-                val missingKeys = (knownRegistryEntries[registryKey.key()] ?: emptySet()) - factories.keys
-                for (key in missingKeys) {
-                    factories[key] = unknownBuilderFactory
-                }
-            }
-            
-            // enqueue build & registration of entries
-            val rerunnableBuilders = vanillaRerunnableBuilders.getOrPut(registryKey, ::LinkedHashMap)
-            for ([key, factory] in factories) {
-                factory as BuilderFactory.Vanilla<Keyed, Any, *>
-                val entry = RegistryEntry.paper(TypedKey.create(registryKey, key))
-                val builder = factory.createAndConfigure(entry)
-                if (builder is RegistryElementBuilder.RerunnableVanilla<*, *>)
-                    rerunnableBuilders[key] = builder
-                
-                // enqueue build & registration (on nms registry freeze)
-                registryResourceKey.preFreeze { registry, lookup ->
-                    registry[key] = builder.build(lookup)
-                }
-                
-                // enqueue addition to required tags (on tag build)
-                for (tagKey in builder.buildTagSet()) {
-                    BOOTSTRAP_LIFECYCLE.modifyTag(tagKey as TagKey<Keyed>) { add(entry) }
-                }
-            }
-            
-            // all these keys are now "known" and can become "missing" in the future
-            knownRegistryEntries.getOrPut(registryKey.key(), ::HashSet) += factories.keys
+            factories as Map<Key, BuilderFactory.Vanilla<Keyed, Any, *>>
+            prepareVanillaBuilders(registryKey, factories)
         }
-    }
-    
-    /**
-     * Prepares nova builder for [registry] by creating and configuring them.
-     * This reads from [novaBuilderFactories] and writes to [novaBuilders].
-     */
-    private fun <T : NovaRegistryElement<T>> prepareNovaBuilders(registry: MutableNovaRegistry<T>) {
-        novaBuilders[registry] = novaBuilderFactories[registry]?.mapValues { [key, factory] ->
-            factory as BuilderFactory.Nova<T, *>
-            factory.createAndConfigure(registry[key])
-        } ?: emptyMap()
     }
     
     @InitFun(runAfter = [ResourceGeneration.PreWorld::class])
@@ -267,75 +212,6 @@ object RegistryLoader {
         }
         
         NovaRegistries.freeze()
-    }
-    
-    /**
-     * Runs nova builders for [registry] by building and registering their entries and tags.
-     */
-    private fun <T : NovaRegistryElement<T>> runNovaBuilders(registry: MutableNovaRegistry<T>) {
-        registry as MutableNovaRegistry<NovaRegistryElement<*>>
-        
-        val builders = novaBuilders[registry]?.toMutableMap() ?: mutableMapOf()
-        
-        // add factory for unknown elements
-        val presentKeys = builders.keys
-        val unknownBuilder = novaUnknownBuilderFactory[registry] as BuilderFactory.Nova<T, *>?
-        if (unknownBuilder != null) {
-            val missingKeys = (knownRegistryEntries[registry.key] ?: emptySet()) - presentKeys
-            for (key in missingKeys) {
-                builders[key] = unknownBuilder.createAndConfigure(registry[key])
-            }
-        }
-        
-        // build elements
-        for ([key, builder] in builders) {
-            registry[key] = builder.build()
-        }
-        
-        // all these keys are now "known" and can become "missing" in the future
-        knownRegistryEntries.getOrPut(registry.key, ::HashSet) += presentKeys
-        
-        // build tags
-        for ([key, tagConfigs] in (novaTagConfigurations[registry] ?: emptyMap())) {
-            registry[key] = buildNovaTagEntries { tagConfigs.forEach { it() } }
-        }
-    }
-    
-    /**
-     * [Reloads][MutableNovaRegistry.reload] the given [registry] be re-running the
-     * registered builders for its elements and tags.
-     */
-    fun reload(registry: MutableNovaRegistry<*>) {
-        requireKnownNovaRegistry(registry)
-        
-        registry.reload {
-            prepareNovaBuilders(registry)
-            runNovaBuilders(registry)
-        }
-    }
-    
-    /**
-     * Re-runs the registered builders for [registry] without reloading the registry itself.
-     * This is a hack to implement something akin to registry reloading for vanilla registries.
-     * It is up to the registry element builder to make sure that re-running it propagates the changes.
-     */
-    fun rerun(registry: RegistryKey<*>) {
-        check(!RegistryContext.isInBootstrapPhase) // re-running is not for bootstrap phase
-        
-        vanillaRerunnableBuilders[registry]?.forEach { [key, builder] ->
-            builder.reset()
-            val factory = vanillaBuilderFactories[registry]?.get(key) as BuilderFactory.Vanilla<Keyed, Any, RegistryElementBuilder.RerunnableVanilla<Keyed, Any>>
-            factory.runBuilder(builder)
-            builder.prepareBuild()
-        }
-    }
-    
-    private fun requireKnownNovaRegistry(registry: MutableNovaRegistry<*>) {
-        require(registry in NovaRegistries.registries.values) { "Registry ${registry.key} is not a known Nova registry." }
-    }
-    
-    private fun checkFrozen() {
-        check(!NovaRegistries.isFrozen) { "Nova registries are frozen." }
     }
     
     @InitFun
@@ -387,6 +263,149 @@ object RegistryLoader {
             true
         )
     }
+    
+    /**
+     * [Reloads][MutableNovaRegistry.reload] the given [registry] be re-running the
+     * registered builders for its elements and tags.
+     */
+    fun reload(registry: MutableNovaRegistry<*>) {
+        requireKnownNovaRegistry(registry)
+        
+        registry.reload {
+            prepareNovaBuilders(registry)
+            runNovaBuilders(registry)
+        }
+    }
+    
+    /**
+     * Re-runs the registered builders for [registry] without reloading the registry itself.
+     * This is a hack to implement something akin to registry reloading for vanilla registries.
+     * It is up to the registry element builder to make sure that re-running it propagates the changes.
+     */
+    fun rerun(registry: RegistryKey<*>) {
+        check(!RegistryContext.isInBootstrapPhase) // re-running is not for bootstrap phase
+        
+        vanillaRerunnableBuilders[registry]?.forEach { [key, builder] ->
+            builder.reset()
+            val factory = vanillaBuilderFactories[registry]?.get(key) as BuilderFactory.Vanilla<Keyed, Any, RegistryElementBuilder.RerunnableVanilla<Keyed, Any>>
+            factory.runBuilder(builder)
+            builder.prepareBuild()
+        }
+    }
+    //</editor-fold>
+    
+    //<editor-fold desc="lifecycle impl vanilla">
+    private fun <API : Keyed, NMS : Any> prepareVanillaBuilders(registryKey: RegistryKey<API>, factories: Map<Key, BuilderFactory.Vanilla<API, NMS, *>>) {
+        val factories = factories.toMutableMap()
+        val registryResourceKey = registryKey.toResourceKey<NMS>()
+        
+        // add factory for unknown elements
+        val unknownBuilderFactory = vanillaUnknownBuilderFactory[registryKey] as BuilderFactory.Vanilla<API, NMS, *>?
+        if (unknownBuilderFactory != null) {
+            val missingKeys = (knownRegistryEntries[registryKey.key()] ?: emptySet()) - factories.keys
+            for (key in missingKeys) {
+                factories[key] = unknownBuilderFactory
+            }
+        }
+        
+        // enqueue build & registration of entries
+        val rerunnableBuilders = vanillaRerunnableBuilders.getOrPut(registryKey, ::LinkedHashMap)
+        val builders = ArrayList<RegistryElementBuilder.Vanilla<API, NMS>>()
+        for ([key, factory] in factories) {
+            val entry = RegistryEntry.paper(TypedKey.create(registryKey, key))
+            val builder = factory.createAndConfigure(entry)
+            builders += builder
+            if (builder is RegistryElementBuilder.RerunnableVanilla<*, *>)
+                rerunnableBuilders[key] = builder
+            
+            // enqueue build & registration (on nms registry freeze)
+            registryResourceKey.preFreeze { registry, lookup ->
+                registry[key] = builder.build(lookup)
+            }
+        }
+        
+        // implicit tags entries from builders
+        val implicitEntries: Provider<Map<TagKey<API>, Set<TagEntry<API>>>> = combinedProvider(
+            builders.map { builder -> builder.tags.map { builder.entry to it } }
+        ) { tagsPerEntry ->
+            buildMap<TagKey<API>, MutableSet<TagEntry<API>>> {
+                for ([entry, tagsDefinedInBuilder] in tagsPerEntry) {
+                    for (tag in tagsDefinedInBuilder) {
+                        require(tag.registry == registryKey) { "Cannot add $entry to tag $tag from another registry" }
+                        getOrPut(tag.tagKey, ::LinkedHashSet) += TagEntry.valueEntry(entry.key, true)
+                    }
+                }
+            }
+        }
+        BOOTSTRAP_LIFECYCLE.addToTags(registryKey, implicitEntries)
+        
+        // all these keys are now "known" and can become "missing" in the future
+        knownRegistryEntries.getOrPut(registryKey.key(), ::HashSet) += factories.keys
+    }
+    //</editor-fold>
+    
+    //<editor-fold desc="lifecycle impl nova">
+    /**
+     * Prepares nova builder for [registry] by creating and configuring them.
+     * This reads from [novaBuilderFactories] and writes to [novaBuilders].
+     */
+    private fun <T : NovaRegistryElement<T>> prepareNovaBuilders(registry: MutableNovaRegistry<T>) {
+        // pass known keys to registry so it can use its unknown factory for missing keys
+        knownRegistryEntries[registry.key]?.forEach(registry::setKnown)
+        
+        novaBuilders[registry] = novaBuilderFactories[registry]?.mapValues { [key, factory] ->
+            factory as BuilderFactory.Nova<T, *>
+            factory.createAndConfigure(registry[key])
+        } ?: emptyMap()
+    }
+    
+    /**
+     * Runs nova builders for [registry] by building and registering their entries and tags.
+     */
+    private fun <T : NovaRegistryElement<T>> runNovaBuilders(registry: MutableNovaRegistry<T>) {
+        val builders = (novaBuilders[registry]?.toMutableMap() ?: mutableMapOf())
+            as MutableMap<Key, RegistryElementBuilder.Nova<T>>
+        
+        // build elements
+        for ([key, builder] in builders) {
+            registry[key] = builder.build()
+        }
+        
+        // all these keys are now "known" and can become "missing" in the future
+        knownRegistryEntries.getOrPut(registry.key, ::HashSet) += builders.keys
+        
+        // build tags
+        val tagConfigurations = novaTagConfigurations[registry] as Map<Key, List<TagBuilder.Nova<T>.() -> Unit>>?
+            ?: emptyMap()
+        val implicitEntries: Provider<Map<Key, Set<RegistryEntry.Nova<T>>>> = combinedProvider(
+            builders.map { [_, builder] -> builder.tags.map { builder.entry to it } }
+        ) { extraTagsPerEntry ->
+            buildMap<Key, MutableSet<RegistryEntry.Nova<T>>> {
+                for ([entry, tagsDefinedInBuilder] in extraTagsPerEntry) {
+                    for (tag in tagsDefinedInBuilder) {
+                        if (tag.registry != registry || tag.tagKey !in tagConfigurations)
+                            continue
+                        getOrPut(tag.tagKey, ::LinkedHashSet) += entry
+                    }
+                }
+            }
+        }
+        for ([tagKey, configurations] in tagConfigurations) {
+            registry[tagKey] = buildNovaTagEntries {
+                add(implicitEntries.map { it[tagKey] ?: emptySet() })
+                configurations.forEach { it() }
+            }
+        }
+    }
+    
+    private fun requireKnownNovaRegistry(registry: MutableNovaRegistry<*>) {
+        require(registry in NovaRegistries.registries.values) { "Registry ${registry.key} is not a known Nova registry." }
+    }
+    
+    private fun checkFrozen() {
+        check(!NovaRegistries.isFrozen) { "Nova registries are frozen." }
+    }
+    //</editor-fold>
     
 }
 

@@ -40,7 +40,7 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
     fun item(item: RegistryEntry.Paper<ItemType>)
     
     /**
-     * Sets the behaviors of this block to [behaviors].
+     * Adds to the behaviors of this block to [behaviors].
      */
     fun behaviors(vararg behaviors: BlockBehaviorHolder)
     

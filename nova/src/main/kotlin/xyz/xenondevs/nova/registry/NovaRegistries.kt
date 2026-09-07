@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.world.player.ability.AbilityType
 import xyz.xenondevs.nova.world.player.attachment.AttachmentType
 
 /**
- * Contains all default Nova registries like [NovaRegistries.BLOCK] and [NovaRegistries.ITEM].
+ * Contains all default Nova registries like [NovaRegistries.GUI_TEXTURE] and [NovaRegistries.NETWORK_TYPE].
  */
 object NovaRegistries {
     
@@ -98,14 +98,17 @@ object NovaRegistries {
     
     /**
      * Creates a new registry with the given [key] that is tracked by Nova.
-     * Contrary to creating a [MutableNovaRegistry] directly by itself, registries tracked by
+     * Contrary to creating a [MutableNovaRegistry] directly by itself, [reloadable] registries tracked by
      * Nova can be reloaded with the built-in reload command and should be loaded via [RegistryLoader].
+     * [unknownEntryFactory] is used to preserve entries that are known from a previous server run
+     * or omitted during registry reloading.
      */
     internal fun <T : NovaRegistryElement<T>> createRegistry(
         key: Key,
-        reloadable: Boolean = RELOADABLE
+        reloadable: Boolean = RELOADABLE,
+        unknownEntryFactory: ((RegistryEntry.Nova<T>) -> T)? = null
     ): MutableNovaRegistry<T> {
-        val registry = MutableNovaRegistry<T>(key, reloadable)
+        val registry = MutableNovaRegistry(key, reloadable, unknownEntryFactory)
         if (registries.putIfAbsent(key, registry) != null)
             throw IllegalArgumentException("Registry key $key is already in use")
         return registry

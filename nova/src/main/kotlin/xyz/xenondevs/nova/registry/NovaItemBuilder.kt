@@ -52,7 +52,7 @@ sealed interface NovaItemBuilder : ConfigurableBuilder, NameableBuilder, Registr
     fun maxStackSize(maxStackSize: Int)
     
     /**
-     * Sets the behaviors of this item to [itemBehaviors].
+     * Adds to the behaviors of this item to [itemBehaviors].
      */
     fun behaviors(vararg itemBehaviors: ItemBehaviorHolder)
     

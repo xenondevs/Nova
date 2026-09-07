@@ -4,6 +4,7 @@ import io.papermc.paper.event.server.ServerResourcesReloadedEvent
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
+import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -11,7 +12,9 @@ import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.util.runTask
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 private sealed interface Tracked {
     
@@ -47,6 +50,7 @@ internal class NovaRegistryContext : RegistryContext {
         private var isInBootstrapPhase = true
         private val trackedEntries: MutableList<Tracked> = Collections.synchronizedList(ArrayList())
         private val reloadListeners: MutableList<() -> Unit> = Collections.synchronizedList(ArrayList())
+        private val dataReloadScheduled = AtomicBoolean()
         
         fun exitBootstrapPhase() {
             registerEvents()
@@ -97,6 +101,16 @@ internal class NovaRegistryContext : RegistryContext {
     
     override fun <T : Keyed> trackUnresolvedTag(key: TagKey<T>, registryAccess: RegistryAccess) {
         trackedEntries += Tracked.Tag(key, registryAccess, if (IS_DEV_SERVER) Throwable() else null)
+    }
+    
+    override fun scheduleDataReload() {
+        if (isInBootstrapPhase || !dataReloadScheduled.compareAndSet(false, true))
+            return
+        
+        runTask {
+            dataReloadScheduled.set(false)
+            Bukkit.reloadData()
+        }
     }
     
     override fun registerPostTagReloadListener(listener: () -> Unit) {

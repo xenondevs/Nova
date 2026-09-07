@@ -36,6 +36,11 @@ interface RegistryContext {
     )
     
     /**
+     * Schedules a reload of the server's Minecraft data. Multiple requests may be coalesced.
+     */
+    fun scheduleDataReload()
+    
+    /**
      * Registers a lister that is called after tags of paper registries were reloaded.
      */
     fun registerPostTagReloadListener(listener: () -> Unit)

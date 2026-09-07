@@ -1,4 +1,3 @@
-
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import io.papermc.paper.registry.RegistryKey
@@ -209,4 +208,3 @@ class RegistryEntrySetSerializerTest {
     
     
 }
-

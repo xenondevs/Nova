@@ -11,11 +11,13 @@ class TestRegistryContext : RegistryContext {
         var inBootstrapPhase: Boolean = true
         val trackedEntries = mutableListOf<TypedKey<*>>()
         val reloadListeners = mutableListOf<() -> Unit>()
+        var scheduledDataReloads = 0
         
         fun reset() {
             inBootstrapPhase = true
             trackedEntries.clear()
             reloadListeners.clear()
+            scheduledDataReloads = 0
         }
     }
     
@@ -27,6 +29,10 @@ class TestRegistryContext : RegistryContext {
     }
     
     override fun <T : Keyed> trackUnresolvedTag(key: TagKey<T>, registryAccess: RegistryAccess) {
+    }
+    
+    override fun scheduleDataReload() {
+        scheduledDataReloads++
     }
     
     override fun registerPostTagReloadListener(listener: () -> Unit) {

@@ -109,8 +109,16 @@ internal object NovaRegistrar : Registrar() {
  */
 abstract class Registrar internal constructor() : Namespaced {
     
-    fun <T : NovaRegistryElement<T>> registry(name: String, reloadable: Boolean = NovaRegistries.RELOADABLE): MutableNovaRegistry<T> =
-        NovaRegistries.createRegistry(key(this, name), reloadable)
+    /**
+     * Creates a Nova registry named [name]. [unknownEntryFactory] is used to preserve entries that
+     * are known from a previous server run or omitted during registry reloading.
+     */
+    fun <T : NovaRegistryElement<T>> registry(
+        name: String,
+        reloadable: Boolean = NovaRegistries.RELOADABLE,
+        unknownEntryFactory: ((RegistryEntry.Nova<T>) -> T)? = null
+    ): MutableNovaRegistry<T> =
+        NovaRegistries.createRegistry(key(this, name), reloadable, unknownEntryFactory)
     
     fun <T : Keyed> tag(name: String, registry: RegistryKey<T>, configure: TagBuilder.Paper<T>.() -> Unit): RegistryEntrySet.Paper.Tag<T> =
         tag(registryEntrySetOf(TagKey.create(registry, name)), configure)

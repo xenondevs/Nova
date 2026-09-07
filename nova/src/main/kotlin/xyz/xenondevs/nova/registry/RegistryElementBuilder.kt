@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.registry
 import net.minecraft.resources.RegistryOps
 import org.bukkit.Keyed
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.commons.provider.mutableProvider
 
 /**
  * A builder of a registry element, either [Nova] or [Vanilla].
@@ -12,14 +12,7 @@ import xyz.xenondevs.commons.provider.provider
  * Things like [NovaItemBuilder] intentionally do not implement this interface directly to hide
  * the build functions.
  */
-sealed interface RegistryElementBuilder<out T : Keyed> {
-    
-    /**
-     * A reloadable set of tags that the element built by this builder belongs in.
-     * Can be updated at any time (independently of registry reloading / re-running).
-     */
-    val tags: Provider<Set<RegistryEntrySet.Paper.Tag<T>>>
-        get() = provider(emptySet())
+sealed interface RegistryElementBuilder<out E : RegistryEntry<*>> : RegistryEntryBuilder<E> {
     
     /**
      * Prepares the builder for build.
@@ -31,7 +24,15 @@ sealed interface RegistryElementBuilder<out T : Keyed> {
     /**
      * A builder of a [NovaRegistryElement].
      */
-    interface Nova<out T : NovaRegistryElement<T>> : RegistryElementBuilder<T> {
+    interface Nova<out T : NovaRegistryElement<T>> :
+        RegistryElementBuilder<RegistryEntry.Nova<T>>,
+        RegistryEntryBuilder.Nova<T> {
+        
+        /**
+         * A reloadable set of tags that the element built by this builder belongs in.
+         * Can be updated at any time (independently of registry reloading).
+         */
+        val tags: Provider<Set<RegistryEntrySet.Nova.Tag<T>>>
         
         /**
          * Builds the registry element.
@@ -50,7 +51,15 @@ sealed interface RegistryElementBuilder<out T : Keyed> {
                 build: (RegistryEntry.Nova<T>, I) -> T
             ): Nova<T> = object : Nova<T> {
                 
+                override val entry = entry
+                final override val tags: Provider<Set<RegistryEntrySet.Nova.Tag<T>>>
+                    field = mutableProvider(emptySet())
+                
                 private lateinit var prep: I
+                
+                override fun tags(vararg tags: RegistryEntrySet.Nova.Tag<T>) {
+                    this.tags.set(this.tags.get() + tags)
+                }
                 
                 override fun prepareBuild() {
                     prep = prepare(entry)
@@ -67,7 +76,15 @@ sealed interface RegistryElementBuilder<out T : Keyed> {
     /**
      * A builder of something that is registered in a vanilla registry.
      */
-    interface Vanilla<out API : Keyed, out NMS : Any> : RegistryElementBuilder<API> {
+    interface Vanilla<out API : Keyed, out NMS : Any> :
+        RegistryElementBuilder<RegistryEntry.Paper<API>>,
+        RegistryEntryBuilder.Paper<API> {
+        
+        /**
+         * A reloadable set of tags that the element built by this builder belongs in.
+         * Can be updated at any time (independently of registry re-running).
+         */
+        val tags: Provider<Set<RegistryEntrySet.Paper.Tag<API>>>
         
         /**
          * Builds the registry element.
@@ -79,8 +96,7 @@ sealed interface RegistryElementBuilder<out T : Keyed> {
     
     /**
      * A [Vanilla] builder that can be reset and re-run. How updates are propagated to the elements
-     * is left to the implementation. [RegistryElementBuilder.Vanilla.prepareBuild] is called 
-     * again on re-run, but [RegistryElementBuilder.Vanilla.build] is not.
+     * is left to the implementation. [prepareBuild] is called again on re-run, but [build] is not.
      * Intended for non-reloadable vanilla registries.
      */
     interface RerunnableVanilla<out API : Keyed, out NMS : Any> : Vanilla<API, NMS> {

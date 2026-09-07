@@ -18,6 +18,8 @@ import org.bukkit.entity.Cow
 import org.bukkit.entity.Frog
 import org.bukkit.entity.Pig
 import org.bukkit.entity.Wolf
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.layout.entity.AgingEntityVariantLayoutBuilder
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
@@ -35,9 +37,16 @@ internal abstract class AbstractEntityVariantBuilder<T : Keyed, NMS : Any, L : E
     private val registryKey: RegistryKey<*>
 ) : EntityVariantBuilder<T, M, LB>, RegistryElementBuilder.Vanilla<T, NMS> {
     
+    final override val tags: Provider<Set<RegistryEntrySet.Paper.Tag<T>>>
+        field = mutableProvider(emptySet())
+    
     private val id = entry.key
     private var configureSpawnConditions: (SpawnConditionsBuilder.() -> Unit)? = null
     private var modelType: M = defaultModelType
+    
+    override fun tags(vararg tags: RegistryEntrySet.Paper.Tag<T>) {
+        this.tags.set(this.tags.get() + tags)
+    }
     
     override fun spawnConditions(spawnConditions: SpawnConditionsBuilder.() -> Unit) {
         this.configureSpawnConditions = spawnConditions

@@ -11,6 +11,7 @@ import org.bukkit.block.BlockType
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.uninitializedProvider
 import xyz.xenondevs.nova.config.CONFIGS
@@ -37,6 +38,7 @@ internal class NovaItemBuilderImpl(
     
     private val key: Key = entry.key
     
+    private val explicitTags = mutableProvider<Set<RegistryEntrySet.Paper.Tag<ItemType>>>(emptySet())
     private val _configId = uninitializedProvider<String>()
     private val _style = uninitializedProvider<Style>()
     private val _name = uninitializedProvider<Component?>()
@@ -65,11 +67,11 @@ internal class NovaItemBuilderImpl(
             }
         }
     }
-    override val tags = _behaviors.flatMap { behaviors ->
+    override val tags = combinedProvider(_behaviors, explicitTags) { behaviors, explicitTags ->
         combinedProvider(behaviors.map { behavior -> behavior.tags }) { tagSets ->
-            tagSets.flatMapTo(HashSet()) { it }
+            tagSets.flatMapTo(HashSet()) { it } + explicitTags
         }
-    }
+    }.flatten()
     
     private var configId: String by _configId
     private var style: Style by _style
@@ -96,6 +98,7 @@ internal class NovaItemBuilderImpl(
         _isHidden.set(false)
         _block.set(null)
         _tooltipStyle.set(null)
+        explicitTags.set(emptySet())
     }
     
     override fun block(block: RegistryEntry.Paper<BlockType>) {
@@ -128,6 +131,10 @@ internal class NovaItemBuilderImpl(
         }
     }
     
+    override fun tags(vararg tags: RegistryEntrySet.Paper.Tag<ItemType>) {
+        this.explicitTags.set(this.explicitTags.get() + tags)
+    }
+    
     override fun config(name: String) {
         this.configId = key.namespace() + ":" + name
     }
@@ -157,7 +164,7 @@ internal class NovaItemBuilderImpl(
     }
     
     override fun behaviors(vararg itemBehaviors: ItemBehaviorHolder) {
-        this.behaviorHolders = itemBehaviors.toMutableList()
+        this.behaviorHolders += itemBehaviors
     }
     
     @JvmName("craftingRemainingItemItemType")

@@ -16,6 +16,8 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.uninitializedProvider
 import xyz.xenondevs.nova.config.CONFIGS
 import xyz.xenondevs.nova.registry.tags.BlockTypeTags
@@ -51,6 +53,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     
     protected val key: Key = entry.key
     
+    private val explicitTags = mutableProvider<Set<RegistryEntrySet.Paper.Tag<BlockType>>>(emptySet())
     protected val _configId = uninitializedProvider<String>()
     protected val _style = uninitializedProvider<Style>()
     protected val _name = uninitializedProvider<Component>()
@@ -85,11 +88,11 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         }
     }
     
-    override val tags = _behaviors.flatMap { behaviors ->
+    override val tags = combinedProvider(_behaviors, explicitTags) { behaviors, explicitTags ->
         combinedProvider(behaviors.map { behavior -> behavior.tags }) { tagSets ->
-            tagSets.flatMapTo(HashSet()) { it }
+            tagSets.flatMapTo(HashSet()) { it } + explicitTags
         }
-    }
+    }.flatten()
     
     protected val _effectiveStateProperties = combinedProvider(
         _stateProperties, _behaviors
@@ -144,6 +147,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected val effectiveStateProperties by _effectiveStateProperties
     
     override fun reset() {
+        explicitTags.set(emptySet())
         configId = key.asString()
         style = (Style.empty())
         name = Component.translatable("block.${key.namespace()}.${key.value()}")
@@ -162,6 +166,10 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         flammable = FlammableSettings(0, 0, false)
         mapColor = null
         selectFluidFlowMode = { FluidFlowMode.BLOCK }
+    }
+    
+    override fun tags(vararg tags: RegistryEntrySet.Paper.Tag<BlockType>) {
+        this.explicitTags.set(this.explicitTags.get() + tags)
     }
     
     override fun config(name: String) {

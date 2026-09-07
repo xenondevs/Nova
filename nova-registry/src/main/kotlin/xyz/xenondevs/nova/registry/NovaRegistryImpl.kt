@@ -5,13 +5,17 @@ import xyz.xenondevs.commons.collections.mapToSet
 import xyz.xenondevs.commons.provider.DeferredValue
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.commons.provider.uninitializedProvider
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
-    override val key: Key
+    override val key: Key,
+    protected val unknownEntryFactory: ((RegistryEntry.Nova<T>) -> T)?
 ) : MutableNovaRegistry<T> {
     
     final override val unmodifiableView: NovaRegistry<T>
@@ -23,13 +27,14 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
     protected val entryByKey: MutableMap<Key, T> = LinkedHashMap()
     protected val keyByEntry: MutableMap<T, Key> = HashMap()
     protected val entriesByName: MutableMap<String, MutableList<T>> = HashMap()
-    protected val unflattenedTagEntriesByKey: MutableMap<Key, Set<NovaTagEntry<T>>> = HashMap()
-    protected val flattenedTagEntriesByKey: MutableMap<Key, Set<RegistryEntry.Nova<T>>> = HashMap()
+    protected val unflattenedTagEntriesByKey: MutableMap<Key, Provider<Set<NovaTagEntry<T>>>> = HashMap()
+    protected val missingEntryKeys: MutableSet<Key> = LinkedHashSet()
     
     // providers: updated on reload, maps are greedy
     protected val entryProviders: MutableMap<Key, Provider<T>> = HashMap()
     protected val optionalEntryProviders: MutableMap<Key, Provider<RegistryEntry.Nova<T>?>> = HashMap()
-    protected val tagProviders: MutableMap<Key, Provider<Set<RegistryEntry.Nova<T>>>> = HashMap()
+    protected val tagProvidersHolder: MutableProvider<Provider<Map<Key, Set<RegistryEntry.Nova<T>>>>> = uninitializedProvider()
+    protected val tagProviders: Provider<Map<Key, Set<RegistryEntry.Nova<T>>>> = tagProvidersHolder.flatten()
     protected val optionalTagProviders: MutableMap<Key, Provider<RegistryEntrySet.Nova.Tag<T>?>> = HashMap()
     
     // caches: cached objects for types that wrap providers, updated implicitly on reload, maps are greedy
@@ -48,13 +53,19 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
         entryByKey[key] = value
         keyByEntry[value] = key
         entriesByName.getOrPut(key.value()) { mutableListOf() } += value
+        missingEntryKeys -= key
     }
     
-    final override fun set(tagKey: Key, entries: Set<NovaTagEntry<T>>): Unit = lock.withLock {
+    final override fun setKnown(key: Key): Unit = lock.withLock {
+        checkNotFrozen()
+        if (unknownEntryFactory != null)
+            missingEntryKeys += key
+    }
+    
+    final override fun set(tagKey: Key, entries: Provider<Set<NovaTagEntry<T>>>): Unit = lock.withLock {
         checkNotFrozen()
         require(tagKey != key) { "Tag key cannot match registry key, as that is reserved for the entrySet tag" }
         require(tagKey !in unflattenedTagEntriesByKey) { "Tag $tagKey is already registered" }
-        require(entries.all { it.registry == this }) { "Cannot have tag entries from other registries" }
         
         unflattenedTagEntriesByKey[tagKey] = entries
     }
@@ -103,9 +114,8 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
             return tagsByKey[key]!!
         } else {
             return tagsByKey.getOrPut(key) {
-                val entries = tagProviders.getOrPutEagerProvider(key) {
-                    flattenedTagEntriesByKey[key]
-                        ?: throw NoSuchElementException("No tag found for key $key")
+                val entries = tagProviders.map { tags ->
+                    tags[key] ?: throw NoSuchElementException("No tag found for key $key")
                 }
                 NovaTagRegistryEntrySet(this, key, entries)
             }
@@ -116,48 +126,106 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
         return optionalTagProviders.getOrPutLazyProvider(key) { tagsByKey[key] }
     }
     
-    final override fun freeze(): Unit = lock.withLock {
+    final override fun freeze() {
+        val flattenedTagContentsProvider = lock.withLock { freezeLocked() }
+        tagProvidersHolder.set(flattenedTagContentsProvider)
+    }
+    
+    protected fun freezeLocked(): Provider<Map<Key, Set<RegistryEntry.Nova<T>>>> {
+        check(lock.isHeldByCurrentThread)
         checkNotFrozen()
         
+        registerUnknownEntries()
+        
         // populate entries map & register "all entries" tag
-        unflattenedTagEntriesByKey[key] = entryByKey.keys.mapToSet { NovaTagEntry.Direct(get(it)) }
+        unflattenedTagEntriesByKey[key] = provider(entryByKey.keys.mapToSet { NovaTagEntry.Direct(get(it)) })
         // populate tags map
         unflattenedTagEntriesByKey.keys.forEach { getTag(it) }
         
-        buildTags()
         isFrozen = true
         
-        try {
-            // bind entry- and tag providers to their initial value
+        return try {
+            val flattenedTagContentsProvider = buildFlattenedTagContentsProvider()
+            
+            // bind entry providers and validate the initial flattened tag contents
             entries.values.forEach { it.get() }
-            tagsByKey.values.forEach { it.get() }
+            flattenedTagContentsProvider.get()
+            
+            flattenedTagContentsProvider
         } catch (e: NoSuchElementException) {
             isFrozen = false // freezing failed
-            throw IllegalStateException("Referenced entries need to be registered before freezing", e)
+            throw IllegalStateException("Referenced entries and tags need to be registered before freezing", e)
+        } catch (t: Throwable) {
+            isFrozen = false
+            throw t
         }
     }
     
-    private fun buildTags() {
+    private fun registerUnknownEntries() {
         check(lock.isHeldByCurrentThread)
-        
-        fun flatten(key: Key): Set<RegistryEntry.Nova<T>> {
-            val memoized = flattenedTagEntriesByKey[key]
-            if (memoized != null)
-                return memoized
-            
-            val entries = unflattenedTagEntriesByKey[key]!!
-            flattenedTagEntriesByKey[key] = emptySet() // prevent infinite recursion in case of cyclic dependencies
-            val result = entries.flatMapTo(LinkedHashSet()) { entry ->
-                when (entry) {
-                    is NovaTagEntry.Direct -> setOf(entry.entry)
-                    is NovaTagEntry.Tag -> flatten(entry.tag.tagKey)
-                }
-            }
-            flattenedTagEntriesByKey[key] = result
-            return result
+        check(unknownEntryFactory != null || missingEntryKeys.isEmpty()) {
+            "Entries were not re-registered and no unknown-entry factory is configured: ${missingEntryKeys.joinToString()}"
         }
         
-        unflattenedTagEntriesByKey.keys.forEach(::flatten)
+        if (unknownEntryFactory == null)
+            return
+        
+        for (key in missingEntryKeys.toList()) {
+            set(key, unknownEntryFactory(get(key)))
+        }
+    }
+    
+    private fun buildFlattenedTagContentsProvider(): Provider<Map<Key, Set<RegistryEntry.Nova<T>>>> {
+        check(lock.isHeldByCurrentThread)
+        
+        val keys = tagsByKey.keys.toList()
+        val providers = keys.map(unflattenedTagEntriesByKey::getValue) // throws for undefined but referenced tags
+        return combinedProvider(providers) { entrySets ->
+            flattenTags(keys.zip(entrySets).toMap(LinkedHashMap()))
+        }
+    }
+    
+    private fun flattenTags(
+        definitions: Map<Key, Set<NovaTagEntry<T>>>
+    ): Map<Key, Set<RegistryEntry.Nova<T>>> {
+        val entriesByTag: MutableMap<Key, MutableSet<RegistryEntry.Nova<T>>> =
+            definitions.keys.associateWithTo(LinkedHashMap()) { LinkedHashSet() }
+        val dependentsByTag: MutableMap<Key, MutableSet<Key>> = HashMap()
+        
+        // Collect direct entries and track dependencies between tags
+        for ([tagKey, entries] in definitions) {
+            val directEntries = entriesByTag.getValue(tagKey)
+            for (entry in entries) {
+                require(entry.registry == this) { "Cannot have tag entries from other registries" }
+                when (entry) {
+                    is NovaTagEntry.Direct<*> -> {
+                        @Suppress("UNCHECKED_CAST")
+                        directEntries += entry.entry as RegistryEntry.Nova<T>
+                    }
+                    
+                    is NovaTagEntry.Tag<*> -> {
+                        val referencedTagKey = entry.tag.tagKey
+                        if (referencedTagKey !in definitions)
+                            throw NoSuchElementException("No tag found for key $referencedTagKey")
+                        dependentsByTag.getOrPut(referencedTagKey, ::LinkedHashSet) += tagKey
+                    }
+                }
+            }
+        }
+        
+        // Iteratively propagate entries to dependent tags
+        val pending = LinkedHashSet(entriesByTag.keys)
+        while (pending.isNotEmpty()) {
+            val tagKey = pending.removeFirst()
+            
+            val entries = entriesByTag.getValue(tagKey)
+            for (dependentKey in dependentsByTag[tagKey].orEmpty()) {
+                if (entriesByTag.getValue(dependentKey).addAll(entries))
+                    pending += dependentKey
+            }
+        }
+        
+        return entriesByTag.mapValues { it.value.toSet() }
     }
     
     /**
@@ -206,7 +274,10 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
     
 }
 
-internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : AbstractNovaRegistry<T>(key) {
+internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(
+    key: Key,
+    unknownEntryFactory: ((RegistryEntry.Nova<T>) -> T)?
+) : AbstractNovaRegistry<T>(key, unknownEntryFactory) {
     
     override val isReloadable: Boolean
         get() = true
@@ -216,9 +287,9 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
     override fun reload(configure: MutableNovaRegistry<T>.() -> Unit) {
         val entryValues: Map<MutableProvider<T>, DeferredValue.Direct<T>>
         val optionalEntryValues: Map<MutableProvider<RegistryEntry.Nova<T>?>, DeferredValue.Direct<RegistryEntry.Nova<T>?>>
-        val tagValues: Map<MutableProvider<Set<RegistryEntry.Nova<T>>>, DeferredValue.Direct<Set<RegistryEntry.Nova<T>>>>
         val optionalTagValues: Map<MutableProvider<RegistryEntrySet.Nova.Tag<T>?>, DeferredValue.Direct<RegistryEntrySet.Nova.Tag<T>?>>
         val allTags: DeferredValue.Direct<Set<RegistryEntrySet.Nova.Tag<T>>>
+        val flattenedTagContentsProvider: Provider<Map<Key, Set<RegistryEntry.Nova<T>>>>
         
         lock.withLock {
             checkFrozen()
@@ -226,9 +297,15 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
             
             try {
                 isReload = true
+                val previousTagKeys = unflattenedTagEntriesByKey.keys - key
                 reset()
                 configure()
-                freeze()
+                
+                for (tagKey in previousTagKeys) {
+                    unflattenedTagEntriesByKey.putIfAbsent(tagKey, provider(emptySet()))
+                }
+                
+                flattenedTagContentsProvider = freezeLocked()
                 entryValues = entryProviders.entries.associate { [key, provider] ->
                     provider as MutableProvider<T>
                     provider to DeferredValue.Direct(getValueOrThrow(key))
@@ -237,11 +314,6 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
                     provider as MutableProvider<RegistryEntry.Nova<T>?>
                     provider to DeferredValue.Direct(entries[key])
                 }
-                tagValues = tagProviders.entries.associate { [key, provider] ->
-                    provider as MutableProvider<Set<RegistryEntry.Nova<T>>>
-                    provider to DeferredValue.Direct(flattenedTagEntriesByKey[key]
-                        ?: throw NoSuchElementException("No tag found for key $key"))
-                }
                 optionalTagValues = optionalTagProviders.entries.associate { [key, provider] ->
                     provider as MutableProvider<RegistryEntrySet.Nova.Tag<T>?>
                     provider to DeferredValue.Direct(tagsByKey[key])
@@ -249,7 +321,7 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
                 allTags = DeferredValue.Direct(tagsByKey.values.toSet())
             } catch (e: NoSuchElementException) {
                 isFrozen = false // freezing failed
-                throw IllegalStateException("Referenced entries need to be registered before freezing", e)
+                throw IllegalStateException("Referenced entries and tags need to be registered before freezing", e)
             } finally {
                 isReload = false
             }
@@ -258,7 +330,7 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
         // update providers outside of lock as updating may run arbitrary code from observers
         entryValues.forEach { [provider, value] -> provider.update(value) }
         optionalEntryValues.forEach { [provider, value] -> provider.update(value) }
-        tagValues.forEach { [provider, value] -> provider.update(value) }
+        tagProvidersHolder.set(flattenedTagContentsProvider)
         optionalTagValues.forEach { [provider, value] -> provider.update(value) }
         (tags as MutableProvider).update(allTags)
     }
@@ -270,18 +342,21 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
         isFrozen = false
         
         // remove all previous values
+        missingEntryKeys += entryByKey.keys
         entryByKey.clear()
         keyByEntry.clear()
         entriesByName.clear()
         unflattenedTagEntriesByKey.clear()
-        flattenedTagEntriesByKey.clear()
     }
     
     override fun <T> createProvider(lazyValue: () -> T) = mutableProvider(lazyValue)
     
 }
 
-internal class StableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : AbstractNovaRegistry<T>(key) {
+internal class StableNovaRegistry<T : NovaRegistryElement<T>>(
+    key: Key,
+    unknownEntryFactory: ((RegistryEntry.Nova<T>) -> T)?
+) : AbstractNovaRegistry<T>(key, unknownEntryFactory) {
     
     override val isReloadable: Boolean
         get() = false

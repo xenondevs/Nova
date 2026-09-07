@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import org.joml.Vector2i
 import org.joml.Vector2ic
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureLayoutBuilder
@@ -19,12 +20,19 @@ internal class GuiTextureBuilderImpl(
     override val entry: RegistryEntry.Nova<GuiTexture>
 ) : GuiTextureBuilder, RegistryElementBuilder.Nova<GuiTexture> {
     
+    override val tags: Provider<Set<RegistryEntrySet.Nova.Tag<GuiTexture>>>
+        field = mutableProvider(emptySet())
+    
     private var hasInventoryLabel: Boolean = true
     private var configureLayout: GuiTextureLayoutBuilder.() -> Unit = {}
     private var titlePosition = TitlePosition()
     private val extraLines = mutableListOf<Pair<Component, TitlePosition>>()
     
     private lateinit var data: Provider<GuiTextureData>
+    
+    override fun tags(vararg tags: RegistryEntrySet.Nova.Tag<GuiTexture>) {
+        this.tags.set(this.tags.get() + tags)
+    }
     
     override fun inventoryLabel(inventoryLabel: Boolean) {
         hasInventoryLabel = inventoryLabel

@@ -8,6 +8,7 @@ import net.minecraft.resources.RegistryOps
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.uninitializedProvider
 import xyz.xenondevs.nova.registry.entries.EnchantmentTags
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
@@ -21,6 +22,7 @@ internal class EnchantmentBuilderImpl(
     override val entry: RegistryEntry.Paper<Enchantment>,
 ) : EnchantmentBuilder, RegistryElementBuilder.RerunnableVanilla<Enchantment, MojangEnchantment> {
     
+    private val explicitTags = mutableProvider<Set<RegistryEntrySet.Paper.Tag<Enchantment>>>(emptySet())
     private val _name = uninitializedProvider<Component>()
     private val _maxLevel = uninitializedProvider<Int>()
     private val _rarity = uninitializedProvider<Int>()
@@ -48,9 +50,10 @@ internal class EnchantmentBuilderImpl(
     private var isCurse: Boolean by _isCurse
     
     override val tags = combinedProvider(
-        _isTableDiscoverable, _isTreasure, _isTradeable, _isCurse
-    ) { isTableDiscoverable, isTreasure, isTradeable, isCurse ->
+        _isTableDiscoverable, _isTreasure, _isTradeable, _isCurse, explicitTags
+    ) { isTableDiscoverable, isTreasure, isTradeable, isCurse, explicitTags ->
         buildSet {
+            addAll(explicitTags)
             if (isTableDiscoverable)
                 add(EnchantmentTags.IN_ENCHANTING_TABLE)
             if (isCurse)
@@ -63,6 +66,7 @@ internal class EnchantmentBuilderImpl(
     }
     
     override fun reset() {
+        explicitTags.set(emptySet())
         name = Component.translatable("enchantment.${entry.key.namespace()}.${entry.key.value()}")
         maxLevel = 1
         rarity = 10
@@ -78,6 +82,10 @@ internal class EnchantmentBuilderImpl(
         isTreasure = false
         isTradeable = false
         isCurse = false
+    }
+    
+    override fun tags(vararg tags: RegistryEntrySet.Paper.Tag<Enchantment>) {
+        this.explicitTags.set(this.explicitTags.get() + tags)
     }
     
     override fun name(name: Component) {

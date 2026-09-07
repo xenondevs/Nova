@@ -1,4 +1,3 @@
-
 package xyz.xenondevs.nova.serialization.cbf
 
 import io.papermc.paper.registry.RegistryKey
@@ -168,5 +167,3 @@ class RegistryEntrySetBinarySerializerTest {
     
     
 }
-
-

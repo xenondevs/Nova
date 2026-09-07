@@ -1,4 +1,3 @@
-
 package xyz.xenondevs.nova.registry
 
 import io.papermc.paper.registry.RegistryKey
@@ -161,12 +160,6 @@ class RegistryEntrySetTest {
     }
     
     
-    
-    
-    
-    
-    
-    
     // --- Paper.Direct from TypedKeys bootstrap behavior ---
     
     @Test
@@ -233,4 +226,3 @@ class RegistryEntrySetTest {
     }
     
 }
-

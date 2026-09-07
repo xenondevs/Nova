@@ -7,6 +7,8 @@ import net.minecraft.resources.RegistryOps
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.animal.wolf.WolfSoundVariant
 import org.bukkit.entity.Wolf
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.util.toIdentifier
 import java.util.*
 
@@ -14,8 +16,15 @@ internal class WolfSoundVariantBuilderImpl(
     override val entry: RegistryEntry.Paper<Wolf.SoundVariant>
 ) : RegistryElementBuilder.Vanilla<Wolf.SoundVariant, WolfSoundVariant>, WolfSoundVariantBuilder {
     
+    override val tags: Provider<Set<RegistryEntrySet.Paper.Tag<Wolf.SoundVariant>>>
+        field = mutableProvider(emptySet())
+    
     private var configureAdultSounds: (WolfSoundSetBuilder.() -> Unit)? = null
     private var configureBabySounds: (WolfSoundSetBuilder.() -> Unit)? = null
+    
+    override fun tags(vararg tags: RegistryEntrySet.Paper.Tag<Wolf.SoundVariant>) {
+        this.tags.set(this.tags.get() + tags)
+    }
     
     /**
      * Configures the adult wolf sound set.
