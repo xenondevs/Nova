@@ -12,6 +12,8 @@ import kotlinx.serialization.modules.SerializersModule
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import xyz.xenondevs.commons.provider.provider
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertSame
@@ -152,6 +154,19 @@ class ConfigStorageTest {
         assertEquals("value", entry.get())
     }
     
+    @Test
+    fun `entries can use an explicit serializer`() {
+        val obj = jsonObj("key" to "value")
+        val storage = ConfigStorage(SerializersModule { }, MapBackend(mapOf(testId to obj)))
+        val config = storage[testId]
+        
+        assertEquals(Wrapper("value"), config.entry(WrapperSerializer, Wrapper("default"), "key").get())
+        assertEquals(Wrapper("value"), config.optionalEntry(WrapperSerializer, "key").get())
+        assertEquals(Wrapper("value"), config.strongEntry(WrapperSerializer, Wrapper("default"), "key").get())
+        assertEquals(Wrapper("value"), config.strongOptionalEntry(WrapperSerializer, "key").get())
+        assertEquals(Wrapper("value"), provider(config).entry(WrapperSerializer, Wrapper("default"), "key").get())
+    }
+    
     //</editor-fold>
     
     //<editor-fold desc="reload">
@@ -237,6 +252,23 @@ class ConfigStorageTest {
         assertTrue(errors.isEmpty())
     }
     
+    @Test
+    fun `onError called when serializer cannot be resolved`() {
+        val errors = mutableListOf<Triple<Key, List<String>, SerializationException>>()
+        val backend = MapBackend(
+            mapOf(testId to jsonObj()),
+            onError = { id, path, e -> errors += Triple(id, path, e) }
+        )
+        val storage = ConfigStorage(SerializersModule { }, backend)
+        
+        assertNull(storage[testId].optionalEntry<Wrapper>("missing").get())
+        
+        assertEquals(1, errors.size)
+        assertEquals(testId, errors[0].first)
+        assertEquals(listOf("missing"), errors[0].second)
+        assertContains(errors[0].third.message!!, Wrapper::class.qualifiedName!!)
+    }
+    
     //</editor-fold>
     
     //<editor-fold desc="setSerializers">
@@ -246,7 +278,11 @@ class ConfigStorageTest {
         val customId = Key.key("custom", "config")
         val otherId = Key.key("other", "config")
         val obj = jsonObj("value" to "hello")
-        val backend = MapBackend(mapOf(customId to obj, otherId to obj))
+        val errors = mutableListOf<Triple<Key, List<String>, SerializationException>>()
+        val backend = MapBackend(
+            mapOf(customId to obj, otherId to obj),
+            onError = { id, path, e -> errors += Triple(id, path, e) }
+        )
         val storage = ConfigStorage(SerializersModule { }, backend)
         
         storage.setSerializers("custom", SerializersModule {
@@ -257,9 +293,13 @@ class ConfigStorageTest {
         val customEntry = storage[customId].optionalEntry<Wrapper>("value")
         assertEquals(Wrapper("hello"), customEntry.get())
         
-        // "other" namespace doesn't, so it throws on deserialization
+        // "other" namespace doesn't, so deserialization fails
         val otherEntry = storage[otherId].optionalEntry<Wrapper>("value")
-        assertThrows<SerializationException> { otherEntry.get() }
+        assertNull(otherEntry.get())
+        assertEquals(1, errors.size)
+        assertEquals(otherId, errors[0].first)
+        assertEquals(listOf("value"), errors[0].second)
+        assertContains(errors[0].third.message!!, Wrapper::class.qualifiedName!!)
     }
     
     @Test
@@ -282,6 +322,7 @@ class ConfigStorageTest {
         override fun getLastModified(id: Key): Long = 0
         override fun onError(id: Key, path: List<String>, exception: SerializationException) =
             onError.invoke(id, path, exception)
+        
         override fun postReload() = Unit
     }
     
