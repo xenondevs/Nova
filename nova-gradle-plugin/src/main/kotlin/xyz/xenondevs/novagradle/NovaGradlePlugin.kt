@@ -1,17 +1,21 @@
 package xyz.xenondevs.novagradle
 
-import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
+import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
+import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import xyz.xenondevs.novagradle.task.AddonExtension
 import xyz.xenondevs.novagradle.task.GenerateLanguageFilesTask
 import xyz.xenondevs.novagradle.task.GenerateWailaTexturesExtension
@@ -26,6 +30,9 @@ import xyz.xenondevs.origami.extension.OrigamiExtension
 import xyz.xenondevs.origami.task.packaging.PrepareOrigamiMarkerTask
 
 private const val NOVA_TASK_GROUP = "nova"
+private const val COMPILER_PLUGIN_ID = "xyz.xenondevs.nova.compiler"
+private const val COMPILER_PLUGIN_GROUP = "xyz.xenondevs.nova"
+private const val COMPILER_PLUGIN_ARTIFACT = "nova-compiler-plugin"
 
 private val MAVEN_CENTRAL_URLS = setOf(
     "https://repo1.maven.org/maven2",
@@ -34,18 +41,30 @@ private val MAVEN_CENTRAL_URLS = setOf(
     "http://repo.maven.apache.org/maven2"
 )
 
-internal class NovaGradlePlugin : Plugin<Project> {
+internal class NovaGradlePlugin : KotlinCompilerPluginSupportPlugin {
     
-    override fun apply(project: Project) {
-        project.pluginManager.apply("org.jetbrains.kotlin.jvm")
-        project.pluginManager.apply("java-library")
-        project.pluginManager.apply("xyz.xenondevs.origami")
-        val addonExt = project.extensions.create<AddonExtension>("addon")
-        val addonJar = createAddonJar(project, addonExt)
-        configureOrigami(project, addonExt, addonJar)
-        createGenWailaTextures(project, addonExt)
-        createGenLangFiles(project)
+    override fun apply(target: Project) {
+        target.pluginManager.apply("org.jetbrains.kotlin.jvm")
+        target.pluginManager.apply("java-library")
+        target.pluginManager.apply("xyz.xenondevs.origami")
+        val addonExt = target.extensions.create<AddonExtension>("addon")
+        val addonJar = createAddonJar(target, addonExt)
+        configureOrigami(target, addonExt, addonJar)
+        createGenWailaTextures(target, addonExt)
+        createGenLangFiles(target)
     }
+    
+    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
+    
+    override fun getCompilerPluginId(): String = COMPILER_PLUGIN_ID
+    
+    override fun getPluginArtifact(): SubpluginArtifact =
+        SubpluginArtifact(COMPILER_PLUGIN_GROUP, COMPILER_PLUGIN_ARTIFACT, Versions.NOVA)
+    
+    override fun applyToCompilation(
+        kotlinCompilation: KotlinCompilation<*>
+    ): Provider<List<SubpluginOption>> =
+        kotlinCompilation.target.project.providers.provider { emptyList() }
     
     private fun configureOrigami(project: Project, ext: AddonExtension, addonJar: TaskProvider<Jar>) {
         val nova = project.configurations.detachedConfiguration(

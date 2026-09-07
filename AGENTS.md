@@ -16,7 +16,7 @@ Nova uses [Origami](https://github.com/xenondevs/origami), an access-widener and
 - `nova-hooks/`: Optional integrations with third-party plugins; each `nova-hook-*` directory is a subproject.
 - `nova-ksp/`: Internal Kotlin Symbol Processing processors for code generation.
 - `nova-gradle-plugin/`: Gradle plugin that addons have to use.
-- `nova-detekt-rules/`: Static analysis rules for Nova and addons to prevent common issues.
+- `nova-compiler-plugin/`: K2 FIR compiler warnings for common Nova API mistakes.
 - `nova-dokka-plugin/`: Internal dokka plugin for Nova's KDoc.
 - `build-logic/`: Shared Gradle convention plugins and build tasks.
 - `catalog/`: Published Gradle version catalog for addons.
@@ -49,7 +49,7 @@ Inspect the tools available to the agent and use JetBrains IDE or IntelliJ index
 Prefer IDE-backed capabilities for:
 
 - reading project and library files and searching by text, regex, filename, or symbol;
-  - if no sources for the minecraft server are available, run `gradle _oriInstall` to create them
+    - if no sources for the minecraft server are available, run `gradle _oriInstall` to create them
 - navigating to declarations and finding usages, implementations, callers, and type hierarchies;
 - inspecting types, documentation, diagnostics, and project structure;
 - editing project files when an IDE-backed edit operation is available;

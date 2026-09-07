@@ -4,7 +4,6 @@ format.version = "1.1"
 [versions]
 bytebase = "0.4.8"
 commons-provider = "2.0.0-alpha.11"
-detekt = "2.0.0-alpha.5"
 dokka = "2.2.0"
 jgrapht = "1.5.3"
 kotlin = "2.4.0"
@@ -30,9 +29,6 @@ commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflecti
 commons-version = { group = "xyz.xenondevs.commons", name = "commons-version", version.ref = "xenondevs-commons" }
 configurate-yaml = { group = "org.spongepowered", name = "configurate-yaml", version = "4.2.0" }
 cosmicBinaryFormat = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format", version = "1.0.0-alpha.4" }
-detekt-api = { module = "dev.detekt:detekt-api", version.ref = "detekt" }
-detekt-plugin = { module = "dev.detekt:detekt-gradle-plugin", version.ref = "detekt" }
-detekt-test = { module = "dev.detekt:detekt-test", version.ref = "detekt" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
 dokka-core = { module = "org.jetbrains.dokka:dokka-core", version.ref = "dokka" }
 dokka-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
@@ -46,6 +42,7 @@ junit-bom = { module = "org.junit:junit-bom", version = "6.1.2" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
 kotlinpoet-ksp = { group = "com.squareup", name = "kotlinpoet-ksp", version = "2.2.0" }
+kotlin-compiler = { group = "org.jetbrains.kotlin", name = "kotlin-compiler", version.ref = "kotlin" }
 kotlin-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }

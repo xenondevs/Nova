@@ -24,9 +24,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
         with:
           cache-disabled: true
-        
+
       - name: Build Nova
-        run: ./gradlew detektMain detektTest test loaderJar -PoutDir=artifacts -Prelease
+        run: ./gradlew test loaderJar -PoutDir=artifacts -Prelease
 
       - name: Upload Artifacts
         id: upload

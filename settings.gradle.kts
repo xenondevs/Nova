@@ -30,7 +30,7 @@ include("nova-ksp:processor:network")
 include("nova-ksp:processor:packet-entity")
 
 // tooling
-include("nova-detekt-rules")
+include("nova-compiler-plugin")
 include("nova-dokka-plugin")
 include("nova-gradle-plugin")
 
