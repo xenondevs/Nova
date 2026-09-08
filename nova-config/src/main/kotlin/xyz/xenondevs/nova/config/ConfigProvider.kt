@@ -66,6 +66,48 @@ inline fun <reified T : Any> Provider<ConfigProvider>.entry(default: Provider<T>
     flatMap { it.entry(default, *paths) }
 
 /**
+ * Gets an entry [Provider] for a value of type [S] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+inline fun <reified S : Any, T : Any> Provider<ConfigProvider>.entry(default: S, vararg path: String, noinline transform: (S) -> T): Provider<T> =
+    flatMap { it.entry(default, *path, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+inline fun <reified S : Any, T : Any> Provider<ConfigProvider>.entry(default: Provider<S>, vararg path: String, noinline transform: (S) -> T): Provider<T> =
+    flatMap { it.entry(default, *path, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+inline fun <reified S : Any, T : Any> Provider<ConfigProvider>.entry(default: S, vararg paths: List<String>, noinline transform: (S) -> T): Provider<T> =
+    flatMap { it.entry(default, *paths, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+inline fun <reified S : Any, T : Any> Provider<ConfigProvider>.entry(default: Provider<S>, vararg paths: List<String>, noinline transform: (S) -> T): Provider<T> =
+    flatMap { it.entry(default, *paths, transform = transform) }
+
+/**
  * Gets an optional entry [Provider] for a value of type [T] under [path], whose value
  * will be null if the entry does not exist or could not be deserialized due to [SerializationException].
  *
@@ -110,6 +152,40 @@ inline fun <reified T : Any> Provider<ConfigProvider>.strongEntry(default: T, va
  */
 inline fun <reified T : Any> Provider<ConfigProvider>.strongEntry(default: Provider<T>, vararg paths: List<String>): Provider<T> =
     flatMap { it.strongEntry(default, *paths) }
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+inline fun <reified S : Any, T : Any> Provider<ConfigProvider>.strongEntry(default: S, vararg path: String, noinline transform: (S) -> T): Provider<T> =
+    flatMap { it.strongEntry(default, *path, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+inline fun <reified S : Any, T : Any> Provider<ConfigProvider>.strongEntry(default: Provider<S>, vararg path: String, noinline transform: (S) -> T): Provider<T> =
+    flatMap { it.strongEntry(default, *path, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+inline fun <reified S : Any, T : Any> Provider<ConfigProvider>.strongEntry(default: S, vararg paths: List<String>, noinline transform: (S) -> T): Provider<T> =
+    flatMap { it.strongEntry(default, *paths, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+inline fun <reified S : Any, T : Any> Provider<ConfigProvider>.strongEntry(default: Provider<S>, vararg paths: List<String>, noinline transform: (S) -> T): Provider<T> =
+    flatMap { it.strongEntry(default, *paths, transform = transform) }
 
 /**
  * Gets an optional entry [Provider] for a value of type [T] under [path], whose value
@@ -162,6 +238,48 @@ fun <T : Any> Provider<ConfigProvider>.entry(serializer: KSerializer<T>, default
     flatMap { it.entry(serializer, default, *paths) }
 
 /**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+fun <S : Any, T : Any> Provider<ConfigProvider>.entry(serializer: KSerializer<S>, default: S, vararg path: String, transform: (S) -> T): Provider<T> =
+    flatMap { it.entry(serializer, default, *path, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+fun <S : Any, T : Any> Provider<ConfigProvider>.entry(serializer: KSerializer<S>, default: Provider<S>, vararg path: String, transform: (S) -> T): Provider<T> =
+    flatMap { it.entry(serializer, default, *path, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+fun <S : Any, T : Any> Provider<ConfigProvider>.entry(serializer: KSerializer<S>, default: S, vararg paths: List<String>, transform: (S) -> T): Provider<T> =
+    flatMap { it.entry(serializer, default, *paths, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+fun <S : Any, T : Any> Provider<ConfigProvider>.entry(serializer: KSerializer<S>, default: Provider<S>, vararg paths: List<String>, transform: (S) -> T): Provider<T> =
+    flatMap { it.entry(serializer, default, *paths, transform = transform) }
+
+/**
  * Gets an optional entry [Provider] for a value deserialized by [serializer] under [path], whose value
  * will be null if the entry does not exist or could not be deserialized due to [SerializationException].
  *
@@ -206,6 +324,40 @@ fun <T : Any> Provider<ConfigProvider>.strongEntry(serializer: KSerializer<T>, d
  */
 fun <T : Any> Provider<ConfigProvider>.strongEntry(serializer: KSerializer<T>, default: Provider<T>, vararg paths: List<String>): Provider<T> =
     flatMap { it.strongEntry(serializer, default, *paths) }
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+fun <S : Any, T : Any> Provider<ConfigProvider>.strongEntry(serializer: KSerializer<S>, default: S, vararg path: String, transform: (S) -> T): Provider<T> =
+    flatMap { it.strongEntry(serializer, default, *path, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+fun <S : Any, T : Any> Provider<ConfigProvider>.strongEntry(serializer: KSerializer<S>, default: Provider<S>, vararg path: String, transform: (S) -> T): Provider<T> =
+    flatMap { it.strongEntry(serializer, default, *path, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+fun <S : Any, T : Any> Provider<ConfigProvider>.strongEntry(serializer: KSerializer<S>, default: S, vararg paths: List<String>, transform: (S) -> T): Provider<T> =
+    flatMap { it.strongEntry(serializer, default, *paths, transform = transform) }
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+fun <S : Any, T : Any> Provider<ConfigProvider>.strongEntry(serializer: KSerializer<S>, default: Provider<S>, vararg paths: List<String>, transform: (S) -> T): Provider<T> =
+    flatMap { it.strongEntry(serializer, default, *paths, transform = transform) }
 
 /**
  * Gets an optional entry [Provider] for a value deserialized by [serializer] under [path], whose value
@@ -292,6 +444,15 @@ fun ConfigProvider.strongNode(vararg path: String): ConfigProvider =
     strongNode(path.asList())
 
 /**
+ * Gets an entry [Provider] for a value of [type] under the first existing path from [paths].
+ * Falls back to [default] if no entry exists or could not be deserialized due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+fun <T : Any> ConfigProvider.entry(type: KType, default: Provider<T>, vararg paths: List<String>): Provider<T> =
+    entry(type, default, { it }, *paths)
+
+/**
  * Gets an entry [Provider] for a value of type [T] under [path].
  * Falls back to [default] if the entry does not exist or could not be deserialized due to [SerializationException].
  *
@@ -307,7 +468,7 @@ inline fun <reified T : Any> ConfigProvider.entry(default: T, vararg path: Strin
  * The returned provider will only be stored in a [WeakReference] in the parent provider.
  */
 inline fun <reified T : Any> ConfigProvider.entry(default: Provider<T>, vararg path: String): Provider<T> =
-    entry(typeOf<T>(), default, path.asList())
+    entry(typeOf<T>(), default, { it }, path.asList())
 
 /**
  * Gets an entry [Provider] for a value of type [T] under the first existing path from [paths].
@@ -325,7 +486,49 @@ inline fun <reified T : Any> ConfigProvider.entry(default: T, vararg paths: List
  * The returned provider will only be stored in a [WeakReference] in the parent provider.
  */
 inline fun <reified T : Any> ConfigProvider.entry(default: Provider<T>, vararg paths: List<String>): Provider<T> =
-    entry(typeOf<T>(), default, *paths)
+    entry(typeOf<T>(), default, { it }, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+inline fun <reified S : Any, T : Any> ConfigProvider.entry(default: S, vararg path: String, noinline transform: (S) -> T): Provider<T> =
+    entry(typeOf<S>(), provider(default), transform, path.asList())
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+inline fun <reified S : Any, T : Any> ConfigProvider.entry(default: Provider<S>, vararg path: String, noinline transform: (S) -> T): Provider<T> =
+    entry(typeOf<S>(), default, transform, path.asList())
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+inline fun <reified S : Any, T : Any> ConfigProvider.entry(default: S, vararg paths: List<String>, noinline transform: (S) -> T): Provider<T> =
+    entry(typeOf<S>(), provider(default), transform, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+inline fun <reified S : Any, T : Any> ConfigProvider.entry(default: Provider<S>, vararg paths: List<String>, noinline transform: (S) -> T): Provider<T> =
+    entry(typeOf<S>(), default, transform, *paths)
 
 /**
  * Gets an optional entry [Provider] for a value of type [T] under [path], whose value
@@ -346,6 +549,13 @@ inline fun <reified T : Any> ConfigProvider.optionalEntry(vararg paths: List<Str
     optionalEntry(typeOf<T>(), *paths)
 
 /**
+ * Gets an entry [Provider] for a value of [type] under the first existing path from [paths].
+ * Falls back to [default] if no entry exists or could not be deserialized due to [SerializationException].
+ */
+fun <T : Any> ConfigProvider.strongEntry(type: KType, default: Provider<T>, vararg paths: List<String>): Provider<T> =
+    strongEntry(type, default, { it }, *paths)
+
+/**
  * Gets an entry [Provider] for a value of type [T] under [path].
  * Falls back to [default] if the entry does not exist or could not be deserialized due to [SerializationException].
  */
@@ -357,7 +567,7 @@ inline fun <reified T : Any> ConfigProvider.strongEntry(default: T, vararg path:
  * Falls back to [default] if the entry does not exist or could not be deserialized due to [SerializationException].
  */
 inline fun <reified T : Any> ConfigProvider.strongEntry(default: Provider<T>, vararg path: String): Provider<T> =
-    strongEntry(typeOf<T>(), default, path.asList())
+    strongEntry(typeOf<T>(), default, { it }, path.asList())
 
 /**
  * Gets an entry [Provider] for a value of type [T] under the first existing path from [paths].
@@ -371,7 +581,41 @@ inline fun <reified T : Any> ConfigProvider.strongEntry(default: T, vararg paths
  * Falls back to [default] if no entry exists or could not be deserialized due to [SerializationException].
  */
 inline fun <reified T : Any> ConfigProvider.strongEntry(default: Provider<T>, vararg paths: List<String>): Provider<T> =
-    strongEntry(typeOf<T>(), default, *paths)
+    strongEntry(typeOf<T>(), default, { it }, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+inline fun <reified S : Any, T : Any> ConfigProvider.strongEntry(default: S, vararg path: String, noinline transform: (S) -> T): Provider<T> =
+    strongEntry(typeOf<S>(), provider(default), transform, path.asList())
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+inline fun <reified S : Any, T : Any> ConfigProvider.strongEntry(default: Provider<S>, vararg path: String, noinline transform: (S) -> T): Provider<T> =
+    strongEntry(typeOf<S>(), default, transform, path.asList())
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+inline fun <reified S : Any, T : Any> ConfigProvider.strongEntry(default: S, vararg paths: List<String>, noinline transform: (S) -> T): Provider<T> =
+    strongEntry(typeOf<S>(), provider(default), transform, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of type [S] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+inline fun <reified S : Any, T : Any> ConfigProvider.strongEntry(default: Provider<S>, vararg paths: List<String>, noinline transform: (S) -> T): Provider<T> =
+    strongEntry(typeOf<S>(), default, transform, *paths)
 
 /**
  * Gets an optional entry [Provider] for a value of type [T] under [path], whose value
@@ -394,7 +638,7 @@ inline fun <reified T : Any> ConfigProvider.strongOptionalEntry(vararg paths: Li
  * The returned provider will only be stored in a [WeakReference] in the parent provider.
  */
 fun <T : Any> ConfigProvider.entry(serializer: KSerializer<T>, default: T, vararg path: String): Provider<T> =
-    entry(serializer, provider(default), path.asList())
+    entry(serializer, provider(default), { it }, path.asList())
 
 /**
  * Gets an entry [Provider] for a value deserialized by [serializer] under [path].
@@ -403,7 +647,7 @@ fun <T : Any> ConfigProvider.entry(serializer: KSerializer<T>, default: T, varar
  * The returned provider will only be stored in a [WeakReference] in the parent provider.
  */
 fun <T : Any> ConfigProvider.entry(serializer: KSerializer<T>, default: Provider<T>, vararg path: String): Provider<T> =
-    entry(serializer, default, path.asList())
+    entry(serializer, default, { it }, path.asList())
 
 /**
  * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths].
@@ -412,7 +656,58 @@ fun <T : Any> ConfigProvider.entry(serializer: KSerializer<T>, default: Provider
  * The returned provider will only be stored in a [WeakReference] in the parent provider.
  */
 fun <T : Any> ConfigProvider.entry(serializer: KSerializer<T>, default: T, vararg paths: List<String>): Provider<T> =
-    entry(serializer, provider(default), *paths)
+    entry(serializer, provider(default), { it }, *paths)
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths].
+ * Falls back to [default] if no entry exists or could not be deserialized due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+fun <T : Any> ConfigProvider.entry(serializer: KSerializer<T>, default: Provider<T>, vararg paths: List<String>): Provider<T> =
+    entry(serializer, default, { it }, *paths)
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+fun <S : Any, T : Any> ConfigProvider.entry(serializer: KSerializer<S>, default: S, vararg path: String, transform: (S) -> T): Provider<T> =
+    entry(serializer, provider(default), transform, path.asList())
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+fun <S : Any, T : Any> ConfigProvider.entry(serializer: KSerializer<S>, default: Provider<S>, vararg path: String, transform: (S) -> T): Provider<T> =
+    entry(serializer, default, transform, path.asList())
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+fun <S : Any, T : Any> ConfigProvider.entry(serializer: KSerializer<S>, default: S, vararg paths: List<String>, transform: (S) -> T): Provider<T> =
+    entry(serializer, provider(default), transform, *paths)
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ */
+fun <S : Any, T : Any> ConfigProvider.entry(serializer: KSerializer<S>, default: Provider<S>, vararg paths: List<String>, transform: (S) -> T): Provider<T> =
+    entry(serializer, default, transform, *paths)
 
 /**
  * Gets an optional entry [Provider] for a value deserialized by [serializer] under [path], whose value
@@ -428,21 +723,62 @@ fun <T : Any> ConfigProvider.optionalEntry(serializer: KSerializer<T>, vararg pa
  * Falls back to [default] if the entry does not exist or could not be deserialized due to [SerializationException].
  */
 fun <T : Any> ConfigProvider.strongEntry(serializer: KSerializer<T>, default: T, vararg path: String): Provider<T> =
-    strongEntry(serializer, provider(default), path.asList())
+    strongEntry(serializer, provider(default), { it }, path.asList())
 
 /**
  * Gets an entry [Provider] for a value deserialized by [serializer] under [path].
  * Falls back to [default] if the entry does not exist or could not be deserialized due to [SerializationException].
  */
 fun <T : Any> ConfigProvider.strongEntry(serializer: KSerializer<T>, default: Provider<T>, vararg path: String): Provider<T> =
-    strongEntry(serializer, default, path.asList())
+    strongEntry(serializer, default, { it }, path.asList())
 
 /**
  * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths].
  * Falls back to [default] if no entry exists or could not be deserialized due to [SerializationException].
  */
 fun <T : Any> ConfigProvider.strongEntry(serializer: KSerializer<T>, default: T, vararg paths: List<String>): Provider<T> =
-    strongEntry(serializer, provider(default), *paths)
+    strongEntry(serializer, provider(default), { it }, *paths)
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths].
+ * Falls back to [default] if no entry exists or could not be deserialized due to [SerializationException].
+ */
+fun <T : Any> ConfigProvider.strongEntry(serializer: KSerializer<T>, default: Provider<T>, vararg paths: List<String>): Provider<T> =
+    strongEntry(serializer, default, { it }, *paths)
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+fun <S : Any, T : Any> ConfigProvider.strongEntry(serializer: KSerializer<S>, default: S, vararg path: String, transform: (S) -> T): Provider<T> =
+    strongEntry(serializer, provider(default), transform, path.asList())
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under [path], transformed to [T] by [transform].
+ * Falls back to the transformed [default] if the entry does not exist or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+fun <S : Any, T : Any> ConfigProvider.strongEntry(serializer: KSerializer<S>, default: Provider<S>, vararg path: String, transform: (S) -> T): Provider<T> =
+    strongEntry(serializer, default, transform, path.asList())
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+fun <S : Any, T : Any> ConfigProvider.strongEntry(serializer: KSerializer<S>, default: S, vararg paths: List<String>, transform: (S) -> T): Provider<T> =
+    strongEntry(serializer, provider(default), transform, *paths)
+
+/**
+ * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths],
+ * transformed to [T] by [transform].
+ * Falls back to the transformed [default] if no entry exists or could not be deserialized
+ * or transformed due to [SerializationException].
+ */
+fun <S : Any, T : Any> ConfigProvider.strongEntry(serializer: KSerializer<S>, default: Provider<S>, vararg paths: List<String>, transform: (S) -> T): Provider<T> =
+    strongEntry(serializer, default, transform, *paths)
 
 /**
  * Gets an optional entry [Provider] for a value deserialized by [serializer] under [path], whose value
@@ -470,7 +806,7 @@ inline fun <reified T : Any> ConfigProvider.entryOrElse(default: Provider<T>?, v
 
 @Deprecated("Use entry instead", ReplaceWith("entry(type, default, *path)", "xyz.xenondevs.nova.config.entry"))
 fun <T : Any> ConfigProvider.entryOrElse(type: KType, default: Provider<T>?, vararg path: String): Provider<T> =
-    if (default != null) entry(type, default, path.asList()) else optionalEntry<T>(type, path.asList()).requireNotNull { missingEntryMessage(path.asList()) }
+    if (default != null) entry(type, default, { it }, path.asList()) else optionalEntry<T>(type, path.asList()).requireNotNull { missingEntryMessage(path.asList()) }
 
 @Deprecated("Use entry instead", ReplaceWith("entry(default, *paths)", "xyz.xenondevs.nova.config.entry"))
 inline fun <reified T : Any> ConfigProvider.entryOrElse(default: T?, vararg paths: Array<String>): Provider<T> =
@@ -482,7 +818,7 @@ inline fun <reified T : Any> ConfigProvider.entryOrElse(default: Provider<T>?, v
 
 @Deprecated("Use entry instead", ReplaceWith("entry(type, default, *paths)", "xyz.xenondevs.nova.config.entry"))
 fun <T : Any> ConfigProvider.entryOrElse(type: KType, default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
-    if (default != null) entry(type, default, *paths.toLists()) else optionalEntry<T>(type, *paths.toLists()).requireNotNull { missingEntryMessage(*paths.toLists()) }
+    if (default != null) entry(type, default, { it }, *paths.toLists()) else optionalEntry<T>(type, *paths.toLists()).requireNotNull { missingEntryMessage(*paths.toLists()) }
 
 @Deprecated("Use strongEntry with a default value instead", ReplaceWith("strongEntry(default, *path)", "xyz.xenondevs.nova.config.strongEntry"))
 inline fun <reified T : Any> ConfigProvider.strongEntry(vararg path: String): Provider<T> =
@@ -502,7 +838,7 @@ inline fun <reified T : Any> ConfigProvider.strongEntryOrElse(default: Provider<
 
 @Deprecated("Use strongEntry instead", ReplaceWith("strongEntry(type, default, *path)", "xyz.xenondevs.nova.config.strongEntry"))
 fun <T : Any> ConfigProvider.strongEntryOrElse(type: KType, default: Provider<T>?, vararg path: String): Provider<T> =
-    if (default != null) strongEntry(type, default, path.asList()) else strongOptionalEntry<T>(type, path.asList()).strongRequireNotNull { missingEntryMessage(path.asList()) }
+    if (default != null) strongEntry(type, default, { it }, path.asList()) else strongOptionalEntry<T>(type, path.asList()).strongRequireNotNull { missingEntryMessage(path.asList()) }
 
 @Deprecated("Use strongEntry instead", ReplaceWith("strongEntry(default, *paths)", "xyz.xenondevs.nova.config.strongEntry"))
 inline fun <reified T : Any> ConfigProvider.strongEntryOrElse(default: T?, vararg paths: Array<String>): Provider<T> =
@@ -514,7 +850,7 @@ inline fun <reified T : Any> ConfigProvider.strongEntryOrElse(default: Provider<
 
 @Deprecated("Use strongEntry instead", ReplaceWith("strongEntry(type, default, *paths)", "xyz.xenondevs.nova.config.strongEntry"))
 fun <T : Any> ConfigProvider.strongEntryOrElse(type: KType, default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
-    if (default != null) strongEntry(type, default, *paths.toLists()) else strongOptionalEntry<T>(type, *paths.toLists()).strongRequireNotNull { missingEntryMessage(*paths.toLists()) }
+    if (default != null) strongEntry(type, default, { it }, *paths.toLists()) else strongOptionalEntry<T>(type, *paths.toLists()).strongRequireNotNull { missingEntryMessage(*paths.toLists()) }
 
 @PublishedApi
 internal fun ConfigProvider.missingEntryMessage(vararg paths: List<String>): String =
@@ -541,20 +877,24 @@ interface ConfigProvider : Provider<JsonElement> {
     fun node(path: List<String>): ConfigProvider
     
     /**
-     * Gets an entry [Provider] for a value of [type] under the first existing path from [paths].
-     * Falls back to [default] if no entry exists or could not be deserialized due to [SerializationException].
+     * Gets an entry [Provider] for a value of [type] under the first existing path from [paths],
+     * transformed to [T] by [transform].
+     * Falls back to the transformed [default] if no entry exists or could not be deserialized
+     * due to [SerializationException] or if [transform] threw an exception.
      *
      * The returned provider will only be stored in a [WeakReference] in the parent provider.
      */
-    fun <T : Any> entry(type: KType, default: Provider<T>, vararg paths: List<String>): Provider<T>
+    fun <S : Any, T : Any> entry(type: KType, default: Provider<S>, transform: (S) -> T, vararg paths: List<String>): Provider<T>
     
     /**
-     * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths].
-     * Falls back to [default] if no entry exists or could not be deserialized due to [SerializationException].
+     * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths],
+     * transformed to [T] by [transform].
+     * Falls back to the transformed [default] if no entry exists or could not be deserialized
+     * due to [SerializationException] or if [transform] threw an exception.
      *
      * The returned provider will only be stored in a [WeakReference] in the parent provider.
      */
-    fun <T : Any> entry(serializer: KSerializer<T>, default: Provider<T>, vararg paths: List<String>): Provider<T>
+    fun <S : Any, T : Any> entry(serializer: KSerializer<S>, default: Provider<S>, transform: (S) -> T, vararg paths: List<String>): Provider<T>
     
     /**
      * Gets an optional entry [Provider] for a value of [type] under the first existing path from [paths],
@@ -578,16 +918,20 @@ interface ConfigProvider : Provider<JsonElement> {
     fun strongNode(path: List<String>): ConfigProvider
     
     /**
-     * Gets an entry [Provider] for a value of [type] under the first existing path from [paths].
-     * Falls back to [default] if no entry exists or could not be deserialized due to [SerializationException].
+     * Gets an entry [Provider] for a value of [type] under the first existing path from [paths],
+     * transformed to [T] by [transform].
+     * Falls back to the transformed [default] if no entry exists or could not be deserialized
+     * or transformed due to [SerializationException].
      */
-    fun <T : Any> strongEntry(type: KType, default: Provider<T>, vararg paths: List<String>): Provider<T>
+    fun <S : Any, T : Any> strongEntry(type: KType, default: Provider<S>, transform: (S) -> T, vararg paths: List<String>): Provider<T>
     
     /**
-     * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths].
-     * Falls back to [default] if no entry exists or could not be deserialized due to [SerializationException].
+     * Gets an entry [Provider] for a value deserialized by [serializer] under the first existing path from [paths],
+     * transformed to [T] by [transform].
+     * Falls back to the transformed [default] if no entry exists or could not be deserialized
+     * or transformed due to [SerializationException].
      */
-    fun <T : Any> strongEntry(serializer: KSerializer<T>, default: Provider<T>, vararg paths: List<String>): Provider<T>
+    fun <S : Any, T : Any> strongEntry(serializer: KSerializer<S>, default: Provider<S>, transform: (S) -> T, vararg paths: List<String>): Provider<T>
     
     /**
      * Gets an optional entry [Provider] for a value of [type] under the first existing path from [paths],
@@ -608,13 +952,13 @@ interface ConfigProvider : Provider<JsonElement> {
     object Empty : ConfigProvider, Provider<JsonElement> by provider(JsonObject(emptyMap())) {
         override val configId = Key.key("nova", "empty_config_provider")
         override fun node(path: List<String>) = Empty
-        override fun <T : Any> entry(type: KType, default: Provider<T>, vararg paths: List<String>) = default
-        override fun <T : Any> entry(serializer: KSerializer<T>, default: Provider<T>, vararg paths: List<String>) = default
+        override fun <S : Any, T : Any> entry(type: KType, default: Provider<S>, transform: (S) -> T, vararg paths: List<String>) = default.map(transform)
+        override fun <S : Any, T : Any> entry(serializer: KSerializer<S>, default: Provider<S>, transform: (S) -> T, vararg paths: List<String>) = default.map(transform)
         override fun <T : Any> optionalEntry(type: KType, vararg paths: List<String>) = NULL_PROVIDER
         override fun <T : Any> optionalEntry(serializer: KSerializer<T>, vararg paths: List<String>) = NULL_PROVIDER
         override fun strongNode(path: List<String>) = Empty
-        override fun <T : Any> strongEntry(type: KType, default: Provider<T>, vararg paths: List<String>) = default
-        override fun <T : Any> strongEntry(serializer: KSerializer<T>, default: Provider<T>, vararg paths: List<String>) = default
+        override fun <S : Any, T : Any> strongEntry(type: KType, default: Provider<S>, transform: (S) -> T, vararg paths: List<String>) = default.strongMap(transform)
+        override fun <S : Any, T : Any> strongEntry(serializer: KSerializer<S>, default: Provider<S>, transform: (S) -> T, vararg paths: List<String>) = default.strongMap(transform)
         override fun <T : Any> strongOptionalEntry(type: KType, vararg paths: List<String>) = NULL_PROVIDER
         override fun <T : Any> strongOptionalEntry(serializer: KSerializer<T>, vararg paths: List<String>) = NULL_PROVIDER
     }

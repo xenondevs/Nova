@@ -167,6 +167,44 @@ class ConfigStorageTest {
         assertEquals(Wrapper("value"), provider(config).entry(WrapperSerializer, Wrapper("default"), "key").get())
     }
     
+    @Test
+    fun `entry transforms deserialized value`() {
+        val obj = jsonObj("key" to "value")
+        val storage = ConfigStorage(SerializersModule { }, MapBackend(mapOf(testId to obj)))
+        
+        val entry = storage[testId].entry(WrapperSerializer, Wrapper("default"), "key") { it.value.length }
+        
+        assertEquals(5, entry.get())
+        assertEquals(5, storage[testId].entry("default", "key") { it.length }.get())
+        assertEquals(5, provider(storage[testId]).entry("default", "key") { it.length }.get())
+        assertEquals(5, storage[testId].strongEntry(WrapperSerializer, Wrapper("default"), "key") { it.value.length }.get())
+        assertEquals(5, storage[testId].strongEntry("default", "key") { it.length }.get())
+        assertEquals(5, provider(storage[testId]).strongEntry("default", "key") { it.length }.get())
+    }
+    
+    @Test
+    fun `entry reports transformation failure and transforms default`() {
+        val errors = mutableListOf<Triple<Key, List<String>, SerializationException>>()
+        val obj = jsonObj("key" to "invalid")
+        val backend = MapBackend(
+            mapOf(testId to obj),
+            onError = { id, path, e -> errors += Triple(id, path, e) }
+        )
+        val storage = ConfigStorage(SerializersModule { }, backend)
+        
+        val entry = storage[testId].entry(WrapperSerializer, Wrapper("default"), "key") {
+            if (it.value == "invalid")
+                throw NoSuchElementException("Invalid value")
+            it.value.length
+        }
+        
+        assertEquals(7, entry.get())
+        assertEquals(1, errors.size)
+        assertEquals(testId, errors[0].first)
+        assertEquals(listOf("key"), errors[0].second)
+        assertTrue(errors[0].third.cause is NoSuchElementException)
+    }
+    
     //</editor-fold>
     
     //<editor-fold desc="reload">

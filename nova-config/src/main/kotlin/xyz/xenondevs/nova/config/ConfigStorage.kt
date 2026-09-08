@@ -118,17 +118,27 @@ class ConfigStorage(
             return SubProvider(path, entry(JsonObject(emptyMap()), path))
         }
         
-        override fun <T : Any> entry(type: KType, default: Provider<T>, vararg paths: List<String>): Provider<T> {
+        override fun <S : Any, T : Any> entry(
+            type: KType,
+            default: Provider<S>,
+            transform: (S) -> T,
+            vararg paths: List<String>
+        ): Provider<T> {
             val provider = combinedProvider(this, default) { cfg, default ->
-                deserializeFirstOrNull(cfg, type, *paths) ?: default
+                deserializeFirstOrNull(cfg, type, transform, *paths) ?: transform(default)
             }
             entries += provider
             return provider
         }
         
-        override fun <T : Any> entry(serializer: KSerializer<T>, default: Provider<T>, vararg paths: List<String>): Provider<T> {
+        override fun <S : Any, T : Any> entry(
+            serializer: KSerializer<S>,
+            default: Provider<S>,
+            transform: (S) -> T,
+            vararg paths: List<String>
+        ): Provider<T> {
             val provider = combinedProvider(this, default) { cfg, default ->
-                deserializeFirstOrNull(cfg, serializer, *paths) ?: default
+                deserializeFirstOrNull(cfg, serializer, transform, *paths) ?: transform(default)
             }
             entries += provider
             return provider
@@ -150,17 +160,27 @@ class ConfigStorage(
             return SubProvider(path, strongEntry(JsonObject(emptyMap()), path))
         }
         
-        override fun <T : Any> strongEntry(type: KType, default: Provider<T>, vararg paths: List<String>): Provider<T> {
+        override fun <S : Any, T : Any> strongEntry(
+            type: KType,
+            default: Provider<S>,
+            transform: (S) -> T,
+            vararg paths: List<String>
+        ): Provider<T> {
             val provider = strongCombinedProvider(this, default) { cfg, default ->
-                deserializeFirstOrNull(cfg, type, *paths) ?: default
+                deserializeFirstOrNull(cfg, type, transform, *paths) ?: transform(default)
             }
             entries += provider
             return provider
         }
         
-        override fun <T : Any> strongEntry(serializer: KSerializer<T>, default: Provider<T>, vararg paths: List<String>): Provider<T> {
+        override fun <S : Any, T : Any> strongEntry(
+            serializer: KSerializer<S>,
+            default: Provider<S>,
+            transform: (S) -> T,
+            vararg paths: List<String>
+        ): Provider<T> {
             val provider = strongCombinedProvider(this, default) { cfg, default ->
-                deserializeFirstOrNull(cfg, serializer, *paths) ?: default
+                deserializeFirstOrNull(cfg, serializer, transform, *paths) ?: transform(default)
             }
             entries += provider
             return provider
@@ -185,11 +205,20 @@ class ConfigStorage(
         }
         
         private fun <T : Any> deserializeFirstOrNull(el: JsonElement, type: KType, vararg paths: List<String>): T? {
+            return deserializeFirstOrNull<T, T>(el, type, { it }, *paths)
+        }
+        
+        private fun <S : Any, T : Any> deserializeFirstOrNull(
+            el: JsonElement,
+            type: KType,
+            transform: (S) -> T,
+            vararg paths: List<String>
+        ): T? {
             val json = getJson(configId.namespace())
             
             val serializer = try {
                 @Suppress("UNCHECKED_CAST")
-                json.serializersModule.serializer(type) as KSerializer<T>
+                json.serializersModule.serializer(type) as KSerializer<S>
             } catch (e: IllegalArgumentException) {
                 backend.onError(
                     configId,
@@ -199,22 +228,38 @@ class ConfigStorage(
                 return null
             }
             
-            return deserializeFirstOrNull(el, json, serializer, *paths)
+            return deserializeFirstOrNull(el, json, serializer, transform, *paths)
         }
         
         private fun <T : Any> deserializeFirstOrNull(el: JsonElement, serializer: KSerializer<T>, vararg paths: List<String>): T? =
-            deserializeFirstOrNull(el, getJson(configId.namespace()), serializer, *paths)
+            deserializeFirstOrNull(el, getJson(configId.namespace()), serializer, { it }, *paths)
         
-        private fun <T : Any> deserializeFirstOrNull(
+        private fun <S : Any, T : Any> deserializeFirstOrNull(
+            el: JsonElement,
+            serializer: KSerializer<S>,
+            transform: (S) -> T,
+            vararg paths: List<String>
+        ): T? =
+            deserializeFirstOrNull(el, getJson(configId.namespace()), serializer, transform, *paths)
+        
+        private fun <S : Any, T : Any> deserializeFirstOrNull(
             el: JsonElement,
             json: Json,
-            serializer: KSerializer<T>,
+            serializer: KSerializer<S>,
+            transform: (S) -> T,
             vararg paths: List<String>
         ): T? {
             val [path, element] = paths.firstNotNullOfOrNull { path -> el.resolve(path)?.let { path to it } }
                 ?: return null
             try {
-                return json.decodeFromJsonElement(serializer, element)
+                val value = json.decodeFromJsonElement(serializer, element)
+                return try {
+                    transform(value)
+                } catch (e: SerializationException) {
+                    throw e
+                } catch (e: Exception) {
+                    throw SerializationException(e.message ?: "Failed to transform config entry", e)
+                }
             } catch (e: SerializationException) {
                 backend.onError(configId, path, e)
                 return null
@@ -242,11 +287,21 @@ class ConfigStorage(
             override fun node(path: List<String>): ConfigProvider =
                 this@ConfigProviderImpl.node(pathPrefix + path)
             
-            override fun <T : Any> entry(type: KType, default: Provider<T>, vararg paths: List<String>): Provider<T> =
-                this@ConfigProviderImpl.entry(type, default, *paths.map { pathPrefix + it }.toTypedArray())
+            override fun <S : Any, T : Any> entry(
+                type: KType,
+                default: Provider<S>,
+                transform: (S) -> T,
+                vararg paths: List<String>
+            ): Provider<T> =
+                this@ConfigProviderImpl.entry(type, default, transform, *paths.map { pathPrefix + it }.toTypedArray())
             
-            override fun <T : Any> entry(serializer: KSerializer<T>, default: Provider<T>, vararg paths: List<String>): Provider<T> =
-                this@ConfigProviderImpl.entry(serializer, default, *paths.map { pathPrefix + it }.toTypedArray())
+            override fun <S : Any, T : Any> entry(
+                serializer: KSerializer<S>,
+                default: Provider<S>,
+                transform: (S) -> T,
+                vararg paths: List<String>
+            ): Provider<T> =
+                this@ConfigProviderImpl.entry(serializer, default, transform, *paths.map { pathPrefix + it }.toTypedArray())
             
             override fun <T : Any> optionalEntry(type: KType, vararg paths: List<String>): Provider<T?> =
                 this@ConfigProviderImpl.optionalEntry(type, *paths.map { pathPrefix + it }.toTypedArray())
@@ -257,11 +312,21 @@ class ConfigStorage(
             override fun strongNode(path: List<String>): ConfigProvider =
                 this@ConfigProviderImpl.strongNode(pathPrefix + path)
             
-            override fun <T : Any> strongEntry(type: KType, default: Provider<T>, vararg paths: List<String>): Provider<T> =
-                this@ConfigProviderImpl.strongEntry(type, default, *paths.map { pathPrefix + it }.toTypedArray())
+            override fun <S : Any, T : Any> strongEntry(
+                type: KType,
+                default: Provider<S>,
+                transform: (S) -> T,
+                vararg paths: List<String>
+            ): Provider<T> =
+                this@ConfigProviderImpl.strongEntry(type, default, transform, *paths.map { pathPrefix + it }.toTypedArray())
             
-            override fun <T : Any> strongEntry(serializer: KSerializer<T>, default: Provider<T>, vararg paths: List<String>): Provider<T> =
-                this@ConfigProviderImpl.strongEntry(serializer, default, *paths.map { pathPrefix + it }.toTypedArray())
+            override fun <S : Any, T : Any> strongEntry(
+                serializer: KSerializer<S>,
+                default: Provider<S>,
+                transform: (S) -> T,
+                vararg paths: List<String>
+            ): Provider<T> =
+                this@ConfigProviderImpl.strongEntry(serializer, default, transform, *paths.map { pathPrefix + it }.toTypedArray())
             
             override fun <T : Any> strongOptionalEntry(type: KType, vararg paths: List<String>): Provider<T?> =
                 this@ConfigProviderImpl.strongOptionalEntry(type, *paths.map { pathPrefix + it }.toTypedArray())
