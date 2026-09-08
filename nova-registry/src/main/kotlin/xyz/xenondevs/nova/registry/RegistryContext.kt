@@ -4,12 +4,18 @@ import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
 import org.bukkit.Keyed
+import org.slf4j.Logger
 import java.util.*
 
 /**
  * Service for working with paper registries.
  */
 interface RegistryContext {
+    
+    /**
+     * The logger of the managing plugin.
+     */
+    val logger: Logger
     
     /**
      * Whether the server is currently in the bootstrap phase,

@@ -4,8 +4,12 @@ import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
 import org.bukkit.Keyed
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class TestRegistryContext : RegistryContext {
+    
+    override val logger: Logger = LoggerFactory.getLogger(TestRegistryContext::class.java)
     
     companion object {
         var inBootstrapPhase: Boolean = true

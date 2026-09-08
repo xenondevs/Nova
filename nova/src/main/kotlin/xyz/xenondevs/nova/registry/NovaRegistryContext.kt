@@ -8,6 +8,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.slf4j.Logger
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.InitializationException
@@ -91,6 +92,9 @@ internal class NovaRegistryContext : RegistryContext {
         }
         
     }
+    
+    override val logger: Logger
+        get() = LOGGER
     
     override val isInBootstrapPhase: Boolean
         get() = Companion.isInBootstrapPhase

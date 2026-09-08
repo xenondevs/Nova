@@ -28,7 +28,13 @@ fun <T : Keyed> LifecycleEventManager<BootstrapContext>.modifyTag(
     val builder = PaperTagBuilder(tag, modify)
     registerEventHandler(
         LifecycleEvents.TAGS.preFlatten(tag.registryKey())
-            .newHandler { event -> builder.apply(event.registrar()) }
+            .newHandler { event ->
+                try {
+                    builder.apply(event.registrar())
+                } catch (t: Throwable) {
+                    RegistryContext.logger.error("Failed to apply paper tag modifications on registry ${tag.registryKey().key().asString()}", t)
+                }
+            }
             .priority(priority)
     )
 }
@@ -46,14 +52,18 @@ fun <T : Keyed> LifecycleEventManager<BootstrapContext>.addToTags(
     registerEventHandler(
         LifecycleEvents.TAGS.preFlatten(registry)
             .newHandler { event ->
-                val registrar = event.registrar()
-                for ([tag, entries] in entriesByTag.get()) {
-                    require(tag.registryKey() == registry) { "Cannot modify tag $tag from another registry" }
-                    val contents = if (registrar.hasTag(tag))
-                        registrar.getTag(tag).toMutableSet()
-                    else mutableSetOf()
-                    contents += entries
-                    registrar.setTag(tag, contents)
+                try {
+                    val registrar = event.registrar()
+                    for ([tag, entries] in entriesByTag.get()) {
+                        require(tag.registryKey() == registry) { "Cannot modify tag $tag from another registry" }
+                        val contents = if (registrar.hasTag(tag))
+                            registrar.getTag(tag).toMutableSet()
+                        else mutableSetOf()
+                        contents += entries
+                        registrar.setTag(tag, contents)
+                    }
+                } catch (t: Throwable) {
+                    RegistryContext.logger.error("Failed to apply paper tag modifications on registry ${registry.key().asString()}", t)
                 }
             }
             .priority(priority)
