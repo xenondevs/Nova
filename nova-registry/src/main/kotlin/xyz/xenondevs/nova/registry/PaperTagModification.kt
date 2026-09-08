@@ -16,57 +16,72 @@ import xyz.xenondevs.commons.collections.mapToSet
 import xyz.xenondevs.commons.provider.Provider
 
 /**
- * Registers a pre-flatten [LifecycleEvents.TAGS] handler that applies [modify] to [tag].
+ * Registers a pre-flatten [LifecycleEvents.TAGS] handler that applies [modify] to [tag], creating
+ * a new tag if it does not exist yet.
  * The builder is run again on every tag reload.
  * Changes to providers supplied to this builder cause a [data reload][Bukkit.reloadData]. 
  */
-fun <T : Keyed> LifecycleEventManager<BootstrapContext>.modifyTag(
+fun <T : Keyed> LifecycleEventManager<BootstrapContext>.createOrModifyTag(
     tag: TagKey<T>,
     priority: Int = 0,
     modify: TagBuilder.Paper<T>.() -> Unit
 ) {
     val builder = PaperTagBuilder(tag, modify)
+    val eventType = LifecycleEvents.TAGS.preFlatten(tag.registryKey())
+    
+    // create empty set (needed for addToTags, which requires an existing tag)
     registerEventHandler(
-        LifecycleEvents.TAGS.preFlatten(tag.registryKey())
-            .newHandler { event ->
-                try {
-                    builder.apply(event.registrar())
-                } catch (t: Throwable) {
-                    RegistryContext.logger.error("Failed to apply paper tag modifications on registry ${tag.registryKey().key().asString()}", t)
-                }
+        eventType.newHandler { event ->
+            try {
+                val registrar = event.registrar()
+                if (!registrar.hasTag(tag))
+                    registrar.setTag(tag, emptySet())
+            } catch (t: Throwable) {
+                RegistryContext.logger.error("Failed to declare paper tag $tag", t)
             }
-            .priority(priority)
+        }.priority(Int.MIN_VALUE)
+    )
+    
+    // actually apply modifications at target priority
+    registerEventHandler(
+        eventType.newHandler { event ->
+            try {
+                builder.apply(event.registrar())
+            } catch (t: Throwable) {
+                RegistryContext.logger.error("Failed to apply paper tag modifications on registry ${tag.registryKey().key().asString()}", t)
+            }
+        }.priority(priority)
     )
 }
 
 /**
- * Adds the entries in [entriesByTag] to their corresponding tags during pre-flatten.
+ * Adds the entries in [entriesByTag] to their corresponding tags during pre-flatten if they exist.
+ * Does not create new tags. Non-existent tags are ignored.
  * Changes to [entriesByTag] cause a [data reload][Bukkit.reloadData].
  */
-fun <T : Keyed> LifecycleEventManager<BootstrapContext>.addToTags(
+fun <T : Keyed> LifecycleEventManager<BootstrapContext>.addToExistingTags(
     registry: RegistryKey<T>,
     entriesByTag: Provider<Map<TagKey<T>, Set<TagEntry<T>>>>,
     priority: Int = -1
 ) {
     entriesByTag.observe(RegistryContext::scheduleDataReload)
     registerEventHandler(
-        LifecycleEvents.TAGS.preFlatten(registry)
-            .newHandler { event ->
-                try {
-                    val registrar = event.registrar()
-                    for ([tag, entries] in entriesByTag.get()) {
-                        require(tag.registryKey() == registry) { "Cannot modify tag $tag from another registry" }
-                        val contents = if (registrar.hasTag(tag))
-                            registrar.getTag(tag).toMutableSet()
-                        else mutableSetOf()
-                        contents += entries
-                        registrar.setTag(tag, contents)
-                    }
-                } catch (t: Throwable) {
-                    RegistryContext.logger.error("Failed to apply paper tag modifications on registry ${registry.key().asString()}", t)
+        LifecycleEvents.TAGS.preFlatten(registry).newHandler { event ->
+            try {
+                val registrar = event.registrar()
+                for ([tag, entries] in entriesByTag.get()) {
+                    require(tag.registryKey() == registry) { "Cannot modify tag $tag from another registry" }
+                    if (entries.isEmpty() || !registrar.hasTag(tag))
+                        continue
+                    
+                    val contents = registrar.getTag(tag).toMutableSet()
+                    contents += entries
+                    registrar.setTag(tag, contents)
                 }
+            } catch (t: Throwable) {
+                RegistryContext.logger.error("Failed to apply paper tag modifications on registry ${registry.key().asString()}", t)
             }
-            .priority(priority)
+        }.priority(priority)
     )
 }
 

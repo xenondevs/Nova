@@ -342,7 +342,7 @@ object RegistryLoader {
                 }
             }
         }
-        BOOTSTRAP_LIFECYCLE.addToTags(registryKey, implicitEntries)
+        BOOTSTRAP_LIFECYCLE.addToExistingTags(registryKey, implicitEntries)
         
         // all these keys are now "known" and can become "missing" in the future
         knownRegistryEntries.getOrPut(registryKey.key(), ::HashSet) += factories.keys

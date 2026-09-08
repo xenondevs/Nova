@@ -97,10 +97,10 @@ object NovaRegistries {
     val TOOLTIP_STYLE: NovaRegistry<TooltipStyle> = INTERNAL_TOOLTIP_STYLE.unmodifiableView
     
     /**
-     * Creates a new registry with the given [key] that is tracked by Nova.
+     * Creates a new [reloadable] registry with the given [key] that is tracked by Nova.
      * Contrary to creating a [MutableNovaRegistry] directly by itself, [reloadable] registries tracked by
      * Nova can be reloaded with the built-in reload command and should be loaded via [RegistryLoader].
-     * [unknownEntryFactory] is used to preserve entries that are known from a previous server run
+     * [unknownEntryFactory] is used to create values for keys that are known from a previous server run
      * or omitted during registry reloading.
      */
     internal fun <T : NovaRegistryElement<T>> createRegistry(

@@ -107,8 +107,8 @@ internal object NovaRegistrar : Registrar() {
 abstract class Registrar internal constructor() : Namespaced {
     
     /**
-     * Creates a Nova registry named [name]. [unknownEntryFactory] is used to preserve entries that
-     * are known from a previous server run or omitted during registry reloading.
+     * Creates a [reloadable] Nova registry named [name] that uses [unknownEntryFactory] to
+     * create values for keys from previous runs or reloads.
      */
     fun <T : NovaRegistryElement<T>> registry(
         name: String,
@@ -118,10 +118,10 @@ abstract class Registrar internal constructor() : Namespaced {
         NovaRegistries.createRegistry(key(this, name), reloadable, unknownEntryFactory)
     
     fun <T : Keyed> tag(name: String, registry: RegistryKey<T>, configure: TagBuilder.Paper<T>.() -> Unit): RegistryEntrySet.Paper.Tag<T> =
-        tag(registryEntrySetOf(TagKey.create(registry, name)), configure)
+        tag(registryEntrySetOf(TagKey.create(registry, key(this, name))), configure)
     
     fun <T : Keyed> tag(tag: RegistryEntrySet.Paper.Tag<T>, configure: TagBuilder.Paper<T>.() -> Unit): RegistryEntrySet.Paper.Tag<T> {
-        BOOTSTRAP_LIFECYCLE.modifyTag(tag.tagKey, modify = configure)
+        BOOTSTRAP_LIFECYCLE.createOrModifyTag(tag.tagKey, modify = configure)
         return tag
     }
     
