@@ -8,6 +8,7 @@ import org.bukkit.Keyed
 import xyz.xenondevs.commons.collections.mapToSet
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
 import java.util.concurrent.ConcurrentHashMap
@@ -103,6 +104,40 @@ internal object PaperTagManager {
         } as Provider<Set<RegistryEntrySet.Paper.Tag<T>>>
     }
     
+    fun <T : Keyed> getTagsByEntry(
+        registryKey: RegistryKey<T>,
+        registryAccess: RegistryAccess = RegistryAccess.registryAccess()
+    ): Provider<Map<RegistryEntry.Paper<T>, Set<RegistryEntrySet.Paper.Tag<T>>>> = combinedProvider(
+        getAllEntries(registryKey, registryAccess),
+        getAllTags(registryKey, registryAccess)
+    ) { entries, tags ->
+        val tagsByEntry = HashMap<RegistryEntry.Paper<T>, HashSet<RegistryEntrySet.Paper.Tag<T>>>()
+        entries.forEach { tagsByEntry[it] = HashSet() }
+        for (tag in tags) for (entry in tag.entries.get()) {
+            tagsByEntry.getOrPut(entry, ::HashSet) += tag
+        }
+        tagsByEntry
+    }
+    
+    fun <T : Keyed> getTagsByElement(
+        tagsByEntry: Provider<Map<RegistryEntry.Paper<T>, Set<RegistryEntrySet.Paper.Tag<T>>>>
+    ): Provider<Map<T, Set<RegistryEntrySet.Paper.Tag<T>>>> = tagsByEntry.map { tags ->
+        tags.mapKeys { it.key.get() }
+    }
+    
+    fun <T : Keyed> getTagLookup(
+        registry: RegistryKey<T>
+    ): ProviderLookup<Key, Set<RegistryEntrySet.Paper.Tag<T>>> {
+        val source = getAllTags(registry).map { allTags ->
+            val map = HashMap<Key, HashSet<RegistryEntrySet.Paper.Tag<T>>>()
+            for (tag in allTags) for (entry in tag.entries.get()) {
+                map.getOrPut(entry.key, ::HashSet) += tag
+            }
+            map
+        }
+        return ProviderLookup(source, ::emptySet)
+    }
+    
 }
 
 internal class ProviderLookup<K : Any, V>(
@@ -117,17 +152,4 @@ internal class ProviderLookup<K : Any, V>(
             source.map { values -> values[key] ?: fallback() }
         }
     
-}
-
-internal fun <T : Keyed> keyToTagLookup(
-    registry: RegistryKey<T>
-): ProviderLookup<Key, Set<RegistryEntrySet.Paper.Tag<T>>> {
-    val source = PaperTagManager.getAllTags(registry).map { allTags ->
-        val map = HashMap<Key, HashSet<RegistryEntrySet.Paper.Tag<T>>>()
-        for (tag in allTags) for (entry in tag.entries.get()) {
-            map.getOrPut(entry.key, ::HashSet) += tag
-        }
-        map
-    }
-    return ProviderLookup(source, ::emptySet)
 }

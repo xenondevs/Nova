@@ -43,7 +43,7 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.util.ItemUtils
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.nova.registry.entries.ItemTypeTags
+import xyz.xenondevs.nova.registry.tags.ItemTypeTags
 import xyz.xenondevs.nova.util.item.isNullOrEmpty
 import xyz.xenondevs.nova.util.toNmsTemplate
 import xyz.xenondevs.nova.world.item.DefaultGuiItems

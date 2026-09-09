@@ -14,7 +14,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.opentest4j.TestAbortedException
 import xyz.xenondevs.nova.registry.entries.ItemTypeEntries
-import xyz.xenondevs.nova.registry.entries.ItemTypeTags
+import xyz.xenondevs.nova.registry.tags.ItemTypeTags
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 

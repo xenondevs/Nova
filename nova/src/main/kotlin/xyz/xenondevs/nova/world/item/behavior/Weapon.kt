@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.registry.entries.ItemTypeTags
+import xyz.xenondevs.nova.registry.tags.ItemTypeTags
 import xyz.xenondevs.nova.util.toNamespacedKey
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider

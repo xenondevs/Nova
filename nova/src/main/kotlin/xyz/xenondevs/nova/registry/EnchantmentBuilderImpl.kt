@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.uninitializedProvider
-import xyz.xenondevs.nova.registry.entries.EnchantmentTags
+import xyz.xenondevs.nova.registry.tags.EnchantmentTags
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.lookupGetterOrThrow
 import xyz.xenondevs.nova.util.toHolderSet

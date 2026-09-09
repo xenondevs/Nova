@@ -14,7 +14,7 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
-import xyz.xenondevs.nova.registry.entries.ItemTypeTags
+import xyz.xenondevs.nova.registry.tags.ItemTypeTags
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.novaKey
@@ -51,7 +51,7 @@ interface BowLogic {
                 return true
             
             return entity is InventoryHolder
-                && entity.inventory.any { it != null &&  it.itemType in ItemTypeTags.ARROWS }
+                && entity.inventory.any { it != null && it.itemType in ItemTypeTags.ARROWS }
         }
         
         override fun handleDrawTick(entity: LivingEntity, bow: ItemStack, tick: Int) = Unit

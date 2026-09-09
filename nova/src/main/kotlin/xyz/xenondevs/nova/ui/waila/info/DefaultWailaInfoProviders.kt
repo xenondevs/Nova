@@ -37,7 +37,7 @@ import xyz.xenondevs.nova.registry.NovaRegistrar.wailaInfoProvider
 import xyz.xenondevs.nova.registry.NovaRegistrar.wailaToolIconProvider
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.RegistryLoader
-import xyz.xenondevs.nova.registry.entries.BlockTypeTags
+import xyz.xenondevs.nova.registry.tags.BlockTypeTags
 import xyz.xenondevs.nova.registry.registryEntrySetOf
 import xyz.xenondevs.nova.registry.typedKey
 import xyz.xenondevs.nova.util.capitalizeAll

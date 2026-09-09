@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.buildNovaTagEntries
 import xyz.xenondevs.nova.registry.emptyRegistryEntrySet
 import xyz.xenondevs.nova.registry.entries.ItemTypeEntries
-import xyz.xenondevs.nova.registry.entries.ItemTypeTags
+import xyz.xenondevs.nova.registry.tags.ItemTypeTags
 import xyz.xenondevs.nova.registry.registryEntrySetOf
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

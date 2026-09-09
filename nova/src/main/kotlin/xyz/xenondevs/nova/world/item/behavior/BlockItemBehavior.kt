@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.registry.entries.BlockTypeTags
+import xyz.xenondevs.nova.registry.tags.BlockTypeTags
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
 import xyz.xenondevs.nova.util.nmsPos

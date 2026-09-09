@@ -8,7 +8,6 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.SET
@@ -26,8 +25,8 @@ internal class TagExtensionsGenerator(private val codeGenerator: CodeGenerator) 
         .nestedClass("Tag")
     private val keyClass = ClassName("net.kyori.adventure.key", "Key")
     private val providerClass = ClassName("xyz.xenondevs.commons.provider", "Provider")
+    private val paperTagManagerClass = ClassName(registryPackage, "PaperTagManager")
     private val providerLookupClass = ClassName(registryPackage, "ProviderLookup")
-    private val keyToTagLookupMember = MemberName(registryPackage, "keyToTagLookup")
     private val suppressAnnotation = AnnotationSpec.builder(Suppress::class)
         .addMember("%S, %S", "unused", "DEPRECATION")
         .build()
@@ -55,8 +54,8 @@ internal class TagExtensionsGenerator(private val codeGenerator: CodeGenerator) 
                 providerLookupClass.parameterizedBy(keyClass, tagSetType),
                 KModifier.PRIVATE
             ).initializer(
-                "%M(%T.%L.registryKey())",
-                keyToTagLookupMember,
+                "%T.getTagLookup(%T.%L.registryKey())",
+                paperTagManagerClass,
                 tagKeysClassName,
                 firstTagProperty.simpleName.getShortName()
             ).build()

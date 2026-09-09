@@ -31,8 +31,8 @@ import xyz.xenondevs.invui.dsl.window
 import xyz.xenondevs.invui.gui.Markers
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.registry.RegistryEntrySet
-import xyz.xenondevs.nova.registry.entries.BlockTypeTags
-import xyz.xenondevs.nova.registry.entries.ItemTypeTags
+import xyz.xenondevs.nova.registry.tags.BlockTypeTags
+import xyz.xenondevs.nova.registry.tags.ItemTypeTags
 import xyz.xenondevs.nova.ui.menu.item.installItemScrollSupport
 import xyz.xenondevs.nova.ui.menu.item.scrollBar
 import xyz.xenondevs.nova.ui.menu.item.scrollableItemProvider

@@ -7,6 +7,7 @@ import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.SET
@@ -19,6 +20,7 @@ internal class EntriesGenerator(private val codeGenerator: CodeGenerator) {
     
     private val registryPackage = "xyz.xenondevs.nova.registry"
     private val entriesPackage = "$registryPackage.entries"
+    private val tagsPackage = "$registryPackage.tags"
     private val registryEntryClass = ClassName(registryPackage, "RegistryEntry")
     private val registryEntryPaperClass = registryEntryClass.nestedClass("Paper")
     private val registryEntrySetPaperTagClass = ClassName(registryPackage, "RegistryEntrySet")
@@ -38,19 +40,37 @@ internal class EntriesGenerator(private val codeGenerator: CodeGenerator) {
         val objectSpec = TypeSpec.objectBuilder("${prettyName}Entries")
             .addKdoc("Contains corresponding entries for keys in [%T].", keysClassName)
         
-        keys.publicStaticPropertiesOfType("TypedKey")
-            .forEach { property ->
-                val propertyName = property.simpleName.getShortName()
-                val valueType = property.primaryTypeArgument().toTypeName()
-                val returnType = registryEntryPaperClass.parameterizedBy(valueType)
-                objectSpec.addProperty(
-                    PropertySpec.builder(propertyName, returnType)
-                        .addAnnotation(jvmFieldAnnotation)
-                        .addKdoc("An entry for [%T.%L].", keysClassName, propertyName)
-                        .initializer("%T.paper(%T.%L)", registryEntryClass, keysClassName, propertyName)
-                        .build()
-                )
-            }
+        val keyProperties = keys.publicStaticPropertiesOfType("TypedKey").toList()
+        val firstKeyProperty = keyProperties.firstOrNull()
+        if (firstKeyProperty != null) {
+            val valueType = firstKeyProperty.primaryTypeArgument().toTypeName()
+            val allEntriesType = registryEntrySetPaperTagClass.parameterizedBy(valueType)
+            objectSpec.addProperty(
+                PropertySpec.builder("ALL_ENTRIES", allEntriesType)
+                    .addAnnotation(jvmFieldAnnotation)
+                    .addKdoc("An entry set containing all entries in this registry.")
+                    .initializer(
+                        "%M(%T.%L.registryKey())",
+                        registryEntrySetOfMember,
+                        keysClassName,
+                        firstKeyProperty.simpleName.getShortName()
+                    )
+                    .build()
+            )
+        }
+        
+        keyProperties.forEach { property ->
+            val propertyName = property.simpleName.getShortName()
+            val valueType = property.primaryTypeArgument().toTypeName()
+            val returnType = registryEntryPaperClass.parameterizedBy(valueType)
+            objectSpec.addProperty(
+                PropertySpec.builder(propertyName, returnType)
+                    .addAnnotation(jvmFieldAnnotation)
+                    .addKdoc("An entry for [%T.%L].", keysClassName, propertyName)
+                    .initializer("%T.paper(%T.%L)", registryEntryClass, keysClassName, propertyName)
+                    .build()
+            )
+        }
         
         FileSpec.builder(entriesPackage, "${prettyName}Entries")
             .addAnnotation(suppressUnusedAnnotation)
@@ -73,6 +93,18 @@ internal class EntriesGenerator(private val codeGenerator: CodeGenerator) {
             val allTagsType = providerClass.parameterizedBy(
                 SET.parameterizedBy(registryEntrySetPaperTagClass.parameterizedBy(valueType))
             )
+            val tagsByEntryType = providerClass.parameterizedBy(
+                MAP.parameterizedBy(
+                    registryEntryPaperClass.parameterizedBy(valueType),
+                    SET.parameterizedBy(registryEntrySetPaperTagClass.parameterizedBy(valueType))
+                )
+            )
+            val tagsByElementType = providerClass.parameterizedBy(
+                MAP.parameterizedBy(
+                    valueType,
+                    SET.parameterizedBy(registryEntrySetPaperTagClass.parameterizedBy(valueType))
+                )
+            )
             objectSpec.addProperty(
                 PropertySpec.builder("ALL_TAGS", allTagsType)
                     .addAnnotation(jvmFieldAnnotation)
@@ -83,6 +115,25 @@ internal class EntriesGenerator(private val codeGenerator: CodeGenerator) {
                         tagKeysClassName,
                         firstTagProperty.simpleName.getShortName()
                     )
+                    .build()
+            )
+            objectSpec.addProperty(
+                PropertySpec.builder("TAGS_BY_ENTRY", tagsByEntryType)
+                    .addAnnotation(jvmFieldAnnotation)
+                    .addKdoc("A provider mapping all registry entries to the tags that contain them.")
+                    .initializer(
+                        "%T.getTagsByEntry(%T.%L.registryKey())",
+                        paperTagManagerClass,
+                        tagKeysClassName,
+                        firstTagProperty.simpleName.getShortName()
+                    )
+                    .build()
+            )
+            objectSpec.addProperty(
+                PropertySpec.builder("TAGS_BY_ELEMENT", tagsByElementType)
+                    .addAnnotation(jvmFieldAnnotation)
+                    .addKdoc("A provider mapping all registry elements to the tags that contain them.")
+                    .initializer("%T.getTagsByElement(TAGS_BY_ENTRY)", paperTagManagerClass)
                     .build()
             )
         }
@@ -100,7 +151,7 @@ internal class EntriesGenerator(private val codeGenerator: CodeGenerator) {
             )
         }
         
-        FileSpec.builder(entriesPackage, "${prettyName}Tags")
+        FileSpec.builder(tagsPackage, "${prettyName}Tags")
             .addAnnotation(suppressUnusedAnnotation)
             .addType(objectSpec.build())
             .build()
