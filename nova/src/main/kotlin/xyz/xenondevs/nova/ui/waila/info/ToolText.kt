@@ -8,10 +8,11 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.registry.RegistryEntrySet
-import xyz.xenondevs.nova.registry.tags
+import xyz.xenondevs.nova.registry.tags.BlockTypeTags
 import xyz.xenondevs.nova.resources.builder.task.TextureIconContent
 import xyz.xenondevs.nova.ui.overlay.MovedFonts
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
@@ -20,13 +21,36 @@ import xyz.xenondevs.nova.world.block.blockType
 private val CHECK_MARK = Component.text("✔", NamedTextColor.GREEN)
 private val CROSS = Component.text("❌", NamedTextColor.RED)
 
+private val TOOL_ICONS: Map<BlockType, List<Component>>
+    by combinedProvider(
+        NovaRegistries.WAILA_TOOL_ICON_PROVIDER.entrySet, BlockTypeTags.TAGS_BY_ELEMENT
+    ) { iconProviders, tagsByBlockType ->
+        combinedProvider(
+            tagsByBlockType.map { [blockType, tags] ->
+                combinedProvider(
+                    iconProviders
+                        .flatMapTo(LinkedHashSet()) { it.getIcon(tags) }
+                        .map(TextureIconContent::getIcon)
+                ) { icons ->
+                    val components = icons.mapNotNull { icon ->
+                        icon
+                            ?.component
+                            ?.shadowColor(ShadowColor.none())
+                            ?.let { component -> MovedFonts.moveVertically(component, 1) }
+                    }
+                    blockType to components
+                }
+            }
+        ) { it.toMap() }
+    }.flatten()
+
 internal object ToolText {
     
     fun getToolText(player: Player, block: Block): Component {
         val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
         return getToolText(
             player,
-            block.blockType.tags.get(),
+            TOOL_ICONS[block.blockType] ?: emptyList(),
             block.blockType.hardness.toDouble(),
             block.isPreferredTool(tool ?: ItemStack.empty())
         )
@@ -36,7 +60,7 @@ internal object ToolText {
         val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
         return getToolText(
             player,
-            emptySet(),
+            emptyList(),
             1.0,
             CustomItemServiceManager.canBreakBlock(block, tool)
         )
@@ -44,7 +68,7 @@ internal object ToolText {
     
     fun getToolText(
         player: Player,
-        tags: Set<RegistryEntrySet.Paper.Tag<BlockType>>,
+        toolIcons: List<Component>,
         hardness: Double,
         correctToolForDrops: Boolean?
     ): Component {
@@ -60,15 +84,7 @@ internal object ToolText {
             builder.append(CROSS)
         }
         
-        NovaRegistries.WAILA_TOOL_ICON_PROVIDER.entrySet.get()
-            .flatMapTo(LinkedHashSet()) { it.getIcon(tags) }
-            .mapNotNull { 
-                TextureIconContent.getIcon(it)
-                    ?.component
-                    ?.shadowColor(ShadowColor.none())
-                    ?.let { c -> MovedFonts.moveVertically(c, 1) }
-            }
-            .forEach(builder::append)
+        toolIcons.forEach(builder::append)
         
         return builder.build()
     }

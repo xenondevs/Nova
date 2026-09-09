@@ -1,10 +1,11 @@
 package xyz.xenondevs.nova.resources.builder.task
 
 import net.kyori.adventure.key.Key
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.get
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.task.TextureIconContent.Companion.getIcon
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 
 private const val HEIGHT = 16
@@ -68,11 +69,11 @@ class TextureIconContent(
     companion object {
         
         /**
-         * Gets the [FontChar] for the texture icon requested in [TextureIconContent],
+         * Gets a provider for the [FontChar] of the texture icon requested in [TextureIconContent],
          * where id is the path of texture, i.e. `minecraft:item/stone_sword`.
          */
-        fun getIcon(id: Key): FontChar? =
-            ResourceLookups.textureIcon[id]
+        fun getIcon(id: Key): Provider<FontChar?> =
+            ResourceLookups.textureIconLookup[id]
         
     }
     
