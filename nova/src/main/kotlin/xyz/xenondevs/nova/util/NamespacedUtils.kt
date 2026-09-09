@@ -1,8 +1,16 @@
 package xyz.xenondevs.nova.util
 
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Namespaced
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.addon.Addon
+
+internal fun parseKey(string: String, defaultNamespace: Namespaced): Key {
+    val separatorIndex = string.indexOf(Key.DEFAULT_SEPARATOR)
+    val namespace = if (separatorIndex >= 1) string.substring(0, separatorIndex) else defaultNamespace.namespace()
+    val value = if (separatorIndex >= 0) string.substring(separatorIndex + 1) else string
+    return Key.key(namespace, value)
+}
 
 /**
  * Creates a new [NamespacedKey] using the [addon's][addon] [namespace][Addon.namespace] as the namespace and [key].

@@ -5,7 +5,6 @@ import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.tag.TagKey
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList
 import it.unimi.dsi.fastutil.doubles.DoubleList
-import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.key.Namespaced
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
@@ -59,6 +58,7 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 import xyz.xenondevs.nova.util.Identifier
+import xyz.xenondevs.nova.util.parseKey
 import xyz.xenondevs.nova.world.block.TileEntityConstructor
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
@@ -115,10 +115,10 @@ abstract class Registrar internal constructor() : Namespaced {
         reloadable: Boolean = NovaRegistries.RELOADABLE,
         unknownEntryFactory: ((RegistryEntry.Nova<T>) -> T)? = null
     ): MutableNovaRegistry<T> =
-        NovaRegistries.createRegistry(key(this, name), reloadable, unknownEntryFactory)
+        NovaRegistries.createRegistry(parseKey(name, this), reloadable, unknownEntryFactory)
     
     fun <T : Keyed> tag(name: String, registry: RegistryKey<T>, configure: TagBuilder.Paper<T>.() -> Unit): RegistryEntrySet.Paper.Tag<T> =
-        tag(registryEntrySetOf(TagKey.create(registry, key(this, name))), configure)
+        tag(registryEntrySetOf(TagKey.create(registry, parseKey(name, this))), configure)
     
     fun <T : Keyed> tag(tag: RegistryEntrySet.Paper.Tag<T>, configure: TagBuilder.Paper<T>.() -> Unit): RegistryEntrySet.Paper.Tag<T> {
         BOOTSTRAP_LIFECYCLE.createOrModifyTag(tag.tagKey, modify = configure)
@@ -127,10 +127,10 @@ abstract class Registrar internal constructor() : Namespaced {
     
     //<editor-fold desc="abilities">
     fun <T : Ability> registerAbilityType(name: String, abilityCreator: (Player) -> T): RegistryEntry.Nova<AbilityType<T>> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_ABILITY_TYPE, key(this, name)) { AbilityType(it, abilityCreator) }
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_ABILITY_TYPE, parseKey(name, this)) { AbilityType(it, abilityCreator) }
     
     fun abilityTypeTag(name: String, configure: TagBuilder.Nova<AbilityType<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<AbilityType<*>> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_ABILITY_TYPE, key(this, name), configure)
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_ABILITY_TYPE, parseKey(name, this), configure)
     
     fun abilityTypeTag(tag: RegistryEntrySet.Nova.Tag<AbilityType<*>>, configure: TagBuilder.Nova<AbilityType<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<AbilityType<*>> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_ABILITY_TYPE, tag.tagKey, configure)
@@ -138,10 +138,10 @@ abstract class Registrar internal constructor() : Namespaced {
     
     //<editor-fold desc="attachments">
     fun <T : Attachment> registerAttachmentType(name: String, constructor: (Player) -> T): RegistryEntry.Nova<AttachmentType<T>> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_ATTACHMENT_TYPE, key(this, name)) { AttachmentType(it, constructor) }
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_ATTACHMENT_TYPE, parseKey(name, this)) { AttachmentType(it, constructor) }
     
     fun attachmentTypeTag(name: String, configure: TagBuilder.Nova<AttachmentType<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<AttachmentType<*>> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_ATTACHMENT_TYPE, key(this, name), configure)
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_ATTACHMENT_TYPE, parseKey(name, this), configure)
     
     fun attachmentTypeTag(tag: RegistryEntrySet.Nova.Tag<AttachmentType<*>>, configure: TagBuilder.Nova<AttachmentType<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<AttachmentType<*>> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_ATTACHMENT_TYPE, tag.tagKey, configure)
@@ -149,10 +149,10 @@ abstract class Registrar internal constructor() : Namespaced {
     
     //<editor-fold desc="blocks">
     fun tileEntity(name: String, constructor: TileEntityConstructor, tileEntity: NovaTileEntityBlockBuilder.() -> Unit): RegistryEntry.Paper<BlockType> =
-        RegistryLoader.enqueueVanilla(RegistryKey.BLOCK, key(this, name), { NovaTileEntityBlockBuilderImpl(it, constructor) }, tileEntity)
+        RegistryLoader.enqueueVanilla(RegistryKey.BLOCK, parseKey(name, this), { NovaTileEntityBlockBuilderImpl(it, constructor) }, tileEntity)
     
     fun block(name: String, block: NovaBlockBuilder.() -> Unit): RegistryEntry.Paper<BlockType> =
-        RegistryLoader.enqueueVanilla(RegistryKey.BLOCK, key(this, name), ::NovaBlockBuilderImpl, block)
+        RegistryLoader.enqueueVanilla(RegistryKey.BLOCK, parseKey(name, this), ::NovaBlockBuilderImpl, block)
     
     fun blockTag(name: String, configure: TagBuilder.Paper<BlockType>.() -> Unit): RegistryEntrySet.Paper.Tag<BlockType> =
         tag(name, RegistryKey.BLOCK, configure)
@@ -163,7 +163,7 @@ abstract class Registrar internal constructor() : Namespaced {
     
     //<editor-fold desc="enchantments">
     fun enchantment(name: String, enchantment: EnchantmentBuilder.() -> Unit): RegistryEntry.Paper<Enchantment> =
-        RegistryLoader.enqueueVanilla(RegistryKey.ENCHANTMENT, key(this, name), ::EnchantmentBuilderImpl, enchantment)
+        RegistryLoader.enqueueVanilla(RegistryKey.ENCHANTMENT, parseKey(name, this), ::EnchantmentBuilderImpl, enchantment)
     //</editor-fold>
     
     //<editor-fold desc="entity variants">
@@ -171,43 +171,43 @@ abstract class Registrar internal constructor() : Namespaced {
      * Registers a new [Cat.Type] under [name] after configuring it with [catVariant].
      */
     fun catVariant(name: String, catVariant: CatVariantBuilder.() -> Unit): RegistryEntry.Paper<Cat.Type> =
-        RegistryLoader.enqueueVanilla(RegistryKey.CAT_VARIANT, key(this, name), ::CatVariantBuilderImpl, catVariant)
+        RegistryLoader.enqueueVanilla(RegistryKey.CAT_VARIANT, parseKey(name, this), ::CatVariantBuilderImpl, catVariant)
     
     /**
      * Registers a new [Chicken.Variant] under [name] after configuring it with [chickenVariant].
      */
     fun chickenVariant(name: String, chickenVariant: ChickenVariantBuilder.() -> Unit): RegistryEntry.Paper<Chicken.Variant> =
-        RegistryLoader.enqueueVanilla(RegistryKey.CHICKEN_VARIANT, key(this, name), ::ChickenVariantBuilderImpl, chickenVariant)
+        RegistryLoader.enqueueVanilla(RegistryKey.CHICKEN_VARIANT, parseKey(name, this), ::ChickenVariantBuilderImpl, chickenVariant)
     
     /**
      * Registers a new [Cow.Variant] under [name] after configuring it with [cowVariant].
      */
     fun cowVariant(name: String, cowVariant: CowVariantBuilder.() -> Unit): RegistryEntry.Paper<Cow.Variant> =
-        RegistryLoader.enqueueVanilla(RegistryKey.COW_VARIANT, key(this, name), ::CowVariantBuilderImpl, cowVariant)
+        RegistryLoader.enqueueVanilla(RegistryKey.COW_VARIANT, parseKey(name, this), ::CowVariantBuilderImpl, cowVariant)
     
     /**
      * Registers a new [Frog.Variant] under [name] after configuring it with [frogVariant].
      */
     fun frogVariant(name: String, frogVariant: FrogVariantBuilder.() -> Unit): RegistryEntry.Paper<Frog.Variant> =
-        RegistryLoader.enqueueVanilla(RegistryKey.FROG_VARIANT, key(this, name), ::FrogVariantBuilderImpl, frogVariant)
+        RegistryLoader.enqueueVanilla(RegistryKey.FROG_VARIANT, parseKey(name, this), ::FrogVariantBuilderImpl, frogVariant)
     
     /**
      * Registers a new [Pig.Variant] under [name] after configuring it with [pigVariant].
      */
     fun pigVariant(name: String, pigVariant: PigVariantBuilder.() -> Unit): RegistryEntry.Paper<Pig.Variant> =
-        RegistryLoader.enqueueVanilla(RegistryKey.PIG_VARIANT, key(this, name), ::PigVariantBuilderImpl, pigVariant)
+        RegistryLoader.enqueueVanilla(RegistryKey.PIG_VARIANT, parseKey(name, this), ::PigVariantBuilderImpl, pigVariant)
     
     /**
      * Registers a new [Wolf.Variant] under [name] after configuring it with [wolfVariant].
      */
     fun wolfVariant(name: String, wolfVariant: WolfVariantBuilder.() -> Unit): RegistryEntry.Paper<Wolf.Variant> =
-        RegistryLoader.enqueueVanilla(RegistryKey.WOLF_VARIANT, key(this, name), ::WolfVariantBuilderImpl, wolfVariant)
+        RegistryLoader.enqueueVanilla(RegistryKey.WOLF_VARIANT, parseKey(name, this), ::WolfVariantBuilderImpl, wolfVariant)
     
     /**
      * Registers a new [Wolf.SoundVariant] under [name] after configuring it with [wolfSoundVariant].
      */
     fun wolfSoundVariant(name: String, wolfSoundVariant: WolfSoundVariantBuilder.() -> Unit): RegistryEntry.Paper<Wolf.SoundVariant> =
-        RegistryLoader.enqueueVanilla(RegistryKey.WOLF_SOUND_VARIANT, key(this, name), ::WolfSoundVariantBuilderImpl, wolfSoundVariant)
+        RegistryLoader.enqueueVanilla(RegistryKey.WOLF_SOUND_VARIANT, parseKey(name, this), ::WolfSoundVariantBuilderImpl, wolfSoundVariant)
     //</editor-fold>
     
     //<editor-fold desc="equipment">
@@ -218,10 +218,10 @@ abstract class Registrar internal constructor() : Namespaced {
         registerEquipment(name) { AnimatedEquipmentLayoutBuilder(namespace(), it).apply(layout).build() }
     
     private fun registerEquipment(name: String, makeLayout: (ResourcePackBuilder) -> EquipmentLayout): RegistryEntry.Nova<Equipment> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_EQUIPMENT, key(this, name), { EquipmentTask.request(it, makeLayout) }, { entry, layout -> Equipment(entry, layout) })
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_EQUIPMENT, parseKey(name, this), { EquipmentTask.request(it, makeLayout) }, { entry, layout -> Equipment(entry, layout) })
     
     fun equipmentTag(name: String, configure: TagBuilder.Nova<Equipment>.() -> Unit): RegistryEntrySet.Nova.Tag<Equipment> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_EQUIPMENT, key(this, name), configure)
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_EQUIPMENT, parseKey(name, this), configure)
     
     fun equipmentTag(tag: RegistryEntrySet.Nova.Tag<Equipment>, configure: TagBuilder.Nova<Equipment>.() -> Unit): RegistryEntrySet.Nova.Tag<Equipment> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_EQUIPMENT, tag.tagKey, configure)
@@ -229,10 +229,10 @@ abstract class Registrar internal constructor() : Namespaced {
     
     //<editor-fold desc="gui textures">
     fun guiTexture(name: String, guiTexture: GuiTextureBuilder.() -> Unit): RegistryEntry.Nova<GuiTexture> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_GUI_TEXTURE, key(this, name), ::GuiTextureBuilderImpl, guiTexture)
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_GUI_TEXTURE, parseKey(name, this), ::GuiTextureBuilderImpl, guiTexture)
     
     fun guiTextureTag(name: String, configure: TagBuilder.Nova<GuiTexture>.() -> Unit): RegistryEntrySet.Nova.Tag<GuiTexture> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_GUI_TEXTURE, key(this, name), configure)
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_GUI_TEXTURE, parseKey(name, this), configure)
     
     fun guiTextureTag(tag: RegistryEntrySet.Nova.Tag<GuiTexture>, configure: TagBuilder.Nova<GuiTexture>.() -> Unit): RegistryEntrySet.Nova.Tag<GuiTexture> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_GUI_TEXTURE, tag.tagKey, configure)
@@ -240,10 +240,10 @@ abstract class Registrar internal constructor() : Namespaced {
     
     //<editor-fold desc="item filter types">
     fun <T : ItemFilter<T>> registerItemFilterType(name: String, serializer: ItemFilterSerializer<T>): RegistryEntry.Nova<ItemFilterType<T>> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_ITEM_FILTER_TYPE, key(this, name)) { ItemFilterType(it, serializer) }
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_ITEM_FILTER_TYPE, parseKey(name, this)) { ItemFilterType(it, serializer) }
     
     fun itemFilterTypeTag(name: String, configure: TagBuilder.Nova<ItemFilterType<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<ItemFilterType<*>> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_ITEM_FILTER_TYPE, key(this, name), configure)
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_ITEM_FILTER_TYPE, parseKey(name, this), configure)
     
     fun itemFilterTypeTag(tag: RegistryEntrySet.Nova.Tag<ItemFilterType<*>>, configure: TagBuilder.Nova<ItemFilterType<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<ItemFilterType<*>> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_ITEM_FILTER_TYPE, tag.tagKey, configure)
@@ -251,11 +251,11 @@ abstract class Registrar internal constructor() : Namespaced {
     
     //<editor-fold desc="items">
     fun item(name: String, item: NovaItemBuilder.() -> Unit): RegistryEntry.Paper<ItemType> =
-        RegistryLoader.enqueueVanilla(RegistryKey.ITEM, key(this, name), ::NovaItemBuilderImpl, item)
+        RegistryLoader.enqueueVanilla(RegistryKey.ITEM, parseKey(name, this), ::NovaItemBuilderImpl, item)
     
     fun item(block: RegistryEntry.Paper<BlockType>, name: String = block.key.value(), item: NovaItemBuilder.() -> Unit): RegistryEntry.Paper<ItemType> {
         require(block.key.namespace() == namespace()) { "The block must be from the same addon (block is from ${block.key.namespace()})!" }
-        return RegistryLoader.enqueueVanilla(RegistryKey.ITEM, key(this, name), ::NovaItemBuilderImpl) { block(block); item() }
+        return RegistryLoader.enqueueVanilla(RegistryKey.ITEM, parseKey(name, this), ::NovaItemBuilderImpl) { block(block); item() }
     }
     
     fun registerItem(
@@ -307,12 +307,12 @@ abstract class Registrar internal constructor() : Namespaced {
         validateLocal: LocalNetworkValidator,
         extractHolders: (NetworkEndPoint) -> List<EndPointDataHolder>?,
         tickDelay: Int
-    ): RegistryEntry.Nova<NetworkType<T>> = RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_NETWORK_TYPE, key(this, name)) {
+    ): RegistryEntry.Nova<NetworkType<T>> = RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_NETWORK_TYPE, parseKey(name, this)) {
         NetworkType(it, createNetwork, createGroup, validateLocal, extractHolders, tickDelay)
     }
     
     fun networkTypeTag(name: String, configure: TagBuilder.Nova<NetworkType<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<NetworkType<*>> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_NETWORK_TYPE, key(this, name), configure)
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_NETWORK_TYPE, parseKey(name, this), configure)
     
     fun networkTypeTag(tag: RegistryEntrySet.Nova.Tag<NetworkType<*>>, configure: TagBuilder.Nova<NetworkType<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<NetworkType<*>> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_NETWORK_TYPE, tag.tagKey, configure)
@@ -320,10 +320,10 @@ abstract class Registrar internal constructor() : Namespaced {
     
     //<editor-fold desc="recipe types">
     fun <T : NovaRecipe> registerRecipeType(name: String, recipeClass: KClass<T>, group: RecipeGroup<in T>, deserializer: RecipeDeserializer<T>?): RegistryEntry.Nova<RecipeType<T>> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_RECIPE_TYPE, key(this, name)) { RecipeType(it, recipeClass, group, deserializer) }
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_RECIPE_TYPE, parseKey(name, this)) { RecipeType(it, recipeClass, group, deserializer) }
     
     fun recipeTypeTag(name: String, configure: TagBuilder.Nova<RecipeType<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<RecipeType<*>> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_RECIPE_TYPE, key(this, name), configure)
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_RECIPE_TYPE, parseKey(name, this), configure)
     
     fun recipeTypeTag(tag: RegistryEntrySet.Nova.Tag<RecipeType<*>>, configure: TagBuilder.Nova<RecipeType<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<RecipeType<*>> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_RECIPE_TYPE, tag.tagKey, configure)
@@ -339,13 +339,13 @@ abstract class Registrar internal constructor() : Namespaced {
     fun tooltipStyle(name: String, meta: TooltipStyleLayoutBuilder.() -> Unit): RegistryEntry.Nova<TooltipStyle> =
         RegistryLoader.enqueueNova(
             NovaRegistries.INTERNAL_TOOLTIP_STYLE,
-            key(this, name),
+            parseKey(name, this),
             { entry -> TooltipStyleTask.request(entry) { TooltipStyleLayoutBuilder(entry.key, it).apply(meta).build() } },
             { entry, _ -> TooltipStyle(entry) }
         )
     
     fun tooltipStyleTag(name: String, configure: TagBuilder.Nova<TooltipStyle>.() -> Unit): RegistryEntrySet.Nova.Tag<TooltipStyle> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_TOOLTIP_STYLE, key(this, name), configure)
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_TOOLTIP_STYLE, parseKey(name, this), configure)
     
     fun tooltipStyleTag(tag: RegistryEntrySet.Nova.Tag<TooltipStyle>, configure: TagBuilder.Nova<TooltipStyle>.() -> Unit): RegistryEntrySet.Nova.Tag<TooltipStyle> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_TOOLTIP_STYLE, tag.tagKey, configure)
@@ -361,7 +361,7 @@ abstract class Registrar internal constructor() : Namespaced {
         name: String,
         wailaInfoProvider: WailaInfoProviderBuilder<S>.() -> Unit
     ): RegistryEntry.Nova<WailaInfoProvider<S>> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_WAILA_INFO_PROVIDER, key(this, name), ::WailaInfoProviderBuilderImpl, wailaInfoProvider)
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_WAILA_INFO_PROVIDER, parseKey(name, this), ::WailaInfoProviderBuilderImpl, wailaInfoProvider)
     
     /**
      * Registers a new [WailaToolIconProvider] with the specified [name] after configuring it with [wailaToolIconProvider].
@@ -370,16 +370,16 @@ abstract class Registrar internal constructor() : Namespaced {
         name: String,
         wailaToolIconProvider: WailaToolIconProviderBuilder.() -> Unit
     ): RegistryEntry.Nova<WailaToolIconProvider> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_WAILA_TOOL_ICON_PROVIDER, key(this, name), ::WailaToolIconProviderBuilderImpl, wailaToolIconProvider)
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_WAILA_TOOL_ICON_PROVIDER, parseKey(name, this), ::WailaToolIconProviderBuilderImpl, wailaToolIconProvider)
     
     fun wailaInfoProviderTag(name: String, configure: TagBuilder.Nova<WailaInfoProvider<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaInfoProvider<*>> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_WAILA_INFO_PROVIDER, key(this, name), configure)
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_WAILA_INFO_PROVIDER, parseKey(name, this), configure)
     
     fun wailaInfoProviderTag(tag: RegistryEntrySet.Nova.Tag<WailaInfoProvider<*>>, configure: TagBuilder.Nova<WailaInfoProvider<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaInfoProvider<*>> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_WAILA_INFO_PROVIDER, tag.tagKey, configure)
     
     fun wailaToolIconProviderTag(name: String, configure: TagBuilder.Nova<WailaToolIconProvider>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaToolIconProvider> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_WAILA_TOOL_ICON_PROVIDER, key(this, name), configure)
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_WAILA_TOOL_ICON_PROVIDER, parseKey(name, this), configure)
     
     fun wailaToolIconProviderTag(tag: RegistryEntrySet.Nova.Tag<WailaToolIconProvider>, configure: TagBuilder.Nova<WailaToolIconProvider>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaToolIconProvider> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_WAILA_TOOL_ICON_PROVIDER, tag.tagKey, configure)
@@ -399,12 +399,12 @@ abstract class Registrar internal constructor() : Namespaced {
     
     @ExperimentalWorldGen
     fun biomeInjection(name: String, biomeInjection: BiomeInjectionBuilder.() -> Unit) {
-        buildRegistryElementLater(namespace(), name, Registries.BIOME, ::BiomeInjectionBuilder, biomeInjection)
+        buildRegistryElementLater(this, name, Registries.BIOME, ::BiomeInjectionBuilder, biomeInjection)
     }
     
     @ExperimentalWorldGen
     fun biome(name: String, biome: BiomeBuilder.() -> Unit): ResourceKey<Biome> =
-        buildRegistryElementLater(namespace(), name, Registries.BIOME, ::BiomeBuilder, biome)
+        buildRegistryElementLater(this, name, Registries.BIOME, ::BiomeBuilder, biome)
     
     @ExperimentalWorldGen
     fun <CC : CarverConfiguration> registerCarver(name: String, carver: WorldCarver<CC>): WorldCarver<CC> {
@@ -422,11 +422,11 @@ abstract class Registrar internal constructor() : Namespaced {
     
     @ExperimentalWorldGen
     fun dimensionType(name: String, dimensionType: DimensionTypeBuilder.() -> Unit): ResourceKey<DimensionType> =
-        buildRegistryElementLater(namespace(), name, Registries.DIMENSION_TYPE, ::DimensionTypeBuilder, dimensionType)
+        buildRegistryElementLater(this, name, Registries.DIMENSION_TYPE, ::DimensionTypeBuilder, dimensionType)
     
     @ExperimentalWorldGen
     fun placedFeature(name: String, placedFeature: PlacedFeatureBuilder.() -> Unit): ResourceKey<PlacedFeature> =
-        buildRegistryElementLater(namespace(), name, Registries.PLACED_FEATURE, ::PlacedFeatureBuilder, placedFeature)
+        buildRegistryElementLater(this, name, Registries.PLACED_FEATURE, ::PlacedFeatureBuilder, placedFeature)
     
     @ExperimentalWorldGen
     fun <FC : FeatureConfiguration, F : Feature<FC>> configuredFeature(name: String, feature: F, config: FC): ResourceKey<ConfiguredFeature<*, *>> =

@@ -691,7 +691,7 @@ fun Identifier.toString(separator: String): String {
 }
 
 fun Identifier(namespaced: Namespaced, name: String): Identifier {
-    return Identifier.fromNamespaceAndPath(namespaced.namespace(), name)
+    return parseKey(name, namespaced).toIdentifier()
 }
 
 fun <T : Any> io.papermc.paper.registry.tag.TagKey<*>.toNmsTagKey(): TagKey<T> =

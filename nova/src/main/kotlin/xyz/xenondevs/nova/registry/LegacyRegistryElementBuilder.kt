@@ -1,14 +1,15 @@
 package xyz.xenondevs.nova.registry
 
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Key.key
+import net.kyori.adventure.key.Namespaced
 import net.minecraft.core.Registry
 import net.minecraft.core.WritableRegistry
-import net.minecraft.resources.Identifier
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
 import xyz.xenondevs.nova.util.contains
+import xyz.xenondevs.nova.util.parseKey
 import xyz.xenondevs.nova.util.register
+import xyz.xenondevs.nova.util.toIdentifier
 import xyz.xenondevs.nova.util.toKey
 
 @RegistryElementBuilderDsl
@@ -32,12 +33,12 @@ abstract class LegacyRegistryElementBuilder<T : Any> internal constructor(
 }
 
 internal fun <T : Any, B : LegacyRegistryElementBuilder<T>> buildRegistryElementLater(
-    namespace: String, name: String,
+    namespace: Namespaced, name: String,
     registryKey: ResourceKey<out Registry<T>>,
     makeBuilder: (Key, WritableRegistry<T>, RegistryOps.RegistryInfoLookup) -> B,
     configureBuilder: B.() -> Unit
 ): ResourceKey<T> {
-    val id = Identifier.fromNamespaceAndPath(namespace, name)
+    val id = parseKey(name, namespace).toIdentifier()
     val key = ResourceKey.create(registryKey, id)
     registryKey.preFreeze { registry, lookup ->
         makeBuilder(id.toKey(), registry, lookup).apply(configureBuilder).register()
@@ -47,12 +48,12 @@ internal fun <T : Any, B : LegacyRegistryElementBuilder<T>> buildRegistryElement
 
 @JvmName("buildRegistryElementLazily1")
 internal fun <T : Any, B : LegacyRegistryElementBuilder<T>> buildRegistryElementLater(
-    namespace: String, name: String,
+    namespace: Namespaced, name: String,
     registryKey: ResourceKey<out Registry<T>>,
     makeBuilder: (Key, WritableRegistry<T>) -> B,
     configureBuilder: B.() -> Unit
 ): ResourceKey<T> {
-    val id = Identifier.fromNamespaceAndPath(namespace, name)
+    val id = parseKey(name, namespace).toIdentifier()
     val key = ResourceKey.create(registryKey, id)
     registryKey.preFreeze { registry, _ ->
         makeBuilder(id.toKey(), registry).apply(configureBuilder).register()
@@ -63,12 +64,12 @@ internal fun <T : Any, B : LegacyRegistryElementBuilder<T>> buildRegistryElement
 
 @JvmName("buildRegistryElementLazily2")
 internal fun <T : Any, B : LegacyRegistryElementBuilder<T>> buildRegistryElementLater(
-    namespace: String, name: String,
+    namespace: Namespaced, name: String,
     registryKey: ResourceKey<out Registry<*>>,
     makeBuilder: (Key, RegistryOps.RegistryInfoLookup) -> B,
     configureBuilder: B.() -> Unit
 ) {
-    val id = key(namespace, name)
+    val id = parseKey(name, namespace)
     registryKey.preFreeze { lookup ->
         makeBuilder(id, lookup).apply(configureBuilder).register()
     }
