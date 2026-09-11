@@ -102,7 +102,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
     
     private val breakMethod: BreakMethod by lazy { createBreakMethod() }
     
-    private val soundGroup: SoundGroup? = if (SoundEngine.overridesSound(block.blockSoundGroup.hitSound)) block.novaSoundGroup else null
+    private val soundGroup: SoundGroup? = if (SoundEngine.overridesSound(block.clientsideBlockState.soundGroup.hitSound)) block.novaSoundGroup else null
     private val hardness: Double = block.blockType.hardness.toDouble()
     private val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
     

@@ -66,7 +66,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected val _requiresToolForDrops = uninitializedProvider<Boolean>()
     protected val _breakParticles = uninitializedProvider<RegistryEntry.Paper<ItemType>?>()
     protected val _showBreakAnimation = uninitializedProvider<Boolean>()
-    protected val _soundGroup = uninitializedProvider<SoundGroup?>()
+    protected val _soundGroup = uninitializedProvider<SoundGroup>()
     protected val _pistonReaction = uninitializedProvider<PistonMoveReaction>()
     protected val _selectLightEmission = uninitializedProvider<BlockSelectorScope.() -> Int>()
     protected val _explosionResistance = uninitializedProvider<Float>()
@@ -103,14 +103,14 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     }
     
     protected val _properties = combinedProvider(
-        _hardness, _requiresToolForDrops, _pistonReaction, _selectLightEmission,
-        _explosionResistance, _flammable, _mapColor
-    ) { hardness, requiresToolForDrops, pistonReaction, selectLightEmission, explosionResistance, flammable, mapColor ->
+        _hardness, _requiresToolForDrops, _pistonReaction, _selectLightEmission, _explosionResistance, _flammable, _mapColor, _soundGroup
+    ) { hardness, requiresToolForDrops, pistonReaction, selectLightEmission, explosionResistance, flammable, mapColor, soundGroup ->
         Properties.of()
             .setId(TypedKey.create(entry.registry, entry.key).toResourceKey())
             .pushReaction(pistonReaction.nmsPushReaction)
             .explosionResistance(explosionResistance)
             .mapColor(mapColor.toNmsMapColor())
+            .sound(soundGroup.nmsSoundType)
             .lightLevel { state ->
                 val proto = ProtoBlockState(
                     entry,
@@ -138,7 +138,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected var requiresToolForDrops: Boolean by _requiresToolForDrops
     protected var breakParticles: RegistryEntry.Paper<ItemType>? by _breakParticles
     protected var showBreakAnimation: Boolean by _showBreakAnimation
-    protected var soundGroup: SoundGroup? by _soundGroup
+    protected var soundGroup: SoundGroup by _soundGroup
     protected var pistonReaction: PistonMoveReaction by _pistonReaction
     protected var selectLightEmission: BlockSelectorScope.() -> Int by _selectLightEmission
     protected var explosionResistance: Float by _explosionResistance
@@ -160,7 +160,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         requiresToolForDrops = false
         breakParticles = null
         showBreakAnimation = true
-        soundGroup = null
+        soundGroup = SoundGroup.EMPTY
         pistonReaction = PistonMoveReaction.MOVE
         selectLightEmission = { 0 }
         explosionResistance = 0f

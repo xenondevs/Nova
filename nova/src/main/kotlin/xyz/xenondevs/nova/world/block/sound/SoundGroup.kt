@@ -2,22 +2,89 @@
 
 package xyz.xenondevs.nova.world.block.sound
 
+import net.minecraft.resources.Identifier
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.level.block.SoundType
 import org.bukkit.Location
 import org.bukkit.SoundCategory
 import org.bukkit.block.Block
+import org.bukkit.craftbukkit.CraftSound
+import org.bukkit.craftbukkit.CraftSoundGroup
 import xyz.xenondevs.nova.util.center
 import org.bukkit.SoundGroup as BukkitSoundGroup
 
-data class SoundGroup(
-    val volume: Float,
-    val pitch: Float,
-    val breakSound: String,
-    val stepSound: String,
-    val placeSound: String,
-    val hitSound: String,
-    val fallSound: String
+// TODO: Migrate to Bukkit's SoundGroup once Paper supports inlined sounds properly (https://github.com/PaperMC/Paper/pull/14152)
+
+/**
+ * Groups block break-, step-, place-, hit-, and fall sounds.
+ */
+class SoundGroup internal constructor(
+    internal val nmsSoundType: SoundType
 ) {
+    
+    /**
+     * Creates a sound group with the given base [volume] and [pitch] using
+     * the sounds under [breakSound], [stepSound], [placeSound], [hitSound], and [fallSound].
+     */
+    constructor(
+        volume: Float,
+        pitch: Float,
+        breakSound: String,
+        stepSound: String,
+        placeSound: String,
+        hitSound: String,
+        fallSound: String
+    ) : this(SoundType(
+        volume,
+        pitch,
+        SoundEvent.createVariableRangeEvent(Identifier.parse(breakSound)),
+        SoundEvent.createVariableRangeEvent(Identifier.parse(stepSound)),
+        SoundEvent.createVariableRangeEvent(Identifier.parse(placeSound)),
+        SoundEvent.createVariableRangeEvent(Identifier.parse(hitSound)),
+        SoundEvent.createVariableRangeEvent(Identifier.parse(fallSound))
+    ))
+    
+    /**
+     * The base volume of this sound group.
+     */
+    val volume: Float
+        get() = nmsSoundType.volume
+    
+    /**
+     * The base pitch of this sound group.
+     */
+    val pitch: Float
+        get() = nmsSoundType.pitch
+    
+    /**
+     * The sound played when the block is broken.
+     */
+    val breakSound: String
+        get() = nmsSoundType.breakSound.location.toString()
+    
+    /**
+     * The sound played when stepping on the block.
+     */
+    val stepSound: String
+        get() = nmsSoundType.stepSound.location.toString()
+    
+    /**
+     * The sound played when the block is placed.
+     */
+    val placeSound: String
+        get() = nmsSoundType.placeSound.location.toString()
+    
+    /**
+     * The sound played while the block is being broken.
+     */
+    val hitSound: String
+        get() = nmsSoundType.hitSound.location.toString()
+    
+    /**
+     * The sound played when an entity lands on the block.
+     */
+    val fallSound: String
+        get() = nmsSoundType.fallSound.location.toString()
     
     val breakVolume: Float
         get() = (volume + 1f) / 2f
@@ -80,9 +147,13 @@ data class SoundGroup(
         location.world!!.playSound(location, fallSound, SoundCategory.BLOCKS, fallVolume, fallPitch)
     }
     
+    override fun equals(other: Any?): Boolean = other is SoundGroup && nmsSoundType == other.nmsSoundType
+    override fun hashCode(): Int = nmsSoundType.hashCode()
+    
     companion object {
         
         //<editor-fold desc="vanilla sound groups", defaultstate="collapsed">
+        val EMPTY: SoundGroup = from(SoundType.EMPTY)
         val WOOD: SoundGroup = from(SoundType.WOOD)
         val GRAVEL: SoundGroup = from(SoundType.GRAVEL)
         val GRASS: SoundGroup = from(SoundType.GRASS)
@@ -144,6 +215,7 @@ data class SoundGroup(
         val COPPER: SoundGroup = from(SoundType.COPPER)
         val CAVE_VINES: SoundGroup = from(SoundType.CAVE_VINES)
         val SPORE_BLOSSOM: SoundGroup = from(SoundType.SPORE_BLOSSOM)
+        val CACTUS_FLOWER: SoundGroup = from(SoundType.CACTUS_FLOWER)
         val AZALEA: SoundGroup = from(SoundType.AZALEA)
         val FLOWERING_AZALEA: SoundGroup = from(SoundType.FLOWERING_AZALEA)
         val MOSS_CARPET: SoundGroup = from(SoundType.MOSS_CARPET)
@@ -177,9 +249,11 @@ data class SoundGroup(
         val CHERRY_WOOD: SoundGroup = from(SoundType.CHERRY_WOOD)
         val CHERRY_WOOD_HANGING_SIGN: SoundGroup = from(SoundType.CHERRY_WOOD_HANGING_SIGN)
         val CHISELED_BOOKSHELF: SoundGroup = from(SoundType.CHISELED_BOOKSHELF)
+        val SHELF: SoundGroup = from(SoundType.SHELF)
         val COBWEB: SoundGroup = from(SoundType.COBWEB)
         val COPPER_BULB: SoundGroup = from(SoundType.COPPER_BULB)
         val COPPER_GRATE: SoundGroup = from(SoundType.COPPER_GRATE)
+        val COPPER_GOLEM_STATUE: SoundGroup = from(SoundType.COPPER_GOLEM_STATUE)
         val DECORATED_POT: SoundGroup = from(SoundType.DECORATED_POT)
         val DECORATED_POT_CRACKED: SoundGroup = from(SoundType.DECORATED_POT_CRACKED)
         val HANGING_SIGN: SoundGroup = from(SoundType.HANGING_SIGN)
@@ -187,6 +261,7 @@ data class SoundGroup(
         val NETHER_WOOD: SoundGroup = from(SoundType.NETHER_WOOD)
         val NETHER_WOOD_HANGING_SIGN: SoundGroup = from(SoundType.NETHER_WOOD_HANGING_SIGN)
         val PINK_PETALS: SoundGroup = from(SoundType.PINK_PETALS)
+        val LEAF_LITTER: SoundGroup = from(SoundType.LEAF_LITTER)
         val POLISHED_TUFF: SoundGroup = from(SoundType.POLISHED_TUFF)
         val SPONGE: SoundGroup = from(SoundType.SPONGE)
         val SUSPICIOUS_GRAVEL: SoundGroup = from(SoundType.SUSPICIOUS_GRAVEL)
@@ -195,31 +270,38 @@ data class SoundGroup(
         val TUFF_BRICKS: SoundGroup = from(SoundType.TUFF_BRICKS)
         val VAULT: SoundGroup = from(SoundType.VAULT)
         val WET_SPONGE: SoundGroup = from(SoundType.WET_SPONGE)
+        val CREAKING_HEART: SoundGroup = from(SoundType.CREAKING_HEART)
+        val SPAWNER: SoundGroup = from(SoundType.SPAWNER)
+        val RESIN: SoundGroup = from(SoundType.RESIN)
+        val RESIN_BRICKS: SoundGroup = from(SoundType.RESIN_BRICKS)
+        val IRON: SoundGroup = from(SoundType.IRON)
+        val DRIED_GHAST: SoundGroup = from(SoundType.DRIED_GHAST)
+        val SULFUR: SoundGroup = from(SoundType.SULFUR)
+        val POTENT_SULFUR: SoundGroup = from(SoundType.POTENT_SULFUR)
+        val SULFUR_SPIKE: SoundGroup = from(SoundType.SULFUR_SPIKE)
+        val CINNABAR: SoundGroup = from(SoundType.CINNABAR)
         //</editor-fold>
         
+        /**
+         * Creates a [SoundGroup] equivalent to [soundGroup].
+         */
         fun from(soundGroup: BukkitSoundGroup): SoundGroup {
+            if (soundGroup is CraftSoundGroup)
+                return SoundGroup(soundGroup.handle)
+            
             return SoundGroup(
                 soundGroup.volume,
                 soundGroup.pitch,
-                soundGroup.breakSound.key().asString(),
-                soundGroup.stepSound.key().asString(),
-                soundGroup.placeSound.key().asString(),
-                soundGroup.hitSound.key().asString(),
-                soundGroup.fallSound.key().asString()
+                CraftSound.bukkitToMinecraft(soundGroup.breakSound).location.toString(),
+                CraftSound.bukkitToMinecraft(soundGroup.stepSound).location.toString(),
+                CraftSound.bukkitToMinecraft(soundGroup.placeSound).location.toString(),
+                CraftSound.bukkitToMinecraft(soundGroup.hitSound).location.toString(),
+                CraftSound.bukkitToMinecraft(soundGroup.fallSound).location.toString()
             )
         }
         
-        fun from(soundType: SoundType): SoundGroup {
-            return SoundGroup(
-                soundType.volume,
-                soundType.pitch,
-                soundType.breakSound.location.toString(),
-                soundType.stepSound.location.toString(),
-                soundType.placeSound.location.toString(),
-                soundType.hitSound.location.toString(),
-                soundType.fallSound.location.toString()
-            )
-        }
+        internal fun from(soundType: SoundType): SoundGroup =
+            SoundGroup(soundType)
         
     }
     

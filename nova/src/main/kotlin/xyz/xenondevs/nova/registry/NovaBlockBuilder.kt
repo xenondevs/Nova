@@ -163,6 +163,7 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
     
     /**
      * Configures the sounds made by this block.
+     * Defaults to [SoundGroup.EMPTY].
      */
     fun sounds(soundGroup: SoundGroup)
     

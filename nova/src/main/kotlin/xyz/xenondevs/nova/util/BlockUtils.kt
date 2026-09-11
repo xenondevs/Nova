@@ -1,11 +1,16 @@
 package xyz.xenondevs.nova.util
 
 import io.papermc.paper.math.BlockPosition
+import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
+import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundSource
 import net.minecraft.util.ProblemReporter
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ExperienceOrb
@@ -53,14 +58,22 @@ import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.context.intention.ImplicitIntentions
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
+import xyz.xenondevs.nova.util.particle.item
+import xyz.xenondevs.nova.util.particle.particle
 import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.isNova
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
+import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import xyz.xenondevs.nova.world.block.novaBlock
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
+import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
+import xyz.xenondevs.nova.world.item.itemType
 import java.util.*
 import kotlin.math.floor
+import kotlin.random.Random
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -90,19 +103,10 @@ val Block.center: Location
     get() = Location(world, x + 0.5, y + 0.5, z + 0.5)
 
 /**
- * The sound group of this block, also considering custom sound groups of Nova blocks.
+ * The sound group of this block. Supports custom sound groups.
  */
-val Block.novaSoundGroup: SoundGroup?
-    get() {
-        val type = this@novaSoundGroup.blockType
-        if (this@novaSoundGroup.blockType.isNova) {
-            return type.novaBlock?.soundGroup
-        }
-        
-        return if (!type.isAir)
-            SoundGroup.from(type.createBlockData().soundGroup)
-        else null
-    }
+val Block.novaSoundGroup: SoundGroup
+    get() = SoundGroup.from(nmsBlockState.soundType)
 
 @Deprecated("Use Bukkit equivalent", ReplaceWith("getRelative(x, y, z)"))
 fun Block.add(x: Int, y: Int, z: Int): Block =
@@ -231,7 +235,12 @@ object BlockUtils {
         val state = ctx[BlockPlace.BLOCK_STATE]
         if (state is NovaBlockState) {
             val flags = ctx[BlockPlace.BLOCK_UPDATE_FLAGS]
-            block.world.serverLevel.setBlock(block.nmsPos, state.nmsBlockState, flags.value)
+            val level = block.world.serverLevel
+            level.setBlock(block.nmsPos, state.nmsBlockState, flags.value)
+            
+            if (ctx[BlockPlace.BLOCK_PLACE_EFFECTS])
+                block.novaSoundGroup.playPlaceSound(block)
+            
             return@exec true
         } else {
             // TODO: place block by block state
@@ -351,6 +360,10 @@ object BlockUtils {
             val drops = novaBlock.getDrops(block, blockState, ctx)
             val level = block.world.serverLevel
             val pos = block.nmsPos
+            
+            if (ctx[BlockBreak.BLOCK_BREAK_EFFECTS])
+                playBreakEffects(blockState, ctx, block, sendEffectsToBreaker)
+            
             level.setBlock(pos, level.getFluidState(pos).createLegacyBlock(), ctx[BlockBreak.BLOCK_UPDATE_FLAGS].value)
             return@exec drops
         } else {
@@ -365,68 +378,68 @@ object BlockUtils {
         }
     }
     
-    // TODO: call and fix
     private fun playBreakEffects(state: NovaBlockState, ctx: Context<BlockBreak>, block: Block, sendEffectsToBreaker: Boolean) {
-//        val player = ctx[BlockBreak.SOURCE_ENTITY] as? Player
-//        val level = block.world.serverLevel
-//        val dimension = level.dimension()
-//        val nmsPos = block.nmsPos
-//        
-//        fun broadcast(packet: Packet<*>, sendEffectsToBreaker: Boolean) {
-//            MINECRAFT_SERVER.playerList.broadcast(
-//                if (sendEffectsToBreaker) null else player?.serverPlayer,
-//                block.x.toDouble(), block.y.toDouble(), block.z.toDouble(),
-//                64.0,
-//                dimension,
-//                packet
-//            )
-//        }
-//        
-//        fun broadcastBreakSound(soundGroup: SoundGroup) {
-//            val soundPacket = ClientboundSoundPacket(
-//                Holder.direct(SoundEvent.createVariableRangeEvent(Identifier.parse(soundGroup.breakSound))),
-//                SoundSource.BLOCKS,
-//                nmsPos.x + 0.5,
-//                nmsPos.y + 0.5,
-//                nmsPos.z + 0.5,
-//                soundGroup.breakVolume,
-//                soundGroup.breakPitch,
-//                Random.nextLong()
-//            )
-//            
-//            broadcast(soundPacket, true)
-//        }
-//        
-//        fun broadcastCustomBreakParticles(sendToBreaker: Boolean) {
-//            val breakParticlesMaterial = state.novaBlock.breakParticles
-//                ?: return
-//            val breakParticles = particle(ParticleTypes.BLOCK, block.location.add(0.5, 0.5, 0.5)) {
-//                block(breakParticlesMaterial)
-//                offset(0.3, 0.3, 0.3)
-//                amount(70)
-//            }
-//            broadcast(breakParticles, sendToBreaker)
-//        }
-//        
-//        val soundGroup = state.novaBlock.soundGroup
-//        val modelProvider = state.modelProvider
-//        if (modelProvider is BackingStateBlockModelProvider || modelProvider is ModelLessBlockModelProvider) {
-//            // use the level event packet for blocks that use block states (sound & particles)
-//            val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, block.nmsBlockState.id, false)
-//            broadcast(levelEventPacket, sendEffectsToBreaker)
-//            
-//            if (soundGroup != null && SoundEngine.overridesSound(block.type.soundGroup.breakSound.key.key))
-//                broadcastBreakSound(soundGroup)
-//            
-//            // if no break particles were displayed with the level event packet, send custom ones
-//            if (modelProvider is ModelLessBlockModelProvider && modelProvider.info.material.hasNoBreakParticles())
-//                broadcastCustomBreakParticles(true)
-//        } else if (modelProvider is DisplayEntityBlockModelProvider) {
-//            // send sound and break particles manually for display entity blocks
-//            if (soundGroup != null)
-//                broadcastBreakSound(soundGroup)
-//            broadcastCustomBreakParticles(sendEffectsToBreaker || modelProvider.info.collider.material.hasNoBreakParticles())
-//        }
+        val player = ctx[BlockBreak.SOURCE_ENTITY] as? Player
+        val level = block.world.serverLevel
+        val dimension = level.dimension()
+        val nmsPos = block.nmsPos
+        
+        fun broadcast(packet: Packet<*>, sendToBreaker: Boolean) {
+            MINECRAFT_SERVER.playerList.broadcast(
+                if (sendToBreaker) null else player?.serverPlayer,
+                block.x.toDouble(), block.y.toDouble(), block.z.toDouble(),
+                64.0,
+                dimension,
+                packet
+            )
+        }
+        
+        fun broadcastBreakSound(soundGroup: SoundGroup) {
+            val soundPacket = ClientboundSoundPacket(
+                Holder.direct(soundGroup.nmsSoundType.breakSound),
+                SoundSource.BLOCKS,
+                nmsPos.x + 0.5,
+                nmsPos.y + 0.5,
+                nmsPos.z + 0.5,
+                soundGroup.breakVolume,
+                soundGroup.breakPitch,
+                Random.nextLong()
+            )
+            
+            broadcast(soundPacket, true)
+        }
+        
+        fun broadcastCustomBreakParticles(sendToBreaker: Boolean) {
+            val breakParticlesMaterial = state.novaBlock.breakParticles
+                ?: return
+            val breakParticles = particle(ParticleTypes.ITEM, block.location.add(0.5, 0.5, 0.5)) {
+                item(breakParticlesMaterial)
+                offset(0.3, 0.3, 0.3)
+                amount(70)
+            }
+            broadcast(breakParticles, sendToBreaker)
+        }
+        
+        val soundGroup = block.novaSoundGroup
+        val modelProvider = state.novaBlock.modelProviders.get()[state.nmsBlockState]
+            ?: return
+        val clientsideBlockState = modelProvider.clientsideBlockState
+        if (modelProvider is BackingStateBlockModelProvider || modelProvider is ModelLessBlockModelProvider) {
+            // use the level event packet for blocks that use block states (sound & particles)
+            val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, MojangBlock.getId(state.nmsBlockState), false)
+            broadcast(levelEventPacket, sendEffectsToBreaker)
+            
+            if (SoundEngine.overridesSound(clientsideBlockState.soundType.breakSound))
+                broadcastBreakSound(soundGroup)
+            
+            // if no break particles were displayed with the level event packet, send custom ones
+            if (modelProvider is ModelLessBlockModelProvider && !clientsideBlockState.shouldSpawnTerrainParticles())
+                broadcastCustomBreakParticles(true)
+        } else if (modelProvider is DisplayEntityBlockModelProvider) {
+            // send sound and break particles manually for display entity blocks
+            broadcastBreakSound(soundGroup)
+            broadcastCustomBreakParticles(sendEffectsToBreaker || !clientsideBlockState.shouldSpawnTerrainParticles())
+        }
     }
     
     internal fun breakVanillaBlock(

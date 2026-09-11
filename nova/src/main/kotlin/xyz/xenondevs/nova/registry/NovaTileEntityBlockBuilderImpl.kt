@@ -52,7 +52,6 @@ internal class NovaTileEntityBlockBuilderImpl(
                     _selectFluidFlowMode,
                     _breakParticles.flatten(),
                     _showBreakAnimation,
-                    _soundGroup,
                     tileEntity,
                     _tickrate
                 )

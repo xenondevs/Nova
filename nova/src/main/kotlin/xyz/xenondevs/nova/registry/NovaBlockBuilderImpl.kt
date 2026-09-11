@@ -28,8 +28,7 @@ internal open class NovaBlockBuilderImpl(
                     _flammable,
                     _selectFluidFlowMode,
                     _breakParticles.flatten(),
-                    _showBreakAnimation,
-                    _soundGroup
+                    _showBreakAnimation
                 )
             }
     

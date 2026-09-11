@@ -70,7 +70,6 @@ import xyz.xenondevs.nova.util.toPropertyStringMap
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
-import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
@@ -239,8 +238,7 @@ internal open class NovaBlock(
     flammable: Provider<FlammableSettings>,
     selectFluidFlowMode: Provider<BlockSelectorScope.() -> FluidFlowMode>,
     breakParticles: Provider<ItemType?>,
-    showBreakAnimation: Provider<Boolean>,
-    soundGroup: Provider<SoundGroup?>
+    showBreakAnimation: Provider<Boolean>
 ) : Block(properties.get()) {
     
     val key: Key
@@ -252,7 +250,6 @@ internal open class NovaBlock(
     val item by item
     val breakParticles by breakParticles
     val showBreakAnimation by showBreakAnimation
-    val soundGroup by soundGroup
     
     val fluidFlowModes: Map<NmsBlockState, FluidFlowMode>
         by selectFluidFlowMode.map { selector ->
