@@ -20,7 +20,6 @@ import xyz.xenondevs.nova.util.component.adventure.isEmpty
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.toMinecraftLocaleCode
 import java.util.*
-import kotlin.math.roundToInt
 
 /**
  * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [GuiTexture.component].
@@ -107,34 +106,40 @@ class GuiTexture internal constructor(
             // render server-side to prevent client-side translation mismatch from impacting alignment
             .map { [text, position] -> LocaleManager.render(text, locale) to position }
             .forEach { [text, position] ->
-                val textWidth = CharSizes.calculateComponentWidth(text, locale.toMinecraftLocaleCode()).roundToInt()
+                val movedText = MovedFonts.moveVertically(text, position.offset.y())
+                val textSize = CharSizes.calculateComponentSize(movedText, locale.toMinecraftLocaleCode(), false)
                 when (position.alignment) {
                     TitlePosition.Alignment.DEFAULT -> {
+                        val preMove = -data.offset + position.offset.x()
                         builder
-                            .move(-data.offset + position.offset.x())
-                            .append(MovedFonts.moveVertically(text, position.offset.y()))
-                            .move(-textWidth - position.offset.x() + data.offset)
+                            .move(preMove)
+                            .append(movedText)
+                            .move(-textSize.width - preMove)
                     }
                     
                     TitlePosition.Alignment.LEFT -> {
+                        val preMove = position.offset.x() - textSize.xRange.start
                         builder
-                            .move(position.offset.x())
-                            .append(MovedFonts.moveVertically(text, position.offset.y()))
-                            .move(-textWidth - position.offset.x())
+                            .move(preMove)
+                            .append(movedText)
+                            .move(-textSize.width - preMove)
                     }
                     
                     TitlePosition.Alignment.CENTER -> {
+                        val visualCenter = (textSize.xRange.start + textSize.xRange.endInclusive) / 2
+                        val preMove = data.width / 2f + position.offset.x() - visualCenter
                         builder
-                            .move((data.width / 2f - textWidth / 2f + position.offset.x()).roundToInt())
-                            .append(MovedFonts.moveVertically(text, position.offset.y()))
-                            .move((-position.offset.x() - textWidth / 2f - data.width / 2f).roundToInt())
+                            .move(preMove)
+                            .append(movedText)
+                            .move(-textSize.width - preMove)
                     }
                     
                     TitlePosition.Alignment.RIGHT -> {
+                        val preMove = data.width + 1 + position.offset.x() - textSize.xRange.endInclusive
                         builder
-                            .move(data.width + 1 - textWidth + position.offset.x())
-                            .append(MovedFonts.moveVertically(text, position.offset.y()))
-                            .move(-data.width - 1 - position.offset.x())
+                            .move(preMove)
+                            .append(movedText)
+                            .move(-textSize.width - preMove)
                     }
                 }
             }

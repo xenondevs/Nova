@@ -17,6 +17,13 @@ interface BossBarOverlay {
     val centerX: Float?
     
     /**
+     * At which x-coordinate the visual left edge of the [Component] should be placed. Gui-scale affected.
+     * Can be null if it should not be left-aligned.
+     */
+    val leftX: Float?
+        get() = null
+    
+    /**
      * The [Component] of this [BossBarOverlay].
      */
     val component: Component

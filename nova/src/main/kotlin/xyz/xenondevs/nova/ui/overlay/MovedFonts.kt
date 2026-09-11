@@ -2,52 +2,106 @@ package xyz.xenondevs.nova.ui.overlay
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentBuilder
+import net.kyori.adventure.text.TranslatableComponent
+import net.kyori.adventure.text.TranslationArgument
+import net.kyori.adventure.text.format.Style
+import net.kyori.adventure.text.format.TextDecoration
 import xyz.xenondevs.nova.util.component.adventure.font
-import xyz.xenondevs.nova.util.component.adventure.fontName
+import kotlin.math.roundToInt
 
 object MovedFonts {
     
-    private val MOVED_FONT_REGEX = Regex("""([a-z0-9/._:-]*)/([\d-]*)""")
+    private val MOVED_FONT_REGEX = Regex("""(.+)/(-?\d+)""")
     
     /**
-     * Creates a copy of the given [component] with its font changed to a vertically moved font by the given [distance].
+     * Creates a copy of [component] that is moved vertically by [distance].
      *
-     * If the given [component] is already vertically moved, its current and new distances will only be added together if [addDistance] is true.
+     * If [component] already uses a moved font, [addDistance] controls whether [distance] is added to its current
+     * movement or replaces it.
      *
      * Depending on the [distance] and configuration settings, the font that the component was changed to might not exist.
      */
-    fun moveVertically(component: Component, distance: Int, addDistance: Boolean = false): Component {
-        fun updateFont(builder: ComponentBuilder<*, *>, previousFont: String?) {
-            if (previousFont == "nova:move")
-                return
-            
-            var font = previousFont ?: "default"
-            var currentDistance = 0
-            if (previousFont != null) {
-                val match = MOVED_FONT_REGEX.matchEntire(previousFont)
-                if (match != null) {
-                    font = match.groupValues[1]
-                    currentDistance = match.groupValues[2].toInt()
-                }
-            }
-            
-            val newDistance = if (addDistance) currentDistance + distance else distance
-            if (newDistance != 0) {
-                builder.font("$font/${newDistance}")
-            } else {
-                builder.font(font)
+    fun moveVertically(component: Component, distance: Int, addDistance: Boolean = false): Component =
+        moveComponent(component, Style.empty(), 0, distance, addDistance)
+    
+    /**
+     * Applies the requested moved font to [builder].
+     *
+     * Returns the horizontal correction needed for italic text.
+     */
+    private fun applyMovedFont(
+        builder: ComponentBuilder<*, *>,
+        previousFont: String?,
+        distance: Int,
+        addDistance: Boolean
+    ): Int? {
+        if (previousFont == "nova:move")
+            return null
+        
+        var font = previousFont ?: "default"
+        var currentDistance = 0
+        if (previousFont != null) {
+            val match = MOVED_FONT_REGEX.matchEntire(previousFont)
+            if (match != null) {
+                font = match.groupValues[1]
+                currentDistance = match.groupValues[2].toInt()
             }
         }
         
+        val newDistance = if (addDistance) currentDistance + distance else distance
+        builder.font("$font/$newDistance")
+        
+        return (newDistance / 4f).roundToInt() - (currentDistance / 4f).roundToInt()
+    }
+    
+    /**
+     * Moves [component] and everything nested inside it.
+     *
+     * [parentStyle] is the inherited style.
+     * [activeItalicCompensation] is the amount of pre-existing italic correction.
+     */
+    private fun moveComponent(
+        component: Component,
+        parentStyle: Style,
+        activeItalicCompensation: Int,
+        distance: Int,
+        addDistance: Boolean
+    ): Component {
+        val effectiveStyle = parentStyle.merge(component.style())
         val builder = component.toBuilder()
-        updateFont(builder, component.fontName())
-        builder.mapChildrenDeep {
-            val childBuilder = it.toBuilder()
-            updateFont(childBuilder, it.fontName())
-            childBuilder.build()
+        val fontCompensation = applyMovedFont(builder, effectiveStyle.font()?.asString(), distance, addDistance)
+        val italicCompensation = when {
+            fontCompensation == null -> activeItalicCompensation
+            effectiveStyle.hasDecoration(TextDecoration.ITALIC) -> fontCompensation
+            else -> 0
         }
         
-        return builder.build()
+        var moved = builder.build()
+        if (moved is TranslatableComponent) {
+            moved = moved.arguments(moved.arguments().map { argument ->
+                val value = argument.value()
+                if (value is Component) {
+                    TranslationArgument.component(
+                        moveComponent(value, effectiveStyle, italicCompensation, distance, addDistance)
+                    )
+                } else {
+                    argument
+                }
+            })
+        }
+        moved = moved.children(component.children().map {
+            moveComponent(it, effectiveStyle, italicCompensation, distance, addDistance)
+        })
+        
+        val compensationDelta = italicCompensation - activeItalicCompensation
+        if (compensationDelta == 0)
+            return moved
+        
+        return Component.text()
+            .append(MoveCharacters.getMovingComponent(compensationDelta))
+            .append(moved)
+            .append(MoveCharacters.getMovingComponent(-compensationDelta))
+            .build()
     }
     
 }

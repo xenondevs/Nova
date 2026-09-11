@@ -26,6 +26,7 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundBossEventPacketEv
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.unregisterPacketListener
 import xyz.xenondevs.nova.network.send
+import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.ui.overlay.MovedFonts
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarOrigin
@@ -161,18 +162,26 @@ object BossBarOverlayManager : Listener, PacketListener {
             
             val builder = Component.text()
             barLevelOverlays.forEach { [overlay, offset] ->
+                val component = MovedFonts.moveVertically(overlay.component, offset, true)
                 
                 val centerX = overlay.centerX
+                val leftX = overlay.leftX
                 var width = overlay.getWidth(player.locale)
-                if (centerX != null) {
-                    val preMove = centerX - width / 2
+                if (centerX != null || leftX != null) {
+                    val xRange = CharSizes.calculateComponentSize(component, player.locale, true).xRange
+                    val preMove = if (centerX != null) {
+                        val visualCenter = (xRange.start + xRange.endInclusive) / 2
+                        centerX - visualCenter
+                    } else {
+                        leftX!! - xRange.start
+                    }
                     builder.move(preMove)
                     
                     width += preMove
                 }
                 
                 builder
-                    .append(MovedFonts.moveVertically(overlay.component, offset, true))
+                    .append(component)
                     .move(-width)
             }
             
