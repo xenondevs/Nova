@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import it.unimi.dsi.fastutil.ints.IntSet
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectList
+import xyz.xenondevs.nova.resources.FONT_BASELINE
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
@@ -158,11 +159,14 @@ abstract class UnihexProvider internal constructor(
                     // +1 because bounds are inclusive
                     // /2 because they're rendered at gui-scale 2
                     // +1 for spacing between characters
-                    // integer operations because the next character always starts at the next integer (e.g 4 -> 5, 4.5 -> 5)
-                    ((right - left + 1) / 2 + 1).toFloat(),
+                    (right - left + 1) / 2f + 1f,
+                    
+                    0f, (right - left + 1) / 2f,
                     
                     // /2 because they're rendered at gui-scale 2
-                    top / 2f, bottom / 2f
+                    top / 2f - FONT_BASELINE, (bottom + 1) / 2f - FONT_BASELINE,
+                    
+                    0.5f, 0.5f
                 ))
             }
         }

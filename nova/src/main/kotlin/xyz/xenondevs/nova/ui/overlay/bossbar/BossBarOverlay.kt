@@ -31,7 +31,7 @@ interface BossBarOverlay {
      * Gets the vertical range of this overlay in pixels, relative from the [offset] position.
      */
     fun getVerticalRange(locale: String): IntRange {
-        val componentRange = CharSizes.calculateComponentSize(component, locale).yRange
+        val componentRange = CharSizes.calculateComponentSize(component, locale, true).yRange
         return IntRange(offset + componentRange.start.toInt(), offset + componentRange.endInclusive.toInt())
     }
     

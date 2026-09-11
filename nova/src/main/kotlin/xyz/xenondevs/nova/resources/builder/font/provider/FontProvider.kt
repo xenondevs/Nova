@@ -25,7 +25,7 @@ abstract class FontProvider internal constructor(private val type: String) {
      * Implementations of this should be lazy, meaning that any modifications to the font after retrieving this map
      * will not be present. This is why this property is internal.
      *
-     * Format: `size -> [width, height, ascent, yMin, yMax]`
+     * Format: `codePoint -> [width, xMin, xMax, yMin, yMax, boldOffset, shadowOffset]`
      *
      * # DO NOT MUTATE
      */

@@ -37,7 +37,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider("bitmap")
     /**
      * The [BitmapGlyphImageType] of this [BitmapProvider]. Used to calculate char sizes.
      */
-    protected abstract val glyphImageType: BitmapGlyphImageType<T>
+    internal abstract val glyphImageType: BitmapGlyphImageType<T>
     
     /**
      * The code points, aligned in a grid pointing to the glyphs.
@@ -87,22 +87,27 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider("bitmap")
                     
                     val rescale = height / glyphHeight.toFloat()
                     
-                    var width = glyphImageType.findRightBorder(glyph, glyphWidth, glyphHeight)
-                        ?.let { rightBorder -> ((rightBorder + 1) * rescale).roundToInt().toFloat() }
+                    val borders = glyphImageType.findBorders(glyph, glyphWidth, glyphHeight)
+                    val leftBorder = borders?.left
+                    val rightBorder = borders?.right
+                    var width = rightBorder
+                        ?.let { ((it + 1) * rescale).roundToInt().toFloat() }
                         ?: 0f
                     
                     width += 1f // +1 to include space between characters
                     if (width < 0) width += 1f
                     
-                    var minY = 0f
-                    var maxY = 0f
-                    val horizontalBorders = glyphImageType.findTopBottomBorders(glyph, glyphWidth, glyphHeight)
-                    if (horizontalBorders != null) {
-                        minY = ((horizontalBorders.x() - ascent) * rescale)
-                        maxY = ((horizontalBorders.y() - ascent) * rescale)
+                    val minX = leftBorder?.let { it * rescale } ?: Float.MAX_VALUE
+                    val maxX = rightBorder?.let { (it + 1) * rescale } ?: -Float.MAX_VALUE
+                    
+                    var minY = Float.MAX_VALUE
+                    var maxY = -Float.MAX_VALUE
+                    if (borders != null) {
+                        minY = borders.top * rescale - ascent
+                        maxY = (borders.bottom + 1) * rescale - ascent
                     }
                     
-                    map.put(codePoint, floatArrayOf(width, minY, maxY))
+                    map.put(codePoint, floatArrayOf(width, minX, maxX, minY, maxY, 1f, 1f))
                 }
             }
         }
@@ -149,8 +154,10 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider("bitmap")
                 val sizes = entry.value
                 map.put(codePoint, floatArrayOf(
                     sizes[0], // width
-                    sizes[1] + ascentDiff, // yMin
-                    sizes[2] + ascentDiff  // yMax
+                    sizes[1], sizes[2], // xMin, xMax
+                    sizes[3] + ascentDiff, // yMin
+                    sizes[4] + ascentDiff, // yMax
+                    sizes[5], sizes[6] // boldOffset, shadowOffset
                 ))
             }
             

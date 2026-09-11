@@ -39,12 +39,28 @@ class MovedFontContent : PackBuildData {
         if (font in MOVED_FONT_BLACKLIST)
             return
         
-        val pair = font to y
-        if (pair in requested)
-            return
+        if (y != 0)
+            requestMovedFont(font, 0)
         
-        requested += pair
-        queue += pair
+        val request = font to y
+        if (requested.add(request))
+            queue += request
+    }
+    
+    /**
+     * Gets the source font and vertical offset of the moved font under [id], or null if [id] is not a moved font.
+     */
+    internal fun getSource(id: ResourcePath<ResourceType.Font>): Pair<ResourcePath<ResourceType.Font>, Int>? {
+        val separator = id.path.lastIndexOf('/')
+        if (separator <= 0)
+            return null
+        
+        val offset = id.path.substring(separator + 1).toIntOrNull() ?: return null
+        val source = ResourcePath(ResourceType.Font, id.namespace, id.path.substring(0, separator))
+        if (offset == 0 || source to offset !in requested)
+            return null
+        
+        return ResourcePath(ResourceType.Font, source.namespace, source.path + "/0") to offset
     }
     
     /**

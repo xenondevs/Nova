@@ -20,8 +20,8 @@ class SpaceProvider(val advances: Int2FloatMap) : FontProvider("space") {
         get() {
             val sizes = Int2ObjectOpenHashMap<FloatArray>()
             for ([codePoint, width] in advances.int2FloatEntrySet()) {
-                // width, yMin, yMax
-                sizes[codePoint] = floatArrayOf(width, Float.MAX_VALUE, -Float.MAX_VALUE)
+                // width, xMin, xMax, yMin, yMax, boldOffset, shadowOffset
+                sizes[codePoint] = floatArrayOf(width, Float.MAX_VALUE, -Float.MAX_VALUE, Float.MAX_VALUE, -Float.MAX_VALUE, 1f, 1f)
             }
             
             return sizes

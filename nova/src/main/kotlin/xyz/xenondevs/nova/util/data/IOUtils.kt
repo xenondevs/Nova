@@ -16,6 +16,8 @@ import java.io.OutputStream
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import javax.imageio.ImageIO
+import javax.imageio.stream.MemoryCacheImageInputStream
+import javax.imageio.stream.MemoryCacheImageOutputStream
 import kotlin.io.path.extension
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
@@ -38,24 +40,24 @@ inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {
 }
 
 internal fun Path.readImageDimensions(): Dimension {
-    inputStream().buffered().use {
-        val imageIn = ImageIO.createImageInputStream(it)
-        val reader = ImageIO.getImageReadersBySuffix(extension).next()
-        try {
-            reader.input = imageIn
-            return Dimension(reader.getWidth(0), reader.getHeight(0))
-        } finally {
-            reader.dispose()
+    inputStream().buffered().use { bin ->
+        MemoryCacheImageInputStream(bin).use { min ->
+            val reader = ImageIO.getImageReadersBySuffix(extension).next()
+            try {
+                reader.input = min
+                return Dimension(reader.getWidth(0), reader.getHeight(0))
+            } finally {
+                reader.dispose()
+            }
         }
     }
 }
 
-internal fun Path.readImage(): BufferedImage {
-    return inputStream().buffered().use(ImageIO::read)
-}
+internal fun Path.readImage(): BufferedImage =
+    inputStream().buffered().use { bin -> ImageIO.read(MemoryCacheImageInputStream(bin)) }
 
 internal fun Path.writeImage(image: RenderedImage, formatName: String) {
-    outputStream().buffered().use { ImageIO.write(image, formatName, it) }
+    outputStream().buffered().use { bin -> MemoryCacheImageOutputStream(bin).use { ImageIO.write(image, formatName, it) } }
 }
 
 internal fun <T> File.useZip(create: Boolean = false, run: (Path) -> T): T =
