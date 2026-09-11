@@ -17,10 +17,10 @@ import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_INFO_PROVIDER
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
-import xyz.xenondevs.nova.ui.waila.info.ToolText
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
+import xyz.xenondevs.nova.ui.waila.info.getCustomItemServiceToolText
 import xyz.xenondevs.nova.ui.waila.overlay.WailaOverlayCompound
 import xyz.xenondevs.nova.util.capitalizeAll
 import xyz.xenondevs.nova.util.component.adventure.move
@@ -148,7 +148,7 @@ internal class Waila(
             Component.text()
                 .append(blockName)
                 .append(Component.text(" "))
-                .append(ToolText.getCustomItemServiceToolText(player, block))
+                .append(getCustomItemServiceToolText(player, block))
                 .build(),
             WailaLine.Alignment.LEFT
         )

@@ -15,7 +15,6 @@ import xyz.xenondevs.nova.resources.builder.task.FontChar
 import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
-import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.item.Equipment
 import kotlin.reflect.typeOf
@@ -114,18 +113,6 @@ internal object ResourceLookups {
      */
     var wailaData: Map<Key, FontChar>
         by wailaDataLookup
-    
-    /**
-     * Lookup for WAILA background characters.
-     */
-    val wailaBackgroundLookup: MutableProvider<List<List<FontChar>>> =
-        resourceLookup("waila_background_lookup", emptyList())
-    
-    /**
-     * WAILA background characters indexed by height and part.
-     */
-    var wailaBackground: List<List<FontChar>>
-        by wailaBackgroundLookup
     
     /**
      * Lookup for texture icons.

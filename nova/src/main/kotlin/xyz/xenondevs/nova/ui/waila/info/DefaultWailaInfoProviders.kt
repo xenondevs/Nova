@@ -5,9 +5,13 @@ import io.papermc.paper.registry.keys.BlockTypeKeys
 import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.ShadowColor
+import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
+import org.bukkit.GameMode
+import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.Ageable
 import org.bukkit.block.data.BlockData
@@ -30,18 +34,31 @@ import org.bukkit.block.data.type.RespawnAnchor
 import org.bukkit.block.data.type.SeaPickle
 import org.bukkit.block.data.type.TechnicalPiston
 import org.bukkit.block.data.type.TestBlock
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
+import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistrar.wailaInfoProvider
 import xyz.xenondevs.nova.registry.NovaRegistrar.wailaToolIconProvider
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.RegistryLoader
-import xyz.xenondevs.nova.registry.tags.BlockTypeTags
 import xyz.xenondevs.nova.registry.registryEntrySetOf
+import xyz.xenondevs.nova.registry.tags.BlockTypeTags
 import xyz.xenondevs.nova.registry.typedKey
+import xyz.xenondevs.nova.resources.CharSizes
+import xyz.xenondevs.nova.resources.builder.task.FontChar
+import xyz.xenondevs.nova.resources.builder.task.TextureIconContent
+import xyz.xenondevs.nova.resources.builder.task.WailaEnergyBarTextures
+import xyz.xenondevs.nova.ui.overlay.MovedFonts
 import xyz.xenondevs.nova.util.capitalizeAll
 import xyz.xenondevs.nova.util.component.adventure.move
+import xyz.xenondevs.nova.util.component.adventure.toMinecraftLocaleCode
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.isNovaTileEntity
 import xyz.xenondevs.nova.world.block.name
@@ -65,18 +82,32 @@ object DefaultWailaInfoProviders {
             val blockType = getMainBlockType(blockState)
             
             val lines = buildList {
+                val firstLine = Component.text()
+                    .append(blockType.name)
+                    .append(Component.text(" "))
+                    .append(getToolText(player, block))
+                    .build()
                 this += WailaLine(
-                    Component.text()
-                        .append(blockType.name)
-                        .append(Component.text(" "))
-                        .append(ToolText.getToolText(player, block))
-                        .build(),
+                    firstLine,
                     WailaLine.Alignment.LEFT
                 )
                 
+                if (blockType.isNovaTileEntity) {
+                    val tileEntity = block.novaTileEntity
+                    if (tileEntity is NetworkedTileEntity) {
+                        val energyHolder = tileEntity.holders.firstInstanceOfOrNull<DefaultEnergyHolder>()
+                        if (energyHolder != null) {
+                            val firstLineWidth = CharSizes.calculateComponentWidth(blockType.name, player.locale().toMinecraftLocaleCode())
+                            this += WailaLine(
+                                createEnergyBar(energyHolder, firstLineWidth),
+                                WailaLine.Alignment.LEFT
+                            )
+                        }
+                    }
+                }
+                
                 this += WailaLine(
                     Component.text()
-                        .move(1) // to adjust for italic
                         .append(Component.text(
                             blockType.key.namespace
                                 .replace('_', ' ')
@@ -90,17 +121,6 @@ object DefaultWailaInfoProviders {
                     WailaLine.Alignment.LEFT
                 )
                 
-                if (blockType.isNovaTileEntity) {
-                    val tileEntity = block.novaTileEntity
-                    if (tileEntity is NetworkedTileEntity) {
-                        val energyHolder = tileEntity.holders.firstInstanceOfOrNull<DefaultEnergyHolder>()
-                        if (energyHolder != null) {
-                            this += EnergyHolderLine.getEnergyBarLine(energyHolder)
-                            this += EnergyHolderLine.getEnergyAmountLine(energyHolder)
-                            this += EnergyHolderLine.getEnergyDeltaLine(energyHolder)
-                        }
-                    }
-                }
             }
             
             return@infoProvider WailaInfo(blockType.key, lines)
@@ -317,6 +337,178 @@ object DefaultWailaInfoProviders {
     
 }
 
+//<editor-fold desc="tool icons">
+private val CHECK_MARK = Component.text("✔", NamedTextColor.GREEN)
+private val CROSS = Component.text("❌", NamedTextColor.RED)
+
+private val TOOL_ICONS: Map<BlockType, List<Component>>
+    by combinedProvider(
+        NovaRegistries.WAILA_TOOL_ICON_PROVIDER.entrySet, BlockTypeTags.TAGS_BY_ELEMENT
+    ) { iconProviders, tagsByBlockType ->
+        combinedProvider(
+            tagsByBlockType.map { [blockType, tags] ->
+                combinedProvider(
+                    iconProviders
+                        .flatMapTo(LinkedHashSet()) { it.getIcon(tags) }
+                        .map(TextureIconContent::getIcon)
+                ) { icons ->
+                    val components = icons.mapNotNull { icon ->
+                        icon
+                            ?.component
+                            ?.shadowColor(ShadowColor.none())
+                            ?.let { component -> MovedFonts.moveVertically(component, 1) }
+                    }
+                    blockType to components
+                }
+            }
+        ) { it.toMap() }
+    }.flatten()
+
+private fun getToolText(player: Player, block: Block): Component {
+    val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
+    return getToolText(
+        player,
+        TOOL_ICONS[block.blockType] ?: emptyList(),
+        block.blockType.hardness.toDouble(),
+        block.isPreferredTool(tool ?: ItemStack.empty())
+    )
+}
+
+internal fun getCustomItemServiceToolText(player: Player, block: Block): Component {
+    val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
+    return getToolText(
+        player,
+        emptyList(),
+        1.0,
+        CustomItemServiceManager.canBreakBlock(block, tool)
+    )
+}
+
+private fun getToolText(
+    player: Player,
+    toolIcons: List<Component>,
+    hardness: Double,
+    correctToolForDrops: Boolean?
+): Component {
+    val builder = Component.text()
+    
+    if (hardness < 0)
+        return builder.append(CROSS).build()
+    
+    if (player.gameMode == GameMode.CREATIVE || correctToolForDrops == true) {
+        builder.append(CHECK_MARK)
+    } else if (correctToolForDrops != null) {
+        builder.append(CROSS)
+    }
+    
+    toolIcons.forEach(builder::append)
+    
+    return builder.build()
+}
+//</editor-fold>
+
+//<editor-fold desc="energy bar">
+private val ENERGY_BAR_BACKGROUND_COLOR = TextColor.color(0x595959)
+private val ENERGY_BAR_FILL_COLOR = TextColor.color(0xEB0000)
+private const val ENERGY_BAR_BORDER_WIDTH = 1
+
+private val ENERGY_BALANCED_INDICATOR = Component
+    .text("↑↓", NamedTextColor.DARK_GRAY)
+    .shadowColor(ShadowColor.none())
+
+private val ENERGY_LARGE_INCREASE_SMALL_DECREASE_INDICATOR = Component.text()
+    .color(NamedTextColor.DARK_GRAY)
+    .shadowColor(ShadowColor.none())
+    .append(Component.text("↑", null, TextDecoration.BOLD))
+    .append(Component.text("↓"))
+    .build()
+
+private val ENERGY_SMALL_INCREASE_LARGE_DECREASE_INDICATOR = Component
+    .text()
+    .color(NamedTextColor.DARK_GRAY)
+    .shadowColor(ShadowColor.none())
+    .append(Component.text("↑"))
+    .append(Component.text("↓", null, TextDecoration.BOLD))
+    .build()
+
+private val ENERGY_ONLY_INCREASE_INDICATOR = Component
+    .text("↑", NamedTextColor.DARK_GRAY)
+    .shadowColor(ShadowColor.none())
+
+private val ENERGY_ONLY_DECREASE_INDICATOR = Component
+    .text("↓", NamedTextColor.DARK_GRAY)
+    .shadowColor(ShadowColor.none())
+
+private fun createEnergyBar(holder: DefaultEnergyHolder, width: Float): Component {
+    val indicator = when {
+        holder.energyPlus == holder.energyMinus && holder.energyPlus == 0L -> null
+        holder.energyPlus == holder.energyMinus -> ENERGY_BALANCED_INDICATOR
+        holder.energyPlus == 0L -> ENERGY_ONLY_DECREASE_INDICATOR
+        holder.energyMinus == 0L -> ENERGY_ONLY_INCREASE_INDICATOR
+        holder.energyPlus > holder.energyMinus -> ENERGY_LARGE_INCREASE_SMALL_DECREASE_INDICATOR
+        holder.energyPlus < holder.energyMinus -> ENERGY_SMALL_INCREASE_LARGE_DECREASE_INDICATOR
+        else -> null
+    }
+    val middlePieceCount = ((width - WailaEnergyBarTextures.END_PIECE_WIDTH * 2) / WailaEnergyBarTextures.MIDDLE_PIECE_WIDTH).roundToInt().coerceAtLeast(1)
+    val barWidth = WailaEnergyBarTextures.END_PIECE_WIDTH * 2 + middlePieceCount * WailaEnergyBarTextures.MIDDLE_PIECE_WIDTH
+    val percentage = (holder.energy.toDouble() / holder.maxEnergy.toDouble()).coerceIn(0.0, 1.0)
+    val fillWidth = ((barWidth - ENERGY_BAR_BORDER_WIDTH * 2) * percentage).roundToInt()
+    
+    val builder = Component.text()
+        .move(-1)
+        .append(createSolidEnergyBar(barWidth, ENERGY_BAR_BACKGROUND_COLOR))
+        .move(-(barWidth - ENERGY_BAR_BORDER_WIDTH))
+        .append(createSolidEnergyBar(fillWidth, ENERGY_BAR_FILL_COLOR))
+        .move(-(fillWidth + ENERGY_BAR_BORDER_WIDTH))
+        .append(createEnergyBarForeground(middlePieceCount))
+        .append(Component.text(" "))
+    
+    if (indicator != null)
+        builder.append(indicator)
+    
+    return builder.build()
+}
+
+private fun createSolidEnergyBar(width: Int, color: TextColor): Component {
+    val builder = Component.text()
+    repeat(width) {
+        builder.appendEnergyBarChar(WailaEnergyBarTextures.barPart, 1, color)
+    }
+    return builder.build()
+}
+
+private fun createEnergyBarForeground(middlePieceCount: Int): Component {
+    val builder = Component.text()
+    builder.appendEnergyBarChar(
+        WailaEnergyBarTextures.start,
+        WailaEnergyBarTextures.END_PIECE_WIDTH
+    )
+    
+    repeat(middlePieceCount) { index ->
+        builder.appendEnergyBarChar(
+            WailaEnergyBarTextures.middle(index),
+            WailaEnergyBarTextures.MIDDLE_PIECE_WIDTH
+        )
+    }
+    
+    builder.appendEnergyBarChar(
+        WailaEnergyBarTextures.end,
+        WailaEnergyBarTextures.END_PIECE_WIDTH
+    )
+    return builder.build()
+}
+
+private fun TextComponent.Builder.appendEnergyBarChar(char: FontChar, width: Int, color: TextColor? = null) {
+    var component = char.component.shadowColor(ShadowColor.none())
+    if (color != null)
+        component = component.color(color)
+    
+    append(component)
+    move(width - char.width)
+}
+//</editor-fold>
+
+//<editor-fold desc="waila icons">
 private val MAX_TEXTURE_STAGES = mapOf(
     BlockTypeKeys.BEETROOTS to 3,
     BlockTypeKeys.CARROTS to 3,
@@ -395,3 +587,4 @@ private fun getMainBlockType(blockState: BlockData): BlockType {
         else -> type
     }
 }
+//</editor-fold>

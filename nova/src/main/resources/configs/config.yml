@@ -97,7 +97,7 @@ waila:
   pos_update_interval: 1
   # The interval for updating the overlay, regardless if the player is still looking at the same block.
   # Updating the overlay under these circumstances is still required for displaying the tool matching, energy, etc. properly.
-  data_update_interval: 5
+  data_update_interval: 1
   # A list of namespaced ids representing the blocks that should not be shown in WAILA.
   # Allows wildcard patterns, e.g. "minecraft:*_ore" or "minecraft:*"
   blacklisted_blocks: [ ]
