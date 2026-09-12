@@ -418,11 +418,14 @@ object RegistryLoader {
 internal object KnownRegistryEntries {
     
     private const val KNOWN_REGISTRY_ENTRIES_KEY = "known_registry_entries"
+    private const val KNOWN_TILE_ENTITIES_KEY = "known_tile_entities"
     val knownRegistryEntries: MutableMap<Key, MutableSet<Key>> = PermanentStorage.retrieve(KNOWN_REGISTRY_ENTRIES_KEY) ?: HashMap()
+    val knownTileEntities: MutableSet<Key> = PermanentStorage.retrieve(KNOWN_TILE_ENTITIES_KEY) ?: HashSet()
     
     @InitFun
     private fun storeKnownRegistryEntryKeys() {
         PermanentStorage.store(KNOWN_REGISTRY_ENTRIES_KEY, knownRegistryEntries)
+        PermanentStorage.store(KNOWN_TILE_ENTITIES_KEY, knownTileEntities)
     }
     
 }
