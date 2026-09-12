@@ -62,12 +62,14 @@ import org.bukkit.craftbukkit.CraftWorld
 import org.bukkit.craftbukkit.block.CraftBlockType
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.entity.CraftEntity
+import org.bukkit.craftbukkit.entity.CraftFallingBlock
 import org.bukkit.craftbukkit.entity.CraftLivingEntity
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.craftbukkit.inventory.CraftItemType
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
+import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
@@ -92,6 +94,7 @@ import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 import net.minecraft.world.entity.Pose as MojangPose
 import net.minecraft.world.entity.ai.attributes.Attribute as MojangAttribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier as MojangAttributeModifier
+import net.minecraft.world.entity.item.FallingBlockEntity as MojangFallingBlockEntity
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -111,6 +114,9 @@ val LivingEntity.nmsEntity: MojangLivingEntity
 
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
+
+val FallingBlock.nmsEntity: MojangFallingBlockEntity
+    get() = (this as CraftFallingBlock).handle
 
 fun ItemStack?.unwrap(): MojangStack =
     this?.let(CraftItemStack::unwrap) ?: MojangStack.EMPTY

@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.InsideBlockEffectApplier
+import net.minecraft.world.entity.item.FallingBlockEntity
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelReader
@@ -87,10 +88,12 @@ import net.minecraft.world.InteractionResult as NmsInteractionResult
 import net.minecraft.world.entity.Entity as NmsEntity
 import net.minecraft.world.entity.player.Player as NmsPlayer
 import net.minecraft.world.item.ItemStack as NmsItemStack
+import net.minecraft.world.level.block.Fallable as NmsFallable
 import net.minecraft.world.level.block.state.BlockState as NmsBlockState
 import org.bukkit.block.Block as BukkitBlock
 import org.bukkit.block.BlockState as CapturedBlockState
 import org.bukkit.craftbukkit.block.CraftBlockState as CraftCapturedBlockState
+import org.bukkit.entity.FallingBlock as BukkitFallingBlock
 
 private val BLOCK_STATE_CACHED_TYPE: VarHandle = MethodHandles
     .privateLookupIn(NmsBlockState::class.java, MethodHandles.lookup())
@@ -240,7 +243,7 @@ internal open class NovaBlock(
     hitParticles: Provider<ItemType?>,
     breakParticles: Provider<BlockType?>,
     showBreakAnimation: Provider<Boolean>
-) : Block(properties.get()) {
+) : Block(properties.get()), NmsFallable {
     
     val key: Key
         get() = entry.key
@@ -612,6 +615,41 @@ internal open class NovaBlock(
         val blockState = NovaBlockStateImpl(nmsBlockState)
         runSafely("handle scheduled tick") {
             behaviors.forEach { it.handleScheduledTick(block, blockState) }
+        }
+    }
+    
+    override fun onLand(
+        nmsLevel: Level,
+        nmsPos: NmsBlockPos,
+        nmsBlockState: NmsBlockState,
+        nmsReplacedState: NmsBlockState,
+        nmsEntity: FallingBlockEntity
+    ) {
+        if (nmsLevel !is ServerLevel)
+            return
+        
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsBlockState)
+        val replacedState = nmsReplacedState.bukkitBlockData
+        val entity = nmsEntity.bukkitEntity as BukkitFallingBlock
+        runSafely("handle falling block land") {
+            behaviors.forEach { it.handleFallingBlockLand(block, blockState, replacedState, entity) }
+        }
+    }
+    
+    override fun onBrokenAfterFall(
+        nmsLevel: Level,
+        nmsPos: NmsBlockPos,
+        nmsEntity: FallingBlockEntity
+    ) {
+        if (nmsLevel !is ServerLevel)
+            return
+        
+        val block = nmsPos.toBlock(nmsLevel.world)
+        val blockState = NovaBlockStateImpl(nmsEntity.blockState)
+        val entity = nmsEntity.bukkitEntity as BukkitFallingBlock
+        runSafely("handle falling block destroy") {
+            behaviors.forEach { it.handleFallingBlockDestroy(block, blockState, entity) }
         }
     }
     

@@ -98,6 +98,15 @@ val Block.below: Block
     get() = world.getBlockAt(x, y - 1, z)
 
 /**
+ * Schedules a tick at [this] block in [delay] ticks.
+ * Canceled if the block's type changes.
+ */
+fun Block.scheduleTick(delay: Int) {
+    require(delay >= 0) { "Delay must not be negative" }
+    world.serverLevel.scheduleTick(nmsPos, nmsBlockState.block, delay)
+}
+
+/**
  * The location at the center of this block.
  */
 val Block.center: Location
@@ -362,8 +371,13 @@ object BlockUtils {
             val level = block.world.serverLevel
             val pos = block.nmsPos
             
-            if (ctx[BlockBreak.BLOCK_BREAK_EFFECTS])
-                playBreakEffects(blockState, ctx, block, sendEffectsToBreaker)
+            if (ctx[BlockBreak.BLOCK_BREAK_EFFECTS]) {
+                playBreakEffects(
+                    blockState,
+                    block,
+                    if (sendEffectsToBreaker) null else ctx[BlockBreak.SOURCE_ENTITY] as? Player
+                )
+            }
             
             level.setBlock(pos, level.getFluidState(pos).createLegacyBlock(), ctx[BlockBreak.BLOCK_UPDATE_FLAGS].value)
             return@exec drops
@@ -379,15 +393,14 @@ object BlockUtils {
         }
     }
     
-    private fun playBreakEffects(state: NovaBlockState, ctx: Context<BlockBreak>, block: Block, sendEffectsToBreaker: Boolean) {
-        val player = ctx[BlockBreak.SOURCE_ENTITY] as? Player
+    internal fun playBreakEffects(state: NovaBlockState, block: Block, excludedPlayer: Player?) {
         val level = block.world.serverLevel
         val dimension = level.dimension()
         val nmsPos = block.nmsPos
         
-        fun broadcast(packet: Packet<*>, sendToBreaker: Boolean) {
+        fun broadcast(packet: Packet<*>, excludedPlayer: Player? = null) {
             MINECRAFT_SERVER.playerList.broadcast(
-                if (sendToBreaker) null else player?.serverPlayer,
+                excludedPlayer?.serverPlayer,
                 block.x.toDouble(), block.y.toDouble(), block.z.toDouble(),
                 64.0,
                 dimension,
@@ -407,10 +420,10 @@ object BlockUtils {
                 Random.nextLong()
             )
             
-            broadcast(soundPacket, true)
+            broadcast(soundPacket)
         }
         
-        fun broadcastCustomBreakParticles(sendToBreaker: Boolean) {
+        fun broadcastCustomBreakParticles(includeExcludedPlayer: Boolean) {
             val breakParticlesBlock = state.novaBlock.breakParticles
                 ?: return
             val breakParticles = particle(ParticleTypes.BLOCK, block.location.add(0.5, 0.5, 0.5)) {
@@ -418,10 +431,10 @@ object BlockUtils {
                 offset(0.3, 0.3, 0.3)
                 amount(70)
             }
-            broadcast(breakParticles, sendToBreaker)
+            broadcast(breakParticles, if (includeExcludedPlayer) null else excludedPlayer)
         }
         
-        val soundGroup = block.novaSoundGroup
+        val soundGroup = SoundGroup.from(state.nmsBlockState.soundType)
         val modelProvider = state.novaBlock.modelProviders.get()[state.nmsBlockState]
             ?: return
         val clientsideBlockState = modelProvider.clientsideBlockState
@@ -429,7 +442,7 @@ object BlockUtils {
         if (modelProvider is BackingStateBlockModelProvider || modelProvider is ModelLessBlockModelProvider) {
             // use the level event packet for blocks that use block states (sound & particles)
             val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, state.nmsBlockState.id, false)
-            broadcast(levelEventPacket, sendEffectsToBreaker)
+            broadcast(levelEventPacket, excludedPlayer)
             
             if (SoundEngine.overridesSound(clientsideBlockState.soundType.breakSound))
                 broadcastBreakSound(soundGroup)
@@ -440,7 +453,7 @@ object BlockUtils {
         } else if (modelProvider is DisplayEntityBlockModelProvider) {
             // send sound and break particles manually for display entity blocks
             broadcastBreakSound(soundGroup)
-            broadcastCustomBreakParticles(sendEffectsToBreaker || hasNoBreakParticles)
+            broadcastCustomBreakParticles(hasNoBreakParticles)
         }
     }
     

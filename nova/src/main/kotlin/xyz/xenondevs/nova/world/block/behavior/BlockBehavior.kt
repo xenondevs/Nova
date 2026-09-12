@@ -4,6 +4,7 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Entity
+import org.bukkit.entity.FallingBlock
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
@@ -112,7 +113,18 @@ interface BlockBehavior : BlockBehaviorHolder {
     /**
      * Handles a scheduled tick for a block of [state] at [block].
      */
-    fun handleScheduledTick(block: Block, state: NovaBlockState) = Unit // TODO: implement triggering scheduled ticks
+    fun handleScheduledTick(block: Block, state: NovaBlockState) = Unit
+    
+    /**
+     * Handles a falling block of [state] successfully landing at [block].
+     * [replacedState] is the block state of the previous block at that position.
+     */
+    fun handleFallingBlockLand(block: Block, state: NovaBlockState, replacedState: BlockData, entity: FallingBlock) = Unit
+    
+    /**
+     * Handles a falling block of [state] being destroyed at [block] instead of being placed.
+     */
+    fun handleFallingBlockDestroy(block: Block, state: NovaBlockState, entity: FallingBlock) = Unit
     
     /**
      * Retrieves the amount of experience that would be dropped when breaking a block of [state] at [block] with the given [ctx].

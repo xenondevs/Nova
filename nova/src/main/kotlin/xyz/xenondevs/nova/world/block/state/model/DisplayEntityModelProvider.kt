@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.block.state.model
 
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import io.papermc.paper.datacomponent.DataComponentTypes
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -19,6 +21,9 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Display.Brightness
+import org.bukkit.entity.Entity
+import org.bukkit.entity.FallingBlock
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
@@ -29,12 +34,15 @@ import org.joml.Intersectiond
 import org.joml.Matrix4f
 import org.joml.Matrix4fc
 import org.joml.Vector2d
+import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.network.packet.ClientboundSetPassengersPacket
 import xyz.xenondevs.nova.network.packetHandler
+import xyz.xenondevs.nova.network.send
 import xyz.xenondevs.nova.packetentity.ItemDisplayMetadata
 import xyz.xenondevs.nova.packetentity.PacketBlockDisplay
 import xyz.xenondevs.nova.packetentity.PacketEntityPassengersDsl
@@ -53,8 +61,10 @@ import xyz.xenondevs.nova.util.item.requiresLight
 import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.nmsDirection
+import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.ColliderCube
@@ -160,6 +170,29 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
             ?.lastOrNull()
             ?.metadata
             ?.let { setWaterlogMetadata(it, block) }
+    }
+    
+    fun createFallingModel(entity: FallingBlock): FallingBlockModel {
+        val viewers = entity.trackedBy.mapTo(HashSet(), Player::getUniqueId)
+        val displays = info.models.map { model ->
+            packetItemDisplay {
+                location by entity.passengerLocation
+                sendMovementPackets = false
+            }.apply {
+                viewerWhitelist = viewers
+                setMetadata(metadata, model)
+                metadata.transform = Matrix4f()
+                    .translation(0f, 0.5f - entity.height.toFloat(), 0f)
+                    .mul(model.transform)
+            }
+        }
+        
+        displays.lastOrNull()?.spawnHandlers?.add { viewer ->
+            val realPassengers = entity.passengers.mapToIntArray(Entity::getEntityId)
+            val modelPassengers = displays.mapToIntArray(PacketItemDisplay::id)
+            viewer.send(ClientboundSetPassengersPacket(entity.entityId, realPassengers + modelPassengers))
+        }
+        return FallingBlockModel(entity, displays)
     }
     
     private fun createDisplay(block: Block, model: DisplayEntityBlockModelData.Model) = packetItemDisplay {
@@ -300,6 +333,7 @@ internal object DisplayEntityModelProviderManager : Listener {
     }
     
     private val entitiesByChunk = HashMap<ChunkPos, HashMap<Block, Entities>>()
+    private val fallingBlocks = HashMap<FallingBlock, FallingBlockModel>()
     
     var colliderOutlinesEnabled = false
         set(value) {
@@ -314,9 +348,16 @@ internal object DisplayEntityModelProviderManager : Listener {
     @InitFun
     private fun init() {
         registerEvents()
-        Bukkit.getWorlds().asSequence()
-            .flatMap { it.loadedChunks.asSequence() }
-            .forEach(::loadChunk)
+        Bukkit.getWorlds().forEach { world ->
+            world.loadedChunks.forEach(::loadChunk)
+            world.entities
+                .asSequence()
+                .filterIsInstance<FallingBlock>()
+                .forEach(::loadFallingBlock)
+        }
+        runTaskTimer(0, 1) {
+            fallingBlocks.values.removeIf { !it.update() }
+        }
     }
     
     @EventHandler
@@ -329,6 +370,20 @@ internal object DisplayEntityModelProviderManager : Listener {
         entitiesByChunk.remove(event.chunk.pos)
             ?.values
             ?.forEach(Entities::despawn)
+    }
+    
+    @EventHandler
+    private fun handleEntityAdd(event: EntityAddToWorldEvent) {
+        val entity = event.entity as? FallingBlock
+            ?: return
+        loadFallingBlock(entity)
+    }
+    
+    @EventHandler
+    private fun handleEntityRemove(event: EntityRemoveFromWorldEvent) {
+        val entity = event.entity as? FallingBlock
+            ?: return
+        unloadFallingBlock(entity)
     }
     
     private fun loadChunk(chunk: Chunk) {
@@ -383,4 +438,49 @@ internal object DisplayEntityModelProviderManager : Listener {
             entitiesByChunk.remove(chunkPos)
     }
     
+    private fun loadFallingBlock(entity: FallingBlock) {
+        if (entity in fallingBlocks)
+            return
+        val modelProvider = entity.nmsEntity.blockState
+            .let { (it.block as? NovaBlock)?.modelProviders?.get()[it] as? DisplayEntityBlockModelProvider }
+            ?: return
+        fallingBlocks[entity] = modelProvider.createFallingModel(entity)
+    }
+    
+    private fun unloadFallingBlock(entity: FallingBlock) {
+        fallingBlocks.remove(entity)?.detach()
+    }
+    
 }
+
+internal class FallingBlockModel(
+    private val entity: FallingBlock,
+    private val displays: List<PacketItemDisplay>
+) {
+    
+    init {
+        displays.forEach(PacketItemDisplay::spawn)
+    }
+    
+    fun update(): Boolean {
+        if (!entity.isValid) {
+            detach()
+            return false
+        }
+        
+        val viewers = entity.trackedBy.mapTo(HashSet()) { it.uniqueId }
+        displays.forEach { display ->
+            display.location = entity.passengerLocation
+            display.viewerWhitelist = viewers
+        }
+        
+        return true
+    }
+    
+    fun detach() {
+        displays.forEach(PacketItemDisplay::despawn)
+    }
+}
+
+private val FallingBlock.passengerLocation: Location
+    get() = location.add(0.0, height, 0.0)
