@@ -30,12 +30,14 @@ import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuild
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.BlockModelTask
 import xyz.xenondevs.nova.serialization.kotlinx.BlockTypeEntrySerializer
+import xyz.xenondevs.nova.util.nmsNoteBlockInstrument
 import xyz.xenondevs.nova.util.nmsPushReaction
 import xyz.xenondevs.nova.util.toNmsMapColor
 import xyz.xenondevs.nova.util.toPropertyStringMap
 import xyz.xenondevs.nova.util.toResourceKey
 import xyz.xenondevs.nova.world.block.ColliderCube
 import xyz.xenondevs.nova.world.block.FluidFlowMode
+import xyz.xenondevs.nova.world.block.NoteBlockInstrument
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorFactory
@@ -68,6 +70,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected val _breakParticles = uninitializedProvider<RegistryEntry.Paper<BlockType>?>()
     protected val _showBreakAnimation = uninitializedProvider<Boolean>()
     protected val _soundGroup = uninitializedProvider<SoundGroup>()
+    protected val _noteBlockInstrument = uninitializedProvider<NoteBlockInstrument>()
     protected val _pistonReaction = uninitializedProvider<PistonMoveReaction>()
     protected val _selectLightEmission = uninitializedProvider<BlockSelectorScope.() -> Int>()
     protected val _explosionResistance = uninitializedProvider<Float>()
@@ -104,14 +107,15 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     }
     
     protected val _properties = combinedProvider(
-        _hardness, _requiresToolForDrops, _pistonReaction, _selectLightEmission, _explosionResistance, _flammable, _mapColor, _soundGroup
-    ) { hardness, requiresToolForDrops, pistonReaction, selectLightEmission, explosionResistance, flammable, mapColor, soundGroup ->
+        _hardness, _requiresToolForDrops, _pistonReaction, _selectLightEmission, _explosionResistance, _flammable, _mapColor, _soundGroup, _noteBlockInstrument
+    ) { hardness, requiresToolForDrops, pistonReaction, selectLightEmission, explosionResistance, flammable, mapColor, soundGroup, noteBlockInstrument ->
         Properties.of()
             .setId(TypedKey.create(entry.registry, entry.key).toResourceKey())
             .pushReaction(pistonReaction.nmsPushReaction)
             .explosionResistance(explosionResistance)
             .mapColor(mapColor.toNmsMapColor())
             .sound(soundGroup.nmsSoundType)
+            .instrument(noteBlockInstrument.nmsNoteBlockInstrument)
             .lightLevel { state ->
                 val proto = ProtoBlockState(
                     entry,
@@ -141,6 +145,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected var breakParticles: RegistryEntry.Paper<BlockType>? by _breakParticles
     protected var showBreakAnimation: Boolean by _showBreakAnimation
     protected var soundGroup: SoundGroup by _soundGroup
+    protected var noteBlockInstrument: NoteBlockInstrument by _noteBlockInstrument
     protected var pistonReaction: PistonMoveReaction by _pistonReaction
     protected var selectLightEmission: BlockSelectorScope.() -> Int by _selectLightEmission
     protected var explosionResistance: Float by _explosionResistance
@@ -164,6 +169,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         breakParticles = null
         showBreakAnimation = true
         soundGroup = SoundGroup.EMPTY
+        noteBlockInstrument = NoteBlockInstrument.HARP
         pistonReaction = PistonMoveReaction.MOVE
         selectLightEmission = { 0 }
         explosionResistance = 0f
@@ -237,6 +243,11 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     override fun sounds(soundGroup: SoundGroup) {
         this.soundGroup = soundGroup
     }
+    
+    override fun noteBlockInstrument(instrument: NoteBlockInstrument) {
+        this.noteBlockInstrument = instrument
+    }
+    
     
     override fun stateProperties(vararg stateProperties: BlockStateProperty<*>) {
         this.stateProperties += stateProperties

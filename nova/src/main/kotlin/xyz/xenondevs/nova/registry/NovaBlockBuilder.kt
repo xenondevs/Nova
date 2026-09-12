@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuild
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.world.block.ColliderCube
 import xyz.xenondevs.nova.world.block.FluidFlowMode
+import xyz.xenondevs.nova.world.block.NoteBlockInstrument
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.behavior.BlockDrops
@@ -167,6 +168,15 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
      * Defaults to [SoundGroup.EMPTY].
      */
     fun sounds(soundGroup: SoundGroup)
+    
+    /**
+     * Configures the instrument used by nearby note blocks.
+     * Normal instruments require this block to be below the note block,
+     * while mob-head instruments require this block to be above the note block.
+     * Defaults to [NoteBlockInstrument.HARP].
+     */
+    fun noteBlockInstrument(instrument: NoteBlockInstrument)
+    
     
     /**
      * Configures how pistons interact with this block.

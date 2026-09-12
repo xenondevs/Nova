@@ -82,6 +82,7 @@ import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.world.block.NoteBlockInstrument
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
@@ -96,6 +97,7 @@ import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.item.ItemUseAnimation as MojangItemUseAnimation
 import net.minecraft.world.level.block.Block as MojangBlock
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument as MojangNoteBlockInstrument
 
 val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
 val REGISTRY_ACCESS: RegistryAccess by lazy { MINECRAFT_SERVER.registryAccess() }
@@ -346,9 +348,6 @@ val ItemUseAnimation.nmsItemUseAnimation: MojangItemUseAnimation
         ItemUseAnimation.TRIDENT -> MojangItemUseAnimation.TRIDENT
     }
 
-val BlockType.nmsBlock: MojangBlock
-    get() = (this as CraftBlockType<*>).handle
-
 val PistonMoveReaction.nmsPushReaction: PushReaction
     get() = when (this) {
         PistonMoveReaction.MOVE -> PushReaction.NORMAL
@@ -357,6 +356,39 @@ val PistonMoveReaction.nmsPushReaction: PushReaction
         PistonMoveReaction.IGNORE -> PushReaction.IGNORE
         PistonMoveReaction.PUSH_ONLY -> PushReaction.PUSH_ONLY
     }
+
+internal val NoteBlockInstrument.nmsNoteBlockInstrument: MojangNoteBlockInstrument
+    get() = when (this) {
+        NoteBlockInstrument.HARP -> MojangNoteBlockInstrument.HARP
+        NoteBlockInstrument.BASS_DRUM -> MojangNoteBlockInstrument.BASEDRUM
+        NoteBlockInstrument.SNARE_DRUM -> MojangNoteBlockInstrument.SNARE
+        NoteBlockInstrument.CLICKS_AND_STICKS -> MojangNoteBlockInstrument.HAT
+        NoteBlockInstrument.BASS_GUITAR -> MojangNoteBlockInstrument.BASS
+        NoteBlockInstrument.FLUTE -> MojangNoteBlockInstrument.FLUTE
+        NoteBlockInstrument.BELL -> MojangNoteBlockInstrument.BELL
+        NoteBlockInstrument.GUITAR -> MojangNoteBlockInstrument.GUITAR
+        NoteBlockInstrument.CHIME -> MojangNoteBlockInstrument.CHIME
+        NoteBlockInstrument.XYLOPHONE -> MojangNoteBlockInstrument.XYLOPHONE
+        NoteBlockInstrument.IRON_XYLOPHONE -> MojangNoteBlockInstrument.IRON_XYLOPHONE
+        NoteBlockInstrument.COW_BELL -> MojangNoteBlockInstrument.COW_BELL
+        NoteBlockInstrument.DIDGERIDOO -> MojangNoteBlockInstrument.DIDGERIDOO
+        NoteBlockInstrument.BIT -> MojangNoteBlockInstrument.BIT
+        NoteBlockInstrument.BANJO -> MojangNoteBlockInstrument.BANJO
+        NoteBlockInstrument.PLING -> MojangNoteBlockInstrument.PLING
+        NoteBlockInstrument.TRUMPET -> MojangNoteBlockInstrument.TRUMPET
+        NoteBlockInstrument.EXPOSED_TRUMPET -> MojangNoteBlockInstrument.TRUMPET_EXPOSED
+        NoteBlockInstrument.WEATHERED_TRUMPET -> MojangNoteBlockInstrument.TRUMPET_WEATHERED
+        NoteBlockInstrument.OXIDIZED_TRUMPET -> MojangNoteBlockInstrument.TRUMPET_OXIDIZED
+        NoteBlockInstrument.ZOMBIE -> MojangNoteBlockInstrument.ZOMBIE
+        NoteBlockInstrument.SKELETON -> MojangNoteBlockInstrument.SKELETON
+        NoteBlockInstrument.CREEPER -> MojangNoteBlockInstrument.CREEPER
+        NoteBlockInstrument.DRAGON -> MojangNoteBlockInstrument.DRAGON
+        NoteBlockInstrument.WITHER_SKELETON -> MojangNoteBlockInstrument.WITHER_SKELETON
+        NoteBlockInstrument.PIGLIN -> MojangNoteBlockInstrument.PIGLIN
+    }
+
+val BlockType.nmsBlock: MojangBlock
+    get() = (this as CraftBlockType<*>).handle
 
 val ItemType.nmsItem: MojangItem
     get() = (this as CraftItemType<*>).handle
