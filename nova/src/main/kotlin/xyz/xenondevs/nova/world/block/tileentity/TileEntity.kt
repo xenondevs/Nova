@@ -33,6 +33,8 @@ import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.BlockUpdateFlags
 import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
+import xyz.xenondevs.nova.world.block.behavior.TileEntityDrops
+import xyz.xenondevs.nova.world.block.behavior.TileEntityInteractive
 import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.itemTypeOrNull
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityModelProviderManager
@@ -181,14 +183,16 @@ abstract class TileEntity(
     open fun handleTick() = Unit
     
     /**
-     * @see BlockBehavior.useItemOn
+     * Same as [BlockBehavior.useItemOn].
+     * Requires the [TileEntityInteractive] behavior on the block in order to be called.
      */
     open fun useItemOn(ctx: Context<BlockInteract>): InteractionResult {
         return InteractionResult.Pass
     }
     
     /**
-     * @see BlockBehavior.use
+     * Same as [BlockBehavior.use].
+     * Requires the [TileEntityInteractive] behavior on the block in order to be called.
      */
     open fun use(ctx: Context<BlockInteract>): InteractionResult {
         val player = ctx[BlockInteract.SOURCE_ENTITY] as? Player
@@ -200,6 +204,7 @@ abstract class TileEntity(
     
     /**
      * Gets a list of [ItemStacks][ItemStack] to be dropped when this [TileEntity] is destroyed.
+     * Requires the [TileEntityDrops] behavior on the block in order to be called.
      */
     open fun getDrops(includeSelf: Boolean): List<ItemStack> {
         val drops = ArrayList<ItemStack>()

@@ -43,6 +43,7 @@ import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorFactory
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.behavior.DefaultBlockBehavior
+import xyz.xenondevs.nova.world.block.behavior.DefaultTileEntityBlockBehavior
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
@@ -83,7 +84,9 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     ) { holders, configId ->
         val cfg = CONFIGS[configId]
         buildList {
-            this += DefaultBlockBehavior()
+            this += DefaultBlockBehavior
+            if (this@AbstractNovaBlockBuilder is NovaTileEntityBlockBuilderImpl)
+                this += DefaultTileEntityBlockBehavior
             for (holder in holders) {
                 this += when (holder) {
                     is BlockBehaviorFactory<*> -> holder.create(entry, cfg)

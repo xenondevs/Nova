@@ -11,6 +11,11 @@ object DefaultBlockTags {
      */
     val NOVA = NovaRegistrar.blockTag("nova") {}
     
+    /**
+     * Contains all Nova tile-entity blocks.
+     */
+    val NOVA_TILE_ENTITY = NovaRegistrar.blockTag("nova_tile_entity") {}
+    
     init {
         val needsCopperTool = MinecraftRegistrar.blockTag("minecraft:needs_copper_tool") {}
         val needsNetheriteTool = MinecraftRegistrar.blockTag("minecraft:needs_netherite_tool") {}
