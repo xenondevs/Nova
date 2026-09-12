@@ -69,7 +69,7 @@ internal class NovaBlockBreaker(
     }
     
     private fun spawnHitParticles() {
-        val texture = blockState.novaBlock.breakParticles ?: return
+        val texture = blockState.novaBlock.hitParticles ?: return
         val side = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation) ?: BlockFace.UP
         
         val particlePacket = particle(ParticleTypes.ITEM, block.location.add(0.5, 0.5, 0.5).advance(side, 0.6)) {

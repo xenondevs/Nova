@@ -64,7 +64,8 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected val _layout = uninitializedProvider<BlockModelLayout>()
     protected val _hardness = uninitializedProvider<Double>()
     protected val _requiresToolForDrops = uninitializedProvider<Boolean>()
-    protected val _breakParticles = uninitializedProvider<RegistryEntry.Paper<ItemType>?>()
+    protected val _hitParticles = uninitializedProvider<RegistryEntry.Paper<ItemType>?>()
+    protected val _breakParticles = uninitializedProvider<RegistryEntry.Paper<BlockType>?>()
     protected val _showBreakAnimation = uninitializedProvider<Boolean>()
     protected val _soundGroup = uninitializedProvider<SoundGroup>()
     protected val _pistonReaction = uninitializedProvider<PistonMoveReaction>()
@@ -136,7 +137,8 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected var layout: BlockModelLayout by _layout
     protected var hardness: Double by _hardness
     protected var requiresToolForDrops: Boolean by _requiresToolForDrops
-    protected var breakParticles: RegistryEntry.Paper<ItemType>? by _breakParticles
+    protected var hitParticles: RegistryEntry.Paper<ItemType>? by _hitParticles
+    protected var breakParticles: RegistryEntry.Paper<BlockType>? by _breakParticles
     protected var showBreakAnimation: Boolean by _showBreakAnimation
     protected var soundGroup: SoundGroup by _soundGroup
     protected var pistonReaction: PistonMoveReaction by _pistonReaction
@@ -158,6 +160,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         layout = BlockModelLayout.DEFAULT
         hardness = -1.0
         requiresToolForDrops = false
+        hitParticles = null
         breakParticles = null
         showBreakAnimation = true
         soundGroup = SoundGroup.EMPTY
@@ -202,11 +205,13 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         toolCategories: Set<Key>,
         toolTier: Key?,
         requiresToolForDrops: Boolean,
-        breakParticles: RegistryEntry.Paper<ItemType>?,
+        hitParticles: RegistryEntry.Paper<ItemType>?,
+        breakParticles: RegistryEntry.Paper<BlockType>?,
         showBreakAnimation: Boolean
     ) {
         this.hardness = hardness
         this.requiresToolForDrops = requiresToolForDrops
+        this.hitParticles = hitParticles
         this.breakParticles = breakParticles
         this.showBreakAnimation = showBreakAnimation
         

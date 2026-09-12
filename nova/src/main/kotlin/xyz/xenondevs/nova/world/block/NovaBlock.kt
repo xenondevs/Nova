@@ -237,7 +237,8 @@ internal open class NovaBlock(
     properties: Provider<Properties>,
     flammable: Provider<FlammableSettings>,
     selectFluidFlowMode: Provider<BlockSelectorScope.() -> FluidFlowMode>,
-    breakParticles: Provider<ItemType?>,
+    hitParticles: Provider<ItemType?>,
+    breakParticles: Provider<BlockType?>,
     showBreakAnimation: Provider<Boolean>
 ) : Block(properties.get()) {
     
@@ -248,6 +249,7 @@ internal open class NovaBlock(
     val style by style
     val behaviors by behaviors
     val item by item
+    val hitParticles by hitParticles
     val breakParticles by breakParticles
     val showBreakAnimation by showBreakAnimation
     

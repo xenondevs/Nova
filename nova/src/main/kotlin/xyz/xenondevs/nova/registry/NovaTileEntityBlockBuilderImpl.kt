@@ -50,6 +50,7 @@ internal class NovaTileEntityBlockBuilderImpl(
                     _properties,
                     _flammable,
                     _selectFluidFlowMode,
+                    _hitParticles.flatten(),
                     _breakParticles.flatten(),
                     _showBreakAnimation,
                     tileEntity,

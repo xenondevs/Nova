@@ -147,8 +147,8 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
      * `minecraft:shears_major_breaking_speed` tags, respectively.
      * The lowest vanilla harvest tiers, `wood`, `wooden`, and `gold`, do not create a `needs_*_tool` tag.
      * 
-     * [breakParticles] is used for entity-backed blocks that use barriers.
-     * Since all blocks can fall back to entity-backed models, this should still be set for state-backed blocks.
+     * [hitParticles] and [breakParticles] are used while breaking entity-backed blocks that use barriers.
+     * Since all blocks can fall back to entity-backed models, these should still be set for state-backed blocks.
      * 
      * Independently, [showBreakAnimation] can be used to disable the breaking animation entirely.
      */
@@ -157,7 +157,8 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
         toolCategories: Set<Key> = emptySet(),
         toolTier: Key? = null,
         requiresToolForDrops: Boolean = false,
-        breakParticles: RegistryEntry.Paper<ItemType>? = null,
+        hitParticles: RegistryEntry.Paper<ItemType>? = null,
+        breakParticles: RegistryEntry.Paper<BlockType>? = null,
         showBreakAnimation: Boolean = true
     )
     

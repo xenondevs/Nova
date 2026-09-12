@@ -59,7 +59,8 @@ internal class NovaTileEntityBlock(
     properties: Provider<Properties>,
     flammable: Provider<FlammableSettings>,
     selectFluidFlowMode: Provider<BlockSelectorScope.() -> FluidFlowMode>,
-    breakParticles: Provider<ItemType?>,
+    hitParticles: Provider<ItemType?>,
+    breakParticles: Provider<BlockType?>,
     showBreakAnimation: Provider<Boolean>,
     val tileEntityConstructor: TileEntityConstructor,
     val tickrate: Provider<Int>
@@ -74,6 +75,7 @@ internal class NovaTileEntityBlock(
     properties,
     flammable,
     selectFluidFlowMode,
+    hitParticles,
     breakParticles,
     showBreakAnimation
 ), EntityBlock {

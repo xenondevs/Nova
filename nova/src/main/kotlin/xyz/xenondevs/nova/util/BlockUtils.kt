@@ -19,6 +19,7 @@ import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.item.crafting.AbstractCookingRecipe
 import net.minecraft.world.level.block.DoorBlock
+import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.TallFlowerBlock
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.level.storage.TagValueInput
@@ -58,7 +59,7 @@ import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.context.intention.ImplicitIntentions
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
-import xyz.xenondevs.nova.util.particle.item
+import xyz.xenondevs.nova.util.particle.block
 import xyz.xenondevs.nova.util.particle.particle
 import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.blockType
@@ -410,10 +411,10 @@ object BlockUtils {
         }
         
         fun broadcastCustomBreakParticles(sendToBreaker: Boolean) {
-            val breakParticlesMaterial = state.novaBlock.breakParticles
+            val breakParticlesBlock = state.novaBlock.breakParticles
                 ?: return
-            val breakParticles = particle(ParticleTypes.ITEM, block.location.add(0.5, 0.5, 0.5)) {
-                item(breakParticlesMaterial)
+            val breakParticles = particle(ParticleTypes.BLOCK, block.location.add(0.5, 0.5, 0.5)) {
+                block(breakParticlesBlock)
                 offset(0.3, 0.3, 0.3)
                 amount(70)
             }
@@ -424,21 +425,22 @@ object BlockUtils {
         val modelProvider = state.novaBlock.modelProviders.get()[state.nmsBlockState]
             ?: return
         val clientsideBlockState = modelProvider.clientsideBlockState
+        val hasNoBreakParticles = clientsideBlockState.renderShape == RenderShape.INVISIBLE || !clientsideBlockState.shouldSpawnTerrainParticles()
         if (modelProvider is BackingStateBlockModelProvider || modelProvider is ModelLessBlockModelProvider) {
             // use the level event packet for blocks that use block states (sound & particles)
-            val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, MojangBlock.getId(state.nmsBlockState), false)
+            val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, state.nmsBlockState.id, false)
             broadcast(levelEventPacket, sendEffectsToBreaker)
             
             if (SoundEngine.overridesSound(clientsideBlockState.soundType.breakSound))
                 broadcastBreakSound(soundGroup)
             
             // if no break particles were displayed with the level event packet, send custom ones
-            if (modelProvider is ModelLessBlockModelProvider && !clientsideBlockState.shouldSpawnTerrainParticles())
+            if (modelProvider is ModelLessBlockModelProvider && hasNoBreakParticles)
                 broadcastCustomBreakParticles(true)
         } else if (modelProvider is DisplayEntityBlockModelProvider) {
             // send sound and break particles manually for display entity blocks
             broadcastBreakSound(soundGroup)
-            broadcastCustomBreakParticles(sendEffectsToBreaker || !clientsideBlockState.shouldSpawnTerrainParticles())
+            broadcastCustomBreakParticles(sendEffectsToBreaker || hasNoBreakParticles)
         }
     }
     
