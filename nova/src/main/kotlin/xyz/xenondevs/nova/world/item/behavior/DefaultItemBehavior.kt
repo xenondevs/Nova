@@ -53,7 +53,7 @@ internal class DefaultItemBehavior(
     override val baseDataComponents: Provider<DataComponentMap> = (tooltipStyle ?: NULL_PROVIDER).map { tooltipStyle ->
         buildDataComponentMap {
             if (name != null) {
-                this[DataComponentTypes.ITEM_NAME] = name.style(style)
+                this[DataComponentTypes.ITEM_NAME] = name.style(name.style().merge(style))
             } else {
                 this[DataComponentTypes.TOOLTIP_DISPLAY] = tooltipDisplay().hideTooltip(true).build()
             }

@@ -248,7 +248,7 @@ internal open class NovaBlock(
     val key: Key
         get() = entry.key
     
-    val name by combinedProvider(name, style) { name, style -> name.style(style) }
+    val name by combinedProvider(name, style) { name, style -> name.style(name.style().merge(style)) }
     val style by style
     val behaviors by behaviors
     val item by item
