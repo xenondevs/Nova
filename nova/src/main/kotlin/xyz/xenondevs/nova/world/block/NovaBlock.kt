@@ -116,9 +116,9 @@ private val NmsBlockState.blockType: BlockType
 @Suppress("UNCHECKED_CAST")
 private val NmsBlockState.blockTypeEntry: RegistryEntry.Paper<BlockType>
     get() {
-        val cached = BLOCK_STATE_CACHED_TYPE.get(this)
+        val cached = BLOCK_STATE_CACHED_TYPE_ENTRY.get(this)
         if (cached != null)
-            return BLOCK_STATE_CACHED_TYPE_ENTRY.get(this) as RegistryEntry.Paper<BlockType>
+            return cached as RegistryEntry.Paper<BlockType>
         val entry = RegistryEntry.paper(RegistryKey.BLOCK, blockType)
         BLOCK_STATE_CACHED_TYPE_ENTRY.set(this, entry)
         return entry
