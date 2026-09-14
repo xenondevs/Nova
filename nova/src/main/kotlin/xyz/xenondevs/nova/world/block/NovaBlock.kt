@@ -8,6 +8,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.core.Direction
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionHand
@@ -49,12 +50,16 @@ import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.context.intention.ImplicitIntentions
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.network.currentPacketSourcePlayer
 import xyz.xenondevs.nova.registry.FlammableSettings
 import xyz.xenondevs.nova.registry.ProtoBlockState
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.bootstrapFlatMap
+import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockSelectorScope
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.blockFace
@@ -299,8 +304,7 @@ internal open class NovaBlock(
         // adjust defaultBlockState to the actual defaults of the properties
         registerDefaultState(stateProperties.fold(defaultBlockState) { state, prop -> state.setValue(prop, prop.defaultValue) })
         
-        // Vanilla initializes these caches before Nova's blocks are registered.
-        //stateDefinition.possibleStates.forEach { it.initCache() } fixme
+        stateDefinition.possibleStates.forEach(BLOCK_STATE_REGISTRY::add)
         
         val flammable = flammable.get()
         (Blocks.FIRE as FireBlock).setFlammable(this, flammable.igniteOdds, flammable.burnOdds)
@@ -764,11 +768,32 @@ internal open class NovaBlock(
     
     override fun toString(): String = key.asString()
     
+    @InternalInit(
+        stage = InternalInitStage.PRE_WORLD,
+        runAfter = [ResourceGeneration.PreWorld::class]
+    )
     companion object {
         
         // hack to make properties available in createBlockStateDefinition 
         // (called from super constructor, where a field wouldn't be initialized yet)
         val STATE_PROPERTIES: ScopedValue<List<BlockStateProperty<*>>> = ScopedValue.newInstance()
+        
+        @InitFun
+        private fun initCaches() {
+            val remainingStates = ArrayList<NmsBlockState>()
+            
+            for (block in BuiltInRegistries.BLOCK) {
+                if (block !is NovaBlock)
+                    continue
+                
+                val states = block.stateDefinition.possibleStates.iterator()
+                if (states.hasNext())
+                    states.next().initCache()
+                states.forEachRemaining(remainingStates::add)
+            }
+            
+            remainingStates.parallelStream().forEach(NmsBlockState::initCache)
+        }
         
     }
     
