@@ -3,9 +3,9 @@
   "minVersion": "0.8",
   "package": "xyz.xenondevs.nova.network.mixin",
   "mixins": [
-    "PacketHandlerTrackingConnectionMixin",
-    "PacketHandlerTrackingListenerAndPacketMixin",
-    "PlayerListMixin"
+    "bindpackethandler.PlayerListMixin",
+    "trackpacketlistener.ConnectionMixin",
+    "trackpacketlistener.ListenerAndPacketMixin"
   ],
   "mixinextras": {
     "minVersion": "0.5.0"
