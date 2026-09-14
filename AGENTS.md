@@ -34,6 +34,7 @@ Nova uses [Origami](https://github.com/xenondevs/origami), an access-widener and
 ### Mixin Guidelines
 
 * Mixins are written in Java.
+* Name the mixin subpackage after the "goal" or "feature" to be accomplished. For example `.trackpacketlistener` for Mixins that track the packet listener. The Mixin files themselves should be package-private abstract classes named after the class they are mixin into, suffixed by Mixin (ex. `ConnectionMixin`).
 * Under no circumstances should a non-Mixin class be placed in the Mixin package. This does NOT work.
 * Due to the nature of our Mixin loader, we cannot inject custom interfaces into NMS classes. To externally access Mixin fields, create Kotlin extension properties that use a VarHandle. Remember that Origami's DynamicInvoker erases custom types, so the type will often be `Object`.
 * Don't store descriptors for Mixin annotations in static fields. It is fine to duplicate descriptors used in Mixin annotations.
