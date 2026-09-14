@@ -7,14 +7,12 @@ import xyz.xenondevs.cbf.CbfSecurityManager
 import xyz.xenondevs.cbf.serializer.BinarySerializer
 import xyz.xenondevs.commons.reflection.classifierClass
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound.NamespacedCompoundBinarySerializer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import kotlin.reflect.KType
 
 internal object CbfSerializers {
     
     fun register() {
-        Cbf.registerSerializer(NamespacedCompoundBinarySerializer)
         Cbf.registerSerializer(ColorBinarySerializer)
         Cbf.registerSerializer(BukkitColorBinarySerializer)
         Cbf.registerSerializer(LocationBinarySerializer)

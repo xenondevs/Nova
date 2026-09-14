@@ -9,10 +9,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
-import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.retrieveData
 import xyz.xenondevs.nova.util.item.storeData
 import xyz.xenondevs.nova.world.item.DefaultItemTags
@@ -105,10 +103,8 @@ interface Chargeable : ItemBehavior {
             itemStack.storeData(ENERGY_KEY, energy.coerceIn(0..maxEnergy))
         
         override fun addEnergy(itemStack: BukkitStack, energy: Long) {
-            val compound = itemStack.novaCompound ?: NamespacedCompound()
-            val currentEnergy = compound[ENERGY_KEY] ?: 0L
-            compound[ENERGY_KEY] = (currentEnergy + energy).coerceIn(0..maxEnergy)
-            itemStack.novaCompound = compound
+            val currentEnergy = itemStack.retrieveData<Long>(ENERGY_KEY) ?: 0L
+            itemStack.storeData(ENERGY_KEY, (currentEnergy + energy).coerceIn(0..maxEnergy))
         }
         
         override fun toString(itemStack: ItemStack): String {

@@ -5,7 +5,7 @@ package xyz.xenondevs.nova.util.item
 import com.mojang.brigadier.StringReader
 import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Key.key
+import net.kyori.adventure.key.Namespaced
 import net.kyori.adventure.text.Component
 import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.core.component.DataComponentMap
@@ -28,15 +28,12 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.Tag
-import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.cbf.Cbf
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.serialization.cbf.NAMESPACED_COMPOUND_DEPRECATION
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
+import xyz.xenondevs.nova.serialization.persistentdata.get
+import xyz.xenondevs.nova.serialization.persistentdata.set
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
-import xyz.xenondevs.nova.util.data.getByteArrayOrNull
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.isNova
 import xyz.xenondevs.nova.world.item.itemType
@@ -104,58 +101,25 @@ internal fun <T : Any> MojangStack.update(type: DataComponentType<T>, action: (T
 internal fun ItemStack.clientsideCopy(): ItemStack =
     PacketItems.getClientSideStack(null, unwrap(), true).asBukkitMirror()
 
-//<editor-fold desc="Nova Compound", defaultstate="collapsed">
-@Suppress("DEPRECATION")
-@Deprecated(NAMESPACED_COMPOUND_DEPRECATION)
-var ItemStack.novaCompound: NamespacedCompound?
-    get() = unwrap().novaCompound
-    set(novaCompound) {
-        CraftItemStack.unwrap(this).novaCompound = novaCompound
-    }
+//<editor-fold desc="Nova item data", defaultstate="collapsed">
+inline fun <reified T : Any> ItemStack.retrieveData(key: Key): T? = persistentDataContainer[key]
+inline fun <reified T : Any> ItemStack.retrieveData(addon: Namespaced, key: String): T? = retrieveData(addon.namespace(), key)
+inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, key: String): T? = retrieveData(Key.key(namespace, key))
 
-@Suppress("DEPRECATION")
-@Deprecated(NAMESPACED_COMPOUND_DEPRECATION)
-var MojangStack.novaCompound: NamespacedCompound?
-    get() = unsafeCustomData
-        ?.getByteArrayOrNull("nova_cbf")
-        ?.let(Cbf::read)
-    set(novaCompound) {
-        if (novaCompound != null) {
-            update(DataComponents.CUSTOM_DATA, CustomData.EMPTY) { customData ->
-                customData.update { compoundTag ->
-                    compoundTag.putByteArray("nova_cbf", Cbf.write(novaCompound))
-                }
-            }
-        } else {
-            var customData = get(DataComponents.CUSTOM_DATA) ?: return
-            customData = customData.update { it.remove("nova_cbf") }
-            set(DataComponents.CUSTOM_DATA, customData)
-        }
-    }
-
-inline fun <reified T : Any> ItemStack.retrieveData(key: Key): T? = retrieveData(key.namespace(), key.value())
-inline fun <reified T : Any> ItemStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.namespace(), key)
-inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, key: String): T? = novaCompound?.get(namespace, key)
-
-inline fun <reified T : Any> ItemStack.storeData(key: Key, data: T?) = storeData(key.namespace(), key.value(), data)
-inline fun <reified T : Any> ItemStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.namespace(), key, data)
-inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String, data: T?) {
-    val novaCompound = this.novaCompound ?: NamespacedCompound()
-    novaCompound[namespace, key] = data
-    this.novaCompound = novaCompound
+inline fun <reified T : Any> ItemStack.storeData(key: Key, data: T?) {
+    editPersistentDataContainer { it[key] = data }
 }
 
-inline fun <reified T : Any> MojangStack.retrieveData(key: Key): T? = retrieveData(key.namespace(), key.value())
-inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.namespace(), key)
-inline fun <reified T : Any> MojangStack.retrieveData(namespace: String, key: String): T? = novaCompound?.get(namespace, key)
+inline fun <reified T : Any> ItemStack.storeData(addon: Namespaced, key: String, data: T?) = storeData(addon.namespace(), key, data)
+inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String, data: T?) = storeData(Key.key(namespace, key), data)
 
-inline fun <reified T : Any> MojangStack.storeData(key: Key, data: T?) = storeData(key.namespace(), key.value(), data)
-inline fun <reified T : Any> MojangStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.namespace(), key, data)
-inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: String, data: T?) {
-    val novaCompound = this.novaCompound ?: NamespacedCompound()
-    novaCompound[namespace, key] = data
-    this.novaCompound = novaCompound
-}
+inline fun <reified T : Any> MojangStack.retrieveData(key: Key): T? = asBukkitMirror().retrieveData(key)
+inline fun <reified T : Any> MojangStack.retrieveData(addon: Namespaced, key: String): T? = retrieveData(addon.namespace(), key)
+inline fun <reified T : Any> MojangStack.retrieveData(namespace: String, key: String): T? = retrieveData(Key.key(namespace, key))
+
+inline fun <reified T : Any> MojangStack.storeData(key: Key, data: T?) = asBukkitMirror().storeData(key, data)
+inline fun <reified T : Any> MojangStack.storeData(addon: Namespaced, key: String, data: T?) = storeData(addon.namespace(), key, data)
+inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: String, data: T?) = storeData(Key.key(namespace, key), data)
 //</editor-fold>
 
 object ItemUtils {
@@ -186,7 +150,7 @@ object ItemUtils {
                         } else throw IllegalArgumentException("Not an item name in Nova: $name")
                     }
                     
-                    else -> ItemTypeTest(Registry.ITEM.getOrThrow(key(id)))
+                    else -> ItemTypeTest(Registry.ITEM.getOrThrow(Key.key(id)))
                 }
             } catch (ex: Exception) {
                 throw IllegalArgumentException("Unknown item $id", ex)
@@ -203,7 +167,7 @@ object ItemUtils {
     fun getItemStack(s: String): ItemStack {
         return when (s.substringBefore(':')) {
             "minecraft" -> toItemStack(s)
-            else -> getItemStack(key(s))
+            else -> getItemStack(Key.key(s))
         }
     }
     

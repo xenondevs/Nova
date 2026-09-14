@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.serialization.persistentdata
 
+import io.papermc.paper.persistence.PersistentDataContainerView
 import net.kyori.adventure.key.Key
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
@@ -34,11 +35,11 @@ fun <T : Any> PersistentDataContainer.set(key: Key, serializer: BinarySerializer
 /**
  * Reads the value under [key] as [T] using CBF, or null if there is no value under [key].
  */
-inline operator fun <reified T> PersistentDataContainer.get(key: Key): T? =
+inline operator fun <reified T> PersistentDataContainerView.get(key: Key): T? =
     get(key.toNamespacedKey(), PersistentDataType.BYTE_ARRAY)?.let(Cbf::read)
 
 /**
  * Reads the value under [key] as [T] using [serializer], or null if there is no value under [key].
  */
-fun <T : Any> PersistentDataContainer.get(key: Key, serializer: BinarySerializer<T>): T? =
+fun <T : Any> PersistentDataContainerView.get(key: Key, serializer: BinarySerializer<T>): T? =
     get(key.toNamespacedKey(), PersistentDataType.BYTE_ARRAY)?.let(serializer::read)

@@ -1,50 +1,65 @@
 package xyz.xenondevs.nova.world.item.legacy
 
-import net.minecraft.core.component.DataComponentGetter
+import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.component.CustomData
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.util.getOrNull
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import xyz.xenondevs.nova.util.data.getStringOrNull
-import kotlin.jvm.optionals.getOrNull
+import xyz.xenondevs.nova.world.item.NovaItem
 
 internal object ItemStackLegacyConversion {
     
     private val ENABLED by MAIN_CONFIG.entry<Boolean>("performance", "item_stack_legacy_conversion")
     
-    private val specializedConverters = HashMap<String, ArrayList<ItemStackLegacyConverter>>()
-    private val genericConverters = ArrayList<ItemStackLegacyConverter>()
-    
-    // there are no legacy converters at the moment
-    
-    private fun registerConverter(converter: ItemStackLegacyConverter) {
-        val affectedItemIds = converter.affectedItemIds
-        if (affectedItemIds != null) {
-            for (affectedItemId in affectedItemIds) {
-                specializedConverters.getOrPut(affectedItemId, ::ArrayList) += converter
-            }
-        } else {
-            genericConverters += converter
-        }
-    }
-    
     @Suppress("DEPRECATION")
     @JvmStatic
-    fun convert(prototype: DataComponentGetter, patch: DataComponentPatch): DataComponentPatch {
+    fun convert(item: Holder<Item>, patch: DataComponentPatch): ItemStackLegacyConversionResult? {
         if (!ENABLED)
-            return patch
+            return null
         
-        val unsafeCustomTag = patch.get(prototype, DataComponents.CUSTOM_DATA)?.unsafe
-            ?: return patch // not a nova item
+        val prototype = item.components()
+        val customTag = patch.get(prototype, DataComponents.CUSTOM_DATA)
+            ?.unsafe
+            ?.copy()
+            ?: return null
+        var changed = ItemStackNamespacedCompoundConverter.convert(customTag)
         
-        val novaId = unsafeCustomTag
+        val novaId = customTag
             .getCompoundOrNull("nova")
             ?.getStringOrNull("id")
-            ?: return patch // not a nova item
+        val legacyItem = novaId
+            ?.let(BuiltInRegistries.ITEM::getOrNull)
+            ?.takeIf { it.value() is NovaItem }
+        val convertedItem = legacyItem ?: item
+        if (legacyItem != null) {
+            customTag.remove("nova")
+            changed = true
+        }
         
-        val converters = (specializedConverters[novaId] ?: emptyList()) + genericConverters
-        return converters.fold(patch) { acc, converter -> converter.convert(acc) }
+        if (!changed)
+            return null
+        
+        val convertedPatch = DataComponentPatch.builder().apply {
+            copy(patch)
+            if (customTag.isEmpty) {
+                remove(DataComponents.CUSTOM_DATA)
+            } else {
+                set(DataComponents.CUSTOM_DATA, CustomData.of(customTag))
+            }
+        }.build()
+        
+        return ItemStackLegacyConversionResult(convertedItem, convertedPatch)
     }
     
 }
+
+internal data class ItemStackLegacyConversionResult(
+    val item: Holder<Item>,
+    val components: DataComponentPatch
+)

@@ -35,6 +35,7 @@
     "event.prevention.PaperPluginManagerImplMixin",
     "fakeplayer.LivingEntityMixin",
     "item.consistentuseloop.ServerGamePacketListenerImplMixin",
+    "item.data.ItemStackMixin",
     "item.enchantment.EnchantmentMixin",
     "item.fuel.FuelValuesMixin",
     "item.recipe.customrecipechoice.CraftRecipeMixin",

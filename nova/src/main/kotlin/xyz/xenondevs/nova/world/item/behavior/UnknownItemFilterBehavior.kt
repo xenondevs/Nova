@@ -9,10 +9,9 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
-import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.retrieveData
+import xyz.xenondevs.nova.util.item.storeData
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.item.DefaultItems
@@ -24,10 +23,9 @@ private val DATA_KEY = Key.key("nova", "unknown_item_filter_original_data")
 internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<UnknownItemFilter> {
     
     override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {
-        val data = itemStack.novaCompound ?: return InteractionResult.Pass
-        val id = data.get<Key>(ID_KEY) ?: return InteractionResult.Pass
+        val id = itemStack.retrieveData<Key>(ID_KEY) ?: return InteractionResult.Pass
         val filterType = NovaRegistries.ITEM_FILTER_TYPE.getValue(id) ?: return InteractionResult.Pass
-        val filterStack = filterType.serializer.deserialize(data.get<Compound>(DATA_KEY)!!)
+        val filterStack = filterType.serializer.deserialize(itemStack.retrieveData<Compound>(DATA_KEY)!!)
             .toItemStack()
             .apply { amount = itemStack.amount }
         
@@ -35,21 +33,19 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
     }
     
     override fun getFilter(itemStack: ItemStack): UnknownItemFilter {
-        val data = itemStack.novaCompound!!
-        return UnknownItemFilter(data[ID_KEY]!!, data[DATA_KEY]!!)
+        return UnknownItemFilter(
+            itemStack.retrieveData(ID_KEY)!!,
+            itemStack.retrieveData(DATA_KEY)!!
+        )
     }
     
     override fun setFilter(itemStack: ItemStack, filter: UnknownItemFilter?) {
-        var compound = itemStack.novaCompound
         if (filter != null) {
-            compound = compound ?: NamespacedCompound()
-            compound[ID_KEY] = filter.originalId
-            compound[DATA_KEY] = filter.originalData
-            itemStack.novaCompound = compound
-        } else if (compound != null) {
-            compound.remove(ID_KEY)
-            compound.remove(DATA_KEY)
-            itemStack.novaCompound = compound
+            itemStack.storeData(ID_KEY, filter.originalId)
+            itemStack.storeData(DATA_KEY, filter.originalData)
+        } else {
+            itemStack.storeData<Key>(ID_KEY, null)
+            itemStack.storeData<Compound>(DATA_KEY, null)
         }
     }
     
@@ -68,8 +64,8 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
     
     override fun toString(itemStack: ItemStack): String {
         return "UnknownItemFilterBehavior(" +
-            "id=${itemStack.novaCompound?.get<Key>(ID_KEY)?.asString()}, " +
-            "data=${itemStack.novaCompound?.get<Compound>(DATA_KEY)})" +
+            "id=${itemStack.retrieveData<Key>(ID_KEY)?.asString()}, " +
+            "data=${itemStack.retrieveData<Compound>(DATA_KEY)})" +
             ")"
     }
     
