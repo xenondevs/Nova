@@ -37,6 +37,7 @@ import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.component.TypedDataComponent
+import net.minecraft.core.particles.ItemParticleOption
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
@@ -125,6 +126,7 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetSlotP
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundDisconnectPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundDisguisedChatPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundLoginDisconnectPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundLevelParticlesPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundMerchantOffersPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundOpenScreenPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlaceGhostRecipePacketEvent
@@ -163,6 +165,7 @@ import xyz.xenondevs.nova.util.nmsItem
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.toTemplate
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.novaItem
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -392,6 +395,13 @@ internal object PacketItems : PacketListener {
     private fun getClientSideItem(player: Player?, template: ItemStackTemplate): ItemStackTemplate {
         val stack = getClientSideStack(player, template.create(), false)
         return ItemStackTemplate.fromNonEmptyStack(stack)
+    }
+    
+    @PacketHandler
+    private fun handleLevelParticles(event: ClientboundLevelParticlesPacketEvent) {
+        val particle = event.particle
+        if (particle is ItemParticleOption)
+            event.particle = ItemParticleOption(particle.type, getClientSideItem(event.player, particle.item))
     }
     
     @PacketHandler
@@ -702,6 +712,7 @@ internal object PacketItems : PacketListener {
     
     @PacketHandler
     private fun handleRegistryData(event: ClientboundUpdateTagsPacketEvent) {
+        // removes nova items from tags
         // inject STRUCTURE_VOID into the minecraft:bundles tag for scroll support
         event.tags = event.tags.mapValues { [key, payloads] ->
             if (key != Registries.ITEM)
@@ -721,7 +732,13 @@ internal object PacketItems : PacketListener {
             
             val serialized = tags.entries.associate { [tagKey, tagValues] ->
                 val registry = REGISTRY_ACCESS.lookupOrThrow(tagKey.registry())
-                tagKey.location() to tagValues.mapTo(IntArrayList()) { registry.getId(it.value()) }
+                tagKey.location() to IntArrayList(tagValues.size).apply {
+                    for (holder in tagValues) {
+                        val item = holder.value()
+                        if (item !is NovaItem)
+                            add(registry.getId(item))
+                    }
+                }
             }
             
             TagNetworkSerialization.NetworkPayload(serialized)
