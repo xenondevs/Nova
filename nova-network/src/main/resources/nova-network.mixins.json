@@ -4,6 +4,9 @@
   "package": "xyz.xenondevs.nova.network.mixin",
   "mixins": [
     "bindpackethandler.PlayerListMixin",
+    "trackpacketencoding.ChunkPacketBlockControllerAntiXrayMixin",
+    "trackpacketencoding.ClientboundLevelChunkPacketDataMixin",
+    "trackpacketencoding.PacketEncoderMixin",
     "trackpacketlistener.ConnectionMixin",
     "trackpacketlistener.ListenerAndPacketMixin"
   ],
