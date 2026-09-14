@@ -58,7 +58,6 @@ data class NetworkBridgeData(
         writer.writeNetworkTypeCubeFaceSetMap(connections)
         writer.writeNetworkTypeUUIDMap(networks)
         writer.writeNetworkTypeSet(supportedNetworkTypes)
-        // FIXME !!!!!!!! LEGACY CONVERSION: BIT ORDER IS NOW REVERSED
         writer.writeByte(bridgeFaces.data)
     }
     
@@ -71,7 +70,6 @@ data class NetworkBridgeData(
                 reader.readNetworkTypeCubeFaceSetMap(),
                 reader.readNetworkTypeUUIDMap(),
                 reader.readNetworkTypeSet(),
-                // FIXME !!!!!!!! LEGACY CONVERSION: BIT ORDER IS NOW REVERSED
                 CubeFaceSet(reader.readByte())
             )
         
@@ -131,7 +129,6 @@ private fun ByteWriter.writeNetworkTypeCubeFaceSetMap(map: Map<NetworkType<*>, C
     writeVarInt(map.size)
     for ([networkType, set] in map) {
         writeString(networkType.key.asString())
-        // FIXME !!!!!!!! LEGACY CONVERSION: BIT ORDER IS NOW REVERSED
         writeByte(set.data)
     }
 }
