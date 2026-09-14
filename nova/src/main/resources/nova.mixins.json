@@ -26,6 +26,7 @@
     "block.rewrite.LevelChunkMixin",
     "block.rewrite.MappedRegistryMixin",
     "block.rewrite.NewChunkHolderMixin",
+    "block.rewrite.PalettedContainerDataMixin",
     "block.rewrite.ServerLevelMixin",
     "block.sound.EntityMixin",
     "block.sound.LivingEntityMixin",

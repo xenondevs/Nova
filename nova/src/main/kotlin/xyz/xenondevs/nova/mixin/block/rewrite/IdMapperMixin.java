@@ -6,55 +6,31 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xyz.xenondevs.commons.provider.Provider;
-import xyz.xenondevs.nova.resources.lookup.ResourceLookups;
-import xyz.xenondevs.nova.world.block.NovaBlock;
-import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider;
+import xyz.xenondevs.nova.world.block.logic.PacketBlocks;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
+import static xyz.xenondevs.nova.network.PacketEncodingTrackingKt.isInPacketEncoding;
 
 @Mixin(IdMapper.class)
 abstract class IdMapperMixin<T> {
     
     @Final
     @Shadow
-    private Reference2IntMap<T> tToId;
-    
-    @Unique
-    private final Provider<Map<BlockState, BlockState>> nova$maskedBlockStates = ResourceLookups.INSTANCE.getBlockModelLookup().map(lookup -> {
-        var map = new IdentityHashMap<BlockState, BlockState>();
-        for (var value : lookup.values()) {
-            if (!(value instanceof BackingStateBlockModelProvider mp))
-                continue;
-            map.put(mp.getInfo().getVanillaBlockState(), mp.getInfo().getMaskedBlockState());
-        }
-        return map;
-    });
+    public Reference2IntMap<T> tToId;
     
     @Inject(method = "getId", at = @At("HEAD"), cancellable = true)
     private void modifyId(
         T thing,
         CallbackInfoReturnable<Integer> cir
     ) {
-        if (!(thing instanceof BlockState state))
+        if (!isInPacketEncoding() || !(thing instanceof BlockState state))
             return;
         
-        var block = state.getBlock();
-        BlockState replacement;
-        if (block instanceof NovaBlock novaBlock) {
-            replacement = novaBlock.getClientsideBlockStates().get(state);
-        } else {
-            replacement = nova$maskedBlockStates.get().get(state);
-        }
-        
-        if (replacement != null) {
+        var replacement = PacketBlocks.getClientSideState(state);
+        if (replacement != state)
             cir.setReturnValue(tToId.getInt(replacement));
-        }
     }
     
 }

@@ -11,7 +11,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xyz.xenondevs.nova.world.block.NovaBlock;
+import xyz.xenondevs.nova.world.block.logic.PacketBlocks;
 import xyz.xenondevs.nova.world.item.NovaItem;
+
+import static xyz.xenondevs.nova.network.PacketEncodingTrackingKt.isInPacketEncoding;
 
 @Mixin(MappedRegistry.class)
 abstract class MappedRegistryMixin<T> {
@@ -25,8 +28,11 @@ abstract class MappedRegistryMixin<T> {
         @Nullable T thing,
         CallbackInfoReturnable<Integer> cir
     ) {
+        if (!isInPacketEncoding())
+            return;
+        
         if (thing instanceof NovaBlock novaBlock)
-            cir.setReturnValue(toId.getInt(novaBlock.getClientsideBlock()));
+            cir.setReturnValue(toId.getInt(PacketBlocks.getClientSideBlock(novaBlock)));
         
         // fall back to plain shulker shell in case something is not handled by PacketItems
         if (thing instanceof NovaItem)
