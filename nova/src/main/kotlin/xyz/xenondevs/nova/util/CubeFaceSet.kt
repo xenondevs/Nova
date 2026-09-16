@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.util
 
-import xyz.xenondevs.nova.world.*
-
 import org.bukkit.block.BlockFace
 
 /**
@@ -22,10 +20,15 @@ inline fun CubeFaceSet(init: (face: BlockFace) -> Boolean): CubeFaceSet =
  * [BlockFace.SOUTH], [BlockFace.WEST], [BlockFace.UP], [BlockFace.DOWN])
  * stored as a bitmask in a single [Byte].
  *
- * Bit layout (MSB to LSB): `- | - | DOWN | UP | WEST | SOUTH | EAST | NORTH`
+ * Bit layout (MSB to LSB): `0 | 0 | DOWN | UP | WEST | SOUTH | EAST | NORTH`
  */
 @JvmInline
-value class CubeFaceSet(val data: Byte) {
+value class CubeFaceSet private constructor(val data: Byte) {
+    
+    /**
+     * Creates a new [CubeFaceSet] from the lowest six bits of [data].
+     */
+    constructor(data: Int) : this((data and DATA_MASK).toByte())
     
     /**
      * Creates a new [CubeFaceSet] with the faces that are set to `true`.
@@ -165,8 +168,16 @@ value class CubeFaceSet(val data: Byte) {
     
     companion object {
         
+        private const val DATA_MASK = 0b111111
+        
+        /**
+         * Creates a new [CubeFaceSet] from the lowest six bits of [data].
+         */
+        operator fun invoke(data: Byte): CubeFaceSet =
+            CubeFaceSet(data.toInt())
+        
         /** A [CubeFaceSet] containing all six faces. */
-        val ALL = CubeFaceSet(-1)
+        val ALL = CubeFaceSet(DATA_MASK)
         
         /** An empty [CubeFaceSet]. */
         val NONE = CubeFaceSet(0)

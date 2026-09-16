@@ -131,5 +131,5 @@ internal object LegacyNetworkRegionFileReaderV1 : LegacyRegionizedFileReader<Net
 
 internal fun convertLegacyCubeFaceSet(data: Byte): CubeFaceSet {
     val reversedData = Integer.reverse(data.toInt() and 0x3F) ushr 26
-    return CubeFaceSet(reversedData.toByte())
+    return CubeFaceSet(reversedData)
 }

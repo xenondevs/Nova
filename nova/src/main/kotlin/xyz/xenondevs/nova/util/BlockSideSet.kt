@@ -154,7 +154,7 @@ value class BlockSideSet(val data: Byte) {
             data = data or (1 shl BlockFace.UP.ordinal)
         if (BlockSide.BOTTOM in this)
             data = data or (1 shl BlockFace.DOWN.ordinal)
-        return CubeFaceSet(data.toByte())
+        return CubeFaceSet(data)
     }
     
     companion object {

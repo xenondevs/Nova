@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.util
 
-import xyz.xenondevs.nova.world.*
-
 import org.bukkit.block.BlockFace
 
 /**
@@ -197,7 +195,7 @@ data class CubeFaceMap<out V>(
             data = data or 0b010000
         if (map(down))
             data = data or 0b100000
-        return CubeFaceSet(data.toByte())
+        return CubeFaceSet(data)
     }
     
     companion object {
