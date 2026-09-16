@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.ui.menu.sideconfig
 
-import xyz.xenondevs.nova.world.*
-
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.block.BlockFace
@@ -18,7 +16,7 @@ import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.ui.menu.item.TP_BUTTON_COLORS
 import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.node.ContainerEndPointDataHolder
@@ -26,6 +24,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.itemProvider
@@ -41,8 +40,8 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
     
     protected val simpleMode = mutableProvider(SimplicityMode.ADVANCED)
     private val isSimpleConfiguration = mutableProvider(false)
-    private val containersAtFace: Map<BlockFace, MutableProvider<C?>> =
-        CUBE_FACES.associateWith { mutableProvider(null) }
+    private val containersAtFace: CubeFaceMap<MutableProvider<C?>> =
+        CubeFaceMap { mutableProvider(null) }
     
     override val gui = tabGui(
         "x x x x x x x x",
@@ -85,7 +84,7 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
     override fun refresh(state: NetworkState) {
         super.refresh(state)
         isSimpleConfiguration.set(isSimpleConfiguration())
-        containersAtFace.forEach { [face, container] -> container.set(holder.containerConfig[face]) }
+        containersAtFace.forEach { face, container -> container.set(holder.containerConfig[face]) }
     }
     
     private fun queueCycleContainer(face: BlockFace, move: Int) {
@@ -137,12 +136,12 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
         val [_, face] = getFaceFromSide(side)
         
         itemProvider by itemProvider {
-            type by containersAtFace[face]!!.flatMap { container ->
+            type by containersAtFace[face].flatMap { container ->
                 if (container != null)
                     TP_BUTTON_COLORS[containers.indexOf(container)]
                 else DefaultGuiItems.GRAY_BTN
             }
-            name by containersAtFace[face]!!.map { container ->
+            name by containersAtFace[face].map { container ->
                 Component.translatable(
                     namedContainers[container] ?: "",
                     NamedTextColor.AQUA

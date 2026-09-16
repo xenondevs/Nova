@@ -14,7 +14,7 @@ import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
@@ -33,8 +33,8 @@ abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal construct
     protected val holder: H
 ) {
     
-    protected val connectionTypes: Map<BlockFace, MutableProvider<NetworkConnectionType>> =
-        CUBE_FACES.associateWith { mutableProvider(NetworkConnectionType.NONE) }
+    protected val connectionTypes: CubeFaceMap<MutableProvider<NetworkConnectionType>> =
+        CubeFaceMap { mutableProvider(NetworkConnectionType.NONE) }
     
     protected val networkType by networkType
     
@@ -45,7 +45,7 @@ abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal construct
     }
     
     open fun refresh(state: NetworkState) {
-        connectionTypes.forEach { [face, type] -> type.set(getConnectionType(face)) }
+        connectionTypes.forEach { face, type -> type.set(getConnectionType(face)) }
     }
     
     private fun queueCycleConnectionType(face: BlockFace, move: Int) {
@@ -71,7 +71,7 @@ abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal construct
     
     protected fun connectionConfigItem(side: BlockSide) = item {
         val [side, face] = getFaceFromSide(side)
-        val connectionType = connectionTypes[face]!!
+        val connectionType = connectionTypes[face]
         
         val btnType = connectionType.map { type ->
             when (type) {
