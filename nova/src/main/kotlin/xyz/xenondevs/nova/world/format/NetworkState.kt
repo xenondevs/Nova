@@ -42,8 +42,7 @@ class NetworkState internal constructor(
     
     private val networksById = HashMap<UUID, ProtoNetwork<*>>()
     
-    @PublishedApi
-    internal val nodesByPos = HashMap<Block, NetworkNode>()
+    private val nodesByChunk = HashMap<ChunkPos, MutableMap<Block, NetworkNode>>()
     
     /**
      * Mutex for all data governed by this [NetworkState].
@@ -60,14 +59,20 @@ class NetworkState internal constructor(
      * Adds [node] to the network state.
      */
     operator fun plusAssign(node: NetworkNode) {
-        nodesByPos[node.block] = node
+        val nodes = nodesByChunk.getOrPut(node.block.chunkPos, ::HashMap)
+        nodes[node.block] = node
     }
     
     /**
      * Removes [node] from the network state.
      */
     operator fun minusAssign(node: NetworkNode) {
-        nodesByPos -= node.block
+        val chunkPos = node.block.chunkPos
+        val nodes = nodesByChunk[chunkPos]
+            ?: return
+        nodes -= node.block
+        if (nodes.isEmpty())
+            nodesByChunk -= chunkPos
     }
     
     /**
@@ -103,7 +108,25 @@ class NetworkState internal constructor(
      * Checks whether a node with the same position as [node] is present in the network state.
      */
     operator fun contains(node: NetworkNode) =
-        node.block in nodesByPos
+        getNode(node.block) != null
+    
+    /**
+     * Gets the loaded network node at [block], or null if there is none.
+     */
+    fun getNode(block: Block): NetworkNode? =
+        nodesByChunk[block.chunkPos]?.get(block)
+    
+    /**
+     * Gets all loaded network nodes in the chunk at [chunkPos].
+     */
+    fun getNodes(chunkPos: ChunkPos): Collection<NetworkNode> =
+        nodesByChunk[chunkPos]?.values ?: emptyList()
+    
+    /**
+     * Removes and returns all loaded network nodes in the chunk at [chunkPos].
+     */
+    fun removeNodes(chunkPos: ChunkPos): Map<Block, NetworkNode> =
+        nodesByChunk.remove(chunkPos) ?: emptyMap()
     
     /**
      * Gets the [ProtoNetwork] with the given [networkId] and [type], or throws an exception
@@ -148,7 +171,7 @@ class NetworkState internal constructor(
      * @throws IllegalStateException If there is no data for a node at [block].
      */
     suspend fun resolveNode(block: Block): NetworkNode {
-        val node = nodesByPos[block]
+        val node = getNode(block)
         if (node != null)
             return node
         
@@ -159,7 +182,7 @@ class NetworkState internal constructor(
      * Finds all nearby [NetworkNodes][NetworkNode] of [block] using the given [faces].
      */
     fun getNearbyNodes(block: Block, faces: CubeFaceSet): CubeFaceMap<NetworkNode?> =
-        faces.associateWith { face -> nodesByPos[block.getRelative(face)] }
+        faces.associateWith { face -> getNode(block.getRelative(face)) }
     
     /**
      * Runs [action] for each nearby [NetworkNode] of [block] using the given [faces].
@@ -170,7 +193,7 @@ class NetworkState internal constructor(
         action: (face: BlockFace, neighbor: NetworkNode) -> Unit
     ) {
         faces.forEach { face ->
-            val neighbor = nodesByPos[block.getRelative(face)]
+            val neighbor = getNode(block.getRelative(face))
             if (neighbor != null)
                 action(face, neighbor)
         }
@@ -643,7 +666,7 @@ class NetworkState internal constructor(
     ) {
         val allowedFaces = getAllowedFaces(endPoint, networkType)
         val isCurrentlyConnected = hasConnection(endPoint, networkType, face)
-        val neighbor = nodesByPos[endPoint.block.getRelative(face)]
+        val neighbor = getNode(endPoint.block.getRelative(face))
         
         if (face in allowedFaces) {
             if (!isCurrentlyConnected) {

@@ -17,7 +17,6 @@ import io.papermc.paper.registry.RegistryKey
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
@@ -103,7 +102,6 @@ import xyz.xenondevs.nova.world.item.logic.PacketItems
 import xyz.xenondevs.nova.world.item.name
 import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.world.item.recipe.RecipeManager
-import xyz.xenondevs.nova.world.pos
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.max
@@ -580,7 +578,7 @@ internal object NovaCommand : Command() {
     private fun reregisterNetworkNodes(ctx: CommandContext<CommandSourceStack>) {
         val nodes = Bukkit.getWorlds().asSequence()
             .flatMap { it.loadedChunks.asList() }
-            .flatMap { runBlocking { NetworkManager.getNodes(it.pos) } }
+            .flatMap { NetworkManager.getNodes(it).nodes.values }
             .toList()
         
         for (node in nodes) {
@@ -620,9 +618,9 @@ internal object NovaCommand : Command() {
     }
     
     private fun showNetworkNodeInfo(block: Block, ctx: CommandContext<CommandSourceStack>) {
-        val node = runBlocking { NetworkManager.getNode(block) }
-        if (node != null) {
-            NetworkManager.queueRead(block.chunkPos) { state ->
+        NetworkManager.queueRead(block.chunkPos) { state ->
+            val node = state.getNode(block)
+            if (node != null) {
                 val connectedNodes = state.getConnectedNodes(node)
                 
                 fun buildNetworkInfoComponent(type: NetworkType<*>, id: UUID): Component {
@@ -777,15 +775,15 @@ internal object NovaCommand : Command() {
                     ))
                 
                 ctx.source.sender.sendMessage(builder.build())
+            } else {
+                ctx.source.sender.sendMessage(Component.translatable(
+                    "command.nova.show_network_node_info.failure", NamedTextColor.RED,
+                    Component.text(block.world.name, NamedTextColor.AQUA),
+                    Component.text(block.x, NamedTextColor.AQUA),
+                    Component.text(block.y, NamedTextColor.AQUA),
+                    Component.text(block.z, NamedTextColor.AQUA)
+                ))
             }
-        } else {
-            ctx.source.sender.sendMessage(Component.translatable(
-                "command.nova.show_network_node_info.failure", NamedTextColor.RED,
-                Component.text(block.world.name, NamedTextColor.AQUA),
-                Component.text(block.x, NamedTextColor.AQUA),
-                Component.text(block.y, NamedTextColor.AQUA),
-                Component.text(block.z, NamedTextColor.AQUA)
-            ))
         }
     }
     

@@ -145,7 +145,7 @@ class ProtoNetwork<T : Network<T>>(
     /**
      * Removes all [nodes] from this [NetworkData].
      */
-    fun removeAll(nodes: Set<NetworkNode>) {
+    fun removeAll(nodes: Collection<NetworkNode>) {
         for (node in nodes) {
             this.nodes -= node.block
         }

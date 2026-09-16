@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.block.tileentity.network
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import org.bukkit.Bukkit
+import org.bukkit.Chunk
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.event.EventHandler
@@ -18,6 +19,7 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.CubeFaceSet
+import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.ChunkPos
@@ -69,7 +71,7 @@ object NetworkManager : Listener {
     private fun runConfigurators() {
         for (world in Bukkit.getWorlds()) {
             for (chunk in world.loadedChunks) {
-                queueLoadChunk(chunk.pos)
+                queueLoadChunk(chunk)
             }
         }
         
@@ -153,10 +155,12 @@ object NetworkManager : Listener {
         queueTask(bridge) { RemoveBridgeTask(it, bridge, updateNodes) }
     
     /**
-     * Queues a network task to load the chunk at [pos].
+     * Queues a network task to load [chunk].
      */
-    private fun queueLoadChunk(pos: ChunkPos) =
-        queueTask(pos.world!!) { LoadChunkTask(it, pos) }
+    private fun queueLoadChunk(chunk: Chunk) {
+        val snapshot = getNodes(chunk)
+        queueTask(chunk.world) { LoadChunkTask(it, chunk.pos, snapshot) }
+    }
     
     /**
      * Queues a network task to unload the chunk at [pos].
@@ -187,40 +191,36 @@ object NetworkManager : Listener {
     
     /**
      * Registers a new [NetworkNodeProvider], which will be used to discover
-     * [NetworkNodes][NetworkNode] during chunk load and end point / bridge add tasks.
+     * [NetworkNodes][NetworkNode] during chunk load.
      */
     fun registerNetworkNodeProvider(provider: NetworkNodeProvider) {
         nodeProviders += provider
     }
     
     /**
-     * Gets all [NetworkNodes][NetworkNode] in the chunk at [pos]
+     * Creates a snapshot of all [NetworkNodes][NetworkNode] and unknown blocks in [chunk]
      * using the registered [NetworkNodeProviders][NetworkNodeProvider].
+     *
+     * Unrelated to [NetworkState].
+     * Must be called from the server thread.
      */
-    suspend fun getNodes(pos: ChunkPos): List<NetworkNode> {
-        return nodeProviders.flatMap { it.getNodes(pos) }
+    fun getNodes(chunk: Chunk): NetworkNodeSnapshot {
+        checkServerThread()
+        return nodeProviders.fold(NetworkNodeSnapshot.EMPTY) { snapshot, provider ->
+            snapshot + provider.getNodes(chunk)
+        }
     }
     
     /**
      * Gets the [NetworkNode] at the specified block [pos] using the registered
-     * [NetworkNodeProviders][NetworkNodeProvider] or null if there is none.
+     * [NetworkNodeProviders][NetworkNodeProvider], or null if there is none.
+     *
+     * Unrelated to [NetworkState].
+     * Must be called from the server thread.
      */
-    suspend fun getNode(pos: Block): NetworkNode? {
-        for (nodeProvider in nodeProviders) {
-            val node = nodeProvider.getNode(pos)
-            if (node != null)
-                return node
-        }
-        
-        return null
-    }
-    
-    /**
-     * Checks whether it is [unknown][NetworkNodeProvider.isUnknown] if the block at [pos] is a [NetworkNode]
-     * using the registered [NetworkNodeProviders][NetworkNodeProvider].
-     */
-    suspend fun isUnknown(pos: Block): Boolean {
-        return nodeProviders.any { it.isUnknown(pos) }
+    fun getNode(block: Block): NetworkNode? {
+        checkServerThread()
+        return nodeProviders.firstNotNullOfOrNull { it.getNode(block) }
     }
     
     @EventHandler
@@ -230,7 +230,7 @@ object NetworkManager : Listener {
     
     @EventHandler(priority = EventPriority.LOW) // WorldDataManager is LOWEST
     private fun handleChunkLoad(event: ChunkLoadEvent) {
-        queueLoadChunk(event.chunk.pos)
+        queueLoadChunk(event.chunk)
     }
     
     @EventHandler

@@ -5,18 +5,12 @@ import jdk.jfr.Event
 import jdk.jfr.Label
 import jdk.jfr.Name
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
-import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
-import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
-import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.format.NetworkState
-import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
-import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
 
 internal class UnloadChunkTask(
     state: NetworkState,
-    override val chunkPos: ChunkPos,
+    override val chunkPos: ChunkPos
 ) : NetworkTask(state) {
     
     //<editor-fold desc="jfr event", defaultstate="collapsed">
@@ -35,45 +29,24 @@ internal class UnloadChunkTask(
     //</editor-fold>
     
     override suspend fun run(): Boolean {
-        val clustersToInit = HashSet<ProtoNetwork<*>>()
-        
-        fun remove(node: NetworkNode, network: ProtoNetwork<*>) {
-            network.removeNode(node)
-            network.cluster?.forEach { previouslyClusteredNetwork ->
-                previouslyClusteredNetwork.invalidateCluster()
-                clustersToInit += previouslyClusteredNetwork
-            }
-        }
-        
-        val chunkNodes = NetworkManager.getNodes(chunkPos).associateByTo(HashMap(), NetworkNode::block)
-        val networkNodes = state.storage.getOrLoadRegionizedChunk(chunkPos).getData()
-        if (networkNodes.isEmpty())
+        val nodes = state.removeNodes(chunkPos)
+        if (nodes.isEmpty())
             return false
         
-        for ([pos, data] in networkNodes) {
-            val node = chunkNodes[pos]
-            if (node == null || node !in state)
+        // TODO: chunk to networks index
+        val emptyNetworks = ArrayList<ProtoNetwork<*>>()
+        for (network in state.networks) {
+            if (network.nodes.keys.none(nodes::containsKey))
                 continue
             
-            state -= node
-            
-            when {
-                node is NetworkBridge && data is NetworkBridgeData ->
-                    state.forEachNetwork(node) { _, network -> remove(node, network) }
-                
-                node is NetworkEndPoint && data is NetworkEndPointData ->
-                    state.forEachNetwork(node) { _, _, network -> remove(node, network) }
-                
-                else -> throw IllegalStateException("Node type and data type do not match")
-            }
+            network.removeAll(nodes.values)
+            network.cluster?.invalidate()
+            if (network.isEmpty())
+                emptyNetworks += network
         }
         
-        for (network in clustersToInit) {
-            if (network.isEmpty()) {
-                state -= network
-            } else {
-                network.initCluster()
-            }
+        for (network in emptyNetworks) {
+            state -= network
         }
         
         return true
