@@ -387,11 +387,11 @@ class NetworkState internal constructor(
      *
      * @throws IllegalStateException If there is no data for [endPoint].
      */
-    suspend fun setNetwork(endPoint: NetworkEndPoint, faces: Iterable<BlockFace>, network: ProtoNetwork<*>) {
+    suspend fun setNetwork(endPoint: NetworkEndPoint, faces: CubeFaceSet, network: ProtoNetwork<*>) {
         val data = getEndPointData(endPoint)
         val type = network.type
         val uuid = network.uuid
-        for (face in faces) {
+        faces.forEach { face ->
             data.networks[type, face] = uuid
         }
     }
@@ -413,9 +413,9 @@ class NetworkState internal constructor(
     /**
      * Forgets the connection of [endPoint] to the network of [networkType] at all [faces].
      */
-    suspend fun removeNetwork(endPoint: NetworkEndPoint, networkType: NetworkType<*>, faces: Iterable<BlockFace>) {
+    suspend fun removeNetwork(endPoint: NetworkEndPoint, networkType: NetworkType<*>, faces: CubeFaceSet) {
         val data = getEndPointData(endPoint)
-        for (face in faces) {
+        faces.forEach { face ->
             data.networks.remove(networkType, face)
         }
     }

@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.energy
 
-import xyz.xenondevs.nova.world.*
-
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.commons.provider.Provider
@@ -44,7 +42,7 @@ class EnergyNetwork internal constructor(
                     
                     var insert = false
                     var extract = false
-                    for (face in faces) {
+                    faces.forEach { face ->
                         val connectionType = energyHolder.connectionConfig[face]
                         insert = insert || connectionType.insert
                         extract = extract || connectionType.extract

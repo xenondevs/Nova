@@ -1,11 +1,10 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.item.channel
 
-import xyz.xenondevs.nova.world.*
-
 import org.bukkit.block.BlockFace
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.getOrSet
 import xyz.xenondevs.commons.collections.mapToArray
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemNetwork
@@ -30,8 +29,8 @@ internal class ItemChannelsBuilder {
     
     private val channels = arrayOfNulls<ItemDistributorBuilder?>(ItemNetwork.CHANNEL_AMOUNT)
     
-    fun addHolder(holder: ItemHolder, faces: Set<BlockFace>) {
-        for (face in faces) {
+    fun addHolder(holder: ItemHolder, faces: CubeFaceSet) {
+        faces.forEach { face ->
             val channel = holder.channels[face]
             channels.getOrSet(channel, ::ItemDistributorBuilder).addHolder(holder, face)
         }

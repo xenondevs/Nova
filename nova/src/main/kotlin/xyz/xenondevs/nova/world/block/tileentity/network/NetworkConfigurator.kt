@@ -20,18 +20,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.withLock
 import org.bukkit.World
-import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.task.LoadChunkTask
 import xyz.xenondevs.nova.world.block.tileentity.network.task.NetworkTask
 import xyz.xenondevs.nova.world.block.tileentity.network.task.ProtectedNodeNetworkTask
-import xyz.xenondevs.nova.world.block.tileentity.network.task.ProtectionResult
 import xyz.xenondevs.nova.world.block.tileentity.network.task.UnloadChunkTask
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.concurrent.CompletableFuture
@@ -172,23 +170,15 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     
     /**
      * Queries the block use protection in all 6 cartesian directions around [node] asynchronously
-     * and returns the [ProtectionResult].
+     * and returns the result.
      */
     private fun queryProtectionAsync(node: NetworkNode): CompletableFuture<CubeFaceSet> {
         val owner = node.owner
         return if (owner != null) {
-            val results = CUBE_FACES.mapToArray { face ->
-                ProtectionManager.canUseBlockAsync(owner, null, node.block.getRelative(face))
-            }
-            
-            CompletableFuture.allOf(*results).thenApply {
-                var data = 0
-                for ([i, result] in results.withIndex()) {
-                    if (result.get())
-                        data = data or (1 shl i)
-                }
-                CubeFaceSet(data.toByte())
-            }
+            // TODO: Await ProtectionManager startup
+            val results = CubeFaceMap { ProtectionManager.canUseBlockAsync(owner, null, node.block.getRelative(it)) }
+            CompletableFuture.allOf(*results.values.toTypedArray())
+                .thenApply { results.mapToCubeFaceSet { it.get() } }
         } else CompletableFuture.completedFuture(CubeFaceSet.ALL)
     }
     

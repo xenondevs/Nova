@@ -1,17 +1,17 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
+import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
-import org.bukkit.block.Block
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
-import xyz.xenondevs.nova.world.block.tileentity.network.node.MutableNetworkNodeConnection
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNodeConnection
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.format.NetworkState
 import java.util.*
@@ -23,7 +23,7 @@ class ProtoNetwork<T : Network<T>>(
     private val state: NetworkState,
     override val type: NetworkType<T>,
     override val uuid: UUID = UUID.randomUUID(),
-    override val nodes: MutableMap<Block, MutableNetworkNodeConnection> = HashMap()
+    override val nodes: MutableMap<Block, NetworkNodeConnection> = HashMap()
 ) : NetworkData<T> {
     
     /**
@@ -51,8 +51,10 @@ class ProtoNetwork<T : Network<T>>(
     fun addAll(network: NetworkData<T>) {
         for ((node, faces) in network.nodes.values) {
             require(node !is GhostNetworkNode)
-            val myFaces = this.nodes.getOrPut(node.block) { MutableNetworkNodeConnection(node) }.faces
-            myFaces += faces
+            nodes.compute(node.block) { _, connection ->
+                val connection = connection ?: NetworkNodeConnection(node)
+                connection.copy(faces = connection.faces + faces)
+            }
         }
         markDirty()
     }
@@ -62,7 +64,7 @@ class ProtoNetwork<T : Network<T>>(
      */
     fun addBridge(bridge: NetworkBridge) {
         require(bridge !is GhostNetworkNode)
-        nodes[bridge.block] = MutableNetworkNodeConnection(bridge, Collections.emptySet())
+        nodes[bridge.block] = NetworkNodeConnection(bridge)
         markDirty()
     }
     
@@ -73,20 +75,8 @@ class ProtoNetwork<T : Network<T>>(
      * @return - `true` if the [endPoint] was added to the [ProtoNetwork]
      * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.block]
      */
-    fun addEndPoint(endPoint: NetworkNode, face: BlockFace): Boolean {
-        require(endPoint !is GhostNetworkNode)
-        val presentFaces = nodes[endPoint.block]?.faces
-        if (presentFaces != null) {
-            if (presentFaces.add(face)) {
-                markDirty()
-            }
-            return false
-        } else {
-            nodes[endPoint.block] = MutableNetworkNodeConnection(endPoint, EnumSet.of(face))
-            markDirty()
-            return true
-        }
-    }
+    fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace): Boolean =
+        addEndPoint(endPoint, CubeFaceSet.NONE + face)
     
     /**
      * Adds [faces] to the [NetworkEndPoint] at [endPoint.pos][NetworkEndPoint.block],
@@ -95,16 +85,19 @@ class ProtoNetwork<T : Network<T>>(
      * @return - `true` if the [endPoint] was added to the [ProtoNetwork]
      * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.block]
      */
-    fun addEndPoint(endPoint: NetworkNode, faces: Set<BlockFace>): Boolean {
+    fun addEndPoint(endPoint: NetworkEndPoint, faces: CubeFaceSet): Boolean {
         require(endPoint !is GhostNetworkNode)
-        val presentFaces = nodes[endPoint.block]?.faces
-        if (presentFaces != null) {
-            if (presentFaces.addAll(faces)) {
+        require(faces.isNotEmpty())
+        val connection = nodes[endPoint.block]
+        if (connection != null) {
+            val updatedFaces = connection.faces + faces
+            if (updatedFaces != connection.faces) {
+                nodes[endPoint.block] = connection.copy(faces = updatedFaces)
                 markDirty()
             }
             return false
         } else {
-            nodes[endPoint.block] = MutableNetworkNodeConnection(endPoint, faces.toEnumSet())
+            nodes[endPoint.block] = NetworkNodeConnection(endPoint, faces)
             markDirty()
             return true
         }
@@ -132,18 +125,20 @@ class ProtoNetwork<T : Network<T>>(
      * - `false` if [endPoint] is still connected through other faces
      */
     fun removeFace(endPoint: NetworkEndPoint, face: BlockFace): Boolean {
-        val presentFaces = nodes[endPoint.block]?.faces
+        val connection = nodes[endPoint.block]
             ?: return false
+        val updatedFaces = connection.faces - face
         
-        if (presentFaces.remove(face)) {
-            markDirty()
-        }
-        
-        if (presentFaces.isEmpty()) {
+        if (updatedFaces == connection.faces)
+            return false
+        if (updatedFaces.isEmpty()) {
             nodes -= endPoint.block
+            markDirty()
             return true
         }
         
+        nodes[endPoint.block] = connection.copy(faces = updatedFaces)
+        markDirty()
         return false
     }
     
@@ -276,12 +271,7 @@ class ProtoNetwork<T : Network<T>>(
      * Creates an immutable copy of this [ProtoNetwork].
      */
     fun immutableCopy(): NetworkData<T> =
-        ImmutableNetworkData(
-            type, uuid,
-            nodes.mapValuesTo(HashMap(nodes.size)) { [_, con] ->
-                con.copy(faces = con.faces.toEnumSet())
-            }
-        )
+        ImmutableNetworkData(type, uuid, HashMap(nodes))
     
     /**
      * Marks this [ProtoNetwork] and its [cluster] as dirty,
