@@ -93,7 +93,7 @@ internal class LoadChunkTask(
                 node.handleNetworkLoaded(state)
             }
             
-            network.enlargeCluster(nodes)
+            network.cluster?.invalidate()
         }
         
         return updatedNetworks.isNotEmpty()

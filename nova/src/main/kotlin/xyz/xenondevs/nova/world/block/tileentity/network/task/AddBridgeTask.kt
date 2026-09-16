@@ -57,7 +57,6 @@ internal class AddBridgeTask(
         val nearbyBridges: CubeFaceMap<NetworkBridge?> = nearbyNodes.map { it as? NetworkBridge }
         val nearbyEndPoints: CubeFaceMap<NetworkEndPoint?> = nearbyNodes.map { it as? NetworkEndPoint }
         
-        val clustersToInit = HashMap<ProtoNetwork<*>, Collection<NetworkNode>>()
         for (networkType in supportedNetworkTypes) {
             val availableBridges = nearbyBridges.filter { face, bridge ->
                 face.oppositeFace in state.getAllowedFaces(bridge, networkType) && node.typeId == bridge.typeId
@@ -71,12 +70,7 @@ internal class AddBridgeTask(
             
             val network = connectBridgeToBridges(node, availableBridges, networkType)
             connectBridgeToEndPoints(node, availableEndPoints, network)
-            clustersToInit[network] = availableEndPoints.values
-        }
-        
-        // init or enlarge the network clusters
-        for ([network, endPoints] in clustersToInit) {
-            network.enlargeCluster(endPoints)
+            network.cluster?.invalidate()
         }
     }
     

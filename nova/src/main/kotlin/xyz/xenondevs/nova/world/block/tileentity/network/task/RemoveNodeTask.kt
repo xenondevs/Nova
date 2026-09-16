@@ -14,7 +14,6 @@ internal abstract class RemoveNodeTask<T : NetworkNode>(
     override val chunkPos = node.block.chunkPos
     
     protected val nodesToUpdate = HashSet<NetworkNode>()
-    protected val clustersToInit = HashSet<ProtoNetwork<*>>()
     
     final override suspend fun run(): Boolean {
         if (node !in state)
@@ -23,13 +22,6 @@ internal abstract class RemoveNodeTask<T : NetworkNode>(
         state -= node
         remove()
         state.removeNodeData(node)
-        
-        for (network in clustersToInit) {
-            if (network !in state)
-                continue
-            
-            network.initCluster()
-        }
         
         if (updateNodes) {
             for (node in nodesToUpdate) {
@@ -43,18 +35,9 @@ internal abstract class RemoveNodeTask<T : NetworkNode>(
     abstract suspend fun remove()
     
     /**
-     * Invalidates the cluster of all [ProtoNetworks][ProtoNetwork] clustered with [network] and
-     * schedules them for re-initialization in via [clustersToInit].
-     * Only registered networks' clusters will actually be re-initialized.
+     * Invalidates the cluster of all [ProtoNetworks][ProtoNetwork] clustered with [network].
      */
-    protected fun reclusterize(network: ProtoNetwork<*>) {
-        val cluster = network.cluster
-            ?: return
-        
-        for (previouslyClusteredNetwork in cluster) {
-            previouslyClusteredNetwork.invalidateCluster()
-            clustersToInit += previouslyClusteredNetwork
-        }
-    }
+    protected fun invalidateCluster(network: ProtoNetwork<*>) =
+        network.cluster?.invalidate()
     
 }

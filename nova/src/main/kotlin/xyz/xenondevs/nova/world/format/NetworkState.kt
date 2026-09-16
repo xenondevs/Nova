@@ -544,21 +544,18 @@ class NetworkState internal constructor(
     }
     
     /**
-     * Tries to connect [endPoint] to [bridge] from [face] over [networkType],
-     * adding all [ProtoNetworks][ProtoNetwork] whose clusters need to be enlarged
-     * with [endPoint] to [clustersToEnlarge].
+     * Tries to connect [endPoint] to [bridge] from [face] over [networkType].
      */
     suspend fun connectEndPointToBridge(
         endPoint: NetworkEndPoint, bridge: NetworkBridge,
-        networkType: NetworkType<*>, face: BlockFace,
-        clustersToEnlarge: MutableSet<ProtoNetwork<*>>
+        networkType: NetworkType<*>, face: BlockFace
     ) {
         val oppositeFace = face.oppositeFace
         val network = getNetwork(bridge, networkType)!!
         
         // add to network
-        network.addEndPoint(endPoint, face)
-        clustersToEnlarge += network
+        if (network.addEndPoint(endPoint, face))
+            network.cluster?.invalidate()
         
         // update state
         setConnection(endPoint, networkType, face)
@@ -567,15 +564,13 @@ class NetworkState internal constructor(
     }
     
     /**
-     * Connects [endPoint] to [other] from [face] over [networkType]
-     * and adds the new [ProtoNetwork] to [clustersToInit].
+     * Connects [endPoint] to [other] from [face] over [networkType].
      *
      * @return `true` if the action was successful
      */
     suspend fun <T : Network<T>> connectEndPointToEndPoint(
         endPoint: NetworkEndPoint, other: NetworkEndPoint,
-        networkType: NetworkType<T>, face: BlockFace,
-        clustersToInit: MutableSet<ProtoNetwork<*>>
+        networkType: NetworkType<T>, face: BlockFace
     ): Boolean {
         if (!endPoint.requestsLocalNetwork(face) && !other.requestsLocalNetwork(face.oppositeFace))
             return false
@@ -588,7 +583,6 @@ class NetworkState internal constructor(
         val network = createNetwork(networkType)
         network.addEndPoint(endPoint, face)
         network.addEndPoint(other, oppositeFace)
-        clustersToInit += network
         
         // update state
         setConnection(endPoint, networkType, face)
@@ -600,37 +594,27 @@ class NetworkState internal constructor(
     }
     
     /**
-     * Disconnects [endPoint] from [bridge] at [face] over [networkType],
-     * adding all [ProtoNetworks][ProtoNetwork] whose clusters need to be reinitialized
-     * to [clustersToInit].
+     * Disconnects [endPoint] from [bridge] at [face] over [networkType].
      */
     suspend fun disconnectEndPointFromBridge(
         endPoint: NetworkEndPoint, bridge: NetworkBridge,
-        networkType: NetworkType<*>, face: BlockFace,
-        clustersToInit: MutableSet<ProtoNetwork<*>>
+        networkType: NetworkType<*>, face: BlockFace
     ) {
         removeConnection(endPoint, networkType, face)
         removeConnection(bridge, networkType, face.oppositeFace)
         removeNetwork(endPoint, networkType, face)
         
         val network = getNetwork(bridge, networkType)!!
-        if (network.removeFace(endPoint, face)) {
-            network.cluster?.forEach { previouslyClusteredNetwork ->
-                previouslyClusteredNetwork.invalidateCluster()
-                clustersToInit += previouslyClusteredNetwork
-            }
-        }
+        if (network.removeFace(endPoint, face))
+            network.cluster?.invalidate()
     }
     
     /**
-     * Disconnects [endPoint] from [other] at [face] over [networkType],
-     * adding all [ProtoNetworks][ProtoNetwork] whose clusters need to be reinitialized
-     * to [clustersToInit].
+     * Disconnects [endPoint] from [other] at [face] over [networkType].
      */
     suspend fun disconnectEndPointFromEndPoint(
         endPoint: NetworkEndPoint, other: NetworkEndPoint,
-        networkType: NetworkType<*>, face: BlockFace,
-        clustersToInit: MutableSet<ProtoNetwork<*>>
+        networkType: NetworkType<*>, face: BlockFace
     ) {
         val oppositeFace = face.oppositeFace
         
@@ -646,12 +630,7 @@ class NetworkState internal constructor(
         removeNetwork(endPoint, networkType, face)
         removeNetwork(other, networkType, oppositeFace)
         
-        network.cluster?.forEach { previouslyClusteredNetwork ->
-            previouslyClusteredNetwork.invalidateCluster()
-            if (previouslyClusteredNetwork != network) {
-                clustersToInit += previouslyClusteredNetwork
-            }
-        }
+        network.cluster?.invalidate()
     }
     
     /**
@@ -662,9 +641,6 @@ class NetworkState internal constructor(
         endPoint: NetworkEndPoint,
         networkType: NetworkType<*>, face: BlockFace
     ) {
-        val clustersToEnlarge = HashSet<ProtoNetwork<*>>()
-        val clustersToInit = HashSet<ProtoNetwork<*>>()
-        
         val allowedFaces = getAllowedFaces(endPoint, networkType)
         val isCurrentlyConnected = hasConnection(endPoint, networkType, face)
         val neighbor = nodesByPos[endPoint.block.getRelative(face)]
@@ -673,22 +649,19 @@ class NetworkState internal constructor(
             if (!isCurrentlyConnected) {
                 when {
                     neighbor is NetworkBridge && face.oppositeFace in getAllowedFaces(neighbor, networkType) ->
-                        connectEndPointToBridge(endPoint, neighbor, networkType, face, clustersToEnlarge)
+                        connectEndPointToBridge(endPoint, neighbor, networkType, face)
                     
                     neighbor is NetworkEndPoint && face.oppositeFace in getAllowedFaces(neighbor, networkType) ->
-                        connectEndPointToEndPoint(endPoint, neighbor, networkType, face, clustersToInit)
+                        connectEndPointToEndPoint(endPoint, neighbor, networkType, face)
                 }
             }
         } else if (isCurrentlyConnected) {
             when (neighbor) {
-                is NetworkBridge -> disconnectEndPointFromBridge(endPoint, neighbor, networkType, face, clustersToInit)
-                is NetworkEndPoint -> disconnectEndPointFromEndPoint(endPoint, neighbor, networkType, face, clustersToInit)
+                is NetworkBridge -> disconnectEndPointFromBridge(endPoint, neighbor, networkType, face)
+                is NetworkEndPoint -> disconnectEndPointFromEndPoint(endPoint, neighbor, networkType, face)
                 null -> Unit
             }
         }
-        
-        clustersToEnlarge.forEach { it.enlargeCluster(endPoint) }
-        clustersToInit.forEach { it.initCluster() }
         
         endPoint.handleNetworkUpdate(this)
         neighbor?.handleNetworkUpdate(this)

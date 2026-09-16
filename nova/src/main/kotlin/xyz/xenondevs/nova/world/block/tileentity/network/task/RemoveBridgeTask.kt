@@ -56,12 +56,11 @@ internal class RemoveBridgeTask(
                     state -= currentNetwork
                     state += recalculatedNetworks
                     reassignNetworks(recalculatedNetworkLayouts, recalculatedNetworks)
-                    clustersToInit += recalculatedNetworks
-                    reclusterize(currentNetwork)
+                    invalidateCluster(currentNetwork)
                 } else {
                     currentNetwork.removeNode(node) // network empty check not required because >1 connected bridges
                     if (connectedEndPoints.isNotEmpty()) { // networks have not been split, only detached end points could de-cluster
-                        reclusterize(currentNetwork)
+                        invalidateCluster(currentNetwork)
                     }
                 }
             } else {
@@ -69,9 +68,9 @@ internal class RemoveBridgeTask(
                 
                 if (currentNetwork.isEmpty()) {
                     state -= currentNetwork
-                    reclusterize(currentNetwork)
+                    invalidateCluster(currentNetwork)
                 } else if (connectedEndPoints.isNotEmpty()) { // networks have not been split, only detached end points could de-cluster
-                    reclusterize(currentNetwork)
+                    invalidateCluster(currentNetwork)
                 }
             }
         }

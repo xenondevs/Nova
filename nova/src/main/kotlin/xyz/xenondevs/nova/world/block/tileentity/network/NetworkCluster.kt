@@ -114,6 +114,16 @@ class ProtoNetworkCluster : Iterable<ProtoNetwork<*>> {
     operator fun contains(network: ProtoNetwork<*>) =
         network in networks
     
+    /**
+     * Invalidates this cluster by clearing the cluster reference of all contained [ProtoNetworks][ProtoNetwork].
+     */
+    fun invalidate() {
+        for (network in networks) {
+            network.invalidateCluster(this)
+        }
+        networks.clear()
+    }
+    
     override operator fun iterator() =
         networks.iterator()
     

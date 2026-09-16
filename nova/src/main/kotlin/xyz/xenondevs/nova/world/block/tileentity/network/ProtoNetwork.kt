@@ -166,50 +166,16 @@ class ProtoNetwork<T : Network<T>>(
      *
      * Does nothing if the [cluster] has already been built.
      */
-    suspend fun initCluster() {
+    suspend fun initCluster(): ProtoNetworkCluster {
         if (cluster != null)
-            return
+            return cluster!!
         
         val cluster = ProtoNetworkCluster()
-        val queue = LinkedList<ProtoNetwork<*>>()
+        val queue = ArrayDeque<ProtoNetwork<*>>()
         queue += this
         processClusterQueue(cluster, queue)
         this.cluster = cluster
-    }
-    
-    
-    /**
-     * Enlarges the [cluster] using the [ProtoNetworks][ProtoNetwork] of [node].
-     * Enlarging a cluster also initializes / updates the clusters of all
-     * [ProtoNetworks][ProtoNetwork] that are clustered with it.
-     *
-     * If no [cluster] has been built yet, [initCluster] will be called instead.
-     */
-    suspend fun enlargeCluster(node: NetworkNode) {
-        val cluster = cluster ?: return initCluster()
-        
-        val queue = LinkedList<ProtoNetwork<*>>()
-        queueWithRelatedNetworks(cluster, queue, node)
-        processClusterQueue(cluster, queue)
-    }
-    
-    /**
-     * Enlarges the [cluster] using the [ProtoNetworks][ProtoNetwork] of [nodes].
-     * Enlarging a cluster also initializes / updates the clusters of all
-     * [ProtoNetworks][ProtoNetwork] that are clustered with it.
-     *
-     * If no [cluster] has been built yet, [initCluster] will be called instead.
-     */
-    suspend fun enlargeCluster(nodes: Collection<NetworkNode>) {
-        val cluster = cluster ?: return initCluster()
-        if (nodes.isEmpty())
-            return
-        
-        val queue = LinkedList<ProtoNetwork<*>>()
-        for (node in nodes) {
-            queueWithRelatedNetworks(cluster, queue, node)
-        }
-        processClusterQueue(cluster, queue)
+        return cluster
     }
     
     private suspend fun processClusterQueue(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>) {
@@ -261,10 +227,11 @@ class ProtoNetwork<T : Network<T>>(
     }
     
     /**
-     * Invalidates the [cluster] of this [ProtoNetwork], requiring it to be rebuilt via [initCluster].
+     * Unsets the [ProtoNetwork.cluster] iff it matches [cluster].
      */
-    fun invalidateCluster() {
-        cluster = null
+    fun invalidateCluster(cluster: ProtoNetworkCluster) {
+        if (this.cluster === cluster)
+            this.cluster = null
     }
     
     /**

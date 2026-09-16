@@ -48,12 +48,9 @@ internal class RemoveEndPointTask(
             val network = state.getNetworkOrThrow(networkType, networkId)
             network.removeNode(node)
             
-            if (network.isEmpty()) {
+            if (network.isEmpty())
                 state -= network
-                reclusterize(network)
-            } else {
-                reclusterize(network)
-            }
+            invalidateCluster(network)
         }
     }
     
