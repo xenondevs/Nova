@@ -5,7 +5,9 @@ import com.google.common.collect.ImmutableMap
 import net.kyori.adventure.key.Key
 import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.level.block.state.properties.Property
+import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Keyed
+import org.bukkit.craftbukkit.block.data.CraftBlockData
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.util.toNamespacedKey
@@ -38,20 +40,41 @@ abstract class BlockStateProperty<T : Comparable<T>>(
     val initializer: (Context<BlockPlace>) -> T
 ) : Keyed {
     
-    internal abstract val nmsProperty: Property<T>
+    internal abstract val nmsProperty: Property<*>
+    
+    @Suppress("UNCHECKED_CAST")
+    internal open fun fromNmsValue(value: Any): T = value as T
+    
+    internal open fun toNmsValue(value: T): Any = value
+    
+    @Suppress("UNCHECKED_CAST")
+    private fun nmsPropertyTyped(): Property<Comparable<Any>> = nmsProperty as Property<Comparable<Any>>
+    
+    internal fun get(state: BlockState): T? =
+        state.getOptionalValue(nmsPropertyTyped()).getOrNull()?.let(::fromNmsValue)
+    
+    @Suppress("UNCHECKED_CAST")
+    internal fun set(state: BlockState, value: T): BlockState =
+        state.setValue(nmsPropertyTyped(), toNmsValue(value) as Comparable<Any>)
+    
+    @Suppress("UNCHECKED_CAST")
+    internal fun set(data: CraftBlockData, value: T) {
+        data.set(nmsPropertyTyped(), toNmsValue(value) as Comparable<Any>)
+    }
+    
     internal val name: String
         get() = nmsProperty.name
     
     /**
      * A list of all possible values that this property can have.
      */
-    val values: List<T>
-        get() = nmsProperty.possibleValues
+    open val values: List<T>
+        get() = nmsProperty.possibleValues.map(::fromNmsValue)
     
     /**
      * Determines whether the given [value] is valid for this property.
      */
-    open fun isValidValue(value: T): Boolean = value in nmsProperty.possibleValues
+    open fun isValidValue(value: T): Boolean = toNmsValue(value) in nmsProperty.possibleValues
     
     /**
      * Determines whether the given [string] is valid for this property.
@@ -64,7 +87,8 @@ abstract class BlockStateProperty<T : Comparable<T>>(
      */
     fun valueToString(value: T): String {
         require(isValidValue(value)) { "Value $value is not valid for property $this" }
-        return nmsProperty.getName(value)
+        @Suppress("UNCHECKED_CAST")
+        return nmsPropertyTyped().getName(toNmsValue(value) as Comparable<Any>)
     }
     
     /**
@@ -72,13 +96,30 @@ abstract class BlockStateProperty<T : Comparable<T>>(
      * or throws an [IllegalArgumentException] if [string] is not valid for this property.
      */
     fun stringToValue(string: String): T {
-        return nmsProperty.getValue(string).getOrNull()
+        return nmsProperty.getValue(string).getOrNull()?.let(::fromNmsValue)
             ?: throw IllegalArgumentException("Value $string is not valid for property $this")
     }
     
     override fun key() = key
     override fun getKey() = key.toNamespacedKey()
     override fun toString(): String = key.asString()
+    
+}
+
+internal class MappedProperty<T : Comparable<T>, N : Comparable<N>>(
+    override val nmsProperty: Property<N>,
+    default: T,
+    private val fromNms: (N) -> T,
+    private val toNms: (T) -> N,
+    initializer: (Context<BlockPlace>) -> T
+) : BlockStateProperty<T>(Key.key("minecraft", nmsProperty.name), default, initializer) {
+    
+    @Suppress("UNCHECKED_CAST")
+    override fun fromNmsValue(value: Any): T = fromNms(value as N)
+    
+    override fun toNmsValue(value: T): Any = toNms(value)
+    
+    override fun isValidValue(value: T): Boolean = value in values
     
 }
 

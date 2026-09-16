@@ -214,7 +214,7 @@ val ItemType.blockTypeOrNull: BlockType?
 
 @Suppress("UNCHECKED_CAST")
 private fun <T : Comparable<T>> NmsBlockState.setValue(property: BlockStateProperty<T>, value: Any): NmsBlockState =
-    setValue(property.nmsProperty, value as T)
+    property.set(this, value as T)
 
 /**
  * Shortcut for `bootstrapFlatMap { it.config }` 
