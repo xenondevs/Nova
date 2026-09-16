@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla
 
+import net.minecraft.world.level.block.entity.BlockEntity
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 import java.util.*
@@ -8,12 +9,15 @@ import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 internal open class NetworkedNMSInventory(
-    protected val container: ItemStackContainer
+    protected val container: ItemStackContainer,
+    private vararg val blockEntities: BlockEntity
 ) : NetworkedInventory {
     
     // UUID is not required for vanilla item holder implementations, because inventory side configuration cannot be changed
     override val uuid = UUID(0L, 0L)
     override val size = container.size
+    
+    private var changed = false
     
     override fun add(itemStack: BukkitStack, amount: Int): Int {
         val maxStackSize = itemStack.maxStackSize
@@ -45,6 +49,9 @@ internal open class NetworkedNMSInventory(
             remaining -= transfer
         }
         
+        if (remaining < amount)
+            markChanged()
+        
         return remaining
     }
     
@@ -59,6 +66,8 @@ internal open class NetworkedNMSInventory(
         
         val transfer = min(amount, current.count)
         current.count -= transfer
+        if (transfer > 0)
+            markChanged()
     }
     
     override fun isFull(): Boolean {
@@ -78,6 +87,20 @@ internal open class NetworkedNMSInventory(
         for ([index, item] in container.withIndex()) {
             destination[index] = item.copy().asBukkitMirror()
         }
+    }
+    
+    protected fun markChanged() {
+        changed = true
+    }
+    
+    fun postNetworkTickSync() {
+        if (!changed)
+            return
+        
+        for (blockEntity in blockEntities) {
+            blockEntity.setChanged()
+        }
+        changed = false
     }
     
     override fun equals(other: Any?): Boolean {

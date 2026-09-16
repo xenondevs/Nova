@@ -1,9 +1,8 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.item
 
-import xyz.xenondevs.nova.world.*
-
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
+import xyz.xenondevs.commons.collections.identityHashSet
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.nova.config.MAIN_CONFIG
@@ -17,16 +16,17 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionT
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.channel.ItemChannelsBuilder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.channel.ItemDistributor
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
+import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.NetworkedNMSInventory
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-// TODO: block updates?
 class ItemNetwork internal constructor(
     networkData: NetworkData<ItemNetwork>
 ) : Network<ItemNetwork>, NetworkData<ItemNetwork> by networkData {
     
     private val endPoints = ArrayList<NetworkEndPoint>()
     internal val channels: Array<ItemDistributor?>
+    private val nmsInventories = identityHashSet<NetworkedNMSInventory>()
     private val transferRate: Int
     val complexity: Int
     
@@ -57,6 +57,21 @@ class ItemNetwork internal constructor(
         this.transferRate = transferRate
         this.complexity = complexity
         channels = channelsBuilder.build()
+        
+        for (distributor in channels) {
+            if (distributor == null)
+                continue
+            
+            // last priority level contains all inventories
+            for ((inventory) in distributor.providerLevels.lastOrNull().orEmpty()) {
+                if (inventory is NetworkedNMSInventory)
+                    nmsInventories += inventory
+            }
+            for ((inventory) in distributor.consumerLevels.lastOrNull().orEmpty()) {
+                if (inventory is NetworkedNMSInventory)
+                    nmsInventories += inventory
+            }
+        }
     }
     
     override fun isValid(): Boolean =
@@ -76,6 +91,10 @@ class ItemNetwork internal constructor(
             nextChannel++
             if (nextChannel >= channels.size) nextChannel = 0
         } while (transfersLeft != 0 && nextChannel != startingChannel)
+    }
+    
+    internal fun postTickSync() {
+        nmsInventories.forEach(NetworkedNMSInventory::postNetworkTickSync)
     }
     
     override fun toString(): String {

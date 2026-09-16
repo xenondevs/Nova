@@ -7,9 +7,6 @@ import xyz.xenondevs.nova.world.block.novaTileEntity
 import xyz.xenondevs.nova.world.block.tileentity.UnknownTileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 
-/**
- * A [NetworkNodeProvider] for all [TileEntities][xyz.xenondevs.nova.world.block.tileentity.TileEntity] that are [NetworkNodes][xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode].
- */
 internal object NovaNetworkNodeProvider : NetworkNodeProvider {
     
     override fun getNode(block: Block): NetworkNode? =

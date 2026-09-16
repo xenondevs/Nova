@@ -49,7 +49,7 @@ import java.util.concurrent.ConcurrentHashMap
 )
 object NetworkManager : Listener {
     
-    private val nodeProviders = mutableListOf<NetworkNodeProvider>(NovaNetworkNodeProvider)
+    private val nodeProviders = mutableListOf(NovaNetworkNodeProvider, VanillaNetworkNodeProvider)
     private val configurators = ConcurrentHashMap<World, NetworkConfigurator>()
     private val ticker = NetworkTicker.create()
     

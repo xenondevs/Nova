@@ -78,6 +78,10 @@ internal class ItemNetworkGroup(data: NetworkGroupData<ItemNetwork>) : NetworkGr
         }
     }
     
+    override fun postTickSync() {
+        networks.forEach(ItemNetwork::postTickSync)
+    }
+    
     private fun takeSnapshot() {
         for ([provider, snapshot] in providerSnapshots) {
             provider.copyContents(snapshot)

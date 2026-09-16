@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.channel.FluidNetworkChannel
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
+import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaCauldronTileEntity
 import kotlin.math.min
 import kotlin.math.roundToLong
 
@@ -23,7 +24,7 @@ class FluidNetwork internal constructor(
 ) : Network<FluidNetwork>, NetworkData<FluidNetwork> by networkData {
     
     private val endPoints = ArrayList<NetworkEndPoint>()
-//    private val cauldrons = ArrayList<VanillaCauldronTileEntity>()
+    private val cauldrons = ArrayList<VanillaCauldronTileEntity>()
     private val channels: Array<FluidNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     private val transferRate: Long
     private val complexity: Int
@@ -48,9 +49,8 @@ class FluidNetwork internal constructor(
                         }
                     }
                     
-//                    if (node is VanillaCauldronTileEntity) {
-//                        cauldrons += node
-//                    }
+                    if (node is VanillaCauldronTileEntity)
+                        cauldrons += node
                     endPoints += node
                     complexity++
                 } else if (node is FluidBridge) {
@@ -86,10 +86,9 @@ class FluidNetwork internal constructor(
     }
     
     fun postTickSync() {
-        // TODO
-//        for (cauldron in cauldrons) {
-//            cauldron.postNetworkTickSync()
-//        }
+        for (cauldron in cauldrons) {
+            cauldron.postNetworkTickSync()
+        }
     }
     
     override fun toString(): String {

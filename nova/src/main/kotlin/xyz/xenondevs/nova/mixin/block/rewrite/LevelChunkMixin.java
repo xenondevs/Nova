@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xyz.xenondevs.nova.world.block.NovaBlock;
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock;
 import xyz.xenondevs.nova.world.block.NovaTileEntityProxy;
+import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntityManager;
 
 @Mixin(LevelChunk.class)
 abstract class LevelChunkMixin {
@@ -30,16 +31,14 @@ abstract class LevelChunkMixin {
     private ServerLevel level;
     
     @Inject(method = "setBlockState", at = @At("HEAD"))
-    private void captureNovaTileEntity(
+    private void captureBlockEntity(
         BlockPos pos,
         BlockState state,
         int flags,
         CallbackInfoReturnable<BlockState> cir,
-        @Share("oldNovaTileEntity") LocalRef<NovaTileEntityProxy> oldNovaTileEntity
+        @Share("oldBlockEntity") LocalRef<BlockEntity> oldBlockEntity
     ) {
-        if (getBlockEntity(pos) instanceof NovaTileEntityProxy proxy) {
-            oldNovaTileEntity.set(proxy);
-        }
+        oldBlockEntity.set(getBlockEntity(pos));
     }
     
     @Inject(method = "setBlockState", at = @At("RETURN"))
@@ -47,7 +46,7 @@ abstract class LevelChunkMixin {
         CallbackInfoReturnable<BlockState> cir,
         @Local(argsOnly = true, name = "pos") BlockPos pos,
         @Local(argsOnly = true, name = "state") BlockState state,
-        @Share("oldNovaTileEntity") LocalRef<NovaTileEntityProxy> oldNovaTileEntity
+        @Share("oldBlockEntity") LocalRef<BlockEntity> oldBlockEntity
     ) {
         BlockState oldState = cir.getReturnValue();
         if (oldState == null || state == null)
@@ -55,6 +54,14 @@ abstract class LevelChunkMixin {
         
         var oldBlock = oldState.getBlock();
         var newBlock = state.getBlock();
+        var previousBlockEntity = oldBlockEntity.get();
+        
+        VanillaTileEntityManager.handleBlockStateChange(
+            oldState,
+            state,
+            previousBlockEntity,
+            getBlockEntity(pos)
+        );
         
         if (oldBlock == newBlock) {
             if (oldState != state && oldBlock instanceof NovaBlock novaBlock) {
@@ -64,7 +71,7 @@ abstract class LevelChunkMixin {
         }
         
         if (oldBlock instanceof NovaTileEntityBlock oldNovaBlock) {
-            oldNovaBlock.nmsHandleBreak(oldState, level, pos, state, oldNovaTileEntity.get());
+            oldNovaBlock.nmsHandleBreak(oldState, level, pos, state, (NovaTileEntityProxy) previousBlockEntity);
         } else if (oldBlock instanceof NovaBlock oldNovaBlock) {
             oldNovaBlock.nmsHandleBreak(oldState, level, pos, state);
         }
