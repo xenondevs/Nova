@@ -45,16 +45,17 @@ data class BlockSideMap<out V>(
     /**
      * A list of all non-null values in this map.
      */
-    val values: Collection<V & Any> = run {
-        val list = ArrayList<V & Any>(6)
-        if (front != null) list.add(front)
-        if (left != null) list.add(left)
-        if (back != null) list.add(back)
-        if (right != null) list.add(right)
-        if (top != null) list.add(top)
-        if (bottom != null) list.add(bottom)
-        list
-    }
+    val values: Collection<V & Any>
+        get() = run {
+            val list = ArrayList<V & Any>(6)
+            if (front != null) list.add(front)
+            if (left != null) list.add(left)
+            if (back != null) list.add(back)
+            if (right != null) list.add(right)
+            if (top != null) list.add(top)
+            if (bottom != null) list.add(bottom)
+            list
+        }
     
     constructor(all: V) : this(all, all, all, all, all, all)
     

@@ -46,16 +46,17 @@ data class CubeFaceMap<out V>(
     /**
      * A list of all non-null values in this map.
      */
-    val values: Collection<V & Any> = run {
-        val list = ArrayList<V & Any>(6)
-        if (north != null) list.add(north)
-        if (east != null) list.add(east)
-        if (south != null) list.add(south)
-        if (west != null) list.add(west)
-        if (up != null) list.add(up)
-        if (down != null) list.add(down)
-        list
-    }
+    val values: Collection<V & Any>
+        get() = run {
+            val list = ArrayList<V & Any>(6)
+            if (north != null) list.add(north)
+            if (east != null) list.add(east)
+            if (south != null) list.add(south)
+            if (west != null) list.add(west)
+            if (up != null) list.add(up)
+            if (down != null) list.add(down)
+            list
+        }
     
     constructor(all: V) : this(all, all, all, all, all, all)
     
