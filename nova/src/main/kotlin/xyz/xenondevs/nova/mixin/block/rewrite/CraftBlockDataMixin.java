@@ -16,7 +16,10 @@ import xyz.xenondevs.nova.world.block.NovaTileEntityBlock;
 @Mixin(CraftBlockData.class)
 abstract class CraftBlockDataMixin {
     
-    @Inject(method = "<clinit>", at = @At("TAIL"))
+    @Inject(
+        method = "<clinit>",
+        at = @At(value = "INVOKE", target = "Lorg/bukkit/craftbukkit/block/data/CraftBlockData;reloadCache()V")
+    )
     private static void registerNovaBlockData(CallbackInfo ci) {
         register(NovaBlock.class, NovaBlockStateImpl::new);
         register(NovaTileEntityBlock.class, NovaBlockStateImpl::new);
