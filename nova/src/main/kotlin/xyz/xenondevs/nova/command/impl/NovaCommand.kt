@@ -23,6 +23,7 @@ import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
+import net.minecraft.nbt.NbtUtils
 import org.bukkit.Bukkit
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
@@ -63,9 +64,9 @@ import xyz.xenondevs.nova.ui.menu.explorer.blockTagExplorer
 import xyz.xenondevs.nova.ui.menu.explorer.itemTagExplorer
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.CubeFaceSet
-import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.component.adventure.indent
+import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
 import xyz.xenondevs.nova.util.data.UpdatableFile
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
@@ -410,12 +411,13 @@ internal object NovaCommand : Command() {
         } else {
             val blockEntity = block.nmsBlockEntity
             if (blockEntity != null) {
-                val data = blockEntity.saveWithFullMetadata(REGISTRY_ACCESS)
+                val data = blockEntity.persistentDataContainer.toTagCompound()
+                data.keySet().removeIf { !it.startsWith("nova:") }
                 ctx.source.sender.sendMessage(Component.translatable(
                     "command.nova.show_block_data.vanilla_tile_entity",
                     NamedTextColor.GRAY,
                     Component.text(blockState.asString, NamedTextColor.AQUA),
-                    Component.text(data.toString(), NamedTextColor.WHITE)
+                    NbtUtils.toPrettyComponent(data).toAdventureComponent()
                 ))
             } else {
                 ctx.source.sender.sendMessage(Component.translatable(
