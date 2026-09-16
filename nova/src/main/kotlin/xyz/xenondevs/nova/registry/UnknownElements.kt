@@ -21,6 +21,7 @@ internal object UnknownElements {
             name(Component.translatable("item.nova.unknown", Component.text(entry.key.asString())))
             style(NamedTextColor.RED)
             modelDefinition { model = buildModel { createLayeredModel("nova:block/unknown") } }
+            hidden(true)
         }
         
         RegistryLoader.registerVanillaUnknown(
