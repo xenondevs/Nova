@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.minecraft.core.registries.BuiltInRegistries
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
@@ -32,6 +33,7 @@ import xyz.xenondevs.nova.serialization.kotlinx.ValueOrList
 import xyz.xenondevs.nova.ui.menu.advancedTooltips
 import xyz.xenondevs.nova.ui.menu.item.scrollableItemProvider
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
+import xyz.xenondevs.nova.util.nmsItem
 import java.util.*
 
 internal object ItemCategories {
@@ -50,7 +52,9 @@ internal object ItemCategories {
             .groupBy { it.key.namespace() }
             .mapValuesNotNull { [namespace, items] ->
                 val name = addonNamesById[namespace]
-                val visibleItems = items.filterNot(ItemType::isHidden)
+                val visibleItems = items
+                    .filterNot(ItemType::isHidden)
+                    .sortedBy { BuiltInRegistries.ITEM.getId(it.nmsItem) } // sort by registration order
                 if (name != null && visibleItems.isNotEmpty())
                     ItemCategory.Default(name, visibleItems)
                 else null
