@@ -14,11 +14,9 @@ import xyz.xenondevs.commons.provider.provider
 /**
  * Represents a key-value pair in a registry.
  * 
- * Comparable, naturally ordered by registry key and then by entry key.
- * 
  * Two registry entries are considered equal `==` iff their registries and keys match.
  */
-sealed interface RegistryEntry<out T : Keyed> : Provider<T>, Comparable<RegistryEntry<@UnsafeVariance T>> {
+sealed interface RegistryEntry<out T : Keyed> : Provider<T> {
     
     /**
      * The key of the registry entry.
@@ -127,11 +125,6 @@ fun <T, R> Provider<T>.bootstrapFlatMap(transform: (T) -> Provider<R>): Provider
  */
 fun <T> Provider<Provider<T>>.bootstrapFlatten(): Provider<T> = bootstrapFlatMap { it }
 
-private fun comparisonRegistryKey(entry: RegistryEntry<*>): Key = when (entry) {
-    is RegistryEntry.Paper -> entry.registry.key()
-    is RegistryEntry.Nova -> entry.registry.key
-}
-
 private class PaperRegistryEntry<T : Keyed>(
     typedKey: TypedKey<T>,
     override val delegate: Provider<T>
@@ -151,13 +144,6 @@ private class PaperRegistryEntry<T : Keyed>(
         var result = registry.hashCode()
         result = 31 * result + key.hashCode()
         return result
-    }
-    
-    override fun compareTo(other: RegistryEntry<T>): Int {
-        val registryComparison = registry.key().compareTo(comparisonRegistryKey(other))
-        if (registryComparison != 0)
-            return registryComparison
-        return key.compareTo(other.key)
     }
     
     override fun toString(): String = "${registry.key().asString()}/${key.asString()}"
@@ -181,13 +167,6 @@ internal class NovaRegistryEntry<T : NovaRegistryElement<T>>(
         var result = registry.hashCode()
         result = 31 * result + key.hashCode()
         return result
-    }
-    
-    override fun compareTo(other: RegistryEntry<T>): Int {
-        val registryComparison = registry.key.compareTo(comparisonRegistryKey(other))
-        if (registryComparison != 0)
-            return registryComparison
-        return key.compareTo(other.key)
     }
     
     override fun toString(): String = "${registry.key.asString()}/${key.asString()}"
