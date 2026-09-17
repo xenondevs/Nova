@@ -156,8 +156,9 @@ data class Model(
         /**
          * The rotation of an [Element].
          *
-         * @param angle The angle of the rotation. Can be 45.0, 22.5, -22.5, -45.0
-         * @param axis The axis of the rotation.
+         * @param x The rotation around the x-axis, applied first.
+         * @param y The rotation around the y-axis, applied after the rotation around the x-axis.
+         * @param z The rotation around the z-axis, applied after the rotation around the y-axis.
          * @param origin The origin / pivot point of the rotation.
          * @param rescale Whether the model should be rescaled to fit the new size.
          * (for example a 45° rotation stretches the element by sqrt(2))
