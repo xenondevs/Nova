@@ -27,7 +27,8 @@ kotlin {
         )
         
         freeCompilerArgs.addAll(
-            "-Xname-based-destructuring=complete"
+            "-Xname-based-destructuring=complete",
+            "-Xcollection-literals"
         )
         
         if (!providers.gradleProperty("release").isPresent) {

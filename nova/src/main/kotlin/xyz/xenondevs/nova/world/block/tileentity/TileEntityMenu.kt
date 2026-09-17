@@ -83,7 +83,7 @@ interface TileEntityMenu {
          * MenuContainer.from { viewer -> 
          *     window(viewer) {
          *         if (texture != null) {
-         *             title by texture.getTitle(tileEntity.block.name, locale)
+         *             title by texture.getTitle([tileEntity.block.name], locale)
          *         } else {
          *             title by tileEntity.block.name
          *         }
@@ -109,7 +109,7 @@ interface TileEntityMenu {
          * MenuContainer.from { viewer -> 
          *     windowDsl(viewer) {
          *         if (texture != null) {
-         *             title by texture.getTitle(tileEntity.block.name, locale)
+         *             title by texture.getTitle([tileEntity.block.name], locale)
          *         } else {
          *             title by tileEntity.block.name
          *         }
@@ -127,7 +127,7 @@ interface TileEntityMenu {
         ): TileEntityMenu = from(bounds) {
             windowDsl(it) {
                 if (texture != null) {
-                    title by texture.getTitle(tileEntity.blockType.name, locale)
+                    title by texture.getTitle([tileEntity.blockType.name], locale)
                 } else {
                     title by tileEntity.blockType.name
                 }
@@ -167,7 +167,7 @@ interface TileEntityMenu {
         ): TileEntityMenu = CachedWindowTileEntityMenuImpl(bounds, expireAfterClose) {
             windowDsl(it) {
                 if (texture != null) {
-                    title by texture.getTitle(tileEntity.blockType.name, locale)
+                    title by texture.getTitle([tileEntity.blockType.name], locale)
                 } else {
                     title by tileEntity.blockType.name
                 }

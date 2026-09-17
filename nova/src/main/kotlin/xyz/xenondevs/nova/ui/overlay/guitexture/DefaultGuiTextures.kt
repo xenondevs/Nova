@@ -48,7 +48,7 @@ object DefaultGuiTextures {
         inventoryLabel(false)
     }
     val SEARCH_RESULTS = guiTexture("search_results") {
-        title { alignment(Alignment.LEFT, Vector2i(21, 18)) }
+        title { dynamicLine(Alignment.LEFT, Vector2i(21, 18)) }
     }
     val ITEMS_0 = guiTexture("items/0") {
         inventoryLabel(false)
@@ -80,11 +80,17 @@ object DefaultGuiTextures {
     val ITEMS_9 = guiTexture("items/9") {
         inventoryLabel(false)
     }
-    val RECIPE_CRAFTING = guiTexture("recipe/crafting") {}
-    val RECIPE_SMITHING = guiTexture("recipe/smithing") {}
-    val RECIPE_CONVERSION = guiTexture("recipe/conversion") {}
+    val RECIPE_CRAFTING = guiTexture("recipe/crafting") {
+        title { dynamicLine(Alignment.CENTER, Vector2i(0, 34)) }
+    }
+    val RECIPE_SMITHING = guiTexture("recipe/smithing") {
+        title { dynamicLine(Alignment.CENTER, Vector2i(0, 34)) }
+    }
+    val RECIPE_CONVERSION = guiTexture("recipe/conversion") {
+        title { dynamicLine(Alignment.CENTER, Vector2i(0, 34)) }
+    }
     val SIDE_CONFIG = guiTexture("side_config") {
-        title { line(Component.translatable("menu.nova.side_config"), Alignment.LEFT, Vector2i(21, 18)) }
+        title { staticLine(Component.translatable("menu.nova.side_config"), Alignment.LEFT, Vector2i(21, 18)) }
     }
     val TAGS = guiTexture("tags") {}
     

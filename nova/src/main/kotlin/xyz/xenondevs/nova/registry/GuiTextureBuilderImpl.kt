@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.registry
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.joml.Vector2i
 import org.joml.Vector2ic
@@ -12,6 +13,7 @@ import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
 import xyz.xenondevs.nova.resources.builder.task.GuiTextureTask
 import xyz.xenondevs.nova.resources.builder.task.MovedFontContent
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
+import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture.TitleLine
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture.TitlePosition
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture.TitlePosition.Alignment
 import xyz.xenondevs.nova.util.component.adventure.getFontsRecursively
@@ -25,8 +27,7 @@ internal class GuiTextureBuilderImpl(
     
     private var hasInventoryLabel: Boolean = true
     private var configureLayout: GuiTextureLayoutBuilder.() -> Unit = {}
-    private var titlePosition = TitlePosition()
-    private val extraLines = mutableListOf<Pair<Component, TitlePosition>>()
+    private var titleLines: List<TitleLine> = [TitleLine.Dynamic(TitlePosition(), setOf(Key.key("default")))]
     
     private lateinit var data: Provider<GuiTextureData>
     
@@ -39,10 +40,9 @@ internal class GuiTextureBuilderImpl(
     }
     
     override fun title(title: GuiTextureTitleBuilder.() -> Unit) {
-        val titleBuilder = GuiTextureTitleBilderImpl()
+        val titleBuilder = GuiTextureTitleBuilderImpl()
         titleBuilder.title()
-        titlePosition = titleBuilder.titlePosition
-        extraLines += titleBuilder.extraLines
+        titleLines = titleBuilder.lines.toList()
     }
     
     override fun texture(texture: GuiTextureLayoutBuilder.() -> Unit) {
@@ -53,15 +53,15 @@ internal class GuiTextureBuilderImpl(
         data = GuiTextureTask.request(entry) { rpb ->
             // request moved fonts for all used fonts and offsets
             val mfc = rpb.getBuildData<MovedFontContent>()
-            mfc.requestMovedFonts(
-                ResourcePath(ResourceType.Font, "minecraft", "default"),
-                setOf(titlePosition.offset.y())
-            )
-            for ([text, position] in extraLines) {
-                for (font in text.getFontsRecursively()) {
+            for (line in titleLines) {
+                val fonts = when (line) {
+                    is TitleLine.Static -> line.text.getFontsRecursively()
+                    is TitleLine.Dynamic -> line.fonts
+                }
+                for (font in fonts) {
                     mfc.requestMovedFonts(
                         ResourcePath.of(ResourceType.Font, font),
-                        setOf(position.offset.y())
+                        setOf(line.position.offset.y())
                     )
                 }
             }
@@ -73,29 +73,28 @@ internal class GuiTextureBuilderImpl(
         }
     }
     
-    override fun build() = GuiTexture(entry, data, titlePosition, extraLines, hasInventoryLabel)
+    override fun build() = GuiTexture(entry, data, titleLines, hasInventoryLabel)
     
 }
 
-internal class GuiTextureTitleBilderImpl : GuiTextureTitleBuilder {
+internal class GuiTextureTitleBuilderImpl : GuiTextureTitleBuilder {
     
-    var titlePosition = TitlePosition()
-        private set
-    val extraLines = mutableListOf<Pair<Component, TitlePosition>>()
+    val lines = mutableListOf<TitleLine>()
     
-    override fun alignment(
-        alignment: Alignment,
-        offset: Vector2ic
-    ) {
-        titlePosition = TitlePosition(alignment, Vector2i(offset))
-    }
-    
-    override fun line(
+    override fun staticLine(
         text: Component,
         alignment: Alignment,
         offset: Vector2ic
     ) {
-        extraLines += text to TitlePosition(alignment, Vector2i(offset))
+        lines += TitleLine.Static(TitlePosition(alignment, Vector2i(offset)), text)
+    }
+    
+    override fun dynamicLine(
+        alignment: Alignment,
+        offset: Vector2ic,
+        fonts: Set<Key>
+    ) {
+        lines += TitleLine.Dynamic(TitlePosition(alignment, Vector2i(offset)), fonts.toSet())
     }
     
 }

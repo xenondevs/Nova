@@ -1,13 +1,13 @@
 package xyz.xenondevs.nova.ui.overlay.guitexture
 
 import kotlinx.serialization.Serializable
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.joml.Vector2i
 import org.joml.Vector2ic
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
@@ -42,21 +42,14 @@ fun Provider<GuiTexture>.getTitle(translate: String, locale: Provider<Locale>): 
 /**
  * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [GuiTexture.getTitle].
  */
-fun Provider<GuiTexture>.getTitle(title: Component, locale: Provider<Locale>): Provider<Component> =
-    bootstrapFlatMap { it.getTitle(title, locale) }
+fun Provider<GuiTexture>.getTitle(lines: List<Component>, locale: Provider<Locale>): Provider<Component> =
+    bootstrapFlatMap { it.getTitle(lines, locale) }
 
 @Serializable(with = GuiTextureSerializer::class)
 class GuiTexture internal constructor(
     override val entry: RegistryEntry.Nova<GuiTexture>,
     private val data: Provider<GuiTextureData>,
-    /**
-     * The position of the title text added via [getTitle].
-     */
-    val titlePosition: TitlePosition,
-    /**
-     * Additional title text lines and their position that are always there.
-     */
-    val extraLines: List<Pair<Component, TitlePosition>>,
+    private val titleLines: List<TitleLine>,
     /**
      * Whether the inventory label (the title of the player's inventory) should be shown.
      */
@@ -74,34 +67,37 @@ class GuiTexture internal constructor(
     }
     
     /**
-     * Gets a provider of the gui texture component with all [extraLines] for [locale].
+     * Gets a provider of the gui texture component with all static lines for [locale].
      */
-    fun getTitle(locale: Provider<Locale> = provider(Locale.US)): Provider<Component> =
-        getTitle(Component.empty(), locale)
+    fun getTitle(locale: Provider<Locale>): Provider<Component> =
+        getTitle(emptyList(), locale)
     
     /**
-     * Gets a provider of the gui texture component with [translate] as the title text
-     * at [titlePosition] and all [extraLines] for [locale].
+     * Gets a provider of the gui texture component with [translate] in the first dynamic line
+     * and all static lines for [locale].
      */
-    fun getTitle(
-        translate: String,
-        locale: Provider<Locale> = provider(Locale.US)
-    ): Provider<Component> = getTitle(Component.translatable(translate), locale)
+    fun getTitle(translate: String, locale: Provider<Locale>): Provider<Component> =
+        getTitle([Component.translatable(translate)], locale)
     
     /**
-     * Gets a provider of the gui texture component with [title] as the title text
-     * at [titlePosition] and all [extraLines] for [locale].
+     * Gets a provider of the gui texture component with all static lines and [lines] filling the
+     * dynamic lines in the order they are defined.
      */
-    fun getTitle(
-        title: Component,
-        locale: Provider<Locale> = provider(Locale.US)
-    ): Provider<Component> = combinedProvider(data, locale) { data, locale ->
+    fun getTitle(lines: List<Component>, locale: Provider<Locale>): Provider<Component> = combinedProvider(data, locale) { data, locale ->
         val builder = Component.text()
             .move(data.offset)
             .append(Component.text(Character.toString(data.codePoint), NamedTextColor.WHITE).font(data.font))
             .move(-data.width - 1)
         
-        sequenceOf(title to titlePosition, *extraLines.toTypedArray())
+        var dynamicLineIndex = 0
+        titleLines.asSequence()
+            .map { line ->
+                val text = when (line) {
+                    is TitleLine.Static -> line.text
+                    is TitleLine.Dynamic -> lines.getOrNull(dynamicLineIndex++) ?: Component.empty()
+                }
+                text to line.position
+            }
             .filterNot { [text, _] -> text.isEmpty(locale) }
             // render server-side to prevent client-side translation mismatch from impacting alignment
             .map { [text, position] -> LocaleManager.render(text, locale) to position }
@@ -145,6 +141,22 @@ class GuiTexture internal constructor(
             }
         
         builder.build()
+    }
+    
+    internal sealed interface TitleLine {
+        
+        val position: TitlePosition
+        
+        data class Static(
+            override val position: TitlePosition,
+            val text: Component
+        ) : TitleLine
+        
+        data class Dynamic(
+            override val position: TitlePosition,
+            val fonts: Set<Key>
+        ) : TitleLine
+        
     }
     
     /**

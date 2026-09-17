@@ -36,6 +36,7 @@ import xyz.xenondevs.nova.registry.tags.ItemTypeTags
 import xyz.xenondevs.nova.ui.menu.item.installItemScrollSupport
 import xyz.xenondevs.nova.ui.menu.item.scrollBar
 import xyz.xenondevs.nova.ui.menu.item.scrollableItemProvider
+import xyz.xenondevs.nova.ui.menu.locale
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.ui.overlay.guitexture.component
 import xyz.xenondevs.nova.util.PlayerMapManager
@@ -72,7 +73,7 @@ internal fun <T : Keyed> createTagExplorer(
     val mainWindow = provider {
         window(player) {
             title by combinedProvider(DefaultGuiTextures.TAGS, tags, tab) { texture, tags, tab ->
-                texture.getTitle(Component.text("#" + tags[tab].tagKey.key().asString()))
+                texture.getTitle([Component.text("#" + tags[tab].tagKey.key().asString())], locale)
             }.flatten()
             upperGui by gui(
                 "k k k k s v v v v",

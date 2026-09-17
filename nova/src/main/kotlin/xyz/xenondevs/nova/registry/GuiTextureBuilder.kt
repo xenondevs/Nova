@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.registry
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.joml.Vector2i
 import org.joml.Vector2ic
@@ -20,7 +21,9 @@ sealed interface GuiTextureBuilder : RegistryEntryBuilder.Nova<GuiTexture> {
     fun inventoryLabel(inventoryLabel: Boolean)
     
     /**
-     * Configures the title text and its alignment.
+     * Configures the title lines.
+     * If this function is not called, the title consists of one [dynamic line][GuiTextureTitleBuilder.dynamicLine]
+     * at the default position.
      */
     fun title(title: GuiTextureTitleBuilder.() -> Unit)
     
@@ -32,31 +35,32 @@ sealed interface GuiTextureBuilder : RegistryEntryBuilder.Nova<GuiTexture> {
 }
 
 /**
- * A builder for the title of a [GuiTexture], consisting of one or more lines.
- * A [GuiTexture's][GuiTexture] title can be both:
- * * static: defined via [line], retrieved via [GuiTexture.getTitle], or
- * * dynamic: only alignment is defined via [alignment], actual text is set in [GuiTexture.getTitle].
+ * A builder for the title of a [GuiTexture], consisting of static and dynamic lines.
+ * Static lines are defined during registration, while the contents of dynamic lines are supplied to
+ * [GuiTexture.getTitle] in declaration order.
  */
 @RegistryElementBuilderDsl
 sealed interface GuiTextureTitleBuilder {
     
     /**
-     * Sets the positioning of the title text used in [GuiTexture.getTitle].
+     * Adds a static title line whose [text] is defined during registration.
      */
-    fun alignment(
+    fun staticLine(
+        text: Component,
         alignment: Alignment = Alignment.DEFAULT,
         offset: Vector2ic = Vector2i(0, 0)
     )
     
     /**
-     * Adds a line of text to the default title, additional to any custom title
-     * text set in [GuiTexture.getTitle].
-     * Can be invoked multiple times to add multiple lines.
+     * Adds a dynamic title line whose contents are supplied to [GuiTexture.getTitle].
+     *
+     * [fonts] should list all fonts that may be used during runtime. Vertically moved variants
+     * will be automatically generated for them.
      */
-    fun line(
-        text: Component,
+    fun dynamicLine(
         alignment: Alignment = Alignment.DEFAULT,
-        offset: Vector2ic = Vector2i(0, 0)
+        offset: Vector2ic = Vector2i(0, 0),
+        fonts: Set<Key> = setOf(Key.key("minecraft", "default"))
     )
     
 }

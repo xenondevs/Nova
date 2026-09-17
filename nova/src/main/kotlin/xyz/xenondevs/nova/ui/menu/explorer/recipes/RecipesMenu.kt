@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.ui.menu.explorer.recipes
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.ShadowColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
@@ -22,22 +23,17 @@ import xyz.xenondevs.invui.gui.pageProvider
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.nova.registry.entries.ItemTypeEntries
-import xyz.xenondevs.nova.resources.CharSizes
-import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureAlignment
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.ui.menu.locale
 import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.PlayerMapManager
-import xyz.xenondevs.nova.util.component.adventure.font
-import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.itemType
 import xyz.xenondevs.nova.world.item.recipe.RecipeContainer
 import xyz.xenondevs.nova.world.item.recipe.RecipeRegistry
 import java.util.*
-import kotlin.math.round
 
 /**
  * Tries to open the recipe explorer for the recipes of [item],
@@ -144,18 +140,9 @@ internal class RecipesMenu(
             val activePage = activeTab.flatMap { it?.pageProvider ?: provider(0) }
             val activePageCount = activeTab.flatMap { it?.pageCountProvider ?: provider(0) }
             title by combinedProvider(tab, activePage, activePageCount) { tab, activePage, activePageCount ->
-                val pageNumberString = "${activePage + 1} / $activePageCount"
-                val pageNumberComponent = Component.text(pageNumberString, NamedTextColor.WHITE).font("nova:recipes_numbers")
                 recipes[tab].first.texture.getTitle(
-                    Component.text()
-                        .move(
-                            round(GuiTextureAlignment.CHEST_OFFSET.x() + GuiTextureAlignment.CHEST_WIDTH / 2f
-                                // -1 to account for space after last char (counts towards width, but isn't visible)
-                                // -1 to account for shadow which recipe_numbers has as part of the char
-                                - (CharSizes.calculateComponentWidth(pageNumberComponent) - 2) / 2f)
-                        )
-                        .append(pageNumberComponent)
-                        .build(),
+                    [Component.text("${activePage + 1} / $activePageCount", NamedTextColor.WHITE)
+                        .shadowColor(ShadowColor.shadowColor(0xFF282828.toInt()))],
                     locale
                 )
             }.flatten()

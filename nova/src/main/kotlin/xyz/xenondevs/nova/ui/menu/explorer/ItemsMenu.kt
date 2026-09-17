@@ -217,7 +217,7 @@ internal class ItemsMenu private constructor(val player: Player) {
                         .append(Component.text(filter, NamedTextColor.GRAY))
                         .append(Component.text(")", NamedTextColor.DARK_GRAY))
                         .build()
-                    DefaultGuiTextures.SEARCH_RESULTS.getTitle(title, locale)
+                    DefaultGuiTextures.SEARCH_RESULTS.getTitle([title], locale)
                 }.flatten()
                 
                 upperGui by scrollItemsGui(
@@ -389,7 +389,7 @@ private fun tabPageForwardItem(page: MutableProvider<Int>, pageCount: Provider<I
             ItemTypeEntries.AIR
         else if (page + 1 < pageCount)
             DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON
-        else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF   
+        else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF
     }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() < pageCount.get() - 1) {
