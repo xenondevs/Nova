@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.command.impl
 
-import xyz.xenondevs.nova.util.asBukkitMirror
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -25,7 +24,9 @@ import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.nbt.NbtUtils
+import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Bukkit
+import org.bukkit.Chunk
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
@@ -66,6 +67,7 @@ import xyz.xenondevs.nova.ui.menu.explorer.itemTagExplorer
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.util.addItemCorrectly
+import xyz.xenondevs.nova.util.asBukkitMirror
 import xyz.xenondevs.nova.util.component.adventure.indent
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
 import xyz.xenondevs.nova.util.data.UpdatableFile
@@ -77,7 +79,6 @@ import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.toBlock
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
-import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.hitbox.HitboxManager
@@ -168,10 +169,15 @@ internal object NovaCommand : Command() {
                 .then(argument("item", ArgumentTypes.resource(RegistryKey.ITEM))
                     .executes0(::giveClientsideStack)))
             .then(literal("searchBlock")
-                .requiresPlayer()
                 .then(argument("block", ArgumentTypes.resource(RegistryKey.BLOCK))
+                    .requiresPlayer()
                     .then(argument("range", IntegerArgumentType.integer(0, 10))
-                        .executes0(::searchBlock))))
+                        .executes0(::searchBlockFromPlayer)))
+                .then(argument("chunkX", IntegerArgumentType.integer())
+                    .then(argument("chunkZ", IntegerArgumentType.integer())
+                        .then(argument("block", ArgumentTypes.resource(RegistryKey.BLOCK))
+                            .then(argument("range", IntegerArgumentType.integer(0, 10))
+                                .executes0(::searchBlockFromChunk))))))
             .then(literal("fill")
                 .requiresPlayer()
                 .then(argument("from", ArgumentTypes.blockPosition())
@@ -882,17 +888,27 @@ internal object NovaCommand : Command() {
         ))
     }
     
-    private fun searchBlock(ctx: CommandContext<CommandSourceStack>) {
-        val player = ctx.player
+    private fun searchBlockFromPlayer(ctx: CommandContext<CommandSourceStack>) {
+        searchBlock(ctx, ctx.player.location.chunk)
+    }
+    
+    private fun searchBlockFromChunk(ctx: CommandContext<CommandSourceStack>) {
+        val chunkX: Int = ctx["chunkX"]
+        val chunkZ: Int = ctx["chunkZ"]
+        val world = ctx.source.location.world
+        searchBlock(ctx, world.getChunkAt(chunkX, chunkZ))
+    }
+    
+    private fun searchBlock(ctx: CommandContext<CommandSourceStack>, center: Chunk) {
         val block: BlockType = ctx["block"]
         val range: Int = ctx["range"]
         
         val nmsBlock = block.nmsBlock
-        val center = player.location.chunkPos
+        val query: (BlockState) -> Boolean = { it.block == nmsBlock }
         for (xOff in -range..range) {
             for (zOff in -range..range) {
-                val chunkPos = ChunkPos(center.worldUUID, center.x + xOff, center.z + zOff)
-                BlockStateSearcher.searchChunk(chunkPos, listOf { it.block == nmsBlock })[0]?.forEach { [pos, _] ->
+                val chunk = center.world.getChunkAt(center.x + xOff, center.z + zOff)
+                BlockStateSearcher.searchChunk(chunk, query) { pos, _ ->
                     sendBlockSearchResult(ctx, block.name, pos.x, pos.y, pos.z)
                 }
             }
