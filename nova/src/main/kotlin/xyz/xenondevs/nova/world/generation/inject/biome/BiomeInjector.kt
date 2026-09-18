@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.generation.inject.biome
 
+import net.kyori.adventure.key.Key
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
 import net.minecraft.core.registries.Registries
@@ -13,25 +14,29 @@ import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.registry.LegacyNovaRegistries
 import xyz.xenondevs.nova.registry.postFreeze
-import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
 private val LOG_INJECTIONS by MAIN_CONFIG.entry<Boolean>("debug", "logging", "biome_injections")
 private val GENERATION_STEPS = GenerationStep.Decoration.entries.size
 
-@OptIn(ExperimentalWorldGen::class)
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
 internal object BiomeInjector {
+    
+    private val injections = LinkedHashMap<Key, BiomeInjection>()
+    
+    fun add(key: Key, injection: BiomeInjection) {
+        require(key !in injections) { "Duplicate biome injection: ${key.asString()}" }
+        injections[key] = injection
+    }
     
     @InitFun
     fun prepareInjections() {
         Registries.BIOME.postFreeze { biomeRegistry, _ ->
-            val toInject = HashMap<Biome, Array<MutableSet<Holder<PlacedFeature>>>>()
-            for (biomeInjection in LegacyNovaRegistries.BIOME_INJECTION) {
+            val toInject = LinkedHashMap<Biome, Array<LinkedHashSet<Holder<PlacedFeature>>>>()
+            for (biomeInjection in injections.values) {
                 val biomes = biomeInjection.resolveAffectedBiomes(biomeRegistry)
                 for (biome in biomes) {
-                    val featuresPerStep = toInject.getOrPut(biome) { Array(GENERATION_STEPS) { HashSet() } }
+                    val featuresPerStep = toInject.getOrPut(biome) { Array(GENERATION_STEPS) { LinkedHashSet() } }
                     for ([i, features] in biomeInjection.features.withIndex()) {
                         featuresPerStep[i] += features
                     }
@@ -45,6 +50,7 @@ internal object BiomeInjector {
                 
                 injectFeatures(biome, injections.asList())
             }
+            injections.clear()
         }
     }
     

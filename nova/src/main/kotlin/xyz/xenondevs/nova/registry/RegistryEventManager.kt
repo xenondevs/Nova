@@ -24,11 +24,12 @@ internal object RegistryEventManager {
     
     private val preFreezeListeners = ConcurrentHashMap<ResourceKey<*>, ArrayList<PreFreezeListener<*>>>()
     private val postFreezeListeners = ConcurrentHashMap<ResourceKey<*>, ArrayList<PostFreezeListener<*>>>()
-    private val frozen = concurrentHashSet<ResourceKey<*>>()
+    private val frozen = concurrentHashSet<ResourceKey<out Registry<*>>>()
     
     @JvmStatic
     fun handlePreFreeze(registry: WritableRegistry<*>, lookup: RegistryOps.RegistryInfoLookup) {
         val key = registry.key()
+        frozen += key
         try {
             preFreezeListeners.remove(key)?.forEach { it(registry, lookup) }
         } catch (t: Throwable) {
@@ -48,6 +49,7 @@ internal object RegistryEventManager {
         } catch (t: Throwable) {
             LOGGER.error("An exception occurred while running registry post-freeze listeners for $key", t)
         }
+        frozen += key
     }
     
     @JvmStatic
@@ -62,6 +64,7 @@ internal object RegistryEventManager {
             } catch (t: Throwable) {
                 LOGGER.error("An exception occurred while running registry post-freeze listeners for $key", t)
             }
+            frozen += key
         }
     }
     

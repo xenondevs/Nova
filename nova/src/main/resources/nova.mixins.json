@@ -53,6 +53,7 @@
     "registry.events.BuiltInRegistriesMixin",
     "registry.events.RegistryDataLoaderMixin",
     "registry.events.ResourceManagerRegistryLoadTaskMixin",
+    "worldgen.StructureTemplateManagerMixin",
     "worldmigration.DimensionStorageFileFixMixin",
     "worldmigration.WorldMigrationSupportMixin"
   ],

@@ -3,16 +3,18 @@ package xyz.xenondevs.nova.registry
 import com.mojang.serialization.MapCodec
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.tag.TagKey
-import it.unimi.dsi.fastutil.doubles.DoubleArrayList
-import it.unimi.dsi.fastutil.doubles.DoubleList
 import net.kyori.adventure.key.Namespaced
+import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.dimension.DimensionType
+import net.minecraft.world.level.dimension.LevelStem
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings
 import net.minecraft.world.level.levelgen.carver.WorldCarver
 import net.minecraft.world.level.levelgen.feature.Feature
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import net.minecraft.world.level.levelgen.placement.PlacementModifier
 import net.minecraft.world.level.levelgen.structure.Structure
@@ -22,9 +24,11 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType
+import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList
 import net.minecraft.world.level.levelgen.synth.NormalNoise
 import org.bukkit.Keyed
 import org.bukkit.block.BlockType
@@ -53,6 +57,7 @@ import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 import xyz.xenondevs.nova.util.Identifier
 import xyz.xenondevs.nova.util.parseKey
+import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.block.TileEntityConstructor
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
@@ -65,11 +70,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterSerializer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterType
-import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
-import xyz.xenondevs.nova.world.generation.builder.BiomeBuilder
-import xyz.xenondevs.nova.world.generation.builder.BiomeInjectionBuilder
-import xyz.xenondevs.nova.world.generation.builder.DimensionTypeBuilder
-import xyz.xenondevs.nova.world.generation.builder.PlacedFeatureBuilder
+import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjector
 import xyz.xenondevs.nova.world.item.Equipment
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
@@ -386,138 +387,206 @@ abstract class Registrar internal constructor() : Namespaced {
     //</editor-fold>
     
     //<editor-fold desc="worldgen">
-    @ExperimentalWorldGen
+    /**
+     * Registers an entry in [registryKey] under [name] using [create].
+     */
+    private fun <T : Any> worldgenEntry(
+        name: String,
+        registryKey: ResourceKey<out Registry<T>>,
+        create: context(RegistryLookupContext) () -> T
+    ): ResourceKey<T> {
+        val key = ResourceKey.create(registryKey, Identifier(this, name))
+        registryKey.preFreeze { registry, lookup ->
+            registry[key] = context(RegistryLookupContextImpl(lookup)) { create() }
+        }
+        return key
+    }
+    
+    /**
+     * Registers a new [Biome] under [name] after configuring a [Biome.BiomeBuilder] with [biome].
+     */
+    fun biome(
+        name: String,
+        biome: context(RegistryLookupContext) Biome.BiomeBuilder.() -> Unit
+    ): ResourceKey<Biome> = worldgenEntry(name, Registries.BIOME) {
+        Biome.BiomeBuilder().apply { biome() }.build()
+    }
+    
+    /**
+     * Registers a new [MaterialCondition] under [name] using [materialCondition].
+     */
+    fun materialCondition(name: String, materialCondition: context(RegistryLookupContext) () -> MaterialCondition): ResourceKey<MaterialCondition> =
+        worldgenEntry(name, Registries.MATERIAL_CONDITION, materialCondition)
+    
+    /**
+     * Registers a new [MaterialRule] under [name] using [materialRule].
+     */
+    fun materialRule(name: String, materialRule: context(RegistryLookupContext) () -> MaterialRule): ResourceKey<MaterialRule> =
+        worldgenEntry(name, Registries.MATERIAL_RULE, materialRule)
+    
+    /**
+     * Registers a new [DimensionType] under [name] using [dimensionType].
+     */
+    fun dimensionType(name: String, dimensionType: context(RegistryLookupContext) () -> DimensionType): ResourceKey<DimensionType> =
+        worldgenEntry(name, Registries.DIMENSION_TYPE, dimensionType)
+    
+    /**
+     * Registers a new [PlacedFeature] under [name] using [placedFeature].
+     */
+    fun placedFeature(name: String, placedFeature: context(RegistryLookupContext) () -> PlacedFeature): ResourceKey<PlacedFeature> =
+        worldgenEntry(name, Registries.PLACED_FEATURE, placedFeature)
+    
+    /**
+     * Registers a complete dimension under [name] using [dimension] to create its [LevelStem].
+     */
+    fun dimension(name: String, dimension: context(RegistryLookupContext) () -> LevelStem): ResourceKey<LevelStem> =
+        worldgenEntry(name, Registries.LEVEL_STEM, dimension)
+    
+    /**
+     * Registers [ruleTestType] under [name].
+     */
     fun <T : RuleTest> registerRuleTestType(name: String, ruleTestType: RuleTestType<T>): RuleTestType<T> {
         val id = Identifier(this, name)
         Registries.RULE_TEST[id] = ruleTestType
         return ruleTestType
     }
     
-    @ExperimentalWorldGen
-    fun <T : RuleTest> registerRuleTestType(name: String, codec: MapCodec<T>): RuleTestType<T> =
-        registerRuleTestType(name) { codec }
-    
-    @ExperimentalWorldGen
-    fun biomeInjection(name: String, biomeInjection: BiomeInjectionBuilder.() -> Unit) {
-        buildRegistryElementLater(this, name, Registries.BIOME, ::BiomeInjectionBuilder, biomeInjection)
+    /**
+     * Registers a biome injection under [name] after configuring it with [biomeInjection].
+     */
+    fun biomeInjection(name: String, biomeInjection: context(RegistryLookupContext) BiomeInjectionBuilder.() -> Unit) {
+        val key = parseKey(name, this)
+        Registries.BIOME.preFreeze { _, lookup ->
+            val injection = context(RegistryLookupContextImpl(lookup)) {
+                BiomeInjectionBuilder().apply { biomeInjection() }.build()
+            }
+            BiomeInjector.add(key, injection)
+        }
     }
     
-    @ExperimentalWorldGen
-    fun biome(name: String, biome: BiomeBuilder.() -> Unit): ResourceKey<Biome> =
-        buildRegistryElementLater(this, name, Registries.BIOME, ::BiomeBuilder, biome)
-    
-    @ExperimentalWorldGen
+    /**
+     * Registers [carver] under [name].
+     */
     fun registerCarver(name: String, carver: WorldCarver): ResourceKey<WorldCarver> {
         val key = ResourceKey.create(Registries.CARVER, Identifier(this, name))
         Registries.CARVER[key] = carver
         return key
     }
     
-    @ExperimentalWorldGen
+    /**
+     * Registers a new carver type under [name] using [codec].
+     */
     fun registerCarverType(name: String, codec: MapCodec<out WorldCarver>): MapCodec<out WorldCarver> {
         val id = Identifier(this, name)
         Registries.CARVER_TYPE[id] = codec
         return codec
     }
     
-    @ExperimentalWorldGen
-    fun dimensionType(name: String, dimensionType: DimensionTypeBuilder.() -> Unit): ResourceKey<DimensionType> =
-        buildRegistryElementLater(this, name, Registries.DIMENSION_TYPE, ::DimensionTypeBuilder, dimensionType)
-    
-    @ExperimentalWorldGen
-    fun placedFeature(name: String, placedFeature: PlacedFeatureBuilder.() -> Unit): ResourceKey<PlacedFeature> =
-        buildRegistryElementLater(this, name, Registries.PLACED_FEATURE, ::PlacedFeatureBuilder, placedFeature)
-    
-    @ExperimentalWorldGen
-    fun feature(name: String, feature: Feature): ResourceKey<Feature> {
+    /**
+     * Registers [feature] under [name].
+     */
+    fun registerFeature(name: String, feature: Feature): ResourceKey<Feature> {
         val key = ResourceKey.create(Registries.FEATURE, Identifier(this, name))
         Registries.FEATURE[key] = feature
         return key
     }
     
-    @ExperimentalWorldGen
-    fun featureType(name: String, codec: MapCodec<out Feature>): MapCodec<out Feature> {
+    /**
+     * Registers a new feature type under [name] using [codec].
+     */
+    fun registerFeatureType(name: String, codec: MapCodec<out Feature>): MapCodec<out Feature> {
         val id = Identifier(this, name)
         Registries.FEATURE_TYPE[id] = codec
         return codec
     }
     
-    @ExperimentalWorldGen
-    fun <P : PlacementModifier> placementModifierType(name: String, codec: MapCodec<P>): MapCodec<P> {
+    /**
+     * Registers a new placement modifier type under [name] using [codec].
+     */
+    fun <P : PlacementModifier> registerPlacementModifierType(name: String, codec: MapCodec<P>): MapCodec<P> {
         val id = Identifier(this, name)
         Registries.PLACEMENT_MODIFIER_TYPE[id] = codec
         return codec
     }
     
-    @ExperimentalWorldGen
+    /**
+     * Registers [noise] under [name].
+     */
     fun registerNoise(name: String, noise: NormalNoise): NormalNoise {
         val id = Identifier(this, name)
         Registries.NOISE[id] = noise
         return noise
     }
     
-    @ExperimentalWorldGen
-    fun registerParityNoise(name: String, firstOctave: Int, amplitudes: DoubleList) =
-        registerNoise(name, NormalNoise.createParity(firstOctave, amplitudes))
+    /**
+     * Registers new [NoiseGeneratorSettings] under [name] using [noiseSettings].
+     */
+    fun noiseSettings(name: String, noiseSettings: context(RegistryLookupContext) () -> NoiseGeneratorSettings): ResourceKey<NoiseGeneratorSettings> =
+        worldgenEntry(name, Registries.NOISE_SETTINGS, noiseSettings)
     
-    @ExperimentalWorldGen
-    fun registerParityNoise(name: String, firstOctave: Int, amplitudes: List<Double>) =
-        registerParityNoise(name, firstOctave, DoubleArrayList(amplitudes))
+    /**
+     * Registers a new [Structure] under [name] using [structure].
+     */
+    fun structure(name: String, structure: context(RegistryLookupContext) () -> Structure): ResourceKey<Structure> =
+        worldgenEntry(name, Registries.STRUCTURE, structure)
     
-    @ExperimentalWorldGen
-    fun registerParityNoise(name: String, firstOctave: Int, vararg amplitudes: Double) =
-        registerParityNoise(name, firstOctave, DoubleArrayList(amplitudes))
-    
-    @ExperimentalWorldGen
-    fun registerNoiseGenerationSettings(name: String, settings: NoiseGeneratorSettings): NoiseGeneratorSettings {
-        val id = Identifier(this, name)
-        Registries.NOISE_SETTINGS[id] = settings
-        return settings
-    }
-    
-    @ExperimentalWorldGen
-    fun registerStructure(name: String, structure: Structure): Structure {
-        val id = Identifier(this, name)
-        Registries.STRUCTURE[id] = structure
-        return structure
-    }
-    
-    @ExperimentalWorldGen
+    /**
+     * Registers [structurePoolElementType] under [name].
+     */
     fun <P : StructurePoolElement> registerStructurePoolElementType(name: String, structurePoolElementType: StructurePoolElementType<P>): StructurePoolElementType<P> {
         val id = Identifier(this, name)
         Registries.STRUCTURE_POOL_ELEMENT[id] = structurePoolElementType
         return structurePoolElementType
     }
     
-    @ExperimentalWorldGen
+    /**
+     * Registers [structurePieceType] under [name].
+     */
     fun registerStructurePieceType(name: String, structurePieceType: StructurePieceType): StructurePieceType {
         val id = Identifier(this, name)
         Registries.STRUCTURE_PIECE[id] = structurePieceType
         return structurePieceType
     }
     
-    @ExperimentalWorldGen
+    /**
+     * Registers a new structure placement type under [name] using [codec].
+     */
     fun <SP : StructurePlacement> registerStructurePlacementType(name: String, codec: MapCodec<out SP>): MapCodec<out SP> {
         val id = Identifier(this, name)
         Registries.STRUCTURE_PLACEMENT[id] = codec
         return codec
     }
     
-    @ExperimentalWorldGen
+    /**
+     * Registers a new structure processor type under [name] using [structureProcessorType].
+     */
     fun <P : StructureProcessor> registerStructureProcessorType(name: String, structureProcessorType: MapCodec<out P>): MapCodec<out P> {
         val id = Identifier(this, name)
         Registries.STRUCTURE_PROCESSOR[id] = structureProcessorType
         return structureProcessorType
     }
     
-    @ExperimentalWorldGen
-    fun registerStructureSet(name: String, structureSet: StructureSet): StructureSet {
-        val id = Identifier(this, name)
-        Registries.STRUCTURE_SET[id] = structureSet
-        return structureSet
-    }
+    /**
+     * Registers a new [StructureSet] under [name] using [structureSet].
+     */
+    fun structureSet(name: String, structureSet: context(RegistryLookupContext) () -> StructureSet): ResourceKey<StructureSet> =
+        worldgenEntry(name, Registries.STRUCTURE_SET, structureSet)
     
-    @ExperimentalWorldGen
+    /**
+     * Registers a new [StructureTemplatePool] under [name] using [templatePool].
+     */
+    fun templatePool(name: String, templatePool: context(RegistryLookupContext) () -> StructureTemplatePool): ResourceKey<StructureTemplatePool> =
+        worldgenEntry(name, Registries.TEMPLATE_POOL, templatePool)
+    
+    /**
+     * Registers a new [StructureProcessorList] under [name] using [processorList].
+     */
+    fun processorList(name: String, processorList: context(RegistryLookupContext) () -> StructureProcessorList): ResourceKey<StructureProcessorList> =
+        worldgenEntry(name, Registries.PROCESSOR_LIST, processorList)
+    
+    /**
+     * Registers [structureType] under [name].
+     */
     fun <S : Structure> registerStructureType(name: String, structureType: StructureType<S>): StructureType<S> {
         val id = Identifier(this, name)
         Registries.STRUCTURE_TYPE[id] = structureType
