@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.resources.builder.task
 
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.ResourcePath
@@ -68,12 +69,17 @@ class MovedFontContent : PackBuildData {
      */
     inner class Write(private val builder: ResourcePackBuilder) : PackTask {
         
-        override val runsAfter = setOf(FontContent.LoadAll::class)
+        override val runsAfter = setOf(FontContent.LoadAll::class, LanguageContent.LoadAll::class)
         override val runsBefore = setOf(FontContent.Write::class)
         
+        private val langContent by builder.getBuildDataLazily<LanguageContent>()
         private val fontContent by builder.getBuildDataLazily<FontContent>()
         
         override suspend fun run() {
+            val usedGlyphs = IntOpenHashSet()
+            for ([_, t] in langContent.vanillaLangs) for ([_, v] in t) for (c in v.codePoints()) usedGlyphs.add(c)
+            for ([_, t] in langContent.customLangs) for ([_, v] in t) for (c in v.codePoints()) usedGlyphs.add(c)
+            
             builder.logger.info("Creating moved fonts")
             
             val bitmapFonts = HashMap<ResourcePath<ResourceType.Font>, Font>()
@@ -82,7 +88,7 @@ class MovedFontContent : PackBuildData {
                     val font = fontContent.mergedFonts[id]
                         ?: throw IllegalStateException("Font ${id.asString()} does not exist or is not loaded in FontContent")
                     
-                    BitmapFontGenerator(builder, font).generateBitmapFont()
+                    BitmapFontGenerator(builder, font).generateBitmapFont(if (id.namespace == "minecraft") usedGlyphs else null)
                 }
             }
             

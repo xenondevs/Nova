@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.resources.builder
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.ints.IntSet
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.font.Font
@@ -29,16 +31,16 @@ internal class BitmapFontGenerator(
     /**
      * Creates a new [Font] under the same id as the original [font], with the same [ReferenceProviders][ReferenceProvider],
      * [SpaceProviders][SpaceProvider] and [BitmapProviders][BitmapProvider], but with all [UnihexProviders][UnihexProvider]
-     * converted to [BitmapProviders][BitmapProvider].
+     * converted to [BitmapProviders][BitmapProvider] which are optionally filtered by [codePointWhitelist] before conversion.
      */
-    fun generateBitmapFont(): Font {
+    fun generateBitmapFont(codePointWhitelist: IntSet? = null): Font {
         builder.logger.info("Creating a bitmap font for $font")
         
         val providers = ArrayList<FontProvider>()
         for (provider in font.providers) {
             when (provider) {
                 is ReferenceProvider, is SpaceProvider, is BitmapProvider<*> -> providers.add(provider)
-                is UnihexProvider -> providers.addAll(convertUnihexProvider(provider))
+                is UnihexProvider -> providers.addAll(convertUnihexProvider(provider, codePointWhitelist))
                 else -> builder.logger.warn("Skipping unsupported font provider type: ${provider::class.simpleName}")
             }
         }
@@ -47,15 +49,28 @@ internal class BitmapFontGenerator(
     }
     
     /**
-     * Converts the given [UnihexProvider] to a list of [BitmapProviders][BitmapProvider].
+     * Converts the given [UnihexProvider] to a list of [BitmapProviders][BitmapProvider], optionally filtered by [codePointWhitelist].
      *
      * Also writes their bitmap textures to the resource pack build directory.
      */
-    private fun convertUnihexProvider(provider: UnihexProvider): List<BitmapProvider<IntArray>> =
-        provider.glyphRasters.map { [width, glyphRasters] ->
-            val bitmapProvider = buildBitmapProvider(provider, width, glyphRasters)
+    private fun convertUnihexProvider(provider: UnihexProvider, codePointWhitelist: IntSet?): List<BitmapProvider<IntArray>> =
+        provider.glyphRasters.mapNotNull { [width, glyphRasters] ->
+            val bitmapProvider: BitmapProvider<IntArray>
+            if (codePointWhitelist != null) {
+                val filtered = Int2ObjectOpenHashMap<IntArray>()
+                for (entry in glyphRasters.int2ObjectEntrySet()) {
+                    if (codePointWhitelist.contains(entry.intKey)) {
+                        filtered.put(entry.intKey, entry.value)
+                    }
+                }
+                if (filtered.isEmpty())
+                    return@mapNotNull null
+                bitmapProvider = buildBitmapProvider(provider, width, filtered)
+            } else {
+               bitmapProvider =  buildBitmapProvider(provider, width, glyphRasters)
+            }
             bitmapProvider.write(builder)
-            return@map bitmapProvider
+            return@mapNotNull bitmapProvider
         }
     
     /**
