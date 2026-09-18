@@ -21,7 +21,7 @@ internal class UnloadChunkTask(
     private inner class UnloadChunkTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = this@UnloadChunkTask.chunkPos.toString()
+        val pos: String = chunkPos.toString()
         
     }
     

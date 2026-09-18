@@ -77,9 +77,9 @@ class NetworkType<T : Network<T>> internal constructor(
     val tickDelay: Int
 ) : NovaRegistryElement<NetworkType<T>> {
     
-    override fun toString(): String = this@NetworkType.key.asString()
-    override fun hashCode(): Int = this@NetworkType.key.hashCode()
-    override fun equals(other: Any?): Boolean = other is NetworkType<*> && this@NetworkType.key == other.key
+    override fun toString(): String = key.asString()
+    override fun hashCode(): Int = key.hashCode()
+    override fun equals(other: Any?): Boolean = other is NetworkType<*> && key == other.key
     
 }
 

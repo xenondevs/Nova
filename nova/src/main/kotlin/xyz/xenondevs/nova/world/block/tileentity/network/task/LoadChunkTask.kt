@@ -33,7 +33,7 @@ internal class LoadChunkTask(
     private inner class LoadChunkTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = this@LoadChunkTask.chunkPos.toString()
+        val pos: String = chunkPos.toString()
         
     }
     

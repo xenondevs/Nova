@@ -88,10 +88,10 @@ internal class VanillaChestTileEntity internal constructor(
         inventoryLayout = InventoryLayout(CubeFaceMap(inventory))
         
         NetworkManager.queue(block.chunkPos) { state ->
-            if (this@VanillaChestTileEntity !in state)
+            if (this !in state)
                 return@queue false
             
-            state.forEachNetwork(this@VanillaChestTileEntity) { _, _, network ->
+            state.forEachNetwork(this) { _, _, network ->
                 network.markDirty()
                 network.cluster?.invalidate()
             }

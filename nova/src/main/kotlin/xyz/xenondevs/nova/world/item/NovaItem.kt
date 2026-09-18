@@ -281,13 +281,13 @@ internal class NovaItem(
      * Checks whether this [NovaItem] has an [ItemBehavior] of the reified type [T], or a subclass of it.
      */
     fun <T : Any> hasBehavior(type: Class<T>): Boolean =
-        this@NovaItem.behaviors.any { type.isAssignableFrom(it::class.java) }
+        behaviors.any { type.isAssignableFrom(it::class.java) }
     
     /**
      * Gets the first [ItemBehavior] that is an instance of [T], or null if there is none.
      */
     fun <T : Any> getBehaviorOrNull(type: Class<T>): T? =
-        this@NovaItem.behaviors.firstOrNull { type.isAssignableFrom(it::class.java) } as T?
+        behaviors.firstOrNull { type.isAssignableFrom(it::class.java) } as T?
     
     /**
      * Gets the first [ItemBehavior] that is an instance of [T], or throws an [IllegalStateException] if there is none.
@@ -305,7 +305,7 @@ internal class NovaItem(
         block: Block,
         damage: Double
     ): Double = runSafely("modify block damage", damage) {
-        this@NovaItem.behaviors.fold(damage) { currentDamage, behavior ->
+        behaviors.fold(damage) { currentDamage, behavior ->
             behavior.modifyBlockDamage(player, itemStack.clone(), block, currentDamage)
         }
     }
@@ -318,7 +318,7 @@ internal class NovaItem(
         server: ItemStack,
         client: ItemType
     ): ItemType = runSafely("modify client-side item type", client, allowOffMain = true) {
-        this@NovaItem.behaviors.fold(client) { current, behavior -> behavior.modifyClientSideItemType(player, server.clone(), current) }
+        behaviors.fold(client) { current, behavior -> behavior.modifyClientSideItemType(player, server.clone(), current) }
     }
     
     /**
@@ -329,7 +329,7 @@ internal class NovaItem(
         server: ItemStack,
         client: ItemStack
     ): ItemStack = runSafely("modify client-side stack", client, allowOffMain = true) {
-        this@NovaItem.behaviors.fold(client.clone()) { stack, behavior -> behavior.modifyClientSideStack(player, server.clone(), stack) }
+        behaviors.fold(client.clone()) { stack, behavior -> behavior.modifyClientSideStack(player, server.clone(), stack) }
     }
     
     internal fun useNms(
@@ -366,7 +366,7 @@ internal class NovaItem(
     fun use(
         ctx: Context<ItemUse>
     ): InteractionResult = runSafely("handle use", InteractionResult.Fail) {
-        for (behavior in this@NovaItem.behaviors) {
+        for (behavior in behaviors) {
             val result = behavior.use(ctx[ItemUse.HELD_ITEM_STACK], ctx)
             if (result !is InteractionResult.Pass)
                 return result
@@ -411,7 +411,7 @@ internal class NovaItem(
     fun useOnBlock(
         ctx: Context<BlockInteract>
     ): InteractionResult = runSafely("handle use on", InteractionResult.Fail) {
-        for (behavior in this@NovaItem.behaviors) {
+        for (behavior in behaviors) {
             val result = behavior.useOnBlock(ctx[BlockInteract.HELD_ITEM_STACK], ctx[BlockInteract.BLOCK], ctx)
             if (result !is InteractionResult.Pass)
                 return result
@@ -459,7 +459,7 @@ internal class NovaItem(
     fun useOnEntity(
         ctx: Context<EntityInteract>
     ): InteractionResult = runSafely("handle use on living entity", InteractionResult.Fail) {
-        for (behavior in this@NovaItem.behaviors) {
+        for (behavior in behaviors) {
             val result = behavior.useOnEntity(ctx[EntityInteract.HELD_ITEM_STACK], ctx[EntityInteract.TARGET_ENTITY], ctx)
             if (result !is InteractionResult.Pass)
                 return result
@@ -476,7 +476,7 @@ internal class NovaItem(
         attacked: Entity,
         event: EntityDamageByEntityEvent
     ): Unit = runSafely("handle attack entity") {
-        this@NovaItem.behaviors.forEach { it.handleAttackEntity(player, itemStack.clone(), attacked, event) }
+        behaviors.forEach { it.handleAttackEntity(player, itemStack.clone(), attacked, event) }
     }
     
     /**
@@ -487,7 +487,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         event: BlockBreakEvent
     ): Unit = runSafely("handle break block") {
-        this@NovaItem.behaviors.forEach { it.handleBreakBlock(player, itemStack.clone(), event) }
+        behaviors.forEach { it.handleBreakBlock(player, itemStack.clone(), event) }
     }
     
     /**
@@ -498,7 +498,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         event: PlayerItemDamageEvent
     ): Unit = runSafely("handle damage") {
-        this@NovaItem.behaviors.forEach { it.handleDamage(player, itemStack.clone(), event) }
+        behaviors.forEach { it.handleDamage(player, itemStack.clone(), event) }
     }
     
     /**
@@ -509,7 +509,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         event: PlayerItemBreakEvent
     ): Unit = runSafely("handle break") {
-        this@NovaItem.behaviors.forEach { it.handleBreak(player, itemStack.clone(), event) }
+        behaviors.forEach { it.handleBreak(player, itemStack.clone(), event) }
     }
     
     /**
@@ -522,7 +522,7 @@ internal class NovaItem(
         equipped: Boolean,
         event: EntityEquipmentChangedEvent
     ): Unit = runSafely("handle equip") {
-        this@NovaItem.behaviors.forEach { it.handleEquip(player, itemStack.clone(), slot, equipped, event) }
+        behaviors.forEach { it.handleEquip(player, itemStack.clone(), slot, equipped, event) }
     }
     
     /**
@@ -533,7 +533,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         event: InventoryClickEvent
     ): Unit = runSafely("handle inventory click") {
-        this@NovaItem.behaviors.forEach { it.handleInventoryClick(player, itemStack.clone(), event) }
+        behaviors.forEach { it.handleInventoryClick(player, itemStack.clone(), event) }
     }
     
     /**
@@ -544,7 +544,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         event: InventoryClickEvent
     ): Unit = runSafely("handle inventory click on cursor") {
-        this@NovaItem.behaviors.forEach { it.handleInventoryClickOnCursor(player, itemStack.clone(), event) }
+        behaviors.forEach { it.handleInventoryClickOnCursor(player, itemStack.clone(), event) }
     }
     
     /**
@@ -555,7 +555,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         event: InventoryClickEvent
     ): Unit = runSafely("handle inventory hotbar swap") {
-        this@NovaItem.behaviors.forEach { it.handleInventoryHotbarSwap(player, itemStack.clone(), event) }
+        behaviors.forEach { it.handleInventoryHotbarSwap(player, itemStack.clone(), event) }
     }
     
     /**
@@ -566,7 +566,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         event: BlockBreakActionEvent
     ): Unit = runSafely("handle block break action") {
-        this@NovaItem.behaviors.forEach { it.handleBlockBreakAction(player, itemStack.clone(), event) }
+        behaviors.forEach { it.handleBlockBreakAction(player, itemStack.clone(), event) }
     }
     
     /**
@@ -577,7 +577,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         event: PlayerItemConsumeEvent
     ): Unit = runSafely("handle consume") {
-        this@NovaItem.behaviors.forEach { it.handleConsume(player, itemStack.clone(), event) }
+        behaviors.forEach { it.handleConsume(player, itemStack.clone(), event) }
     }
     
     /**
@@ -588,7 +588,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         slot: Int
     ): Unit = runSafely("handle inventory tick") {
-        this@NovaItem.behaviors.forEach { it.handleInventoryTick(player, itemStack.clone(), slot) }
+        behaviors.forEach { it.handleInventoryTick(player, itemStack.clone(), slot) }
     }
     
     /**
@@ -599,7 +599,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         slot: EquipmentSlot
     ): Unit = runSafely("handle equipment tick") {
-        this@NovaItem.behaviors.forEach { it.handleEquipmentTick(player, itemStack.clone(), slot) }
+        behaviors.forEach { it.handleEquipmentTick(player, itemStack.clone(), slot) }
     }
     
     /**
@@ -613,7 +613,7 @@ internal class NovaItem(
         passedUseTicks: Int,
         remainingUseTicks: Int
     ): Unit = runSafely("handle use tick") {
-        this@NovaItem.behaviors.forEach { it.handleUseTick(entity, itemStack.clone(), hand, remainingUseTicks) }
+        behaviors.forEach { it.handleUseTick(entity, itemStack.clone(), hand, remainingUseTicks) }
     }
     
     /**
@@ -624,7 +624,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         hand: EquipmentSlot,
     ): ItemAction = runSafely("handle use finished", ItemAction.None) {
-        ItemAction.Composite(this@NovaItem.behaviors.map { it.handleUseFinished(entity, itemStack.clone(), hand) })
+        ItemAction.Composite(behaviors.map { it.handleUseFinished(entity, itemStack.clone(), hand) })
     }
     
     /**
@@ -637,7 +637,7 @@ internal class NovaItem(
         hand: EquipmentSlot,
         remainingUseTicks: Int
     ): Unit = runSafely("handle use stopped") {
-        this@NovaItem.behaviors.forEach { it.handleUseStopped(entity, itemStack.clone(), hand, remainingUseTicks) }
+        behaviors.forEach { it.handleUseStopped(entity, itemStack.clone(), hand, remainingUseTicks) }
     }
     
     /**
@@ -648,7 +648,7 @@ internal class NovaItem(
         itemStack: ItemStack,
         duration: Int
     ): Int = runSafely("modify use duration", duration) {
-        this@NovaItem.behaviors.fold(duration) { currentDuration, behavior ->
+        behaviors.fold(duration) { currentDuration, behavior ->
             behavior.modifyUseDuration(entity, itemStack.clone(), currentDuration)
         }
     }

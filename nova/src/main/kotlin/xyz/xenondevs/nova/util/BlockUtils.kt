@@ -184,7 +184,7 @@ fun Block.spawnExpOrb(exp: Int, location: Location = this.location.add(.5, .5, .
  * A different number will cause the breaking texture to disappear.
  */
 fun Block.setBreakStage(entityId: Int, stage: Int) {
-    val type = this@setBreakStage.blockType
+    val type = blockType
     if (type.isNova) {
         BlockBreaking.setBreakStage(this, entityId, stage)
     } else {

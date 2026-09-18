@@ -203,6 +203,6 @@ class GuiTexture internal constructor(
         }
     }
     
-    override fun toString(): String = this@GuiTexture.key.asString()
+    override fun toString(): String = key.asString()
     
 }

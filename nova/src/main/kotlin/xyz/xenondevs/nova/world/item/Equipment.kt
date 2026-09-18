@@ -29,6 +29,6 @@ class Equipment internal constructor(
     internal val runtimeData: Provider<RuntimeEquipmentData?>
 ) : NovaRegistryElement<Equipment> {
     
-    override fun toString(): String = this@Equipment.key.asString()
+    override fun toString(): String = key.asString()
     
 }
