@@ -108,7 +108,7 @@ private val Item.itemTypeEntry: RegistryEntry.Paper<ItemType>
 @Suppress("UNCHECKED_CAST")
 private val Item.itemProvider: Provider<ItemProvider>
     get() {
-        val cached = ITEM_CACHED_TYPE_ENTRY.get(this)
+        val cached = ITEM_CACHED_ITEM_PROVIDER.get(this)
         if (cached != null)
             return cached as Provider<ItemProvider>
         val provider = provider(ItemWrapper(itemType.createItemStack()))
