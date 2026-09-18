@@ -20,7 +20,7 @@ class TextureIconContent(
 ) : CustomFontContent(
     builder,
     "nova:texture_icons_%s",
-    true
+    1..19
 ), PackBuildData {
     
     private val added = HashSet<ResourcePath<ResourceType.Texture>>()

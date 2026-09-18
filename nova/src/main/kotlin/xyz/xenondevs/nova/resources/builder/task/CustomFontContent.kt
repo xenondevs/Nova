@@ -18,7 +18,7 @@ private const val END_CODE_POINT: Int = 0xF8FF
 abstract class CustomFontContent internal constructor(
     protected val builder: ResourcePackBuilder,
     private val fontNameTemplate: String,
-    private val generateMovedVariants: Boolean
+    private val movedFontVariants: IntRange? = null
 ) {
     
     private val fontContent by builder.getBuildDataLazily<FontContent>()
@@ -39,7 +39,7 @@ abstract class CustomFontContent internal constructor(
             val id = ResourcePath.of(ResourceType.Font, fontNameTemplate.format(++currentFontNum))
             val font = Font(id)
             fontContent += font
-            if (generateMovedVariants) movedFontContent.requestMovedFonts(id, 1..20)
+            if (movedFontVariants != null) movedFontContent.requestMovedFonts(id, movedFontVariants)
             this.currentFont = font
         }
         

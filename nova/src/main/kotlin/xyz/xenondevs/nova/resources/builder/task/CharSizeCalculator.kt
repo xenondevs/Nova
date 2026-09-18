@@ -62,7 +62,8 @@ class CharSizeCalculator(private val builder: ResourcePackBuilder) : PackTask {
     }
     
     private fun calculateTable(font: Font): CharSizeTable {
-        movedFontContent.getSource(font.id)?.let { [sourceFont, offset] ->
+        // this asserts that fonts with unihex providers generate a zero-offset moved font
+        MovedFontContent.getSource(font.id)?.let { [sourceFont, offset] ->
             return CharSizeTable.moved(sourceFont, offset)
         }
         

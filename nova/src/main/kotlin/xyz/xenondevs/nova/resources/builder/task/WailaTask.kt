@@ -244,7 +244,7 @@ class WailaTask(
 ) : CustomFontContent(
     builder,
     "nova:waila_textures_%s",
-    true
+    1..18
 ), PackTask {
     
     override val stage = BuildStage.POST_WORLD

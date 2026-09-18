@@ -10,6 +10,8 @@ import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.registry.ProtoBlockState
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.task.FontChar
 import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
@@ -65,6 +67,22 @@ internal object ResourceLookups {
      */
     var language: Map<String, Map<String, String>>
         by languageLookup
+    
+    /**
+     * Lookup of generated moved font to origin and offset.
+     * 
+     * Format: `Map<Moved Font, Pair<Source Font, Offset>>`
+     */
+    val movedFontsLookup: MutableProvider<Map<ResourcePath<ResourceType.Font>, Pair<ResourcePath<ResourceType.Font>, Int>>> =
+        resourceLookup("moved_font_lookup", emptyMap())
+    
+    /**
+     * Map of generated moved font to origin and offset.
+     * 
+     * Format: `Map<Moved Font, Pair<Source Font, Offset>>`
+     */
+    var movedFonts: Map<ResourcePath<ResourceType.Font>, Pair<ResourcePath<ResourceType.Font>, Int>>
+        by movedFontsLookup
     
     /**
      * Lookup for getting the [FontChar] for every [GuiTexture].

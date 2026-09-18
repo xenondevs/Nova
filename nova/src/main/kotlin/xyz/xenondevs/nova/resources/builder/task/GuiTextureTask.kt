@@ -55,11 +55,7 @@ private val REPLACED_TEXTURES = setOf(
  */
 class GuiTextureTask(
     builder: ResourcePackBuilder
-) : CustomFontContent(
-    builder,
-    "nova:gui_%s",
-    true
-), PackTask {
+) : CustomFontContent(builder, "nova:gui_%s"), PackTask {
     
     override val stage = BuildStage.PRE_WORLD
     override val runsAfter = setOf(ExtractTask::class, LanguageContent.LoadAll::class)

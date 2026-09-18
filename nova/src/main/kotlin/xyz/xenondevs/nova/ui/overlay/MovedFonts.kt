@@ -1,12 +1,15 @@
 package xyz.xenondevs.nova.ui.overlay
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentBuilder
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.TranslationArgument
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
-import xyz.xenondevs.nova.util.component.adventure.font
+import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import kotlin.math.roundToInt
 
 object MovedFonts {
@@ -49,7 +52,9 @@ object MovedFonts {
         }
         
         val newDistance = if (addDistance) currentDistance + distance else distance
-        builder.font("$font/$newDistance")
+        val newFont = ResourcePath.of(ResourceType.Font, "$font/$newDistance")
+        if (newFont in ResourceLookups.movedFonts)
+            builder.font(if (newFont in ResourceLookups.movedFonts) newFont else Key.key(font))
         
         return (newDistance / 4f).roundToInt() - (currentDistance / 4f).roundToInt()
     }
