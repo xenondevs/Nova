@@ -30,6 +30,7 @@ import org.bukkit.Registry
 import org.bukkit.Tag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.serialization.persistentdata.get
 import xyz.xenondevs.nova.serialization.persistentdata.set
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
@@ -124,8 +125,16 @@ inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: Strin
 
 object ItemUtils {
     
-    @Deprecated("Check registry instead", ReplaceWith("Registry.ITEM.get(Key.key(id)) != null", imports = ["org.bukkit.Registry", "net.kyori.adventure.key.Key"]))
-    fun isIdRegistered(id: String): Boolean = Registry.ITEM.get(Key.key(id)) != null
+    fun isIdRegistered(id: String): Boolean {
+        if (CustomItemServiceManager.getItemByName(id) != null)
+            return true
+        val namespace = id.substringBefore(':')
+        val name = id.substringAfter(':')
+        return when (namespace) {
+            "nova" -> Registry.ITEM.any { it.isNova && it.key.value() == name }
+            else -> Key.parseable(id) && Registry.ITEM.get(Key.key(id)) != null
+        }
+    }
     
     fun getRecipeChoice(nameList: List<String>): RecipeChoice {
         val tests = nameList.map { id ->
@@ -165,9 +174,14 @@ object ItemUtils {
      * Resolves ids from vanilla, nova and custom item services. Can also parse snbt.
      */
     fun getItemStack(s: String): ItemStack {
-        return when (s.substringBefore(':')) {
+        val namespace = s.substringBefore(':')
+        val name = s.substringAfter(':')
+        return when (namespace) {
             "minecraft" -> toItemStack(s)
-            else -> getItemStack(Key.key(s))
+            "nova" -> Registry.ITEM.firstOrNull { it.isNova && it.key.value() == name }
+                ?.createItemStack()
+                ?: throw IllegalArgumentException("Unknown Nova item: $name")
+            else -> CustomItemServiceManager.getItemByName(s) ?: getItemStack(Key.key(s))
         }
     }
     
@@ -176,7 +190,7 @@ object ItemUtils {
      */
     @Deprecated("Use registry instead", ReplaceWith("Registry.ITEM.get(id).createItemStack()", imports = ["org.bukkit.Registry"]))
     fun getItemStack(id: Key): ItemStack =
-        Registry.ITEM.get(id)!!.createItemStack()
+        Registry.ITEM.get(id)?.createItemStack() ?: throw IllegalArgumentException("Unknown item $id")
     
     /**
      * Gets the actually displayed name of the given [itemStack].
@@ -187,7 +201,6 @@ object ItemUtils {
     
     /**
      * Converts the given string to an [ItemStack].
-     * Does not understand custom item ids.
      */
     fun toItemStack(s: String): ItemStack {
         val parser = ItemParser(REGISTRY_ACCESS)
