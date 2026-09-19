@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.block.rewrite;
+package xyz.xenondevs.nova.mixin.item.cache;
 
 import net.minecraft.world.item.Item;
 import org.bukkit.inventory.ItemType;
@@ -9,7 +9,7 @@ import xyz.xenondevs.commons.provider.Provider;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.nova.registry.RegistryEntry;
 
-// see ItemTypeAccess.kt
+// see NovaItem.kt
 @Mixin(Item.class)
 abstract class ItemMixin {
     

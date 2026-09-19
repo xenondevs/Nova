@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.block.rewrite;
+package xyz.xenondevs.nova.mixin.clientsiderewrite;
 
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraft.core.MappedRegistry;

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.block.rewrite;
+package xyz.xenondevs.nova.mixin.block.bukkit;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;

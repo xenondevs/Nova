@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.block.rewrite;
+package xyz.xenondevs.nova.mixin.block.lifecycle;
 
 import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder;
 import com.llamalad7.mixinextras.expression.Definition;

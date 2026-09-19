@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.block.rewrite;
+package xyz.xenondevs.nova.mixin.block.correspondingitem;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;

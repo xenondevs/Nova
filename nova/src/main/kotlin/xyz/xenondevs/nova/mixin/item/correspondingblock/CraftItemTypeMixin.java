@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.block.rewrite;
+package xyz.xenondevs.nova.mixin.item.correspondingblock;
 
 import org.bukkit.block.BlockType;
 import org.bukkit.craftbukkit.inventory.CraftItemType;

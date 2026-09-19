@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.block.rewrite;
+package xyz.xenondevs.nova.mixin.block.bukkit;
 
 import com.google.common.base.Function;
 import net.minecraft.world.level.block.Block;

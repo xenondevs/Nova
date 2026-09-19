@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.block.rewrite;
+package xyz.xenondevs.nova.mixin.block.cache;
 
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.block.BlockType;
@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import xyz.xenondevs.nova.registry.RegistryEntry;
 
-// see BlockTypeAccess.kt
+// see NovaBlock.kt
 @Mixin(BlockState.class)
 abstract class BlockStateMixin {
     

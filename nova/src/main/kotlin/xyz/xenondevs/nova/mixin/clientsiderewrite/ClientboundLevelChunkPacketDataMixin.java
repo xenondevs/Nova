@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.block.rewrite;
+package xyz.xenondevs.nova.mixin.clientsiderewrite;
 
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
@@ -21,7 +21,7 @@ abstract class ClientboundLevelChunkPacketDataMixin {
         method = "<init>(Lnet/minecraft/world/level/chunk/LevelChunk;Lio/papermc/paper/antixray/ChunkPacketInfo;)V",
         at = @At("MIXINEXTRAS:EXPRESSION")
     )
-    private boolean addIfVanillaTileEntity(List<Object> instance, Object e) {
+    private boolean onlyAddIfVanillaTileEntity(List<Object> instance, Object e) {
         if (!(e instanceof ClientboundLevelChunkPacketData.BlockEntityInfo info))
             return true;
         

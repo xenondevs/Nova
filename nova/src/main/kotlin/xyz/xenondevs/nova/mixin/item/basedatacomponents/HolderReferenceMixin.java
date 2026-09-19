@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.block.rewrite;
+package xyz.xenondevs.nova.mixin.item.basedatacomponents;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentMap;
