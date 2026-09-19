@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.channel
 
-import xyz.xenondevs.nova.world.*
-
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.pollFirstWhere
 import xyz.xenondevs.nova.util.CubeFaceMap
@@ -213,7 +211,6 @@ internal class FluidNetworkChannel {
         return map
     }
     
-    // TODO: optimize
     private fun computeAvailableContainers(): List<Triple<List<NetworkedFluidContainer>, List<NetworkedFluidContainer>, List<NetworkedFluidContainer>>> {
         val prioritizedFluidContainers = ArrayList<Triple<List<NetworkedFluidContainer>, List<NetworkedFluidContainer>, List<NetworkedFluidContainer>>>()
         

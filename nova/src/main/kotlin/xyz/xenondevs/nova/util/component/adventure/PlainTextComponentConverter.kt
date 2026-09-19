@@ -6,7 +6,6 @@ import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.flattener.ComponentFlattener
 import xyz.xenondevs.nova.i18n.LocaleManager
 
-// TODO: use built-in component renderer
 object PlainTextComponentConverter {
     
     private val flatteners = HashMap<String, ComponentFlattener>()

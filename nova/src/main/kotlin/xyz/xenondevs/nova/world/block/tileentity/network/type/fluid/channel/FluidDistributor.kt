@@ -77,8 +77,6 @@ internal class FluidDistributor(
                 else providers += buffersInScope
                 
                 availableTransfers -= distributeBetween(availableTransfers, type, consumers, providers)
-                
-                // TODO: balance buffers?
             }
         }
         

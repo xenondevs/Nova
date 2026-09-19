@@ -73,8 +73,6 @@ import kotlin.math.roundToInt
 )
 object DefaultWailaInfoProviders {
     
-    // TODO waila icon by block state
-    
     val DEFAULT = wailaInfoProvider("default") {
         priority = -1
         blocks = registryEntrySetOf(RegistryKey.BLOCK)
