@@ -33,6 +33,7 @@ import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.getOrNull
 import xyz.xenondevs.nova.util.toBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
+import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockSelectorScope
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
@@ -59,6 +60,9 @@ internal class NovaTileEntityBlock(
     properties: Provider<Properties>,
     flammable: Provider<FlammableSettings>,
     selectFluidFlowMode: Provider<BlockSelectorScope.() -> FluidFlowMode>,
+    breakParticles: Provider<ItemType?>,
+    showBreakAnimation: Provider<Boolean>,
+    soundGroup: Provider<SoundGroup?>,
     val tileEntityConstructor: TileEntityConstructor,
     val tickrate: Provider<Int>
 ) : NovaBlock(
@@ -71,7 +75,10 @@ internal class NovaTileEntityBlock(
     config,
     properties,
     flammable,
-    selectFluidFlowMode
+    selectFluidFlowMode,
+    breakParticles,
+    showBreakAnimation,
+    soundGroup
 ), EntityBlock {
     
     lateinit var blockEntityType: BlockEntityType<NovaTileEntityProxy>

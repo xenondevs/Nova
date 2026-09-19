@@ -3,13 +3,13 @@ package xyz.xenondevs.nova.ui.waila
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.Keyed
+import net.kyori.adventure.text.format.ShadowColor
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
-import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.mapEach
 import xyz.xenondevs.nova.config.MAIN_CONFIG
@@ -17,11 +17,13 @@ import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_INFO_PROVIDER
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
-import xyz.xenondevs.nova.ui.waila.info.ToolLine
+import xyz.xenondevs.nova.ui.waila.info.ToolText
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.overlay.WailaOverlayCompound
+import xyz.xenondevs.nova.util.capitalizeAll
+import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.data.WildcardUtils
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.block.blockType
@@ -38,32 +40,27 @@ private val BLACKLISTED_BLOCKS by MAIN_CONFIG.entry<List<String>>("waila", "blac
     }
 }
 
-private val VANILLA_WAILA_INFO_PROVIDERS: Map<BlockType, WailaInfoProvider<BlockType, BlockData>>
-    by flattenInfoProviders()
-
-private inline fun <reified B : Keyed, S : Any> flattenInfoProviders(): Provider<Map<B, WailaInfoProvider<B, S>>> =
-    WAILA_INFO_PROVIDER.entrySet.flatMap { infoProviders: Set<WailaInfoProvider<*, *>> ->
+private val WAILA_INFO_PROVIDERS: Map<BlockType, WailaInfoProvider<BlockData>>
+    by WAILA_INFO_PROVIDER.entrySet.flatMap { infoProviders: Set<WailaInfoProvider<*>> ->
         combinedProvider(
             infoProviders.map { wip -> wip.blocks.map { entries -> entries to wip } }
-        ) { list: List<Pair<Set<Any>, WailaInfoProvider<*, *>>> ->
+        ) { list: List<Pair<Set<BlockType>, WailaInfoProvider<*>>> ->
             buildMap {
-                for ([values: Set<Any>, wip: WailaInfoProvider<*, *>] in list) {
-                    for (value in values) {
-                        if (value !is B)
-                            continue
-                        
-                        @Suppress("UNCHECKED_CAST") // checked via filter above
-                        getOrPut(
-                            value,
-                            ::ArrayList
-                        ) += wip as WailaInfoProvider<B, S>
+                for ([blocks, infoProvider] in list) for (block in blocks) {
+                    val current = this[block]
+                    if (current == null || infoProvider.priority > current.priority) {
+                        @Suppress("UNCHECKED_CAST")
+                        put(block, infoProvider as WailaInfoProvider<BlockData>)
                     }
                 }
-            }.mapValues { [_, infoProviders] -> infoProviders.maxBy { it.priority } }
+            }
         }
     }
 
-internal class Waila(val player: Player) {
+internal class Waila(
+    val player: Player,
+    backgroundEnabled: Boolean
+) {
     
     private var lastPosUpdate: Int = 0
     private var lastDataUpdate: Int = 0
@@ -73,6 +70,14 @@ internal class Waila(val player: Player) {
     private val overlay = WailaOverlayCompound(player)
     
     private var prevInfo: WailaInfo? = null
+    
+    var backgroundEnabled = backgroundEnabled
+        set(value) {
+            if (field == value)
+                return
+            field = value
+            prevInfo?.let { overlay.update(it.icon, it.lines, value) }
+        }
     
     fun setActive(active: Boolean) {
         if (this.active == active)
@@ -118,7 +123,7 @@ internal class Waila(val player: Player) {
             
             if (info != prevInfo) {
                 prevInfo = info
-                overlay.update(info.icon, info.lines)
+                overlay.update(info.icon, info.lines, backgroundEnabled)
             }
             
             return true
@@ -131,7 +136,7 @@ internal class Waila(val player: Player) {
         val type = block.blockType
         
         return getCustomItemServiceInfo(player, block)
-            ?: VANILLA_WAILA_INFO_PROVIDERS[type]?.getInfo(player, block, block.blockData)
+            ?: WAILA_INFO_PROVIDERS[type]?.getInfo(player, block, block.blockData)
     }
     
     private fun getCustomItemServiceInfo(player: Player, block: Block): WailaInfo? {
@@ -139,9 +144,29 @@ internal class Waila(val player: Player) {
         val blockName = CustomItemServiceManager.getName(block, @Suppress("DEPRECATION") player.locale) ?: return null
         
         val lines = ArrayList<WailaLine>()
-        lines += WailaLine(blockName, WailaLine.Alignment.CENTERED)
-        lines += WailaLine(Component.text(blockId.asString(), NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
-        lines += ToolLine.getCustomItemServiceToolLine(player, block)
+        lines += WailaLine(
+            Component.text()
+                .append(blockName)
+                .append(Component.text(" "))
+                .append(ToolText.getCustomItemServiceToolText(player, block))
+                .build(),
+            WailaLine.Alignment.LEFT
+        )
+        lines += WailaLine(
+            Component.text()
+                .move(1) // to adjust for italic
+                .append(Component.text(
+                    blockId.namespace()
+                        .replace('_', ' ')
+                        .replace('-', ' ')
+                        .capitalizeAll(),
+                    NamedTextColor.BLUE,
+                    TextDecoration.ITALIC
+                ))
+                .shadowColor(ShadowColor.none())
+                .build(),
+            WailaLine.Alignment.LEFT
+        )
         
         return WailaInfo(blockId, lines)
     }

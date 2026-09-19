@@ -5,6 +5,8 @@ import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
@@ -12,6 +14,7 @@ import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.NovaBlockState
@@ -33,6 +36,12 @@ interface BlockBehavior : BlockBehaviorHolder {
      */
     val stateProperties: Set<BlockStateProperty<*>>
         get() = emptySet()
+    
+    /**
+     * The tags that every block with this [BlockBehavior] is in.
+     */
+    val tags: Provider<Set<RegistryEntrySet.Paper.Tag<BlockType>>>
+        get() = provider(emptySet())
     
     /**
      * Checks whether a block of [data] can be placed at [block] using the given [ctx].

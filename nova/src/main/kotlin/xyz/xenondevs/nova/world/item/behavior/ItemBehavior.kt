@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.item.DataComponentMap
@@ -45,6 +46,12 @@ interface ItemBehavior : ItemBehaviorHolder {
      */
     val baseDataComponents: Provider<DataComponentMap>
         get() = provider(DataComponentMap.EMPTY)
+    
+    /**
+     * The tags that every item with this [ItemBehavior] is in.
+     */
+    val tags: Provider<Set<RegistryEntrySet.Paper.Tag<ItemType>>>
+        get() = provider(emptySet())
     
     /**
      * Uses the [itemStack] with this behavior by itself, without targeting a block or entity.

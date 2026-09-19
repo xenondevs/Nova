@@ -12,7 +12,7 @@ import java.util.*
 
 internal class WolfSoundVariantBuilderImpl(
     override val entry: RegistryEntry.Paper<Wolf.SoundVariant>
-) : RegistryElementBuilder.Vanilla<WolfSoundVariant>, WolfSoundVariantBuilder {
+) : RegistryElementBuilder.Vanilla<Wolf.SoundVariant, WolfSoundVariant>, WolfSoundVariantBuilder {
     
     private var configureAdultSounds: (WolfSoundSetBuilder.() -> Unit)? = null
     private var configureBabySounds: (WolfSoundSetBuilder.() -> Unit)? = null

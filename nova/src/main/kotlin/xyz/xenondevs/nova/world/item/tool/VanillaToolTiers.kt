@@ -1,31 +1,31 @@
 package xyz.xenondevs.nova.world.item.tool
 
-import net.kyori.adventure.key.Key.key
-import xyz.xenondevs.nova.config.CONFIGS
-import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.registry.RegistryLoader
-import xyz.xenondevs.nova.registry.RegistryEntry
+import net.kyori.adventure.key.Key
 
-@InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
-    runBefore = [RegistryLoader::class]
-)
+/**
+ * The keys of Minecraft's built-in tool tiers.
+ */
 object VanillaToolTiers {
     
-    val WOOD = register("wood")
-    val GOLD = register("gold")
-    val STONE = register("stone")
-    val COPPER = register("copper")
-    val IRON = register("iron")
-    val DIAMOND = register("diamond")
-    val NETHERITE = register("netherite")
+    /** The `minecraft:wooden` tool tier. */
+    val WOOD = Key.key("wooden")
     
-    private fun register(name: String): RegistryEntry.Nova<ToolTier> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_TIER, key(name)) {
-            ToolTier(it, CONFIGS["nova:tool_levels"].entry(name))
-        }
+    /** The `minecraft:gold` tool tier. */
+    val GOLD = Key.key("gold")
+    
+    /** The `minecraft:stone` tool tier. */
+    val STONE = Key.key("stone")
+    
+    /** The `minecraft:copper` tool tier. */
+    val COPPER = Key.key("copper")
+    
+    /** The `minecraft:iron` tool tier. */
+    val IRON = Key.key("iron")
+    
+    /** The `minecraft:diamond` tool tier. */
+    val DIAMOND = Key.key("diamond")
+    
+    /** The `minecraft:netherite` tool tier. */
+    val NETHERITE = Key.key("netherite")
     
 }

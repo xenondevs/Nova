@@ -2,8 +2,6 @@
 
 package xyz.xenondevs.nova.world.block.sound
 
-import xyz.xenondevs.nova.world.*
-
 import net.minecraft.world.level.block.SoundType
 import org.bukkit.Location
 import org.bukkit.SoundCategory

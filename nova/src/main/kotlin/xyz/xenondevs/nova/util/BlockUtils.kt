@@ -54,9 +54,7 @@ import xyz.xenondevs.nova.context.intention.ImplicitIntentions
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.world.block.NovaBlockState
-import xyz.xenondevs.nova.world.block.behavior.BlockSounds
 import xyz.xenondevs.nova.world.block.blockType
-import xyz.xenondevs.nova.world.block.getBehaviorOrNull
 import xyz.xenondevs.nova.world.block.isNova
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.block.novaBlock
@@ -98,7 +96,7 @@ val Block.novaSoundGroup: SoundGroup?
     get() {
         val type = this@novaSoundGroup.blockType
         if (this@novaSoundGroup.blockType.isNova) {
-            return type.getBehaviorOrNull<BlockSounds>()?.soundGroup
+            return type.novaBlock?.soundGroup
         }
         
         return if (!type.isAir)
@@ -400,7 +398,7 @@ object BlockUtils {
 //        }
 //        
 //        fun broadcastCustomBreakParticles(sendToBreaker: Boolean) {
-//            val breakParticlesMaterial = state.block.getBehaviorOrNull<Breakable>()?.breakParticles
+//            val breakParticlesMaterial = state.novaBlock.breakParticles
 //                ?: return
 //            val breakParticles = particle(ParticleTypes.BLOCK, block.location.add(0.5, 0.5, 0.5)) {
 //                block(breakParticlesMaterial)
@@ -410,7 +408,7 @@ object BlockUtils {
 //            broadcast(breakParticles, sendToBreaker)
 //        }
 //        
-//        val soundGroup = state.block.getBehaviorOrNull<BlockSounds>()?.soundGroup
+//        val soundGroup = state.novaBlock.soundGroup
 //        val modelProvider = state.modelProvider
 //        if (modelProvider is BackingStateBlockModelProvider || modelProvider is ModelLessBlockModelProvider) {
 //            // use the level event packet for blocks that use block states (sound & particles)

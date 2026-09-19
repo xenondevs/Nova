@@ -1,17 +1,18 @@
 package xyz.xenondevs.nova.world.item.enchantment
 
 import net.minecraft.world.item.enchantment.Enchantment
+import xyz.xenondevs.commons.provider.Provider
 import java.util.*
 
 internal class CustomEnchantmentLogic(
-    private val tableLevelRequirement: (Int) -> IntRange,
+    private val tableLevelRequirement: Provider<(Int) -> IntRange>,
 ) {
     
     fun getMinCost(level: Int): Int =
-        tableLevelRequirement(level).first
+        tableLevelRequirement.get()(level).first
     
     fun getMaxCost(level: Int): Int =
-        tableLevelRequirement(level).last
+        tableLevelRequirement.get()(level).last
     
     companion object {
         

@@ -35,6 +35,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProc
 import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
 import org.bukkit.Keyed
 import org.bukkit.block.BlockType
+import org.bukkit.block.data.BlockData
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Cat
 import org.bukkit.entity.Chicken
@@ -83,8 +84,6 @@ import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.world.item.recipe.NovaRecipe
 import xyz.xenondevs.nova.world.item.recipe.RecipeType
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
-import xyz.xenondevs.nova.world.item.tool.ToolTier
 import xyz.xenondevs.nova.world.player.ability.Ability
 import xyz.xenondevs.nova.world.player.ability.AbilityType
 import xyz.xenondevs.nova.world.player.attachment.Attachment
@@ -325,29 +324,6 @@ abstract class Registrar internal constructor() : Namespaced {
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_RECIPE_TYPE, tag.tagKey, configure)
     //</editor-fold>
     
-    //<editor-fold desc="tool">
-    fun registerToolCategory(name: String): RegistryEntry.Nova<ToolCategory> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_CATEGORY, key(this, name), ::ToolCategory)
-    
-    fun registerToolTier(name: String): RegistryEntry.Nova<ToolTier> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_TIER, key(this, name)) { ToolTier(it, CONFIGS["${it.key.namespace()}:tool_levels"].entry(0.0, it.key.value())) }
-    
-    fun registerToolTier(name: String, level: Double): RegistryEntry.Nova<ToolTier> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_TIER, key(this, name)) { ToolTier(it, provider(level)) }
-    
-    fun toolCategoryTag(name: String, configure: TagBuilder.Nova<ToolCategory>.() -> Unit): RegistryEntrySet.Nova.Tag<ToolCategory> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_TOOL_CATEGORY, key(this, name), configure)
-    
-    fun toolCategoryTag(tag: RegistryEntrySet.Nova.Tag<ToolCategory>, configure: TagBuilder.Nova<ToolCategory>.() -> Unit): RegistryEntrySet.Nova.Tag<ToolCategory> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_TOOL_CATEGORY, tag.tagKey, configure)
-    
-    fun toolTierTag(name: String, configure: TagBuilder.Nova<ToolTier>.() -> Unit): RegistryEntrySet.Nova.Tag<ToolTier> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_TOOL_TIER, key(this, name), configure)
-    
-    fun toolTierTag(tag: RegistryEntrySet.Nova.Tag<ToolTier>, configure: TagBuilder.Nova<ToolTier>.() -> Unit): RegistryEntrySet.Nova.Tag<ToolTier> =
-        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_TOOL_TIER, tag.tagKey, configure)
-    //</editor-fold>
-    
     //<editor-fold desc="tooltip styles">
     /**
      * Registers a new [TooltipStyle] with the specified [name] and [meta].
@@ -376,10 +352,10 @@ abstract class Registrar internal constructor() : Namespaced {
      * Registers a new [WailaInfoProvider] for vanilla blocks with the specified [name] after configuring it with [wailaInfoProvider].
      */
     @JvmName("wailaInfoProviderVanilla")
-    fun <S : Any> wailaInfoProvider(
+    fun <S : BlockData> wailaInfoProvider(
         name: String,
-        wailaInfoProvider: WailaInfoProviderBuilder<BlockType, S>.() -> Unit
-    ): RegistryEntry.Nova<WailaInfoProvider<BlockType, S>> =
+        wailaInfoProvider: WailaInfoProviderBuilder<S>.() -> Unit
+    ): RegistryEntry.Nova<WailaInfoProvider<S>> =
         RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_WAILA_INFO_PROVIDER, key(this, name), ::WailaInfoProviderBuilderImpl, wailaInfoProvider)
     
     /**
@@ -391,10 +367,10 @@ abstract class Registrar internal constructor() : Namespaced {
     ): RegistryEntry.Nova<WailaToolIconProvider> =
         RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_WAILA_TOOL_ICON_PROVIDER, key(this, name), ::WailaToolIconProviderBuilderImpl, wailaToolIconProvider)
     
-    fun wailaInfoProviderTag(name: String, configure: TagBuilder.Nova<WailaInfoProvider<*, *>>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaInfoProvider<*, *>> =
+    fun wailaInfoProviderTag(name: String, configure: TagBuilder.Nova<WailaInfoProvider<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaInfoProvider<*>> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_WAILA_INFO_PROVIDER, key(this, name), configure)
     
-    fun wailaInfoProviderTag(tag: RegistryEntrySet.Nova.Tag<WailaInfoProvider<*, *>>, configure: TagBuilder.Nova<WailaInfoProvider<*, *>>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaInfoProvider<*, *>> =
+    fun wailaInfoProviderTag(tag: RegistryEntrySet.Nova.Tag<WailaInfoProvider<*>>, configure: TagBuilder.Nova<WailaInfoProvider<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaInfoProvider<*>> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_WAILA_INFO_PROVIDER, tag.tagKey, configure)
     
     fun wailaToolIconProviderTag(name: String, configure: TagBuilder.Nova<WailaToolIconProvider>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaToolIconProvider> =

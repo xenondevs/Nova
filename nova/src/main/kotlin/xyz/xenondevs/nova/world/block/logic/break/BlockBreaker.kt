@@ -42,14 +42,12 @@ import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.NovaBlockState
-import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.blockType
+import xyz.xenondevs.nova.world.block.clientsideBlockState
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
-import xyz.xenondevs.nova.world.block.getBehaviorOrThrow
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import xyz.xenondevs.nova.world.block.novaBlock
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
 
 internal class NovaBlockBreaker(
     player: Player,
@@ -60,19 +58,18 @@ internal class NovaBlockBreaker(
 ) : BlockBreaker(player, block, sequence, blockedUntil) {
     
     val blockType = blockState.blockType
-    private val breakable = blockType.getBehaviorOrThrow<Breakable>()
     
     override fun createBreakMethod(): BreakMethod =
         BreakMethod.of(block, blockType, null)
     
     override fun handleBreakTick() {
         // spawn hit particles if not rendered clientside
-        if (block.blockType == BlockType.BARRIER)
+        if (block.clientsideBlockState.blockType == BlockType.BARRIER)
             spawnHitParticles()
     }
     
     private fun spawnHitParticles() {
-        val texture = breakable.breakParticles ?: return
+        val texture = blockState.novaBlock.breakParticles ?: return
         val side = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation) ?: BlockFace.UP
         
         val particlePacket = particle(ParticleTypes.ITEM, block.location.add(0.5, 0.5, 0.5).advance(side, 0.6)) {
@@ -108,7 +105,6 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
     private val soundGroup: SoundGroup? = if (SoundEngine.overridesSound(block.blockSoundGroup.hitSound)) block.novaSoundGroup else null
     private val hardness: Double = block.blockType.hardness.toDouble()
     private val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
-    private val itemToolCategories: Set<ToolCategory> = ToolCategory.ofItem(tool)
     
     private var destroyTicks = 0
     var progress = 0.0
@@ -232,7 +228,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             //</editor-fold>
             
             // damage tool
-            if (player.gameMode != GameMode.CREATIVE && itemToolCategories.isNotEmpty() && hardness > 0)
+            if (player.gameMode != GameMode.CREATIVE && hardness > 0)
                 player.damageToolBreakBlock()
             
             // capture previous state

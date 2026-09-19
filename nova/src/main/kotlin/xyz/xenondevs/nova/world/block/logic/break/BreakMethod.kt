@@ -12,9 +12,9 @@ import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.packetentity.packetItemDisplay
 import xyz.xenondevs.nova.util.broadcastDestructionStage
-import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.blockType
-import xyz.xenondevs.nova.world.block.getBehaviorOrThrow
+import xyz.xenondevs.nova.world.block.clientsideBlockState
+import xyz.xenondevs.nova.world.block.novaBlock
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import kotlin.random.Random
 
@@ -41,8 +41,8 @@ internal interface BreakMethod {
             predictionPlayer: Player?,
             entityId: Int = predictionPlayer?.entityId ?: Random.nextInt()
         ): BreakMethod {
-            return if (type.getBehaviorOrThrow<Breakable>().showBreakAnimation)
-                if (block.blockType == BlockType.BARRIER) DisplayEntityBreakMethod(block)
+            return if (type.novaBlock?.showBreakAnimation != false)
+                if (block.clientsideBlockState.blockType == BlockType.BARRIER) DisplayEntityBreakMethod(block)
                 else PacketBreakMethod(block, entityId, predictionPlayer)
             else INVISIBLE
         }
@@ -87,7 +87,7 @@ internal class DisplayEntityBreakMethod(block: Block) : VisibleBreakMethod(block
     
     private val itemDisplay = packetItemDisplay {
         location by block.location.add(.5, .5, .5)
-        metadata { itemStack by _breakStage.flatMap { items.getOrNull(it) ?: provider(ItemStack.empty()) }}
+        metadata { itemStack by _breakStage.flatMap { items.getOrNull(it) ?: provider(ItemStack.empty()) } }
     }
     
     init {

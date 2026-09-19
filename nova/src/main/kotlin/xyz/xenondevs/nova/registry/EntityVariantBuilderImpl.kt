@@ -33,7 +33,7 @@ internal abstract class AbstractEntityVariantBuilder<T : Keyed, NMS : Any, L : E
     private val defaultModelType: M,
     private val makeLayoutBuilder: (namespace: String, ResourcePackBuilder) -> LB,
     private val registryKey: RegistryKey<*>
-) : EntityVariantBuilder<T, M, LB>, RegistryElementBuilder.Vanilla<NMS> {
+) : EntityVariantBuilder<T, M, LB>, RegistryElementBuilder.Vanilla<T, NMS> {
     
     private val id = entry.key
     private var configureSpawnConditions: (SpawnConditionsBuilder.() -> Unit)? = null

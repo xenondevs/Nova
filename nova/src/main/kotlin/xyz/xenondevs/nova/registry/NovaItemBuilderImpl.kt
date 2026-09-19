@@ -26,14 +26,14 @@ import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.behavior.BlockItemBehavior
-import xyz.xenondevs.nova.world.item.behavior.DefaultBehavior
+import xyz.xenondevs.nova.world.item.behavior.DefaultItemBehavior
 import xyz.xenondevs.nova.world.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorFactory
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 
 internal class NovaItemBuilderImpl(
     override val entry: RegistryEntry.Paper<ItemType>
-) : NovaItemBuilder, RegistryElementBuilder.RerunnableVanilla<Item> {
+) : NovaItemBuilder, RegistryElementBuilder.RerunnableVanilla<ItemType, Item> {
     
     private val key: Key = entry.key
     
@@ -47,6 +47,29 @@ internal class NovaItemBuilderImpl(
     private val _isHidden = uninitializedProvider<Boolean>()
     private val _block = uninitializedProvider<RegistryEntry.Paper<BlockType>?>()
     private val _tooltipStyle = uninitializedProvider<RegistryEntry.Nova<TooltipStyle>?>()
+    
+    private val _config = _configId.map(CONFIGS::get)
+    private val _behaviors = combinedProvider(
+        _name, _style, _lore, _tooltipStyle, _maxStackSize, _isHidden, _behaviorHolders, _block, _config
+    ) { name, style, lore, tooltipStyle, maxStackSize, isHidden, behaviorHolders, block, config ->
+        buildList {
+            this += DefaultItemBehavior(key, name, style, lore, tooltipStyle, maxStackSize, isHidden)
+            if (block != null)
+                this += BlockItemBehavior(block)
+            
+            for (holder in behaviorHolders) {
+                this += when (holder) {
+                    is ItemBehavior -> holder
+                    is ItemBehaviorFactory<*> -> holder.create(entry, config)
+                }
+            }
+        }
+    }
+    override val tags = _behaviors.flatMap { behaviors ->
+        combinedProvider(behaviors.map { behavior -> behavior.tags }) { tagSets ->
+            tagSets.flatMapTo(HashSet()) { it }
+        }
+    }
     
     private var configId: String by _configId
     private var style: Style by _style
@@ -159,26 +182,7 @@ internal class NovaItemBuilderImpl(
     }
     
     override fun build(lookup: RegistryOps.RegistryInfoLookup): Item {
-        val config = _configId.map(CONFIGS::get)
-        
-        val behaviors = combinedProvider(
-            _name, _style, _lore, _tooltipStyle, _maxStackSize, _behaviorHolders, _block, config
-        ) { name, style, lore, tooltipStyle, maxStackSize, behaviorHolders, block, config ->
-            buildList {
-                this += DefaultBehavior(key, name, style, lore, tooltipStyle, maxStackSize)
-                if (block != null)
-                    this += BlockItemBehavior(block)
-                
-                for (holder in behaviorHolders) {
-                    this += when (holder) {
-                        is ItemBehavior -> holder
-                        is ItemBehaviorFactory<*> -> holder.create(entry, config)
-                    }
-                }
-            }
-        }
-        
-        return NovaItem(entry, behaviors, _craftingRemainingItem, _isHidden, _block, config)
+        return NovaItem(entry, _behaviors, _craftingRemainingItem, _isHidden, _block, _config)
     }
     
     companion object {

@@ -1,14 +1,52 @@
 package xyz.xenondevs.nova.ui.waila.info
 
+import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.keys.BlockTypeKeys
+import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.block.BlockType
+import org.bukkit.block.data.Ageable
 import org.bukkit.block.data.BlockData
+import org.bukkit.block.data.Brushable
+import org.bukkit.block.data.Hatchable
+import org.bukkit.block.data.Levelled
+import org.bukkit.block.data.Lightable
+import org.bukkit.block.data.type.Cake
+import org.bukkit.block.data.type.Campfire
+import org.bukkit.block.data.type.Candle
+import org.bukkit.block.data.type.Cocoa
+import org.bukkit.block.data.type.Comparator
+import org.bukkit.block.data.type.DaylightDetector
+import org.bukkit.block.data.type.DriedGhast
+import org.bukkit.block.data.type.Lantern
 import org.bukkit.block.data.type.PistonHead
+import org.bukkit.block.data.type.RedstoneRail
+import org.bukkit.block.data.type.Repeater
+import org.bukkit.block.data.type.RespawnAnchor
+import org.bukkit.block.data.type.SeaPickle
 import org.bukkit.block.data.type.TechnicalPiston
+import org.bukkit.block.data.type.TestBlock
+import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.registry.NovaRegistrar.wailaInfoProvider
+import xyz.xenondevs.nova.registry.NovaRegistrar.wailaToolIconProvider
+import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.RegistryLoader
+import xyz.xenondevs.nova.registry.entries.BlockTypeTags
+import xyz.xenondevs.nova.registry.registryEntrySetOf
+import xyz.xenondevs.nova.registry.typedKey
+import xyz.xenondevs.nova.world.block.DefaultBlockTags
+import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.blockType
+import xyz.xenondevs.nova.world.block.isNovaTileEntity
+import xyz.xenondevs.nova.world.block.name
+import xyz.xenondevs.nova.world.block.novaTileEntity
+import xyz.xenondevs.nova.world.block.tileentity.NetworkedTileEntity
+import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.DefaultEnergyHolder
+import kotlin.math.roundToInt
 
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
@@ -18,263 +56,264 @@ object DefaultWailaInfoProviders {
     
     // TODO waila icon by block state
     
-    // TODO: implement
+    val DEFAULT_VANILLA = wailaInfoProvider("default_vanilla") {
+        priority = -1
+        blocks = registryEntrySetOf(RegistryKey.BLOCK)
+        infoProvider { player, block, blockState ->
+            val mainBlockType = getMainBlockType(blockState)
+            
+            val lines = buildList {
+                this += WailaLine(mainBlockType.name, WailaLine.Alignment.CENTERED)
+                
+                this += WailaLine(
+                    Component.text(
+                        "minecraft:${blockState.material.name.lowercase()}",
+                        NamedTextColor.DARK_GRAY
+                    ),
+                    WailaLine.Alignment.CENTERED
+                )
+                this += ToolLine.getToolLine(player, block)
+            }
+            
+            return@infoProvider WailaInfo(mainBlockType.key, lines)
+        }
+    }
     
-//    val DEFAULT_VANILLA = wailaInfoProvider<BlockData>("default_vanilla") {
-//        priority = -1
-//        blocks = registryEntrySetOf(RegistryKey.BLOCK)
-//        infoProvider { player, pos, blockState ->
-//            val mainBlockType = getMainBlockType(blockState)
-//            
-//            val lines = buildList {
-//                this += WailaLine(
-//                    Component.translatable(
-//                        mainBlockType.localizedName
-//                            ?: "block.minecraft.${mainBlockType.name.lowercase()}"
-//                    ),
-//                    WailaLine.Alignment.CENTERED
-//                )
-//                
-//                this += WailaLine(
-//                    Component.text(
-//                        "minecraft:${blockState.material.name.lowercase()}",
-//                        NamedTextColor.DARK_GRAY
-//                    ),
-//                    WailaLine.Alignment.CENTERED
-//                )
-//                this += ToolLine.getToolLine(player, pos)
-//            }
-//            
-//            return@infoProvider WailaInfo(Key.key(mainBlockType.name.lowercase()), lines)
-//        }
-//    }
-//    
-//    val DEFAULT_NOVA = wailaInfoProvider("default_nova") {
-//        priority = -1
-//        blocks = NovaRegistries.BLOCK.entrySet
-//        infoProvider { player, pos, blockState ->
-//            if (blockState.block in DefaultBlocks.DELEGATES)
-//                return@infoProvider DEFAULT_VANILLA.get().getInfo(player, pos, pos.blockData)
-//            
-//            val blockType = blockState.block
-//            val id = blockType.key
-//            
-//            val lines = ArrayList<WailaLine>()
-//            lines += WailaLine(blockType.name, WailaLine.Alignment.CENTERED)
-//            lines += WailaLine(Component.text(id.toString(), NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
-//            lines += ToolLine.getToolLine(player, pos)
-//            
-//            if (blockState.block is NovaTileEntityBlock) {
-//                val tileEntity = WorldDataManager.getTileEntity(pos)
-//                if (tileEntity is NetworkedTileEntity) {
-//                    val energyHolder = tileEntity.holders.firstInstanceOfOrNull<DefaultEnergyHolder>()
-//                    if (energyHolder != null) {
-//                        lines += EnergyHolderLine.getEnergyBarLine(energyHolder)
-//                        lines += EnergyHolderLine.getEnergyAmountLine(energyHolder)
-//                        lines += EnergyHolderLine.getEnergyDeltaLine(energyHolder)
-//                    }
-//                }
-//            }
-//            
-//            return@infoProvider WailaInfo(id, lines)
-//        }
-//    }
-//    
-//    val DEFAULT_TOOL_ICON = wailaToolIconProvider("default_tool_icon") {
-//        iconProvider { category, tier ->
-//            val name = when (category) {
-//                SHEARS -> "shears"
-//                SHOVEL, PICKAXE, AXE, HOE, SWORD -> when (tier) {
-//                    WOOD, GOLD -> "${tier.key.value()}en_${category.key.value()}"
-//                    STONE, COPPER, IRON, DIAMOND, NETHERITE -> "${tier.key.value()}_${category.key.value()}"
-//                    else -> null
-//                }
-//                
-//                else -> null
-//            }
-//            
-//            name?.let { Key.key("item/$name") }
-//        }
-//    }
-//    
-//    init {
-//        wailaInfoProvider<Brushable>("brushable") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.SUSPICIOUS_SAND, BlockTypeKeys.SUSPICIOUS_GRAVEL)
-//            infoProvider(DEFAULT_VANILLA) { _, _, blockState, info ->
-//                info.copy(icon = Key.key("${blockState.material.name.lowercase()}_${blockState.dusted}"))
-//            }
-//        }
-//        
-//        wailaInfoProvider<Cake>("brushable") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.CAKE)
-//            infoProvider(DEFAULT_VANILLA) { _, _, cake, info ->
-//                val bites = cake.bites
-//                info.copy(icon = Key.key(if (bites == 0) "cake" else "cake_slice$bites"))
-//            }
-//        }
-//        
-//        wailaInfoProvider<Campfire>("brushable") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.CAMPFIRE, BlockTypeKeys.SOUL_CAMPFIRE)
-//            infoProvider(DEFAULT_VANILLA) { _, _, campfire, info ->
-//                info.copy(icon = Key.key(if (campfire.isLit) campfire.material.name.lowercase() else "campfire_off"))
-//            }
-//        }
-//        
-//        wailaInfoProvider<Candle>("brushable") {
-//            blocks = registryEntrySetOf(BlockTypeTagKeys.CANDLES)
-//            infoProvider(DEFAULT_VANILLA) { _, _, candle, info ->
-//                val name = candle.material.name.lowercase()
-//                val amount = when (candle.candles) {
-//                    1 -> "one_candle"
-//                    2 -> "two_candles"
-//                    3 -> "three_candles"
-//                    4 -> "four_candles"
-//                    else -> IllegalStateException("Invalid amount of candles")
-//                }
-//                info.copy(icon = Key.key("${name}_${amount}"))
-//            }
-//        }
-//        
-//        wailaInfoProvider<Levelled>("cauldron") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.WATER_CAULDRON, BlockTypeKeys.POWDER_SNOW_CAULDRON)
-//            infoProvider(DEFAULT_VANILLA) { _, _, cauldron, info ->
-//                val level = when (cauldron.level) {
-//                    1 -> "level1"
-//                    2 -> "level2"
-//                    3 -> "full"
-//                    else -> throw IllegalStateException("Cauldron level is not 1, 2 or 3")
-//                }
-//                info.copy(icon = Key.key(cauldron.material.name.lowercase() + "_$level"))
-//            }
-//        }
-//        
-//        wailaInfoProvider<Cocoa>("cocoa") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.COCOA)
-//            infoProvider(DEFAULT_VANILLA) { _, _, cocoa, info ->
-//                info.copy(icon = Key.key("cocoa_stage${cocoa.age}"))
-//            }
-//        }
-//        
-//        wailaInfoProvider<Comparator>("comparator") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.COMPARATOR)
-//            infoProvider(DEFAULT_VANILLA) { _, _, comparator, info ->
-//                info.copy(
-//                    icon = Key.key(
-//                        "comparator"
-//                            + (if (comparator.isPowered) "_on" else "")
-//                            + (if (comparator.mode == Comparator.Mode.SUBTRACT) "_subtract" else "")
-//                    )
-//                )
-//            }
-//        }
-//        
-//        wailaInfoProvider<Ageable>("crop") {
-//            blocks = registryEntrySetOf(MAX_TEXTURE_STAGES.keys)
-//            infoProvider(DEFAULT_VANILLA) { _, _, crop, info ->
-//                val maxTexStage = MAX_TEXTURE_STAGES[crop.material.asBlockType()!!.typedKey]!!
-//                val stage = ((crop.age / crop.maximumAge.toDouble()) * maxTexStage).roundToInt()
-//                info.copy(icon = Key.key(crop.material.name.lowercase() + "_stage$stage"))
-//            }
-//        }
-//        
-//        wailaInfoProvider<DaylightDetector>("daylight_detector") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.DAYLIGHT_DETECTOR)
-//            infoProvider(DEFAULT_VANILLA) { _, _, detector, info ->
-//                if (detector.isInverted)
-//                    info.copy(icon = Key.key("daylight_detector_inverted"))
-//                else info
-//            }
-//        }
-//        
-//        wailaInfoProvider<DriedGhast>("dried_ghast") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.DRIED_GHAST)
-//            infoProvider(DEFAULT_VANILLA) { _, _, driedGhast, info ->
-//                info.copy(icon = Key.key("dried_ghast_hydration_${driedGhast.hydration}"))
-//            }
-//        }
-//        
-//        wailaInfoProvider<Hatchable>("hatchable") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.SNIFFER_EGG)
-//            infoProvider(DEFAULT_VANILLA) { _, _, hatchable, info ->
-//                info.copy(icon = Key.key("${hatchable.material.name.lowercase()}_${hatchable.hatch}"))
-//            }
-//        }
-//        
-//        wailaInfoProvider<Lantern>("lantern") {
-//            blocks = registryEntrySetOf(BlockTypeTagKeys.LANTERNS)
-//            infoProvider(DEFAULT_VANILLA) { _, _, lantern, info ->
-//                if (lantern.isHanging)
-//                    info.copy(icon = Key.key(lantern.material.name.lowercase() + "_hanging"))
-//                else info
-//            }
-//        }
-//        
-//        wailaInfoProvider<Lightable>("redstone_lamp") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.REDSTONE_LAMP)
-//            infoProvider(DEFAULT_VANILLA) { _, _, lightable, info ->
-//                if (lightable.isLit)
-//                    info.copy(icon = Key.key("redstone_lamp_on"))
-//                else info
-//            }
-//        }
-//        
-//        wailaInfoProvider<RedstoneRail>("redstone_rail") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.ACTIVATOR_RAIL, BlockTypeKeys.DETECTOR_RAIL, BlockTypeKeys.POWERED_RAIL)
-//            infoProvider(DEFAULT_VANILLA) { _, _, rail, info ->
-//                info.copy(icon = Key.key(rail.material.name.lowercase() + if (rail.isPowered) "_on" else ""))
-//            }
-//        }
-//        
-//        wailaInfoProvider<Repeater>("repeater") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.REPEATER)
-//            infoProvider(DEFAULT_VANILLA) { _, _, repeater, info ->
-//                info.copy(
-//                    icon = Key.key(
-//                        "repeater_${repeater.delay}tick"
-//                            + (if (repeater.isPowered) "_on" else "")
-//                            + (if (repeater.isLocked) "_locked" else "")
-//                    )
-//                )
-//            }
-//        }
-//        
-//        wailaInfoProvider<RespawnAnchor>("respawn_anchor") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.RESPAWN_ANCHOR)
-//            infoProvider(DEFAULT_VANILLA) { _, _, anchor, info ->
-//                info.copy(icon = Key.key("respawn_anchor_${anchor.charges}"))
-//            }
-//        }
-//        
-//        wailaInfoProvider<SeaPickle>("sea_pickle") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.SEA_PICKLE)
-//            infoProvider(DEFAULT_VANILLA) { _, _, pickle, info ->
-//                fun getSeaPickleName(): String {
-//                    val amount = pickle.pickles
-//                    if (amount > 1) {
-//                        val prefix = when (amount) {
-//                            2 -> "two"
-//                            3 -> "three"
-//                            4 -> "four"
-//                            else -> throw IllegalStateException("Invalid amount: $amount")
-//                        }
-//                        
-//                        return prefix + (if (!pickle.isWaterlogged) "_dead_" else "_") + "sea_pickles"
-//                    }
-//                    
-//                    return (if (!pickle.isWaterlogged) "dead_" else "") + "sea_pickle"
-//                }
-//                
-//                info.copy(icon = Key.key(getSeaPickleName()))
-//            }
-//        }
-//        
-//        wailaInfoProvider<TestBlock>("test_block") {
-//            blocks = registryEntrySetOf(BlockTypeKeys.TEST_BLOCK)
-//            infoProvider(DEFAULT_VANILLA) { _, _, testBlock, info ->
-//                info.copy(icon = Key.key("test_block_${testBlock.mode.name.lowercase()}"))
-//            }
-//        }
-//    }
+    val DEFAULT_NOVA = wailaInfoProvider<NovaBlockState>("default_nova") {
+        priority = -1
+        blocks = DefaultBlockTags.NOVA
+        infoProvider { player, block, blockState ->
+            val blockType = blockState.blockType
+            val key = blockType.key
+            
+            val lines = ArrayList<WailaLine>()
+            lines += WailaLine(blockType.name, WailaLine.Alignment.CENTERED)
+            lines += WailaLine(Component.text(key.asString(), NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
+            lines += ToolLine.getToolLine(player, block)
+            
+            if (blockType.isNovaTileEntity) {
+                val tileEntity = block.novaTileEntity
+                if (tileEntity is NetworkedTileEntity) {
+                    val energyHolder = tileEntity.holders.firstInstanceOfOrNull<DefaultEnergyHolder>()
+                    if (energyHolder != null) {
+                        lines += EnergyHolderLine.getEnergyBarLine(energyHolder)
+                        lines += EnergyHolderLine.getEnergyAmountLine(energyHolder)
+                        lines += EnergyHolderLine.getEnergyDeltaLine(energyHolder)
+                    }
+                }
+            }
+            
+            return@infoProvider WailaInfo(key, lines)
+        }
+    }
+    
+    val DEFAULT_TOOL_ICON = wailaToolIconProvider("default_tool_icon") {
+        iconProvider { tags ->
+            buildSet { 
+                if (BlockTypeTags.SHEARS_MINOR_BREAKING_SPEED in tags || BlockTypeTags.SHEARS_MAJOR_BREAKING_SPEED in tags || BlockTypeTags.SHEARS_EXTREME_BREAKING_SPEED in tags)
+                    add(Key.key("item/shears"))
+                if (BlockTypeTags.SWORD_EFFICIENT in tags || BlockTypeTags.SWORD_INSTANTLY_MINES in tags)
+                    add(Key.key("item/wooden_sword"))
+                
+                fun toolType(name: String, typeTag: RegistryEntrySet.Paper.Tag<BlockType>) {
+                    if (typeTag !in tags)
+                        return
+                    when {
+                        BlockTypeTags.NEEDS_STONE_TOOL in tags -> add(Key.key("item/stone_$name"))
+                        BlockTypeTags.NEEDS_IRON_TOOL in tags -> add(Key.key("item/iron_$name"))
+                        BlockTypeTags.NEEDS_DIAMOND_TOOL in tags -> add(Key.key("item/diamond_$name"))
+                        BlockTypeTags.INCORRECT_FOR_WOODEN_TOOL !in tags -> add(Key.key("item/wooden_$name"))
+                        else -> Unit
+                    }
+                }
+                
+                toolType("shovel", BlockTypeTags.MINEABLE_SHOVEL)
+                toolType("pickaxe", BlockTypeTags.MINEABLE_PICKAXE)
+                toolType("axe", BlockTypeTags.MINEABLE_AXE)
+                toolType("hoe", BlockTypeTags.MINEABLE_HOE)
+            }
+            
+        }
+    }
+    
+    init {
+        wailaInfoProvider<Brushable>("brushable") {
+            blocks = registryEntrySetOf(BlockTypeKeys.SUSPICIOUS_SAND, BlockTypeKeys.SUSPICIOUS_GRAVEL)
+            infoProvider(DEFAULT_VANILLA) { _, _, blockState, info ->
+                info.copy(icon = Key.key("${blockState.material.name.lowercase()}_${blockState.dusted}"))
+            }
+        }
+        
+        wailaInfoProvider<Cake>("brushable") {
+            blocks = registryEntrySetOf(BlockTypeKeys.CAKE)
+            infoProvider(DEFAULT_VANILLA) { _, _, cake, info ->
+                val bites = cake.bites
+                info.copy(icon = Key.key(if (bites == 0) "cake" else "cake_slice$bites"))
+            }
+        }
+        
+        wailaInfoProvider<Campfire>("brushable") {
+            blocks = registryEntrySetOf(BlockTypeKeys.CAMPFIRE, BlockTypeKeys.SOUL_CAMPFIRE)
+            infoProvider(DEFAULT_VANILLA) { _, _, campfire, info ->
+                info.copy(icon = Key.key(if (campfire.isLit) campfire.material.name.lowercase() else "campfire_off"))
+            }
+        }
+        
+        wailaInfoProvider<Candle>("brushable") {
+            blocks = registryEntrySetOf(BlockTypeTagKeys.CANDLES)
+            infoProvider(DEFAULT_VANILLA) { _, _, candle, info ->
+                val name = candle.material.name.lowercase()
+                val amount = when (candle.candles) {
+                    1 -> "one_candle"
+                    2 -> "two_candles"
+                    3 -> "three_candles"
+                    4 -> "four_candles"
+                    else -> IllegalStateException("Invalid amount of candles")
+                }
+                info.copy(icon = Key.key("${name}_${amount}"))
+            }
+        }
+        
+        wailaInfoProvider<Levelled>("cauldron") {
+            blocks = registryEntrySetOf(BlockTypeKeys.WATER_CAULDRON, BlockTypeKeys.POWDER_SNOW_CAULDRON)
+            infoProvider(DEFAULT_VANILLA) { _, _, cauldron, info ->
+                val level = when (cauldron.level) {
+                    1 -> "level1"
+                    2 -> "level2"
+                    3 -> "full"
+                    else -> throw IllegalStateException("Cauldron level is not 1, 2 or 3")
+                }
+                info.copy(icon = Key.key(cauldron.material.name.lowercase() + "_$level"))
+            }
+        }
+        
+        wailaInfoProvider<Cocoa>("cocoa") {
+            blocks = registryEntrySetOf(BlockTypeKeys.COCOA)
+            infoProvider(DEFAULT_VANILLA) { _, _, cocoa, info ->
+                info.copy(icon = Key.key("cocoa_stage${cocoa.age}"))
+            }
+        }
+        
+        wailaInfoProvider<Comparator>("comparator") {
+            blocks = registryEntrySetOf(BlockTypeKeys.COMPARATOR)
+            infoProvider(DEFAULT_VANILLA) { _, _, comparator, info ->
+                info.copy(
+                    icon = Key.key(
+                        "comparator"
+                            + (if (comparator.isPowered) "_on" else "")
+                            + (if (comparator.mode == Comparator.Mode.SUBTRACT) "_subtract" else "")
+                    )
+                )
+            }
+        }
+        
+        wailaInfoProvider<Ageable>("crop") {
+            blocks = registryEntrySetOf(MAX_TEXTURE_STAGES.keys)
+            infoProvider(DEFAULT_VANILLA) { _, _, crop, info ->
+                val maxTexStage = MAX_TEXTURE_STAGES[crop.material.asBlockType()!!.typedKey]!!
+                val stage = ((crop.age / crop.maximumAge.toDouble()) * maxTexStage).roundToInt()
+                info.copy(icon = Key.key(crop.material.name.lowercase() + "_stage$stage"))
+            }
+        }
+        
+        wailaInfoProvider<DaylightDetector>("daylight_detector") {
+            blocks = registryEntrySetOf(BlockTypeKeys.DAYLIGHT_DETECTOR)
+            infoProvider(DEFAULT_VANILLA) { _, _, detector, info ->
+                if (detector.isInverted)
+                    info.copy(icon = Key.key("daylight_detector_inverted"))
+                else info
+            }
+        }
+        
+        wailaInfoProvider<DriedGhast>("dried_ghast") {
+            blocks = registryEntrySetOf(BlockTypeKeys.DRIED_GHAST)
+            infoProvider(DEFAULT_VANILLA) { _, _, driedGhast, info ->
+                info.copy(icon = Key.key("dried_ghast_hydration_${driedGhast.hydration}"))
+            }
+        }
+        
+        wailaInfoProvider<Hatchable>("hatchable") {
+            blocks = registryEntrySetOf(BlockTypeKeys.SNIFFER_EGG)
+            infoProvider(DEFAULT_VANILLA) { _, _, hatchable, info ->
+                info.copy(icon = Key.key("${hatchable.material.name.lowercase()}_${hatchable.hatch}"))
+            }
+        }
+        
+        wailaInfoProvider<Lantern>("lantern") {
+            blocks = registryEntrySetOf(BlockTypeTagKeys.LANTERNS)
+            infoProvider(DEFAULT_VANILLA) { _, _, lantern, info ->
+                if (lantern.isHanging)
+                    info.copy(icon = Key.key(lantern.material.name.lowercase() + "_hanging"))
+                else info
+            }
+        }
+        
+        wailaInfoProvider<Lightable>("redstone_lamp") {
+            blocks = registryEntrySetOf(BlockTypeKeys.REDSTONE_LAMP)
+            infoProvider(DEFAULT_VANILLA) { _, _, lightable, info ->
+                if (lightable.isLit)
+                    info.copy(icon = Key.key("redstone_lamp_on"))
+                else info
+            }
+        }
+        
+        wailaInfoProvider<RedstoneRail>("redstone_rail") {
+            blocks = registryEntrySetOf(BlockTypeKeys.ACTIVATOR_RAIL, BlockTypeKeys.DETECTOR_RAIL, BlockTypeKeys.POWERED_RAIL)
+            infoProvider(DEFAULT_VANILLA) { _, _, rail, info ->
+                info.copy(icon = Key.key(rail.material.name.lowercase() + if (rail.isPowered) "_on" else ""))
+            }
+        }
+        
+        wailaInfoProvider<Repeater>("repeater") {
+            blocks = registryEntrySetOf(BlockTypeKeys.REPEATER)
+            infoProvider(DEFAULT_VANILLA) { _, _, repeater, info ->
+                info.copy(
+                    icon = Key.key(
+                        "repeater_${repeater.delay}tick"
+                            + (if (repeater.isPowered) "_on" else "")
+                            + (if (repeater.isLocked) "_locked" else "")
+                    )
+                )
+            }
+        }
+        
+        wailaInfoProvider<RespawnAnchor>("respawn_anchor") {
+            blocks = registryEntrySetOf(BlockTypeKeys.RESPAWN_ANCHOR)
+            infoProvider(DEFAULT_VANILLA) { _, _, anchor, info ->
+                info.copy(icon = Key.key("respawn_anchor_${anchor.charges}"))
+            }
+        }
+        
+        wailaInfoProvider<SeaPickle>("sea_pickle") {
+            blocks = registryEntrySetOf(BlockTypeKeys.SEA_PICKLE)
+            infoProvider(DEFAULT_VANILLA) { _, _, pickle, info ->
+                fun getSeaPickleName(): String {
+                    val amount = pickle.pickles
+                    if (amount > 1) {
+                        val prefix = when (amount) {
+                            2 -> "two"
+                            3 -> "three"
+                            4 -> "four"
+                            else -> throw IllegalStateException("Invalid amount: $amount")
+                        }
+                        
+                        return prefix + (if (!pickle.isWaterlogged) "_dead_" else "_") + "sea_pickles"
+                    }
+                    
+                    return (if (!pickle.isWaterlogged) "dead_" else "") + "sea_pickle"
+                }
+                
+                info.copy(icon = Key.key(getSeaPickleName()))
+            }
+        }
+        
+        wailaInfoProvider<TestBlock>("test_block") {
+            blocks = registryEntrySetOf(BlockTypeKeys.TEST_BLOCK)
+            infoProvider(DEFAULT_VANILLA) { _, _, testBlock, info ->
+                info.copy(icon = Key.key("test_block_${testBlock.mode.name.lowercase()}"))
+            }
+        }
+    }
     
 }
 

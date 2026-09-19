@@ -9,9 +9,7 @@ import xyz.xenondevs.nova.context.AbstractContextIntention
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
 import xyz.xenondevs.nova.context.DefaultingContextParamType
-import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.novaKey
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
 
 /**
  * A [ContextIntention] for when a block is broken.
@@ -112,10 +110,10 @@ object BlockBreak :
         HasOptionalBlockInteraction.applyDefaults(this)
         HasHeldItem.applyDefaults(this)
         
-        addAutofiller(TOOL_ITEM_STACK, Autofiller.from(HELD_ITEM_STACK) { if (it.hasData(DataComponentTypes.TOOL) || ToolCategory.ofItem(it).isNotEmpty()) it else null })
-        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK, TOOL_ITEM_STACK, SOURCE_PLAYER) { block, tool, player -> player.gameMode != GameMode.CREATIVE && ToolUtils.isCorrectToolForDrops(block, tool) })
-        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK, SOURCE_PLAYER) { block, player -> player.gameMode != GameMode.CREATIVE && ToolUtils.isCorrectToolForDrops(block, null) })
-        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK) { block -> ToolUtils.isCorrectToolForDrops(block, null) })
+        addAutofiller(TOOL_ITEM_STACK, Autofiller.from(HELD_ITEM_STACK) { if (it.hasData(DataComponentTypes.TOOL)) it else null })
+        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK, TOOL_ITEM_STACK, SOURCE_PLAYER) { block, tool, player -> player.gameMode != GameMode.CREATIVE && block.isPreferredTool(tool) })
+        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK, SOURCE_PLAYER) { block, player -> player.gameMode != GameMode.CREATIVE && block.isPreferredTool(ItemStack.empty()) })
+        addAutofiller(BLOCK_DROPS, Autofiller.from(BLOCK) { block -> block.isPreferredTool(ItemStack.empty()) })
         addAutofiller(BLOCK_EXP_DROPS, Autofiller.from(BLOCK_DROPS) { it })
         
         // extra autofillers for inherited properties

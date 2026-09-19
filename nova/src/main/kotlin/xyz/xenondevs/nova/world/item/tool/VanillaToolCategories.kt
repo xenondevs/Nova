@@ -1,67 +1,28 @@
 package xyz.xenondevs.nova.world.item.tool
 
 import net.kyori.adventure.key.Key
-import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.registry.RegistryLoader
-import xyz.xenondevs.nova.registry.RegistryEntry
 
-@InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
-    runBefore = [RegistryLoader::class]
-)
+/**
+ * The keys of Minecraft's built-in tool categories.
+ */
 object VanillaToolCategories {
     
-    val SHOVEL = register(
-        "shovel",
-        canDoSweepAttack = false, canBreakBlocksInCreative = true,
-        itemDamageOnBreakBlock = 1, itemDamageOnAttackEntity = 2
-    )
+    /** The `minecraft:shovel` tool category. */
+    val SHOVEL = Key.key("shovel")
     
-    val PICKAXE = register(
-        "pickaxe",
-        canDoSweepAttack = false, canBreakBlocksInCreative = true,
-        itemDamageOnBreakBlock = 1, itemDamageOnAttackEntity = 2
-    )
+    /** The `minecraft:pickaxe` tool category. */
+    val PICKAXE = Key.key("pickaxe")
     
-    val AXE = register(
-        "axe",
-        canDoSweepAttack = false, canBreakBlocksInCreative = true,
-        itemDamageOnBreakBlock = 1, itemDamageOnAttackEntity = 2
-    )
+    /** The `minecraft:axe` tool category. */
+    val AXE = Key.key("axe")
     
-    val HOE = register(
-        "hoe",
-        canDoSweepAttack = false, canBreakBlocksInCreative = true,
-        itemDamageOnBreakBlock = 1, itemDamageOnAttackEntity = 2
-    )
+    /** The `minecraft:hoe` tool category. */
+    val HOE = Key.key("hoe")
     
-    val SWORD = register(
-        "sword",
-        canDoSweepAttack = true, canBreakBlocksInCreative = false,
-        itemDamageOnBreakBlock = 2, itemDamageOnAttackEntity = 1
-    )
+    /** The `minecraft:sword` tool category. */
+    val SWORD = Key.key("sword")
     
-    val SHEARS = register(
-        "shears",
-        canDoSweepAttack = false, canBreakBlocksInCreative = true,
-        itemDamageOnBreakBlock = 1, itemDamageOnAttackEntity = 0
-    )
-    
-    private fun register(
-        name: String,
-        canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
-        itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int
-    ): RegistryEntry.Nova<ToolCategory> {
-        val id = Key.key(name)
-        return RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_CATEGORY, id) {
-            VanillaToolCategory(
-                it,
-                canDoSweepAttack, canBreakBlocksInCreative,
-                itemDamageOnAttackEntity, itemDamageOnBreakBlock
-            )
-        }
-    }
+    /** The `minecraft:shears` tool category. */
+    val SHEARS = Key.key("shears")
     
 }

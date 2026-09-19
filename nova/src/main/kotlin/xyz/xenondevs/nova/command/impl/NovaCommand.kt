@@ -60,6 +60,7 @@ import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
+import xyz.xenondevs.nova.ui.menu.explorer.blockTagExplorer
 import xyz.xenondevs.nova.ui.menu.explorer.itemTagExplorer
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.CubeFaceSet
@@ -158,6 +159,9 @@ internal object NovaCommand : Command() {
             .then(literal("showItemTags")
                 .requiresPlayer()
                 .executes0(::showItemTagsMenu))
+            .then(literal("showBlockTags")
+                .requiresPlayer()
+                .executes0(::showBlockTagsMenu))
             .then(literal("giveClientsideStack")
                 .requiresPlayer()
                 .executes0(::copyClientsideStack)
@@ -794,6 +798,10 @@ internal object NovaCommand : Command() {
     
     private fun showItemTagsMenu(ctx: CommandContext<CommandSourceStack>) {
         itemTagExplorer(ctx.player).open()
+    }
+    
+    private fun showBlockTagsMenu(ctx: CommandContext<CommandSourceStack>) {
+        blockTagExplorer(ctx.player).open()
     }
     
     private fun fillArea(ctx: CommandContext<CommandSourceStack>, from: String, to: String) {

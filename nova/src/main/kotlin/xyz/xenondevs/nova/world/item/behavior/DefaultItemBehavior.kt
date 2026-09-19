@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.NULL_PROVIDER
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
@@ -28,22 +29,26 @@ import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.DataComponentMap
+import xyz.xenondevs.nova.world.item.DefaultItemTags
 import xyz.xenondevs.nova.world.item.ItemAction
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.buildDataComponentMap
 import xyz.xenondevs.nova.world.toNova
 import net.minecraft.network.chat.Component as MojangComponent
 
-internal class DefaultBehavior(
+internal class DefaultItemBehavior(
     id: Key,
     name: Component?,
     style: Style,
     lore: List<Component>,
     tooltipStyle: RegistryEntry.Nova<TooltipStyle>?,
-    maxStackSize: Int
+    maxStackSize: Int,
+    isHidden: Boolean
 ) : ItemBehavior {
     
     private val style = style.toNmsStyle()
+    
+    override val tags = provider(if (isHidden) setOf(DefaultItemTags.NOVA_HIDDEN) else setOf(DefaultItemTags.NOVA))
     
     override val baseDataComponents: Provider<DataComponentMap> = (tooltipStyle ?: NULL_PROVIDER).map { tooltipStyle ->
         buildDataComponentMap {

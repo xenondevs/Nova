@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova.registry
 
-import org.bukkit.Keyed
 import org.bukkit.block.Block
+import org.bukkit.block.BlockType
+import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
@@ -10,7 +11,7 @@ import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
  * A builder for [WailaInfoProvider].
  */
 @RegistryElementBuilderDsl
-sealed interface WailaInfoProviderBuilder<B : Keyed, S : Any> : RegistryEntryBuilder.Nova<WailaInfoProvider<B, S>> {
+sealed interface WailaInfoProviderBuilder<S : BlockData> : RegistryEntryBuilder.Nova<WailaInfoProvider<S>> {
     
     /**
      * The priority of this waila info provider.
@@ -23,7 +24,7 @@ sealed interface WailaInfoProviderBuilder<B : Keyed, S : Any> : RegistryEntryBui
     /**
      * The blocks that this waila info provider applies to.
      */
-    var blocks: RegistryEntrySet<B>
+    var blocks: RegistryEntrySet.Paper<BlockType>
     
     /**
      * Sets the actual functionality of the info provider.
@@ -37,7 +38,7 @@ sealed interface WailaInfoProviderBuilder<B : Keyed, S : Any> : RegistryEntryBui
      * The supplied lambda will be invoked when the given player looks at the given block state at the given position.
      */
     fun infoProvider(
-        base: RegistryEntry.Nova<WailaInfoProvider<B, S>>,
+        base: RegistryEntry.Nova<WailaInfoProvider<S>>,
         modifyInfo: (player: Player, block: Block, blockState: S, info: WailaInfo) -> WailaInfo
     )
     

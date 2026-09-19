@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.registry
 
+import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.tag.TagKey
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -16,6 +18,7 @@ import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.uninitializedProvider
 import xyz.xenondevs.nova.config.CONFIGS
+import xyz.xenondevs.nova.registry.tags.BlockTypeTags
 import xyz.xenondevs.nova.resources.builder.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
@@ -28,19 +31,23 @@ import xyz.xenondevs.nova.util.nmsPushReaction
 import xyz.xenondevs.nova.util.toNmsMapColor
 import xyz.xenondevs.nova.util.toPropertyStringMap
 import xyz.xenondevs.nova.util.toResourceKey
+import xyz.xenondevs.nova.world.block.ColliderCube
 import xyz.xenondevs.nova.world.block.FluidFlowMode
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
-import xyz.xenondevs.nova.world.block.ColliderCube
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorFactory
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
+import xyz.xenondevs.nova.world.block.behavior.DefaultBlockBehavior
+import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
+import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
+import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers
 
 internal data class FlammableSettings(val igniteOdds: Int, val burnOdds: Int, val ignitedByLava: Boolean)
 
 internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     override val entry: RegistryEntry.Paper<BlockType>
-) : NovaBlockBuilder, RegistryElementBuilder.RerunnableVanilla<NovaBlock> {
+) : NovaBlockBuilder, RegistryElementBuilder.RerunnableVanilla<BlockType, T> {
     
     protected val key: Key = entry.key
     
@@ -51,6 +58,11 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected val _behaviorHolders = uninitializedProvider<List<BlockBehaviorHolder>>()
     protected val _stateProperties = uninitializedProvider<List<BlockStateProperty<*>>>()
     protected val _layout = uninitializedProvider<BlockModelLayout>()
+    protected val _hardness = uninitializedProvider<Double>()
+    protected val _requiresToolForDrops = uninitializedProvider<Boolean>()
+    protected val _breakParticles = uninitializedProvider<RegistryEntry.Paper<ItemType>?>()
+    protected val _showBreakAnimation = uninitializedProvider<Boolean>()
+    protected val _soundGroup = uninitializedProvider<SoundGroup?>()
     protected val _pistonReaction = uninitializedProvider<PistonMoveReaction>()
     protected val _selectLightEmission = uninitializedProvider<BlockSelectorScope.() -> Int>()
     protected val _explosionResistance = uninitializedProvider<Float>()
@@ -62,11 +74,20 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         _behaviorHolders, _configId
     ) { holders, configId ->
         val cfg = CONFIGS[configId]
-        holders.map {
-            when (it) {
-                is BlockBehaviorFactory<*> -> it.create(entry, cfg)
-                is BlockBehavior -> it
+        buildList {
+            this += DefaultBlockBehavior()
+            for (holder in holders) {
+                this += when (holder) {
+                    is BlockBehaviorFactory<*> -> holder.create(entry, cfg)
+                    is BlockBehavior -> holder
+                }
             }
+        }
+    }
+    
+    override val tags = _behaviors.flatMap { behaviors ->
+        combinedProvider(behaviors.map { behavior -> behavior.tags }) { tagSets ->
+            tagSets.flatMapTo(HashSet()) { it }
         }
     }
     
@@ -78,8 +99,9 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     }
     
     protected val _properties = combinedProvider(
-        _pistonReaction, _selectLightEmission, _explosionResistance, _flammable, _mapColor
-    ) { pistonReaction, selectLightEmission, explosionResistance, flammable, mapColor ->
+        _hardness, _requiresToolForDrops, _pistonReaction, _selectLightEmission,
+        _explosionResistance, _flammable, _mapColor
+    ) { hardness, requiresToolForDrops, pistonReaction, selectLightEmission, explosionResistance, flammable, mapColor ->
         Properties.of()
             .setId(entry.key.toResourceKey())
             .pushReaction(pistonReaction.nmsPushReaction)
@@ -92,7 +114,10 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
                 )
                 BlockSelectorScope(proto).selectLightEmission()
             }
+            .destroyTime(hardness.toFloat())
             .apply {
+                if (requiresToolForDrops)
+                    requiresCorrectToolForDrops()
                 if (flammable.ignitedByLava)
                     ignitedByLava()
             }
@@ -105,6 +130,11 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected var behaviors: List<BlockBehaviorHolder> by _behaviorHolders
     protected var stateProperties: List<BlockStateProperty<*>> by _stateProperties
     protected var layout: BlockModelLayout by _layout
+    protected var hardness: Double by _hardness
+    protected var requiresToolForDrops: Boolean by _requiresToolForDrops
+    protected var breakParticles: RegistryEntry.Paper<ItemType>? by _breakParticles
+    protected var showBreakAnimation: Boolean by _showBreakAnimation
+    protected var soundGroup: SoundGroup? by _soundGroup
     protected var pistonReaction: PistonMoveReaction by _pistonReaction
     protected var selectLightEmission: BlockSelectorScope.() -> Int by _selectLightEmission
     protected var explosionResistance: Float by _explosionResistance
@@ -121,16 +151,17 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         behaviors = emptyList()
         stateProperties = emptyList()
         layout = BlockModelLayout.DEFAULT
+        hardness = -1.0
+        requiresToolForDrops = false
+        breakParticles = null
+        showBreakAnimation = true
+        soundGroup = null
         pistonReaction = PistonMoveReaction.MOVE
         selectLightEmission = { 0 }
         explosionResistance = 0f
         flammable = FlammableSettings(0, 0, false)
         mapColor = null
-        selectFluidFlowMode = {
-            if (hasProperty(DefaultBlockStateProperties.WATERLOGGED))
-                FluidFlowMode.WATERLOG_IN_OUT
-            else FluidFlowMode.BLOCK
-        }
+        selectFluidFlowMode = { FluidFlowMode.BLOCK }
     }
     
     override fun config(name: String) {
@@ -155,6 +186,42 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     
     override fun behaviors(vararg behaviors: BlockBehaviorHolder) {
         this.behaviors += behaviors
+    }
+    
+    override fun breakable(
+        hardness: Double,
+        toolCategories: Set<Key>,
+        toolTier: Key?,
+        requiresToolForDrops: Boolean,
+        breakParticles: RegistryEntry.Paper<ItemType>?,
+        showBreakAnimation: Boolean
+    ) {
+        this.hardness = hardness
+        this.requiresToolForDrops = requiresToolForDrops
+        this.breakParticles = breakParticles
+        this.showBreakAnimation = showBreakAnimation
+        
+        toolCategories.forEach { category ->
+            val tag = when (category) {
+                VanillaToolCategories.SWORD -> BlockTypeTags.SWORD_EFFICIENT
+                VanillaToolCategories.SHEARS -> BlockTypeTags.SHEARS_MAJOR_BREAKING_SPEED
+                else -> registryEntrySetOf(TagKey.create(RegistryKey.BLOCK, Key.key(category.namespace(), "mineable/${category.value()}")))
+            }
+            tags(tag)
+        }
+        toolTier?.let { tier ->
+            val tagTier = when (tier) {
+                VanillaToolTiers.WOOD, VanillaToolTiers.GOLD -> null
+                else -> tier.value()
+            }
+            if (tagTier != null) {
+                tags(registryEntrySetOf(TagKey.create(RegistryKey.BLOCK, Key.key(tier.namespace(), "needs_${tagTier}_tool"))))
+            }
+        }
+    }
+    
+    override fun sounds(soundGroup: SoundGroup) {
+        this.soundGroup = soundGroup
     }
     
     override fun stateProperties(vararg stateProperties: BlockStateProperty<*>) {

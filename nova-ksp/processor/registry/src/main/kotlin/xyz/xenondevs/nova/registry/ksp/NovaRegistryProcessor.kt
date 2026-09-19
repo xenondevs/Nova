@@ -14,6 +14,7 @@ class NovaRegistryProcessor(
     
     private val entriesGenerator = EntriesGenerator(codeGenerator)
     private val extensionsGenerator = ExtensionsGenerator(codeGenerator)
+    private val tagExtensionsGenerator = TagExtensionsGenerator(codeGenerator)
     private val serializersGenerator = SerializersGenerator(codeGenerator)
     private val typeAliasesGenerator = TypeAliasesGenerator(codeGenerator)
     private val registryKeysGenerator = RegistryKeysGenerator(codeGenerator)
@@ -31,10 +32,12 @@ class NovaRegistryProcessor(
             .filter { it.simpleName.asString().endsWith("Keys") }
             .forEach { entriesGenerator.generateEntriesFile(it) }
         
-        resolver.getDeclarationsFromPackage("io.papermc.paper.registry.keys.tags")
+        val tagKeysDeclarations = resolver.getDeclarationsFromPackage("io.papermc.paper.registry.keys.tags")
             .filterIsInstance<KSClassDeclaration>()
             .filter { it.simpleName.asString().endsWith("TagKeys") }
-            .forEach { entriesGenerator.generateEntrySetsFile(it) }
+            .toList()
+        tagKeysDeclarations.forEach { entriesGenerator.generateEntrySetsFile(it) }
+        tagExtensionsGenerator.generateTagExtensions(tagKeysDeclarations)
         
         val registryKey = resolver.getClassDeclarationByName("io.papermc.paper.registry.RegistryKey")!!
         extensionsGenerator.generateTypedKeyExtensions(registryKey)

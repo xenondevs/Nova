@@ -11,8 +11,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterTyp
 import xyz.xenondevs.nova.world.item.Equipment
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.recipe.RecipeType
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
-import xyz.xenondevs.nova.world.item.tool.ToolTier
 import xyz.xenondevs.nova.world.player.ability.AbilityType
 import xyz.xenondevs.nova.world.player.attachment.AttachmentType
 
@@ -28,14 +26,12 @@ object NovaRegistries {
         private set
     
     internal val INTERNAL_EQUIPMENT = createRegistry<Equipment>(novaKey("equipment"))
-    internal val INTERNAL_TOOL_TIER = createRegistry<ToolTier>(novaKey("tool_tier"))
-    internal val INTERNAL_TOOL_CATEGORY = createRegistry<ToolCategory>(novaKey("tool_category"))
     internal val INTERNAL_NETWORK_TYPE = createRegistry<NetworkType<*>>(novaKey("network_type"), reloadable = false)
     internal val INTERNAL_ABILITY_TYPE = createRegistry<AbilityType<*>>(novaKey("ability_type"))
     internal val INTERNAL_ATTACHMENT_TYPE = createRegistry<AttachmentType<*>>(novaKey("attachment_type"))
     internal val INTERNAL_RECIPE_TYPE = createRegistry<RecipeType<*>>(novaKey("recipe_type"))
     internal val INTERNAL_GUI_TEXTURE = createRegistry<GuiTexture>(novaKey("gui_texture"))
-    internal val INTERNAL_WAILA_INFO_PROVIDER = createRegistry<WailaInfoProvider<*, *>>(novaKey("waila_info_provider"))
+    internal val INTERNAL_WAILA_INFO_PROVIDER = createRegistry<WailaInfoProvider<*>>(novaKey("waila_info_provider"))
     internal val INTERNAL_WAILA_TOOL_ICON_PROVIDER = createRegistry<WailaToolIconProvider>(novaKey("waila_tool_icon_provider"))
     internal val INTERNAL_ITEM_FILTER_TYPE = createRegistry<ItemFilterType<*>>(novaKey("item_filter_type"))
     internal val INTERNAL_TOOLTIP_STYLE = createRegistry<TooltipStyle>(novaKey("tooltip_style"))
@@ -45,18 +41,6 @@ object NovaRegistries {
      */
     @JvmField
     val EQUIPMENT: NovaRegistry<Equipment> = INTERNAL_EQUIPMENT.unmodifiableView
-    
-    /**
-     * Registry for all [ToolTiers][ToolTier].
-     */
-    @JvmField
-    val TOOL_TIER: NovaRegistry<ToolTier> = INTERNAL_TOOL_TIER.unmodifiableView
-    
-    /**
-     * Registry for all [ToolCategories][ToolCategory].
-     */
-    @JvmField
-    val TOOL_CATEGORY: NovaRegistry<ToolCategory> = INTERNAL_TOOL_CATEGORY.unmodifiableView
     
     /**
      * Registry for all [NetworkTypes][NetworkType].
@@ -92,7 +76,7 @@ object NovaRegistries {
      * Registry for all [WailaInfoProviders][WailaInfoProvider].
      */
     @JvmField
-    val WAILA_INFO_PROVIDER: NovaRegistry<WailaInfoProvider<*, *>> = INTERNAL_WAILA_INFO_PROVIDER.unmodifiableView
+    val WAILA_INFO_PROVIDER: NovaRegistry<WailaInfoProvider<*>> = INTERNAL_WAILA_INFO_PROVIDER.unmodifiableView
     
     /**
      * Registry for all [WailaToolIconProviders][WailaToolIconProvider].

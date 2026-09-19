@@ -43,9 +43,7 @@ import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.util.toBlock
-import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.blockType
-import xyz.xenondevs.nova.world.block.hasBehavior
 import xyz.xenondevs.nova.world.block.novaBlockState
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.item.itemType
@@ -173,12 +171,6 @@ internal object BlockBreaking : Listener, PacketListener {
         val novaBlockState = block.novaBlockState
         val breaker: BlockBreaker
         if (novaBlockState != null) {
-            // don't do any breaking logic if the block doesn't have the breakable behavior
-            if (!novaBlockState.blockType.hasBehavior<Breakable>()) {
-                player.send(ClientboundBlockChangedAckPacket(sequence))
-                return
-            }
-            
             breaker = NovaBlockBreaker(player, block, novaBlockState, sequence, getBlockedUntil(player))
         } else {
             breaker = VanillaBlockBreaker(player, block, sequence, getBlockedUntil(player))

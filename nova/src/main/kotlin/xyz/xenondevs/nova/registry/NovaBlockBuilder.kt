@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.registry
 
+import io.papermc.paper.datacomponent.DataComponentTypes
+import net.kyori.adventure.key.Key
 import org.bukkit.Color
 import org.bukkit.block.BlockType
 import org.bukkit.block.PistonMoveReaction
@@ -19,7 +21,9 @@ import xyz.xenondevs.nova.world.block.FluidFlowMode
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.behavior.BlockDrops
+import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
+import xyz.xenondevs.nova.world.item.behavior.Tool
 
 /**
  * A builder for [NovaBlock].
@@ -131,6 +135,38 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
     fun modelLess(stateSelector: BlockSelectorScope.() -> BlockData)
     
     /**
+     * Makes this block breakable. Higher [hardness] values increase the time required to break it,
+     * while [requiresToolForDrops] determines whether an appropriate tool is needed for drops.
+     *
+     * The actual tool category / tool tier behavior is defined on the item-side via the [tool component][DataComponentTypes.TOOL] / [tool behavior][Tool].
+     * The convention is to add your block to the appropriate `<namespace>:mineable/<category>` tag for the tool category, and to the appropriate
+     * `<namespace>:needs_<tier>_tool` tag for the tool tier.
+     * [toolCategories] and [toolTier] add the block to these corresponding tags automatically via [tags], but you can also omit
+     * them here and add the tags manually.
+     * The vanilla `sword` and `shears` categories instead use the `minecraft:sword_efficient` and
+     * `minecraft:shears_major_breaking_speed` tags, respectively.
+     * The lowest vanilla harvest tiers, `wood`, `wooden`, and `gold`, do not create a `needs_*_tool` tag.
+     * 
+     * [breakParticles] is used for entity-backed blocks that use barriers.
+     * Since all blocks can fall back to entity-backed models, this should still be set for state-backed blocks.
+     * 
+     * Independently, [showBreakAnimation] can be used to disable the breaking animation entirely.
+     */
+    fun breakable(
+        hardness: Double = 1.0,
+        toolCategories: Set<Key> = emptySet(),
+        toolTier: Key? = null,
+        requiresToolForDrops: Boolean = false,
+        breakParticles: RegistryEntry.Paper<ItemType>? = null,
+        showBreakAnimation: Boolean = true
+    )
+    
+    /**
+     * Configures the sounds made by this block.
+     */
+    fun sounds(soundGroup: SoundGroup)
+    
+    /**
      * Configures how pistons interact with this block.
      * Defaults to [PistonMoveReaction.MOVE].
      * Tile Entities can never be moved.
@@ -175,16 +211,14 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
     /**
      * Configures how fluids flow into and out of all states of this block.
      *
-     * Defaults to [FluidFlowMode.WATERLOG_IN_OUT] for blocks with the
-     * [Waterloggable] behavior and [FluidFlowMode.BLOCK] otherwise.
+     * Defaults to [FluidFlowMode.BLOCK].
      */
     fun fluidFlowMode(mode: FluidFlowMode) = fluidFlowMode { mode }
     
     /**
      * Configures how fluids flow into and out of each block state.
      *
-     * Defaults to [FluidFlowMode.WATERLOG_IN_OUT] for blocks with the
-     * [Waterloggable] behavior and [FluidFlowMode.BLOCK] otherwise.
+     * Defaults to [FluidFlowMode.BLOCK].
      */
     fun fluidFlowMode(selectFluidFlowMode: BlockSelectorScope.() -> FluidFlowMode)
     

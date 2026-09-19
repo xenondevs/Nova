@@ -1,17 +1,16 @@
 package xyz.xenondevs.nova.registry
 
 import net.kyori.adventure.key.Key
+import org.bukkit.block.BlockType
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
-import xyz.xenondevs.nova.world.item.tool.ToolTier
 
 internal class WailaToolIconProviderBuilderImpl(
     override val entry: RegistryEntry.Nova<WailaToolIconProvider>
 ) : WailaToolIconProviderBuilder, RegistryElementBuilder.Nova<WailaToolIconProvider> {
     
-    private var iconGetter: (category: RegistryEntry.Nova<ToolCategory>, tier: RegistryEntry.Nova<ToolTier>?) -> Key? = { _, _ -> null }
+    private var iconGetter: ((tags: Set<RegistryEntrySet.Paper.Tag<BlockType>>) -> Set<Key>) = { emptySet() }
     
-    override fun iconProvider(iconGetter: (category: RegistryEntry.Nova<ToolCategory>, tier: RegistryEntry.Nova<ToolTier>?) -> Key?) {
+    override fun iconProvider(iconGetter: (tags: Set<RegistryEntrySet.Paper.Tag<BlockType>>) -> Set<Key>) {
         this.iconGetter = iconGetter
     }
     

@@ -3,66 +3,30 @@
 package xyz.xenondevs.nova.util.item
 
 import io.papermc.paper.datacomponent.DataComponentTypes
-import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
-import net.minecraft.tags.BlockTags
-import net.minecraft.tags.TagKey
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
-import org.bukkit.craftbukkit.block.CraftBlock
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nova.util.eyeInWater
-import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.roundToDecimalPlaces
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
-import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.blockType
-import xyz.xenondevs.nova.world.block.getBehaviorOrNull
-import xyz.xenondevs.nova.world.block.isNova
-import xyz.xenondevs.nova.world.item.behavior.Tool
-import xyz.xenondevs.nova.world.item.getBehaviorOrNull
-import xyz.xenondevs.nova.world.item.hasBehavior
-import xyz.xenondevs.nova.world.item.itemType
 import xyz.xenondevs.nova.world.item.novaItem
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
-import xyz.xenondevs.nova.world.item.tool.ToolTier
-import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
-import net.minecraft.world.item.component.Tool as MojangTool
-import net.minecraft.world.level.block.Block as MojangBlock
 
 object ToolUtils {
     
-    fun isCorrectToolForDrops(block: Block, tool: ItemStack?): Boolean {
-        val type = block.blockType
-        
-        // block may not require a tool for drops
-        if (type.isNova) {
-            val requiresToolForDrops = type.getBehaviorOrNull<Breakable>()
-                ?.requiresToolForDrops
-                ?: return false // block is not breakable, so there is no correct tool for drops
-            if (!requiresToolForDrops)
-                return true
-        } else if (!(block as CraftBlock).nmsBlockState.requiresCorrectToolForDrops()) return true
-        
-        val toolComponent = tool?.unwrap()?.get(DataComponents.TOOL)
-        if (tool?.itemType?.hasBehavior<Tool>() != true && toolComponent != null && !type.isNova) {
-            // vanilla tool, vanilla block
-            return toolComponent.isCorrectForDrops(block.nmsBlockState)
-        } else {
-            // mix of vanilla and Nova tool/block
-            return ToolCategory.hasCorrectToolCategory(block, tool) && ToolTier.isCorrectLevel(block, tool)
-        }
-    }
+    @Deprecated("Equivalent Bukkit API exists", ReplaceWith("block.isPreferredTool(tool ?: ItemStack.empty())", "org.bukkit.inventory.ItemStack"))
+    fun isCorrectToolForDrops(block: Block, tool: ItemStack?): Boolean =
+        block.isPreferredTool(tool ?: ItemStack.empty())
     
-    //<editor-fold desc="tool damage", defaultstate="collapsed">
-    @Suppress("DEPRECATION", "UnstableApiUsage", "NullableBooleanElvis")
+    @Suppress("DEPRECATION")
     internal fun calculateDamage(
         player: Player,
         block: Block,
@@ -70,8 +34,7 @@ object ToolUtils {
     ): Double {
         when (player.gameMode) {
             GameMode.CREATIVE -> {
-                val canBreakBlocks = tool?.itemType?.getBehaviorOrNull<Tool>()?.canBreakBlocksInCreative
-                    ?: tool?.getData(DataComponentTypes.TOOL)?.canDestroyBlocksInCreative()
+                val canBreakBlocks = tool?.getData(DataComponentTypes.TOOL)?.canDestroyBlocksInCreative()
                     ?: true
                 
                 return if (canBreakBlocks) 1.0 else 0.0
@@ -89,7 +52,7 @@ object ToolUtils {
         var damage = calculateDamage(
             hardness = block.blockType.hardness.toDouble(),
             correctForDrops = isCorrectToolForDrops(block, tool),
-            speed = getDestroySpeed(block, tool),
+            speed = tool?.let { block.getDestroySpeed(it) }?.toDouble() ?: 1.0,
             efficiency = player.getAttribute(Attribute.MINING_EFFICIENCY)?.value ?: 0.0,
             hasteLevel = player.getPotionEffect(PotionEffectType.HASTE)?.amplifier?.plus(1) ?: 0,
             fatigueLevel = player.getPotionEffect(PotionEffectType.MINING_FATIGUE)?.amplifier?.plus(1) ?: 0,
@@ -132,61 +95,6 @@ object ToolUtils {
         if (!isOnGround) speedMultiplier /= 5.0
         
         return (speedMultiplier / hardness / if (correctForDrops) 30.0 else 100.0).roundToDecimalPlaces(3)
-    }
-    //</editor-fold>
-    
-    private fun getDestroySpeed(block: Block, tool: ItemStack?): Double {
-        if (tool == null)
-            return 1.0
-        
-        val toolComponent = tool.unwrap().get(DataComponents.TOOL)
-        val toolBehavior = tool.itemType.getBehaviorOrNull<Tool>()
-        if (toolBehavior != null) {
-            // Nova tool, Nova/Vanilla block 
-            val itemCategories = toolBehavior.categories
-            val blockCategories = ToolCategory.ofBlock(block)
-            if (itemCategories.any { it in blockCategories })
-                return toolBehavior.breakSpeed
-        } else if (toolComponent != null) {
-            val type = block.blockType
-            if (type.isNova) {
-                // Vanilla tool, Nova block
-                // we need to search for a tool rule that matches the block's tool category (tool rules cannot contain custom blocks)
-                val blockCategories = type.getBehaviorOrNull<Breakable>()?.toolCategories ?: emptySet()
-                return findMatchingToolComponentRules(toolComponent, blockCategories)
-                    .maxOfOrNull { it.speed.orElse(1f) }
-                    ?.toDouble() ?: 1.0
-            } else {
-                // Vanilla tool, Vanilla block
-                return toolComponent.getMiningSpeed(block.nmsBlockState).toDouble()
-            }
-        }
-        
-        return 1.0
-    }
-    
-    /**
-     * Extracts tool component rules from [component] that sort of match any one of the [categories].
-     */
-    private fun findMatchingToolComponentRules(component: MojangTool, categories: Set<ToolCategory>): Set<MojangTool.Rule> {
-        val tags = categories.mapNotNullTo(HashSet(), ::findSimilarTagForToolCategory)
-        return component.rules.filterTo(HashSet()) {
-            it.blocks is HolderSet.Named && (it.blocks as HolderSet.Named<MojangBlock>).key() in tags
-        }
-    }
-    
-    /**
-     * Returns a tag that is similar to the given [category] or null if no such tag exists.
-     */
-    private fun findSimilarTagForToolCategory(category: ToolCategory): TagKey<MojangBlock>? {
-        return when (category.entry) {
-            VanillaToolCategories.AXE -> BlockTags.MINEABLE_WITH_AXE
-            VanillaToolCategories.HOE -> BlockTags.MINEABLE_WITH_HOE
-            VanillaToolCategories.PICKAXE -> BlockTags.MINEABLE_WITH_PICKAXE
-            VanillaToolCategories.SHEARS -> BlockTags.LEAVES
-            VanillaToolCategories.SHOVEL -> BlockTags.MINEABLE_WITH_SHOVEL
-            else -> null
-        }
     }
     
     private fun getFatigueMultiplier(level: Int): Double =

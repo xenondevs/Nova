@@ -4,16 +4,17 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.GameMode
 import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.registry.tags
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
-import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.world.block.blockType
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
-import xyz.xenondevs.nova.world.item.tool.ToolTier
 
 private val CHECK_MARK = Component.text("✔", NamedTextColor.GREEN)
 private val CROSS = Component.text("❌", NamedTextColor.RED)
@@ -24,10 +25,9 @@ object ToolLine {
         val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
         return getToolLine(
             player,
-            ToolCategory.ofBlock(block),
-            ToolTier.ofBlock(block),
+            block.blockType.tags.get(),
             block.blockType.hardness.toDouble(),
-            ToolUtils.isCorrectToolForDrops(block, tool)
+            block.isPreferredTool(tool ?: ItemStack.empty())
         )
     }
     
@@ -35,8 +35,7 @@ object ToolLine {
         val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
         return getToolLine(
             player,
-            null,
-            null,
+            emptySet(),
             1.0,
             CustomItemServiceManager.canBreakBlock(block, tool)
         )
@@ -44,8 +43,7 @@ object ToolLine {
     
     fun getToolLine(
         player: Player,
-        blockToolCategories: Set<ToolCategory>?,
-        blockToolLevel: ToolTier?,
+        tags: Set<RegistryEntrySet.Paper.Tag<BlockType>>,
         hardness: Double,
         correctToolForDrops: Boolean?
     ): WailaLine {
@@ -68,24 +66,19 @@ object ToolLine {
             }
         }
         
-        if (blockToolCategories == null) {
-            appendCanBreak()
-        } else if (blockToolCategories.isNotEmpty()) {
-            builder.append(Component.translatable("waila.nova.required_tool", NamedTextColor.GRAY))
-            blockToolCategories.forEach { builder.append(getToolIcon(blockToolLevel, it)) }
+        val toolIcons = NovaRegistries.WAILA_TOOL_ICON_PROVIDER.entrySet.get()
+            .flatMapTo(LinkedHashSet()) { it.getIcon(tags) }
+            .map { ResourceLookups.textureIcon.getValue(it).component }
+        
+        if (toolIcons.isEmpty()) {
             appendCanBreak()
         } else {
-            builder.append(Component.translatable("waila.nova.required_tool.none", NamedTextColor.GRAY))
+            builder.append(Component.translatable("waila.nova.required_tool", NamedTextColor.GRAY))
+            toolIcons.forEach(builder::append)
+            appendCanBreak()
         }
         
         return WailaLine(builder.build(), Alignment.CENTERED)
     }
-    
-    private fun getToolIcon(tier: ToolTier?, category: ToolCategory): Component =
-        NovaRegistries.WAILA_TOOL_ICON_PROVIDER.entrySet.get()
-            .firstNotNullOfOrNull { it.getIcon(category.entry, tier?.entry) }
-            ?.let { ResourceLookups.textureIcon.getValue(it) }
-            ?.component
-            ?: Component.empty()
     
 }

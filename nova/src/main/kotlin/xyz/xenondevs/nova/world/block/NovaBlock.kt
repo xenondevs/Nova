@@ -70,6 +70,7 @@ import xyz.xenondevs.nova.util.toPropertyStringMap
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
+import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
@@ -152,6 +153,16 @@ var BukkitBlock.blockType: BlockType
         blockData = value.createBlockData()
     }
 
+val BukkitBlock.clientsideBlockState: BlockData
+    get() {
+        val data = blockData
+        if (data is NovaBlockState) {
+            return data.novaBlock.clientsideBlockStates[data.nmsBlockState]?.bukkitBlockData ?: data
+        } else {
+            return data
+        }
+    }
+
 val BukkitBlock.blockTypeEntry: RegistryEntry.Paper<BlockType>
     get() = (this as CraftBlock).blockState.blockTypeEntry
 
@@ -226,7 +237,10 @@ internal open class NovaBlock(
     val config: Provider<ConfigProvider>,
     properties: Provider<Properties>,
     flammable: Provider<FlammableSettings>,
-    selectFluidFlowMode: Provider<BlockSelectorScope.() -> FluidFlowMode>
+    selectFluidFlowMode: Provider<BlockSelectorScope.() -> FluidFlowMode>,
+    breakParticles: Provider<ItemType?>,
+    showBreakAnimation: Provider<Boolean>,
+    soundGroup: Provider<SoundGroup?>
 ) : Block(properties.get()) {
     
     val key: Key
@@ -236,6 +250,9 @@ internal open class NovaBlock(
     val style by style
     val behaviors by behaviors
     val item by item
+    val breakParticles by breakParticles
+    val showBreakAnimation by showBreakAnimation
+    val soundGroup by soundGroup
     
     val fluidFlowModes: Map<NmsBlockState, FluidFlowMode>
         by selectFluidFlowMode.map { selector ->
@@ -324,6 +341,7 @@ internal open class NovaBlock(
             Fluids.WATER.getSource(false)
         else super.getFluidState(state)
     }
+    
     
     //<editor-fold desc="event methods">
     /**

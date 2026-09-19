@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.registry
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.tag.TagKey
+import net.kyori.adventure.key.Key
 import org.bukkit.Keyed
 import xyz.xenondevs.commons.collections.mapToSet
 import xyz.xenondevs.commons.provider.MutableProvider
@@ -102,4 +103,31 @@ internal object PaperTagManager {
         } as Provider<Set<RegistryEntrySet.Paper.Tag<T>>>
     }
     
+}
+
+internal class ProviderLookup<K : Any, V>(
+    private val source: Provider<Map<K, V>>,
+    private val fallback: () -> V
+) {
+    
+    private val providers = ConcurrentHashMap<K, Provider<V>>()
+    
+    operator fun get(key: K): Provider<V> =
+        providers.computeIfAbsent(key) { key ->
+            source.map { values -> values[key] ?: fallback() }
+        }
+    
+}
+
+internal fun <T : Keyed> keyToTagLookup(
+    registry: RegistryKey<T>
+): ProviderLookup<Key, Set<RegistryEntrySet.Paper.Tag<T>>> {
+    val source = PaperTagManager.getAllTags(registry).map { allTags ->
+        val map = HashMap<Key, HashSet<RegistryEntrySet.Paper.Tag<T>>>()
+        for (tag in allTags) for (entry in tag.entries.get()) {
+            map.getOrPut(entry.key.key(), ::HashSet) += tag
+        }
+        map
+    }
+    return ProviderLookup(source, ::emptySet)
 }

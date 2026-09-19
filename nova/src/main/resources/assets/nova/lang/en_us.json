@@ -150,7 +150,6 @@
   "command.nova.reset.files.success": "Successfully reset %s file(s). A server restart or Nova reload is required for the changes to take effect.",
   "command.nova.reset.files.no_files": "Could not find any files matching the given wildcard.",
   "waila.nova.required_tool": "Tool: ",
-  "waila.nova.required_tool.none": "No tool required",
   "waila.nova.required_tool.unbreakable": "Unbreakable",
   "nova.tile_entity_limits.type_blacklist.deny": "You are not allowed to place any tile-entities of this type.",
   "nova.tile_entity_limits.world_blacklist.deny": "You are not allowed to place any tile-entities from Nova in this world.",

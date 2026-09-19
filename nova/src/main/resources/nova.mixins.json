@@ -39,8 +39,6 @@
     "item.recipe.customrecipechoice.CraftRecipeMixin",
     "item.recipe.stonecutter.ServerPlayerMixin",
     "item.recipe.stonecutter.StonecutterMenuMixin",
-    "item.tool.CraftBlockMixin",
-    "item.tool.PlayerMixin",
     "item.use.PlayerMixin",
     "item.use.ServerPlayerGameModeMixin",
     "item.using.ItemMixin",

@@ -1,6 +1,10 @@
 package xyz.xenondevs.nova.util
 
 import com.mojang.authlib.GameProfile
+import io.papermc.paper.datacomponent.DataComponentType
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.Tool
+import io.papermc.paper.datacomponent.item.Weapon
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.NbtIo
@@ -17,6 +21,7 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.storage.TagValueOutput
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.block.Block
 import org.bukkit.craftbukkit.entity.CraftEntity
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
@@ -25,16 +30,8 @@ import org.joml.Vector3d
 import org.joml.Vector3dc
 import org.joml.primitives.AABBdc
 import org.joml.primitives.Rayd
-import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.nova.util.data.NBTUtils
-import xyz.xenondevs.nova.world.item.novaItem
-import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
-import xyz.xenondevs.nova.world.item.behavior.Damageable
-import xyz.xenondevs.nova.world.item.getBehaviorOrNull
-import xyz.xenondevs.nova.world.item.itemType
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
-import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -70,25 +67,17 @@ fun BukkitLivingEntity.damageItemInOffHand(damage: Int = 1): Boolean =
 /**
  * Damages the tool in the [entity's][BukkitLivingEntity] main hand as if they've broken a block.
  */
-fun BukkitLivingEntity.damageToolBreakBlock() = damageToolInMainHand(Damageable::itemDamageOnBreakBlock, VanillaToolCategory::itemDamageOnBreakBlock)
+fun BukkitLivingEntity.damageToolBreakBlock() = damageToolInMainHand(DataComponentTypes.TOOL, Tool::damagePerBlock)
 
 /**
  * Damages the tool in the [entity's][BukkitLivingEntity] main hand as if they've attack an entity.
  */
-fun BukkitLivingEntity.damageToolAttackEntity() = damageToolInMainHand(Damageable::itemDamageOnAttackEntity, VanillaToolCategory::itemDamageOnAttackEntity)
+fun BukkitLivingEntity.damageToolAttackEntity() = damageToolInMainHand(DataComponentTypes.WEAPON, Weapon::itemDamagePerAttack)
 
-private inline fun BukkitLivingEntity.damageToolInMainHand(getNovaDamage: (Damageable) -> Int, getVanillaDamage: (VanillaToolCategory) -> Int) {
-    val itemStack = nmsEntity.mainHandItem
-    val damage: Int
-    if (itemStack.novaItem != null) {
-        val damageable = itemStack.asBukkitMirror().itemType.getBehaviorOrNull<Damageable>() ?: return
-        damage = getNovaDamage(damageable)
-    } else {
-        val toolCategory = ToolCategory.ofItem(itemStack.asBukkitMirror()).firstInstanceOfOrNull<VanillaToolCategory>() ?: return
-        damage = getVanillaDamage(toolCategory)
-    }
-    
-    damageItemInMainHand(damage)
+private inline fun <T : Any> BukkitLivingEntity.damageToolInMainHand(type: DataComponentType.Valued<T>, getValue: (T) -> Int) {
+    val damage = equipment?.itemInMainHand?.getData(type)?.let(getValue) ?: 0
+    if (damage > 0)
+        damageItemInMainHand(damage)
 }
 
 /**
@@ -103,7 +92,7 @@ fun BukkitEntity.teleport(modifyLocation: Location.() -> Unit) {
 /**
  * The translation key for the name of this [BukkitEntity].
  */
-val BukkitEntity.localizedName: String?
+val BukkitEntity.localizedName: String
     get() = (this as CraftEntity).handle.type.descriptionId
 
 /**

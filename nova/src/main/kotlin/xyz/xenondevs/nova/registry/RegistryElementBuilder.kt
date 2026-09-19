@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.registry
 
-import io.papermc.paper.registry.tag.TagKey
 import net.minecraft.resources.RegistryOps
+import org.bukkit.Keyed
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.provider
 
 /**
  * A builder of a registry element, either [Nova] or [Vanilla].
@@ -10,11 +12,18 @@ import net.minecraft.resources.RegistryOps
  * Things like [NovaItemBuilder] intentionally do not implement this interface directly to hide
  * the build functions.
  */
-sealed interface RegistryElementBuilder<out T : Any> {
+sealed interface RegistryElementBuilder<out T : Keyed> {
+    
+    /**
+     * A reloadable set of tags that the element built by this builder belongs in.
+     * Can be updated at any time (independently of registry reloading / re-running).
+     */
+    val tags: Provider<Set<RegistryEntrySet.Paper.Tag<T>>>
+        get() = provider(emptySet())
     
     /**
      * Prepares the builder for build.
-     * This function as called after the builder has been configured, but before the build function is called.
+     * This function is called after the builder has been configured, but before the build function is called.
      * This allows for e.g. queuing asset generation in resource pack tasks, which will be done before the build function is called.
      */
     fun prepareBuild() = Unit
@@ -58,23 +67,28 @@ sealed interface RegistryElementBuilder<out T : Any> {
     /**
      * A builder of something that is registered in a vanilla registry.
      */
-    interface Vanilla<out T : Any> : RegistryElementBuilder<T> {
+    interface Vanilla<out API : Keyed, out NMS : Any> : RegistryElementBuilder<API> {
         
         /**
          * Builds the registry element.
          * Can use [lookup] to get holders for other registry elements.
          */
-        fun build(lookup: RegistryOps.RegistryInfoLookup): T
-        
-        /**
-         * Builds a set of tags that the resulting element should be added to.
-         */
-        fun buildTagSet(): Set<TagKey<*>> = emptySet()
+        fun build(lookup: RegistryOps.RegistryInfoLookup): NMS
         
     }
     
-    interface RerunnableVanilla<out T : Any> : Vanilla<T> {
+    /**
+     * A [Vanilla] builder that can be reset and re-run. How updates are propagated to the elements
+     * is left to the implementation. [RegistryElementBuilder.Vanilla.prepareBuild] is called 
+     * again on re-run, but [RegistryElementBuilder.Vanilla.build] is not.
+     * Intended for non-reloadable vanilla registries.
+     */
+    interface RerunnableVanilla<out API : Keyed, out NMS : Any> : Vanilla<API, NMS> {
         
+        /**
+         * Resets the builder to its initial state.
+         * Called immediately before re-running configuration on the builder.
+         */
         fun reset()
         
     }

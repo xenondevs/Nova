@@ -47,13 +47,13 @@ private sealed interface BuilderFactory<E : RegistryEntry<*>, B : RegistryElemen
         }
     }
     
-    data class Vanilla<P : Keyed, V : Any, B : RegistryElementBuilder.Vanilla<V>>(
+    data class Vanilla<P : Keyed, V : Any, B : RegistryElementBuilder.Vanilla<P, V>>(
         override val makeBuilder: (RegistryEntry.Paper<P>) -> B,
         override val runBuilder: B.() -> Unit
     ) : BuilderFactory<RegistryEntry.Paper<P>, B> {
         override fun createAndConfigure(e: RegistryEntry.Paper<P>): B {
             val builder = makeBuilder(e)
-            if (builder is RegistryElementBuilder.RerunnableVanilla<*>)
+            if (builder is RegistryElementBuilder.RerunnableVanilla<*, *>)
                 builder.reset()
             builder.runBuilder()
             builder.prepareBuild()
@@ -90,7 +90,7 @@ object RegistryLoader {
     
     private val vanillaBuilderFactories: MutableMap<RegistryKey<*>, MutableMap<Key, BuilderFactory.Vanilla<*, *, *>>> = HashMap()
     private val vanillaUnknownBuilderFactory: MutableMap<RegistryKey<*>, BuilderFactory.Vanilla<*, *, *>> = HashMap()
-    private val vanillaRerunnableBuilders: MutableMap<RegistryKey<*>, MutableMap<Key, RegistryElementBuilder.RerunnableVanilla<*>>> = HashMap()
+    private val vanillaRerunnableBuilders: MutableMap<RegistryKey<*>, MutableMap<Key, RegistryElementBuilder.RerunnableVanilla<*, *>>> = HashMap()
     
     /**
      * Enqueues the creation and registration of an [R] in [registry] under [key] by first
@@ -143,7 +143,7 @@ object RegistryLoader {
      * Enqueues the creation and registration of an entry in the Vanilla registry [registry] under [key] by first
      * creating a builder via [makeBuilder] and then running it via [runBuilder].
      */
-    fun <T : Keyed, NMS : Any, B : RegistryElementBuilder.Vanilla<NMS>> enqueueVanilla(
+    fun <T : Keyed, NMS : Any, B : RegistryElementBuilder.Vanilla<T, NMS>> enqueueVanilla(
         registry: RegistryKey<T>,
         key: Key,
         makeBuilder: (RegistryEntry.Paper<T>) -> B,
@@ -193,7 +193,7 @@ object RegistryLoader {
      * which will be invoked for all keys that were registered during a previous iteration but are missing now. 
      * If no unknown builder factory is registered for a registry, missing keys will be ignored.
      */
-    fun <T : Keyed, NMS : Any, B : RegistryElementBuilder.Vanilla<NMS>> registerVanillaUnknown(
+    fun <T : Keyed, NMS : Any, B : RegistryElementBuilder.Vanilla<T, NMS>> registerVanillaUnknown(
         registry: RegistryKey<T>,
         makeBuilder: (RegistryEntry.Paper<T>) -> B,
         runBuilder: B.() -> Unit
@@ -230,7 +230,7 @@ object RegistryLoader {
                 factory as BuilderFactory.Vanilla<Keyed, Any, *>
                 val entry = RegistryEntry.paper(TypedKey.create(registryKey, key))
                 val builder = factory.createAndConfigure(entry)
-                if (builder is RegistryElementBuilder.RerunnableVanilla<*>)
+                if (builder is RegistryElementBuilder.RerunnableVanilla<*, *>)
                     rerunnableBuilders[key] = builder
                 
                 // enqueue build & registration (on nms registry freeze)
@@ -278,7 +278,7 @@ object RegistryLoader {
         val builders = novaBuilders[registry]?.toMutableMap() ?: mutableMapOf()
         
         // add factory for unknown elements
-        val presentKeys = builders.keys 
+        val presentKeys = builders.keys
         val unknownBuilder = novaUnknownBuilderFactory[registry] as BuilderFactory.Nova<T, *>?
         if (unknownBuilder != null) {
             val missingKeys = (knownRegistryEntries[registry.key] ?: emptySet()) - presentKeys
@@ -324,7 +324,7 @@ object RegistryLoader {
         
         vanillaRerunnableBuilders[registry]?.forEach { [key, builder] ->
             builder.reset()
-            val factory = vanillaBuilderFactories[registry]?.get(key) as BuilderFactory.Vanilla<*, *, RegistryElementBuilder.RerunnableVanilla<Any>>
+            val factory = vanillaBuilderFactories[registry]?.get(key) as BuilderFactory.Vanilla<Keyed, Any, RegistryElementBuilder.RerunnableVanilla<Keyed, Any>>
             factory.runBuilder(builder)
             builder.prepareBuild()
         }

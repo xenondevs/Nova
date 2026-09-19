@@ -53,8 +53,6 @@ internal object CbfSerializers {
         Cbf.registerSerializer(Vector4fcBinarySerializer)
         
         Cbf.registerRegistrySerializers(NovaRegistries.EQUIPMENT)
-        Cbf.registerRegistrySerializers(NovaRegistries.TOOL_TIER)
-        Cbf.registerRegistrySerializers(NovaRegistries.TOOL_CATEGORY)
         Cbf.registerRegistrySerializers(NovaRegistries.NETWORK_TYPE)
         Cbf.registerRegistrySerializers(NovaRegistries.ABILITY_TYPE)
         Cbf.registerRegistrySerializers(NovaRegistries.ATTACHMENT_TYPE)

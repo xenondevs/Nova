@@ -5,6 +5,7 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.RegistryOps
 import net.minecraft.world.level.block.entity.BlockEntityType
 import org.bukkit.block.BlockType
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.orElseBy
 import xyz.xenondevs.commons.provider.uninitializedProvider
@@ -49,6 +50,9 @@ internal class NovaTileEntityBlockBuilderImpl(
                     _properties,
                     _flammable,
                     _selectFluidFlowMode,
+                    _breakParticles.flatten(),
+                    _showBreakAnimation,
+                    _soundGroup,
                     tileEntity,
                     _tickrate
                 )
