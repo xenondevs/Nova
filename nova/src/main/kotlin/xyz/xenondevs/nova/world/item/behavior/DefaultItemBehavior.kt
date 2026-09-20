@@ -8,6 +8,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.UseCooldown
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
@@ -34,6 +35,7 @@ import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.util.toIdentifier
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.DataComponentMap
@@ -42,10 +44,11 @@ import xyz.xenondevs.nova.world.item.ItemAction
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.buildDataComponentMap
 import xyz.xenondevs.nova.world.toNova
+import java.util.*
 import net.minecraft.network.chat.Component as MojangComponent
 
 internal class DefaultItemBehavior(
-    id: Key,
+    private val key: Key,
     name: Component?,
     style: Style,
     lore: List<Component>,
@@ -75,7 +78,7 @@ internal class DefaultItemBehavior(
             }
             
             this[DataComponentTypes.MAX_STACK_SIZE] = maxStackSize
-            this[DataComponentTypes.ITEM_MODEL] = id
+            this[DataComponentTypes.ITEM_MODEL] = key
             
             // default empty values
             this[DataComponentTypes.ENCHANTMENTS] = itemEnchantments().build()
@@ -166,6 +169,11 @@ internal class DefaultItemBehavior(
             wrappingComponent.style = style
             wrappingComponent.append(it)
             return@update wrappingComponent
+        }
+        client.unwrap().update(DataComponents.USE_COOLDOWN) {
+            if (it.cooldownGroup.isEmpty)
+                UseCooldown(it.seconds, Optional.of(key.toIdentifier()))
+            else it
         }
         return client
     }
