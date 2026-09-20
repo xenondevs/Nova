@@ -5,6 +5,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
 import net.minecraft.network.protocol.game.ClientboundBundlePacket
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
+import net.minecraft.network.protocol.game.VecDelta
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
@@ -421,6 +422,7 @@ internal class PacketEntityImpl<M : EntityMetadata>(
             val deltaX = (newLocation.x - actualLocation.x).toFixedPoint()
             val deltaY = (newLocation.y - actualLocation.y).toFixedPoint()
             val deltaZ = (newLocation.z - actualLocation.z).toFixedPoint()
+            val delta = VecDelta.Linear(deltaX, deltaY, deltaZ)
             
             actualLocation.add(deltaX.fromFixedPoint(), deltaY.fromFixedPoint(), deltaZ.fromFixedPoint())
             
@@ -430,7 +432,7 @@ internal class PacketEntityImpl<M : EntityMetadata>(
                 
                 return ClientboundMoveEntityPacket.PosRot(
                     id,
-                    deltaX, deltaY, deltaZ,
+                    delta,
                     newLocation.yaw.toPackedByte(),
                     newLocation.pitch.toPackedByte(),
                     true
@@ -438,7 +440,7 @@ internal class PacketEntityImpl<M : EntityMetadata>(
             } else {
                 return ClientboundMoveEntityPacket.Pos(
                     id,
-                    deltaX, deltaY, deltaZ,
+                    delta,
                     true
                 )
             }

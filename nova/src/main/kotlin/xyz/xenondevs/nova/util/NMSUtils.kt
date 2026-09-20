@@ -35,6 +35,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStackTemplate
+import net.minecraft.world.item.ItemInstance
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
@@ -120,6 +121,12 @@ val FallingBlock.nmsEntity: MojangFallingBlockEntity
 
 fun ItemStack?.unwrap(): MojangStack =
     this?.let(CraftItemStack::unwrap) ?: MojangStack.EMPTY
+
+fun MojangStack.asBukkitMirror(): ItemStack =
+    CraftItemStack.asBukkitMirror(this)
+
+fun ItemInstance.asBukkitCopy(): ItemStack =
+    CraftItemStack.asBukkitCopy(this)
 
 val BlockData.nmsBlockState: BlockState
     get() = (this as CraftBlockData).state
@@ -356,11 +363,11 @@ val ItemUseAnimation.nmsItemUseAnimation: MojangItemUseAnimation
 
 val PistonMoveReaction.nmsPushReaction: PushReaction
     get() = when (this) {
-        PistonMoveReaction.MOVE -> PushReaction.NORMAL
-        PistonMoveReaction.BREAK -> PushReaction.DESTROY
-        PistonMoveReaction.BLOCK -> PushReaction.BLOCK
-        PistonMoveReaction.IGNORE -> PushReaction.IGNORE
-        PistonMoveReaction.PUSH_ONLY -> PushReaction.PUSH_ONLY
+        PistonMoveReaction.MOVE -> PushReaction.PUSH_PULL
+        PistonMoveReaction.BREAK -> PushReaction.POPPED
+        PistonMoveReaction.BLOCK -> PushReaction.IMMOVEABLE
+        PistonMoveReaction.IGNORE -> PushReaction.IGNORE_ENTITY
+        PistonMoveReaction.PUSH_ONLY -> PushReaction.PUSH
     }
 
 internal val NoteBlockInstrument.nmsNoteBlockInstrument: MojangNoteBlockInstrument
@@ -721,7 +728,7 @@ fun <T : Any> RegistryAccess.getValueOrThrow(key: ResourceKey<T>): T {
 }
 
 fun <T : Any> RegistryInfoLookup.lookupGetterOrThrow(key: ResourceKey<Registry<T>>): HolderGetter<T> {
-    return lookup(key).getOrNull()?.getter ?: throw IllegalArgumentException("Registry not found: $key")
+    return lookup(key).getOrNull() ?: throw IllegalArgumentException("Registry not found: $key")
 }
 
 fun Identifier.toString(separator: String): String {

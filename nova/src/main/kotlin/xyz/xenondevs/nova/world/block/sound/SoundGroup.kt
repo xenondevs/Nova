@@ -280,6 +280,10 @@ class SoundGroup internal constructor(
         val POTENT_SULFUR: SoundGroup = from(SoundType.POTENT_SULFUR)
         val SULFUR_SPIKE: SoundGroup = from(SoundType.SULFUR_SPIKE)
         val CINNABAR: SoundGroup = from(SoundType.CINNABAR)
+        val SHELF_MUSHROOM: SoundGroup = from(SoundType.SHELF_MUSHROOM)
+        val POPLAR_LEAVES: SoundGroup = from(SoundType.POPLAR_LEAVES)
+        val STRAW_BED: SoundGroup = from(SoundType.STRAW_BED)
+        val RED_SHRUB: SoundGroup = from(SoundType.RED_SHRUB)
         //</editor-fold>
         
         /**

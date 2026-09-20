@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.ui.menu
 
+import xyz.xenondevs.nova.util.asBukkitMirror
 import it.unimi.dsi.fastutil.ints.IntArrayList
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.component.CustomModelData

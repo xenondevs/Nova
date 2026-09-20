@@ -6,7 +6,6 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.biome.BiomeGenerationSettings
 import net.minecraft.world.level.levelgen.GenerationStep
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
@@ -59,7 +58,7 @@ internal object BiomeInjector {
         }.asList()
         
         biome.generationSettings = BiomeGenerationSettings(
-            prevGenSettings.carvers as HolderSet<ConfiguredWorldCarver<*>>,
+            HolderSet.direct(prevGenSettings.carvers.toList()),
             newFeatures
         )
     }

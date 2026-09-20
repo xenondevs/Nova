@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla
 
+import xyz.xenondevs.nova.util.asBukkitMirror
 import net.minecraft.world.level.block.entity.BlockEntity
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory

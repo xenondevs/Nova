@@ -16,7 +16,7 @@ import net.minecraft.util.random.Weighted
 import net.minecraft.util.random.WeightedList
 import net.minecraft.world.attribute.AmbientAdditionsSettings
 import net.minecraft.world.attribute.AmbientMoodSettings
-import net.minecraft.world.attribute.EnvironmentAttributeMap
+import net.minecraft.world.attribute.EnvironmentAttributes
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.level.biome.Biome
@@ -29,7 +29,8 @@ import net.minecraft.world.level.biome.MobSpawnSettings
 import net.minecraft.world.level.biome.MobSpawnSettings.MobSpawnCost
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData
 import net.minecraft.world.level.levelgen.GenerationStep
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver
+import net.minecraft.world.level.levelgen.carver.WorldCarver
+import net.minecraft.util.valueproviders.UniformInt
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.registry.LegacyRegistryElementBuilder
@@ -55,14 +56,15 @@ class BiomeBuilder internal constructor(
     private val lookup: RegistryInfoLookup
 ) : LegacyRegistryElementBuilder<Biome>(registry, id) {
     
-    private val configuredCarverRegistry = lookup.lookupGetterOrThrow(Registries.CONFIGURED_CARVER)
+    private val carverRegistry = lookup.lookupGetterOrThrow(Registries.CARVER)
     private val placedFeatureRegistry = lookup.lookupGetterOrThrow(Registries.PLACED_FEATURE)
     
     private var climateSettings: ClimateSettings? = null
     private var specialEffects: BiomeSpecialEffects? = null
-    private val carvers = ArrayList<Holder<ConfiguredWorldCarver<*>>>()
+    private val carvers = ArrayList<Holder<WorldCarver>>()
     private val features = Array(11) { mutableListOf<Holder<PlacedFeature>>() }
     private var mobSpawnSettings: MobSpawnSettings? = null
+    private var creatureGenerationProbability: Float? = null
     
     /**
      * Sets the [ClimateSettings] of this biome. These settings are mostly used for foliage color and other gameplay
@@ -96,7 +98,9 @@ class BiomeBuilder internal constructor(
      * configure the spawning of mobs.
      */
     fun mobSpawnSettings(mobSpawnSettings: MobSpawnSettingsBuilder.() -> Unit) {
-        this.mobSpawnSettings = MobSpawnSettingsBuilder().apply(mobSpawnSettings).build()
+        val builder = MobSpawnSettingsBuilder().apply(mobSpawnSettings)
+        this.mobSpawnSettings = builder.build()
+        this.creatureGenerationProbability = builder.creatureGenerationProbability
     }
     
     /**
@@ -119,13 +123,13 @@ class BiomeBuilder internal constructor(
     }
     
     /**
-     * Adds [configuredCarvers] to the biome.
+     * Adds [carvers] to the biome.
      *
      * For more information on carvers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/carvers/carvers/).
      */
-    fun carvers(vararg configuredCarvers: ResourceKey<ConfiguredWorldCarver<*>>) {
-        for (key in configuredCarvers) {
-            carvers += configuredCarverRegistry.getOrThrow(key)
+    fun carvers(vararg carvers: ResourceKey<WorldCarver>) {
+        for (key in carvers) {
+            this.carvers += carverRegistry.getOrThrow(key)
         }
     }
     
@@ -150,7 +154,20 @@ class BiomeBuilder internal constructor(
         val generationSettings = BiomeGenerationSettings(HolderSet.direct(carvers), features.map { HolderSet.direct(it) })
         val mobSpawnSettings = this.mobSpawnSettings ?: MobSpawnSettings.EMPTY
         // TODO: expose environment attributes
-        return Biome(climateSettings, EnvironmentAttributeMap.builder().build(), specialEffects, generationSettings, mobSpawnSettings)
+        return Biome.BiomeBuilder()
+            .hasPrecipitation(climateSettings.hasPrecipitation)
+            .temperature(climateSettings.temperature)
+            .temperatureAdjustment(climateSettings.temperatureModifier)
+            .downfall(climateSettings.downfall)
+            .specialEffects(specialEffects)
+            .generationSettings(generationSettings)
+            .mobSpawnSettings(mobSpawnSettings)
+            .apply {
+                creatureGenerationProbability?.let {
+                    setAttribute(EnvironmentAttributes.CREATURE_WORLD_GEN_SPAWN_PROBABILITY, it)
+                }
+            }
+            .build()
     }
     
 }
@@ -501,7 +518,8 @@ class BiomeSpecialEffectsBuilder internal constructor(private val lookup: Regist
 @RegistryElementBuilderDsl
 class MobSpawnSettingsBuilder internal constructor() {
     
-    private var creatureGenerationProbability = 0.1f
+    internal var creatureGenerationProbability = 0.1f
+        private set
     private val spawners = enumMap<MobCategory, MutableList<Weighted<SpawnerData>>>()
     private val mobSpawnCosts = mutableMapOf<EntityType<*>, MobSpawnCost>()
     
@@ -525,7 +543,7 @@ class MobSpawnSettingsBuilder internal constructor() {
      * instance out of the given [entityType], [minCount] and [maxCount].
      */
     fun addSpawn(mobCategory: MobCategory, entityType: EntityType<*>, minCount: Int = 2, maxCount: Int = 4) =
-        addSpawn(mobCategory, SpawnerData(entityType, minCount, maxCount))
+        addSpawn(mobCategory, SpawnerData(entityType, UniformInt.of(minCount, maxCount)))
     
     /**
      * Sets the spawn cost for [entityType] to the given [spawnCost].
@@ -545,11 +563,10 @@ class MobSpawnSettingsBuilder internal constructor() {
      * Builds a [MobSpawnSettings] instance from the current state of this builder.
      */
     internal fun build(): MobSpawnSettings {
-        return MobSpawnSettings(
-            creatureGenerationProbability,
-            spawners.mapValues { [_, v] -> WeightedList.of(v) },
-            mobSpawnCosts
-        )
+        val builder = MobSpawnSettings.Builder()
+        spawners.forEach { [category, entries] -> builder.addAllSpawns(category, WeightedList.of(entries)) }
+        builder.addAllCosts(mobSpawnCosts)
+        return builder.build()
     }
     
 }

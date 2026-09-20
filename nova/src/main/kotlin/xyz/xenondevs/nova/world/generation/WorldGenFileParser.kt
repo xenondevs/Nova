@@ -11,12 +11,12 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.dimension.DimensionType
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
+import net.minecraft.world.level.levelgen.carver.WorldCarver
+import net.minecraft.world.level.levelgen.feature.Feature
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.level.levelgen.structure.StructureSet
-import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
+import net.minecraft.world.level.levelgen.synth.NormalNoise
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -45,11 +45,11 @@ internal object WorldGenFileParser {
     
     private val VANILLA_WORLD_GEN_DIRECTORIES = listOf(
         VanillaWorldGenDir("biome", Biome.DIRECT_CODEC, Registries.BIOME),
-        VanillaWorldGenDir("configured_carver", ConfiguredWorldCarver.DIRECT_CODEC, Registries.CONFIGURED_CARVER),
+        VanillaWorldGenDir("carver", WorldCarver.DIRECT_CODEC, Registries.CARVER),
         VanillaWorldGenDir("dimension_type", DimensionType.DIRECT_CODEC, Registries.DIMENSION_TYPE),
-        VanillaWorldGenDir("configured_feature", ConfiguredFeature.DIRECT_CODEC, Registries.CONFIGURED_FEATURE),
+        VanillaWorldGenDir("feature", Feature.DIRECT_CODEC, Registries.FEATURE),
         VanillaWorldGenDir("placed_feature", PlacedFeature.DIRECT_CODEC, Registries.PLACED_FEATURE),
-        VanillaWorldGenDir("noise", NoiseParameters.DIRECT_CODEC, Registries.NOISE),
+        VanillaWorldGenDir("noise", NormalNoise.DIRECT_CODEC, Registries.NOISE),
         VanillaWorldGenDir("noise_settings", NoiseGeneratorSettings.DIRECT_CODEC, Registries.NOISE_SETTINGS),
         VanillaWorldGenDir("structure", Structure.DIRECT_CODEC, Registries.STRUCTURE),
         VanillaWorldGenDir("structure_set", StructureSet.DIRECT_CODEC, Registries.STRUCTURE_SET)

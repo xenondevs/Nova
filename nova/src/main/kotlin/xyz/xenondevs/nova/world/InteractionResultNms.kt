@@ -8,9 +8,8 @@ internal fun NmsInteractionResult.toNova(): InteractionResult = when (this) {
     is NmsInteractionResult.Success -> {
         val swing = when (swingSource) {
             NmsInteractionResult.SwingSource.NONE,
-            NmsInteractionResult.SwingSource.CLIENT -> false
-            
-            NmsInteractionResult.SwingSource.SERVER -> true
+            NmsInteractionResult.SwingSource.PREDICTED -> false
+            NmsInteractionResult.SwingSource.SERVER_ONLY -> true
         }
         val action: ItemAction?
         if (itemContext.wasItemInteraction) {

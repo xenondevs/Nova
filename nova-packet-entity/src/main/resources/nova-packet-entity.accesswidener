@@ -6,6 +6,7 @@ accessible field net/minecraft/world/entity/item/PrimedTnt DEFAULT_BLOCK_STATE L
 accessible field net/minecraft/world/entity/monster/Shulker DEFAULT_ATTACH_FACE Lnet/minecraft/core/Direction;
 accessible field net/minecraft/world/entity/animal/feline/Cat DEFAULT_COLLAR_COLOR Lnet/minecraft/world/item/DyeColor;
 accessible field net/minecraft/world/entity/animal/wolf/Wolf DEFAULT_COLLAR_COLOR Lnet/minecraft/world/item/DyeColor;
+accessible field net/minecraft/world/entity/decoration/Cushion DEFAULT_COLOR Lnet/minecraft/world/item/DyeColor;
 accessible class net/minecraft/world/level/block/WeatheringCopper$WeatherState
 accessible method net/minecraft/network/protocol/game/ClientboundUpdateAttributesPacket <init> (ILjava/util/List;)V
 accessible method net/minecraft/world/entity/Display$BillboardConstraints getId ()B

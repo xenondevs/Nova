@@ -19,8 +19,8 @@ abstract class SpongeBlockMixin {
     @Definition(id = "BucketPickup", type = BucketPickup.class)
     @Expression("? instanceof BucketPickup")
     @ModifyExpressionValue(method = "removeWaterBreadthFirstSearch", at = @At("MIXINEXTRAS:EXPRESSION"))
-    private boolean isNovaBucketPickup(boolean original, @Local(name = "blockState") BlockState blockState) {
-        return original || NovaWaterloggingBridge.isWaterloggable(blockState.getBlock());
+    private boolean isNovaBucketPickup(boolean original, @Local(name = "state") BlockState state) {
+        return original || NovaWaterloggingBridge.isWaterloggable(state.getBlock());
     }
     
     @Definition(id = "BucketPickup", type = BucketPickup.class)
@@ -35,8 +35,8 @@ abstract class SpongeBlockMixin {
     @Definition(id = "BucketPickup", type = BucketPickup.class)
     @Expression("? instanceof BucketPickup")
     @ModifyExpressionValue(method = "lambda$removeWaterBreadthFirstSearch$1", at = @At("MIXINEXTRAS:EXPRESSION"))
-    private static boolean isNovaBucketPickupInTraversal(boolean original, @Local(name = "blockState") BlockState blockState) {
-        return original || NovaWaterloggingBridge.isWaterloggable(blockState.getBlock());
+    private static boolean isNovaBucketPickupInTraversal(boolean original, @Local(name = "state") BlockState state) {
+        return original || NovaWaterloggingBridge.isWaterloggable(state.getBlock());
     }
     
     @Definition(id = "BucketPickup", type = BucketPickup.class)

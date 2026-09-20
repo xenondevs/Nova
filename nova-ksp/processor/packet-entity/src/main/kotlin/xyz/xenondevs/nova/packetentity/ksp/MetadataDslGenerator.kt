@@ -81,6 +81,7 @@ private val SERIALIZER_MAPPINGS = mapOf(
     mapping("BLOCK_POS", ClassName("net.minecraft.core", "BlockPos"), ClassName("org.joml", "Vector3ic")),
     mapping("OPTIONAL_BLOCK_POS", OPTIONAL.parameterizedBy(ClassName("net.minecraft.core", "BlockPos")), ClassName("org.joml", "Vector3ic").copy(nullable = true)),
     mapping("DIRECTION", ClassName("net.minecraft.core", "Direction"), ClassName("org.bukkit.block", "BlockFace")),
+    mapping("DYE_COLOR", ClassName("net.minecraft.world.item", "DyeColor"), ClassName("org.bukkit", "DyeColor")),
     mapping("ROTATIONS", ClassName("net.minecraft.core", "Rotations"), ClassName("org.joml", "Vector3fc")),
     mapping("POSE", ClassName("net.minecraft.world.entity", "Pose"), ClassName("org.bukkit.entity", "Pose")),
     mapping("VECTOR3", ClassName("org.joml", "Vector3fc")),

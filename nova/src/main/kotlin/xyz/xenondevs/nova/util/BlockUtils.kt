@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import xyz.xenondevs.nova.util.asBukkitMirror
 import io.papermc.paper.math.BlockPosition
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents

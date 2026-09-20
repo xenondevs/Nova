@@ -15,10 +15,6 @@ import net.minecraft.network.protocol.game.ClientboundAnimatePacket
 import net.minecraft.network.protocol.game.ClientboundCommandsPacket
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket
-import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
-import net.minecraft.network.protocol.game.ClientboundLightUpdatePacket
-import net.minecraft.network.protocol.game.ClientboundLightUpdatePacketData
 import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket
 import net.minecraft.network.protocol.game.ClientboundPlayerLookAtPacket
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
@@ -107,7 +103,8 @@ fun ClientboundCommandsPacket(
     entries: List<ClientboundCommandsPacket.Entry>,
     rootIndex: Int
 ): ClientboundCommandsPacket = decodePacket(ClientboundCommandsPacket.STREAM_CODEC) {
-    writeCollection(entries) { buffer, entry -> entry.write(buffer) }
+    writeVarInt(entries.size)
+    entries.forEach { it.write(this) }
     writeVarInt(rootIndex)
 }
 
@@ -137,32 +134,6 @@ fun ClientboundInitializeBorderPacket(
     writeVarInt(newAbsoluteMaxSize)
     writeVarInt(warningBlocks)
     writeVarInt(warningTime)
-}
-
-fun ClientboundLevelChunkWithLightPacket(
-    x: Int,
-    z: Int,
-    chunkData: ClientboundLevelChunkPacketData,
-    lightData: ClientboundLightUpdatePacketData,
-    ready: Boolean
-): ClientboundLevelChunkWithLightPacket =
-    decodeRegistryPacket(ClientboundLevelChunkWithLightPacket.STREAM_CODEC) {
-        writeInt(x)
-        writeInt(z)
-        chunkData.write(this)
-        lightData.write(this)
-    }.also {
-        it.isReady = ready
-    }
-
-fun ClientboundLightUpdatePacket(
-    x: Int,
-    z: Int,
-    lightData: ClientboundLightUpdatePacketData
-): ClientboundLightUpdatePacket = decodePacket(ClientboundLightUpdatePacket.STREAM_CODEC) {
-    writeVarInt(x)
-    writeVarInt(z)
-    lightData.write(this)
 }
 
 fun ClientboundPlayerAbilitiesPacket(

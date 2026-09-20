@@ -88,6 +88,7 @@ import net.minecraft.network.chat.Component as NmsComponent
 import net.minecraft.world.entity.Pose as NmsPose
 import net.minecraft.world.entity.animal.armadillo.Armadillo as NmsArmadillo
 import net.minecraft.world.item.ItemStack as NmsItemStack
+import net.minecraft.world.item.DyeColor as NmsDyeColor
 import net.minecraft.world.item.component.ResolvableProfile as NmsResolvableProfile
 import org.bukkit.entity.Armadillo as BukkitArmadillo
 import org.bukkit.entity.Sniffer as BukkitSniffer
@@ -210,6 +211,12 @@ internal class ConvertingDslProperty<D, T>(
         //</editor-fold>
         
         //<editor-fold desc="enum" defaultstate="collapsed">
+        val DYE_COLOR: ConvertingDslPropertyFactory<NmsDyeColor, DyeColor> =
+            ConvertingDslPropertyFactory(
+                toBukkit = { DyeColor.getByWoolData(it.id.toByte())!! },
+                toNms = { NmsDyeColor.byId(it.woolData.toInt()) }
+            )
+        
         val POSE: ConvertingDslPropertyFactory<NmsPose, Pose> =
             ConvertingDslPropertyFactory(
                 toBukkit = { Pose.entries[it.ordinal] },

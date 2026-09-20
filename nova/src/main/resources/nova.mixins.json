@@ -41,7 +41,6 @@
     "item.consistentuseloop.ServerGamePacketListenerImplMixin",
     "item.data.ItemStackMixin",
     "item.enchantment.EnchantmentMixin",
-    "item.fuel.FuelValuesMixin",
     "item.recipe.customrecipechoice.CraftRecipeMixin",
     "item.recipe.stonecutter.ServerPlayerMixin",
     "item.recipe.stonecutter.StonecutterMenuMixin",

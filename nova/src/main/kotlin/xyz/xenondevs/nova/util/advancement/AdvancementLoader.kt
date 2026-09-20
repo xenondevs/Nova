@@ -38,7 +38,6 @@ object AdvancementLoader {
         
         // set new advancements
         advancementManager.advancements = allAdvancements
-        advancementManager.tree = advancementTree
     }
     
 }

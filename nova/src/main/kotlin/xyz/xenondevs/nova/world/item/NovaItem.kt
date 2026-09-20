@@ -44,6 +44,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.registry.NovaItemBuilder
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.bootstrapFlatMap
+import xyz.xenondevs.nova.util.asBukkitCopy
 import xyz.xenondevs.nova.util.blockFace
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.concurrent.checkServerThread

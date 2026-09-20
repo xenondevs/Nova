@@ -7,7 +7,6 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.addToInventoryPrioritizedOrDrop
 import xyz.xenondevs.nova.world.item.ItemAction
-import xyz.xenondevs.nova.world.player.swingHandEventless
 
 /**
  * The result of an interaction attempt.
@@ -55,7 +54,7 @@ sealed interface InteractionResult {
             applyPostUseSideEffects: Boolean = entity.activeItemRemainingTime == 0
         ) {
             if (swing)
-                entity.swingHandEventless(hand)
+                entity.swingHand(hand)
             
             if (action != null) {
                 val previousItem = entity.equipment?.getItem(hand)?.clone()

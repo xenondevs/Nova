@@ -288,8 +288,7 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
                 block.nmsPos,
                 false
             )
-            val packet = ServerboundUseItemOnPacket(InteractionHand.MAIN_HAND, hitResult, 0)
-            packet.timestamp = System.currentTimeMillis()
+            val packet = ServerboundUseItemOnPacket(InteractionHand.MAIN_HAND, hitResult, 0, System.currentTimeMillis())
             player.packetHandler?.injectIncoming(packet)
         }
     }

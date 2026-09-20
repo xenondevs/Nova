@@ -1,21 +1,16 @@
 package xyz.xenondevs.nova.world.generation
 
-import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
-import net.minecraft.world.level.LevelWriter
 import net.minecraft.world.level.WorldGenLevel
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.ChunkGenerator
 import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
 import org.bukkit.Material
 import org.bukkit.block.BlockType
 import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.world.block.NovaBlock
-import java.util.function.Predicate
 
 /**
  * An extension class of Minecraft's [Feature] that allows to use Bukkit's [Material] and [NovaBlock]s via
@@ -23,7 +18,7 @@ import java.util.function.Predicate
  */
 @Suppress("MemberVisibilityCanBePrivate")
 @ExperimentalWorldGen
-abstract class FeatureType<FC : FeatureConfiguration>(codec: Codec<FC>) : Feature<FC>(codec) {
+abstract class FeatureType(private val featureCodec: MapCodec<out Feature>) : Feature {
     
     /**
      * Sets the block at the given position to the given [Material]. This method uses the block change flag `3`.
@@ -41,25 +36,7 @@ abstract class FeatureType<FC : FeatureConfiguration>(codec: Codec<FC>) : Featur
         level.setBlock(pos, type.nmsBlock.defaultBlockState(), flags)
     }
     
-    //<editor-fold desc="Overrides for better param names" defaultstate="collapsed">
+    override fun codec(): MapCodec<out Feature> = featureCodec
     
-    abstract override fun place(ctx: FeaturePlaceContext<FC>): Boolean
-    
-    override fun setBlock(level: LevelWriter, pos: BlockPos, state: BlockState) {
-        super.setBlock(level, pos, state)
-    }
-    
-    override fun safeSetBlock(level: WorldGenLevel, pos: BlockPos, state: BlockState, predicate: Predicate<BlockState>) {
-        super.safeSetBlock(level, pos, state, predicate)
-    }
-    
-    override fun place(config: FC, level: WorldGenLevel, generator: ChunkGenerator, random: RandomSource, pos: BlockPos): Boolean {
-        return super.place(config, level, generator, random, pos)
-    }
-    
-    override fun markAboveForPostProcessing(level: WorldGenLevel, pos: BlockPos) {
-        super.markAboveForPostProcessing(level, pos)
-    }
-    
-    //</editor-fold>
+    abstract override fun place(level: WorldGenLevel, generator: ChunkGenerator, random: RandomSource, pos: BlockPos): Boolean
 }

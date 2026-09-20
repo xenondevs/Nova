@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.serialization.cbf
 
+import xyz.xenondevs.nova.util.asBukkitMirror
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.nbt.NbtOps

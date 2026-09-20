@@ -11,27 +11,21 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.dimension.DimensionType
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings
-import net.minecraft.world.level.levelgen.carver.CarverConfiguration
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver
 import net.minecraft.world.level.levelgen.carver.WorldCarver
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
 import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import net.minecraft.world.level.levelgen.placement.PlacementModifier
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType
 import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.level.levelgen.structure.StructureSet
 import net.minecraft.world.level.levelgen.structure.StructureType
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
-import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor
-import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
+import net.minecraft.world.level.levelgen.synth.NormalNoise
 import org.bukkit.Keyed
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
@@ -413,17 +407,17 @@ abstract class Registrar internal constructor() : Namespaced {
         buildRegistryElementLater(this, name, Registries.BIOME, ::BiomeBuilder, biome)
     
     @ExperimentalWorldGen
-    fun <CC : CarverConfiguration> registerCarver(name: String, carver: WorldCarver<CC>): WorldCarver<CC> {
-        val id = Identifier(this, name)
-        Registries.CARVER[id] = carver
-        return carver
+    fun registerCarver(name: String, carver: WorldCarver): ResourceKey<WorldCarver> {
+        val key = ResourceKey.create(Registries.CARVER, Identifier(this, name))
+        Registries.CARVER[key] = carver
+        return key
     }
     
     @ExperimentalWorldGen
-    fun <CC : CarverConfiguration> registerConfiguredCarver(name: String, configuredCarver: ConfiguredWorldCarver<CC>): ConfiguredWorldCarver<CC> {
+    fun registerCarverType(name: String, codec: MapCodec<out WorldCarver>): MapCodec<out WorldCarver> {
         val id = Identifier(this, name)
-        Registries.CONFIGURED_CARVER[id] = configuredCarver
-        return configuredCarver
+        Registries.CARVER_TYPE[id] = codec
+        return codec
     }
     
     @ExperimentalWorldGen
@@ -435,52 +429,44 @@ abstract class Registrar internal constructor() : Namespaced {
         buildRegistryElementLater(this, name, Registries.PLACED_FEATURE, ::PlacedFeatureBuilder, placedFeature)
     
     @ExperimentalWorldGen
-    fun <FC : FeatureConfiguration, F : Feature<FC>> configuredFeature(name: String, feature: F, config: FC): ResourceKey<ConfiguredFeature<*, *>> =
-        configuredFeature(name, ConfiguredFeature(feature, config))
-    
-    @ExperimentalWorldGen
-    fun <F : ConfiguredFeature<*, *>> configuredFeature(name: String, configuredFeature: F): ResourceKey<ConfiguredFeature<*, *>> {
-        val key = ResourceKey.create(Registries.CONFIGURED_FEATURE, Identifier(this, name))
-        Registries.CONFIGURED_FEATURE[key] = configuredFeature
-        return key
-    }
-    
-    @ExperimentalWorldGen
-    fun feature(name: String, feature: Feature<*>): ResourceKey<Feature<*>> {
+    fun feature(name: String, feature: Feature): ResourceKey<Feature> {
         val key = ResourceKey.create(Registries.FEATURE, Identifier(this, name))
         Registries.FEATURE[key] = feature
         return key
     }
     
     @ExperimentalWorldGen
-    fun <P : PlacementModifier> placementModifierType(name: String, placementModifierType: PlacementModifierType<P>): PlacementModifierType<P> {
+    fun featureType(name: String, codec: MapCodec<out Feature>): MapCodec<out Feature> {
         val id = Identifier(this, name)
-        Registries.PLACEMENT_MODIFIER_TYPE[id] = placementModifierType
-        return placementModifierType
+        Registries.FEATURE_TYPE[id] = codec
+        return codec
     }
     
     @ExperimentalWorldGen
-    fun <P : PlacementModifier> placementModifierType(name: String, codec: MapCodec<P>): PlacementModifierType<P> =
-        placementModifierType(name) { codec }
-    
-    @ExperimentalWorldGen
-    fun registerNoiseParameters(name: String, noiseParams: NoiseParameters): NoiseParameters {
+    fun <P : PlacementModifier> placementModifierType(name: String, codec: MapCodec<P>): MapCodec<P> {
         val id = Identifier(this, name)
-        Registries.NOISE[id] = noiseParams
-        return noiseParams
+        Registries.PLACEMENT_MODIFIER_TYPE[id] = codec
+        return codec
     }
     
     @ExperimentalWorldGen
-    fun registerNoiseParameters(name: String, firstOctave: Int, amplitudes: DoubleList) =
-        registerNoiseParameters(name, NoiseParameters(firstOctave, amplitudes))
+    fun registerNoise(name: String, noise: NormalNoise): NormalNoise {
+        val id = Identifier(this, name)
+        Registries.NOISE[id] = noise
+        return noise
+    }
     
     @ExperimentalWorldGen
-    fun registerNoiseParameters(name: String, firstOctave: Int, amplitudes: List<Double>) =
-        registerNoiseParameters(name, NoiseParameters(firstOctave, DoubleArrayList(amplitudes)))
+    fun registerParityNoise(name: String, firstOctave: Int, amplitudes: DoubleList) =
+        registerNoise(name, NormalNoise.createParity(firstOctave, amplitudes))
     
     @ExperimentalWorldGen
-    fun registerNoiseParameters(name: String, firstOctave: Int, vararg amplitudes: Double) =
-        registerNoiseParameters(name, NoiseParameters(firstOctave, DoubleArrayList(amplitudes)))
+    fun registerParityNoise(name: String, firstOctave: Int, amplitudes: List<Double>) =
+        registerParityNoise(name, firstOctave, DoubleArrayList(amplitudes))
+    
+    @ExperimentalWorldGen
+    fun registerParityNoise(name: String, firstOctave: Int, vararg amplitudes: Double) =
+        registerParityNoise(name, firstOctave, DoubleArrayList(amplitudes))
     
     @ExperimentalWorldGen
     fun registerNoiseGenerationSettings(name: String, settings: NoiseGeneratorSettings): NoiseGeneratorSettings {
@@ -511,10 +497,10 @@ abstract class Registrar internal constructor() : Namespaced {
     }
     
     @ExperimentalWorldGen
-    fun <SP : StructurePlacement> registerStructurePlacementType(name: String, structurePlacementType: StructurePlacementType<SP>): StructurePlacementType<SP> {
+    fun <SP : StructurePlacement> registerStructurePlacementType(name: String, codec: MapCodec<out SP>): MapCodec<out SP> {
         val id = Identifier(this, name)
-        Registries.STRUCTURE_PLACEMENT[id] = structurePlacementType
-        return structurePlacementType
+        Registries.STRUCTURE_PLACEMENT[id] = codec
+        return codec
     }
     
     @ExperimentalWorldGen

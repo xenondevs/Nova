@@ -1,12 +1,14 @@
 package xyz.xenondevs.nova.world.item.behavior
 
-import org.bukkit.Material
-import org.bukkit.inventory.ItemType
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.CookingFuel
+import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProviders
+import net.minecraft.world.level.storage.loot.providers.number.floats.ResolvableFloat
+import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.util.MINECRAFT_SERVER
-import xyz.xenondevs.nova.util.unwrap
-import net.minecraft.world.item.ItemStack as MojangStack
+import xyz.xenondevs.nova.world.item.DataComponentMap
+import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 /**
@@ -35,55 +37,15 @@ class Fuel(burnTime: Provider<Int>) : ItemBehavior {
      */
     val burnTime: Int by burnTime
     
-    override fun toString(itemStack: BukkitStack): String {
-        return "Fuel(burnTime=$burnTime)"
+    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider {
+        this[DataComponents.COOKING_FUEL] = CookingFuel(
+            ResolvableInt.Constant(this@Fuel.burnTime),
+            ResolvableFloat.fromKey(ContextFloatProviders.COOKING_DEFAULT_SPEED_MULTIPLIER)
+        )
     }
     
-    companion object {
-        
-        /**
-         * Checks if the given [Material] is a fuel item.
-         */
-        fun isFuel(type: ItemType): Boolean =
-            isFuel(type.createItemStack())
-        
-        /**
-         * Gets the burn time of the given [Material] in ticks,
-         * or 0 if the material is not a fuel item.
-         */
-        fun getBurnTime(type: ItemType): Int =
-            getBurnTime(type.createItemStack())
-        
-        /**
-         * Checks if the given [BukkitStack] is a fuel item,
-         * regardless of whether it is a Nova item or not.
-         */
-        fun isFuel(itemStack: BukkitStack): Boolean =
-            isFuel(itemStack.unwrap())
-        
-        /**
-         * Gets the burn time of the given [BukkitStack] in ticks,
-         * regardless of whether it is a Nova item or not, 
-         * or 0 if the item is not a fuel item.
-         */
-        fun getBurnTime(itemStack: BukkitStack): Int =
-            getBurnTime(itemStack.unwrap())
-        
-        /**
-         * Checks if the given [MojangStack] is a fuel item,
-         * regardless of whether it is a Nova item or not.
-         */
-        fun isFuel(itemStack: MojangStack): Boolean =
-            MINECRAFT_SERVER.fuelValues().isFuel(itemStack)
-        
-        /**
-         * Gets the burn time of the given [MojangStack] in ticks,
-         * regardless of whether it is a Nova item or not,
-         * or 0 if the item is not a fuel item.
-         */
-        fun getBurnTime(itemStack: MojangStack): Int =
-            MINECRAFT_SERVER.fuelValues().burnDuration(itemStack)
-        
+    override fun toString(itemStack: BukkitStack): String {
+        return "Fuel(burnTime=$burnTime)"
     }
     
 }

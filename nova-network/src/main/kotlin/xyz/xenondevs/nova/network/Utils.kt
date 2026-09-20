@@ -24,7 +24,10 @@ private val SERVERBOUND_PACKET_IDS: Object2IntMap<PacketType<*>> = run {
     @Suppress("UNCHECKED_CAST")
     val codec = GameProtocols.SERVERBOUND_TEMPLATE.bind(
         RegistryFriendlyByteBuf.decorator(REGISTRY_ACCESS),
-        GameProtocols.Context { false }
+        object : GameProtocols.Context {
+            override fun hasInfiniteMaterials() = false
+            override fun canUseCommandBlocks() = false
+        }
     ).codec() as IdDispatchCodec<*, *, PacketType<*>>
     codec.toId
 }

@@ -40,7 +40,7 @@ object Extinguishing : ItemBehavior {
         val level = pos.world.serverLevel
         val nmsPos = pos.nmsPos
         
-        CampfireBlock.dowse(nmsEntity, level, nmsPos, state)
+        CampfireBlock.douse(nmsEntity, level, nmsPos, state)
         displayCampfireExtinguishParticles(
             pos.location,
             if (state.getValue(CampfireBlock.SIGNAL_FIRE)) ParticleTypes.CAMPFIRE_SIGNAL_SMOKE else ParticleTypes.CAMPFIRE_COSY_SMOKE

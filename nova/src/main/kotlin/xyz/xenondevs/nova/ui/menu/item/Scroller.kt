@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.ui.menu.item
 
+import xyz.xenondevs.nova.util.asBukkitMirror
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.BundleContents.bundleContents
 import io.papermc.paper.datacomponent.item.CustomModelData.customModelData

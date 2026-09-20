@@ -30,10 +30,10 @@ import org.bukkit.Registry
 import org.bukkit.Tag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.serialization.persistentdata.get
 import xyz.xenondevs.nova.serialization.persistentdata.set
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
+import xyz.xenondevs.nova.util.asBukkitMirror
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.isNova
 import xyz.xenondevs.nova.world.item.itemType
@@ -206,10 +206,14 @@ object ItemUtils {
         val components = HashMap<DataComponentType<Any>, ArrayList<Optional<Any>>>()
         
         for (dataComponentPatch in dataComponentPatches) {
-            for ([type, newValueOpt] in dataComponentPatch.entrySet()) {
+            val (added, removed) = dataComponentPatch.split()
+            for (component in added) {
+                val type = component.type as DataComponentType<Any>
+                components.getOrPut(type, ::ArrayList) += Optional.of(component.value)
+            }
+            for (type in removed) {
                 type as DataComponentType<Any>
-                newValueOpt as Optional<Any>
-                components.getOrPut(type, ::ArrayList) += newValueOpt
+                components.getOrPut(type, ::ArrayList) += Optional.empty()
             }
         }
         

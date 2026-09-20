@@ -114,7 +114,7 @@ import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetJigsawBlockPac
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetStructureBlockPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSignUpdatePacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundStatusRequestPacketEvent
-import xyz.xenondevs.nova.network.event.serverbound.ServerboundSwingPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPunchPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundTeleportToEntityPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundUseItemOnPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundUseItemPacketEvent
@@ -165,10 +165,7 @@ internal object PacketEventManager {
         registerEventType(::ClientboundHelloPacketEvent)
         registerPlayerEventType(::ClientboundInitializeBorderPacketEvent)
         registerEventType(::ClientboundKeepAlivePacketEvent)
-        registerPlayerEventType(::ClientboundLevelChunkWithLightPacketEvent)
         registerPlayerEventType(::ClientboundLevelEventPacketEvent)
-        registerPlayerEventType(::ClientboundLevelParticlesPacketEvent)
-        registerPlayerEventType(::ClientboundLightUpdatePacketEvent)
         registerEventType(::ClientboundLoginCompressionPacketEvent)
         registerPlayerEventType(::ClientboundLowDiskSpaceWarningPacketEvent)
         registerPlayerEventType(::ClientboundMerchantOffersPacketEvent)
@@ -176,9 +173,7 @@ internal object PacketEventManager {
         registerPlayerEventType(::ClientboundMoveEntityPosPacketEvent)
         registerPlayerEventType(::ClientboundMoveEntityPosRotPacketEvent)
         registerPlayerEventType(::ClientboundMoveEntityRotPacketEvent)
-        registerPlayerEventType(::ClientboundOpenBookPacketEvent)
         registerPlayerEventType(::ClientboundOpenScreenPacketEvent)
-        registerPlayerEventType(::ClientboundOpenSignEditorPacketEvent)
         registerEventType(::ClientboundPingPacketEvent)
         registerPlayerEventType(::ClientboundPlayerAbilitiesPacketEvent)
         registerPlayerEventType(::ClientboundPlayerCombatEndPacketEvent)
@@ -186,7 +181,6 @@ internal object PacketEventManager {
         registerPlayerEventType(::ClientboundPlayerInfoUpdatePacketEvent)
         registerPlayerEventType(::ClientboundPlayerLookAtPacketEvent)
         registerPlayerEventType(::ClientboundProjectilePowerPacketEvent)
-        registerPlayerEventType(::ClientboundRemoveEntitiesPacketEvent)
         registerEventType(::ClientboundResetChatPacketEvent)
         registerPlayerEventType(::ClientboundRotateHeadPacketEvent)
         registerPlayerEventType(::ClientboundSectionBlocksUpdatePacketEvent)
@@ -214,14 +208,10 @@ internal object PacketEventManager {
         registerPlayerEventType(::ClientboundStopSoundPacketEvent)
         registerPlayerEventType(::ClientboundTagQueryPacketEvent)
         registerPlayerEventType(::ClientboundTakeItemEntityPacketEvent)
-        registerPlayerEventType(::ClientboundUpdateAdvancementsPacketEvent)
         registerPlayerEventType(::ClientboundUpdateAttributesPacketEvent)
         registerPlayerEventType(::ClientboundUpdateMobEffectPacketEvent)
-        registerEventType(::ClientboundUpdateTagsPacketEvent)
-        registerPlayerEventType(::ServerboundAcceptTeleportationPacketEvent)
         registerPlayerEventType(::ServerboundBlockEntityTagQueryPacketEvent)
         registerPlayerEventType(::ServerboundClientCommandPacketEvent)
-        registerPlayerEventType(::ServerboundCommandSuggestionPacketEvent)
         registerPlayerEventType(::ServerboundConfigurationAcknowledgedPacketEvent)
         registerPlayerEventType(::ServerboundContainerClosePacketEvent)
         registerPlayerEventType(::ServerboundEntityTagQueryPacketEvent)
@@ -250,12 +240,8 @@ internal object PacketEventManager {
         registerPlayerEventType(::ServerboundSetCommandMinecartPacketEvent)
         registerPlayerEventType(::ServerboundSetJigsawBlockPacketEvent)
         registerPlayerEventType(::ServerboundSetStructureBlockPacketEvent)
-        registerPlayerEventType(::ServerboundSignUpdatePacketEvent)
         registerEventType(::ServerboundStatusRequestPacketEvent)
-        registerPlayerEventType(::ServerboundSwingPacketEvent)
         registerPlayerEventType(::ServerboundTeleportToEntityPacketEvent)
-        registerPlayerEventType(::ServerboundUseItemOnPacketEvent)
-        registerPlayerEventType(::ServerboundUseItemPacketEvent)
     }
     
     internal inline fun <reified P : Packet<*>, reified E : PacketEvent<P>> registerEventType(noinline constructor: (P) -> E) {

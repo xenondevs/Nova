@@ -8,6 +8,10 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.Vec3
+import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -18,13 +22,17 @@ import xyz.xenondevs.commons.provider.NULL_PROVIDER
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.util.asBukkitMirror
 import xyz.xenondevs.nova.util.component.adventure.toNmsStyle
 import xyz.xenondevs.nova.util.item.update
+import xyz.xenondevs.nova.util.nmsDirection
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
+import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
@@ -96,6 +104,30 @@ internal class DefaultItemBehavior(
         // this asserts that transformations are stored in the interaction result via transformedTo
         player.equipment.setItem(hand, itemStack)
         return result
+    }
+    
+    override fun useOnBlock(itemStack: ItemStack, block: Block, ctx: Context<BlockInteract>): InteractionResult {
+        val player = ctx[BlockInteract.SOURCE_PLAYER]
+            ?: return InteractionResult.Pass
+        val hand = ctx[BlockInteract.HELD_HAND]
+            ?: return InteractionResult.Pass
+        val face = ctx[BlockInteract.CLICKED_BLOCK_FACE]
+            ?: return InteractionResult.Pass
+        
+        // run default data component functionality (of block transformers, etc.)
+        val nmsContext = UseOnContext(
+            player.serverPlayer,
+            hand.nmsInteractionHand,
+            BlockHitResult(Vec3.atCenterOf(block.nmsPos), face.nmsDirection, block.nmsPos, false)
+        )
+        val result = itemStack.unwrap().item.useOn(nmsContext).toNova()
+        if (result !is InteractionResult.Success)
+            return result
+        
+        // reset to previous item so that component-based post-use effects in InteractionResult.Success#performActions work correctly
+        val action = ItemAction.ConvertStack(player.equipment.getItem(hand))
+        player.equipment.setItem(hand, itemStack)
+        return result.copy(action = action)
     }
     
     override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {

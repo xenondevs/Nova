@@ -14,7 +14,7 @@ import net.minecraft.util.valueproviders.IntProvider
 import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.level.levelgen.VerticalAnchor
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
+import net.minecraft.world.level.levelgen.feature.Feature
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider
 import net.minecraft.world.level.levelgen.heightproviders.UniformHeight
 import net.minecraft.world.level.levelgen.placement.BiomeFilter
@@ -30,7 +30,7 @@ import net.minecraft.world.level.levelgen.placement.NoiseBasedCountPlacement
 import net.minecraft.world.level.levelgen.placement.NoiseThresholdCountPlacement
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import net.minecraft.world.level.levelgen.placement.PlacementModifier
-import net.minecraft.world.level.levelgen.placement.RandomOffsetPlacement
+import net.minecraft.world.level.levelgen.placement.OffsetPlacement
 import net.minecraft.world.level.levelgen.placement.RarityFilter
 import net.minecraft.world.level.levelgen.placement.SurfaceRelativeThresholdFilter
 import net.minecraft.world.level.levelgen.placement.SurfaceWaterDepthFilter
@@ -47,7 +47,7 @@ import xyz.xenondevs.nova.world.generation.FeatureType
  * [PlacedFeatures][PlacedFeature] for more information.
  *
  * @see [PlacedFeature]
- * @see [ConfiguredFeature]
+ * @see [Feature]
  * @see [FeatureType]
  */
 @ExperimentalWorldGen
@@ -58,18 +58,16 @@ class PlacedFeatureBuilder internal constructor(
     lookup: RegistryInfoLookup
 ) : LegacyRegistryElementBuilder<PlacedFeature>(registry, id) {
     
-    private val configuredFeatureRegistry = lookup.lookupGetterOrThrow(Registries.CONFIGURED_FEATURE)
+    private val featureRegistry = lookup.lookupGetterOrThrow(Registries.FEATURE)
     
-    private var configuredFeature: Holder<ConfiguredFeature<*, *>>? = null
+    private var feature: Holder<Feature>? = null
     private val modifiers = mutableListOf<PlacementModifier>()
     
     /**
-     * Sets the [ConfiguredFeature] that should be placed by this [PlacedFeature] to [configuredFeature].
-     *
-     * For more information on configured features, check out their [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/features/#2-configured-feature).
+     * Sets the [Feature] that should be placed by this [PlacedFeature].
      */
-    fun configuredFeature(configuredFeature: ResourceKey<ConfiguredFeature<*, *>>) {
-        this.configuredFeature = configuredFeatureRegistry.getOrThrow(configuredFeature)
+    fun feature(feature: ResourceKey<Feature>) {
+        this.feature = featureRegistry.getOrThrow(feature)
     }
     
     /**
@@ -100,7 +98,7 @@ class PlacedFeatureBuilder internal constructor(
     }
     
     /**
-     * Adds a [BiomeFilter] [PlacementModifier] to this [PlacedFeature], which returns the position if the configured
+     * Adds a [BiomeFilter] [PlacementModifier] to this [PlacedFeature], which returns the position if the
      * feature is registered in the biome's feature list at the given position. Empty otherwise.
      */
     fun biomeFilter() {
@@ -291,55 +289,55 @@ class PlacedFeatureBuilder internal constructor(
     }
     
     /**
-     * Adds a [RandomOffsetPlacement] [PlacementModifier] with the given [xzSpread] and [ySpread] values to this
+     * Adds an [OffsetPlacement] [PlacementModifier] with the given [xzSpread] and [ySpread] values to this
      * [PlacedFeature], which offsets the given position by the provided [IntProvider's][IntProvider] value. Please note,
      * that the [xzSpread] [IntProvider] is sampled separately for the x- and z-coordinates.
      */
     fun randomOffset(xzSpread: IntProvider, ySpread: IntProvider) {
-        modifiers += RandomOffsetPlacement.of(xzSpread, ySpread)
+        modifiers += OffsetPlacement.of(xzSpread, ySpread)
     }
     
     /**
-     * Adds a [RandomOffsetPlacement] [PlacementModifier] with the given [xzSpread] and [ySpread] values to this
+     * Adds an [OffsetPlacement] [PlacementModifier] with the given [xzSpread] and [ySpread] values to this
      * [PlacedFeature], which offsets the given position by the provided values.
      */
     fun randomOffset(xzSpread: Int, ySpread: Int) {
-        modifiers += RandomOffsetPlacement.of(ConstantInt.of(xzSpread), ConstantInt.of(ySpread))
+        modifiers += OffsetPlacement.of(ConstantInt.of(xzSpread), ConstantInt.of(ySpread))
     }
     
     /**
-     * Adds a [RandomOffsetPlacement] [PlacementModifier] with a `xzSpread` value of `0` and the given [ySpread] value
+     * Adds an [OffsetPlacement] [PlacementModifier] with a `xzSpread` value of `0` and the given [ySpread] value
      * to this [PlacedFeature], which offsets the y-coordinate of the given position by the provided
      * [IntProvider's][IntProvider] value.
      */
     fun randomVerticalOffset(ySpread: IntProvider) {
-        modifiers += RandomOffsetPlacement.of(ConstantInt.of(0), ySpread)
+        modifiers += OffsetPlacement.vertical(ySpread)
     }
     
     /**
-     * Adds a [RandomOffsetPlacement] [PlacementModifier] with a `xzSpread` value of `0` and the given [ySpread] value to
+     * Adds an [OffsetPlacement] [PlacementModifier] with a `xzSpread` value of `0` and the given [ySpread] value to
      * this [PlacedFeature], which offsets the y-coordinate of the given position by the provided value.
      */
     fun randomVerticalOffset(ySpread: Int) {
-        modifiers += RandomOffsetPlacement.of(ConstantInt.of(0), ConstantInt.of(ySpread))
+        modifiers += OffsetPlacement.vertical(ConstantInt.of(ySpread))
     }
     
     /**
-     * Adds a [RandomOffsetPlacement] [PlacementModifier] with a `ySpread` value of `0` and the given [xzSpread] value to
+     * Adds an [OffsetPlacement] [PlacementModifier] with a `ySpread` value of `0` and the given [xzSpread] value to
      * this [PlacedFeature], which offsets the x- and z-coordinates of the given position by the provided
      * [IntProvider's][IntProvider] value. Please note, that the [xzSpread] [IntProvider] is sampled separately for the
      * x- and z-coordinates.
      */
     fun randomHorizontalOffset(xzSpread: IntProvider) {
-        modifiers += RandomOffsetPlacement.of(xzSpread, ConstantInt.of(0))
+        modifiers += OffsetPlacement.horizontal(xzSpread)
     }
     
     /**
-     * Adds a [RandomOffsetPlacement] [PlacementModifier] with a `ySpread` value of `0` and the given [xzSpread] value to
+     * Adds an [OffsetPlacement] [PlacementModifier] with a `ySpread` value of `0` and the given [xzSpread] value to
      * this [PlacedFeature], which offsets the x- and z-coordinates of the given position by the provided value.
      */
     fun randomHorizontalOffset(xzSpread: Int) {
-        modifiers += RandomOffsetPlacement.of(ConstantInt.of(xzSpread), ConstantInt.of(0))
+        modifiers += OffsetPlacement.horizontal(ConstantInt.of(xzSpread))
     }
     
     /**
@@ -390,11 +388,11 @@ class PlacedFeatureBuilder internal constructor(
      * Builds a [PlacedFeature] instance from the current state of this builder.
      */
     override fun build(): PlacedFeature {
-        requireNotNull(configuredFeature) { "No configured feature was set for placed feature ${id.asString()}" }
+        requireNotNull(feature) { "No feature was set for placed feature ${id.asString()}" }
         if (modifiers.isEmpty())
             LOGGER.warn("Placed feature ${id.asString()} has no placement modifiers!")
         
-        return PlacedFeature(configuredFeature!!, modifiers)
+        return PlacedFeature(feature!!, modifiers)
     }
     
 }

@@ -19,5 +19,5 @@ fun ItemStack.damage(amount: Int, world: World): ItemStack? {
     nms.hurtAndBreak(amount, (world as CraftWorld).handle, null) {
         ref.set(NmsItemStack.EMPTY)
     }
-    return CraftItemStack.asCraftMirror(ref.get()).takeUnless { it.isEmpty }
+    return CraftItemStack.asBukkitMirror(ref.get()).takeUnless { it.isEmpty }
 }

@@ -58,6 +58,7 @@ import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.network.protocol.game.ClientboundCommandSuggestionsPacket
 import net.minecraft.network.protocol.game.ClientboundCommandsPacket
 import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket
+import net.minecraft.network.protocol.game.ClientboundUpdateAdvancementsPacket
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.resources.Identifier
@@ -125,8 +126,8 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetConte
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundDisconnectPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundDisguisedChatPacketEvent
-import xyz.xenondevs.nova.network.event.clientbound.ClientboundLoginDisconnectPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundLevelParticlesPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundLoginDisconnectPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundMerchantOffersPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundOpenScreenPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlaceGhostRecipePacketEvent
@@ -155,6 +156,8 @@ import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClickPac
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
+import xyz.xenondevs.nova.util.asBukkitCopy
+import xyz.xenondevs.nova.util.asBukkitMirror
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import xyz.xenondevs.nova.util.data.getStringOrNull
@@ -276,7 +279,7 @@ internal object PacketItems : PacketListener {
     
     @PacketHandler
     private fun handlePlayerChat(event: ClientboundPlayerChatPacketEvent) {
-        event.unsignedContent = event.unsignedContent?.let { getClientSideComponent(event.player, it) }
+        event.unsignedContent = event.unsignedContent.map { getClientSideComponent(event.player, it) }
         event.chatType = event.chatType.mapComponents(event.player)
     }
     
@@ -683,30 +686,30 @@ internal object PacketItems : PacketListener {
     
     @PacketHandler
     private fun handleAdvancements(event: ClientboundUpdateAdvancementsPacketEvent) {
-        event.added = event.added.map {
-            AdvancementHolder(
-                it.id,
+        event.added = event.added.map { (advancement, x, y) ->
+            ClientboundUpdateAdvancementsPacket.PositionedAdvancement(AdvancementHolder(
+                advancement.id,
                 Advancement(
-                    it.value.parent,
-                    it.value.display.map { display ->
+                    advancement.value.parent,
+                    advancement.value.display.map { display ->
                         DisplayInfo(
                             getClientSideStack(event.player, display.icon.create(), false).toTemplate()!!,
                             getClientSideComponent(event.player, display.title),
                             getClientSideComponent(event.player, display.description),
                             display.background,
                             display.type,
-                            display.shouldShowToast(),
-                            display.shouldAnnounceChat(),
-                            display.isHidden
-                        ).apply { setLocation(display.x, display.y) }
+                            display.showToast,
+                            display.announceToChat,
+                            display.hidden
+                        )
                     },
-                    it.value.rewards,
-                    it.value.criteria,
-                    it.value.requirements,
-                    it.value.sendsTelemetryEvent,
-                    it.value.name
+                    advancement.value.rewards,
+                    advancement.value.criteria,
+                    advancement.value.requirements,
+                    advancement.value.sendsTelemetryEvent,
+                    advancement.value.name
                 )
-            )
+            ), x, y)
         }
     }
     
@@ -926,13 +929,14 @@ internal object PacketItems : PacketListener {
     }
     
     private fun mergeIntoClientSidePatch(builder: DataComponentPatch.Builder, patch: DataComponentPatch) {
-        for ([type, valueOpt] in patch.entrySet()) {
-            if (isIrrelevantClientSideComponent(type))
+        val (added, removed) = patch.split()
+        for (component in added) {
+            if (isIrrelevantClientSideComponent(component.type))
                 continue
-            
-            if (valueOpt.isPresent) {
-                builder.set(TypedDataComponent.createUnchecked(type, valueOpt.get()))
-            } else {
+            builder.set(component)
+        }
+        for (type in removed) {
+            if (!isIrrelevantClientSideComponent(type)) {
                 builder.remove(type)
             }
         }
@@ -965,7 +969,7 @@ internal object PacketItems : PacketListener {
             itemStack.set(
                 DataComponents.CONTAINER,
                 ItemContainerContents.fromItems(
-                    contents.allItemsCopyStream()
+                    contents.itemCopies()
                         .map { getClientSideStack(player, it, false) }
                         .toList()
                 )

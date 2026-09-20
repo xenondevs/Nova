@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.command.impl
 
+import xyz.xenondevs.nova.util.asBukkitMirror
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext

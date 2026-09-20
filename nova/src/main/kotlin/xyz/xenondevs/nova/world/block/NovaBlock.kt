@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.block
 
+import xyz.xenondevs.nova.util.asBukkitCopy
 import io.papermc.paper.registry.RegistryKey
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

@@ -1,6 +1,7 @@
 accessWidener v2 named
 
 accessible class net/minecraft/world/level/chunk/PalettedContainer$Data
+accessible field net/minecraft/world/level/chunk/PalettedContainer data Lnet/minecraft/world/level/chunk/PalettedContainer$Data;
 accessible field net/minecraft/core/IdMapper tToId Lit/unimi/dsi/fastutil/objects/Reference2IntMap;
 accessible method net/minecraft/world/item/component/BundleContents <init> (Ljava/util/List;Lorg/apache/commons/lang3/math/Fraction;I)V
 accessible field net/minecraft/world/level/chunk/HashMapPalette values Lnet/minecraft/util/CrudeIncrementalIntIdentityHashBiMap;
@@ -61,8 +62,6 @@ accessible method net/minecraft/world/level/biome/BiomeGenerationSettings <init>
 accessible field net/minecraft/world/level/biome/Biome generationSettings Lnet/minecraft/world/level/biome/BiomeGenerationSettings;
 mutable field net/minecraft/world/level/biome/Biome generationSettings Lnet/minecraft/world/level/biome/BiomeGenerationSettings;
 accessible method net/minecraft/world/level/biome/Biome$ClimateSettings <init> (ZFLnet/minecraft/world/level/biome/TemperatureModifier;F)V
-accessible method net/minecraft/world/level/biome/MobSpawnSettings <init> (FLjava/util/Map;Ljava/util/Map;)V
-accessible method net/minecraft/world/level/biome/Biome <init> (Lnet/minecraft/world/level/biome/Biome$ClimateSettings;Lnet/minecraft/world/attribute/EnvironmentAttributeMap;Lnet/minecraft/world/level/biome/BiomeSpecialEffects;Lnet/minecraft/world/level/biome/BiomeGenerationSettings;Lnet/minecraft/world/level/biome/MobSpawnSettings;)V
 accessible method net/minecraft/core/Holder$Reference bindValue (Ljava/lang/Object;)V
 accessible field org/bukkit/event/inventory/PrepareItemCraftEvent matrix Lorg/bukkit/inventory/CraftingInventory;
 mutable field org/bukkit/event/inventory/PrepareItemCraftEvent matrix Lorg/bukkit/inventory/CraftingInventory;
