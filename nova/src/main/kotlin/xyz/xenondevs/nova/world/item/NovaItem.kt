@@ -11,12 +11,12 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.craftbukkit.inventory.CraftItemType
 import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -28,6 +28,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.flatten
@@ -49,6 +50,7 @@ import xyz.xenondevs.nova.util.blockFace
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.nmsItem
 import xyz.xenondevs.nova.util.toBlock
 import xyz.xenondevs.nova.util.toIdentifier
@@ -65,6 +67,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 import net.minecraft.world.InteractionResult as NmsInteractionResult
 import net.minecraft.world.entity.Entity as NmsEntity
+import net.minecraft.world.entity.LivingEntity as NmsLivingEntity
 import net.minecraft.world.entity.player.Player as NmsPlayer
 import net.minecraft.world.item.ItemStack as NmsItemStack
 
@@ -602,54 +605,74 @@ internal class NovaItem(
         behaviors.forEach { it.handleEquipmentTick(player, itemStack.clone(), slot) }
     }
     
-    /**
-     * Handles a use tick for [entity] with [itemStack] with this [NovaItem] in [hand]
-     * with [passedUseTicks] passed and [remainingUseTicks] remaining.
-     */
-    fun handleUseTick(
-        entity: LivingEntity,
-        itemStack: ItemStack,
-        hand: EquipmentSlot,
-        passedUseTicks: Int,
+    override fun onUseTick(
+        nmsLevel: Level,
+        nmsLivingEntity: NmsLivingEntity,
+        nmsItemStack: NmsItemStack,
         remainingUseTicks: Int
-    ): Unit = runSafely("handle use tick") {
-        behaviors.forEach { it.handleUseTick(entity, itemStack.clone(), hand, remainingUseTicks) }
+    ) {
+        val entity = nmsLivingEntity.bukkitEntity
+        val hand = nmsLivingEntity.usedItemHand.bukkitEquipmentSlot
+        
+        InteractionResult.Success(
+            swing = false,
+            action = runSafely("handle use finished", ItemAction.None) {
+                behaviors.mapNotNull { it.handleUseTick(entity, nmsItemStack.asBukkitCopy(), hand, remainingUseTicks) }
+                    .takeUnlessEmpty()
+                    ?.let(ItemAction::Composite)
+            }
+        ).performActions(entity, hand, true)
     }
     
-    /**
-     * Handles the use of [itemStack] with this [NovaItem] finishing for [entity] in [hand].
-     */
-    fun handleUseFinished(
-        entity: LivingEntity,
-        itemStack: ItemStack,
-        hand: EquipmentSlot,
-    ): ItemAction = runSafely("handle use finished", ItemAction.None) {
-        ItemAction.Composite(behaviors.map { it.handleUseFinished(entity, itemStack.clone(), hand) })
+    override fun finishUsingItem(
+        nmsItemStack: NmsItemStack,
+        nmsLevel: Level,
+        nmsEntity: NmsLivingEntity
+    ): NmsItemStack {
+        val entity = nmsEntity.bukkitEntity
+        val hand = nmsEntity.usedItemHand.bukkitEquipmentSlot
+        
+        InteractionResult.Success(
+            swing = false,
+            action = runSafely("handle use finished", ItemAction.None) {
+                ItemAction.Composite(behaviors.map { it.handleUseFinished(entity, nmsItemStack.asBukkitCopy(), hand) })
+            }
+        ).performActions(entity, hand, true)
+        
+        return super.finishUsingItem(nmsEntity.getItemInHand(hand.nmsInteractionHand), nmsLevel, nmsEntity)
     }
     
-    /**
-     * Handles the use of [itemStack] with this [NovaItem] being stopped for [entity] in [hand]
-     * and [remainingUseTicks] left.
-     */
-    fun handleUseStopped(
-        entity: LivingEntity,
-        itemStack: ItemStack,
-        hand: EquipmentSlot,
-        remainingUseTicks: Int
-    ): Unit = runSafely("handle use stopped") {
-        behaviors.forEach { it.handleUseStopped(entity, itemStack.clone(), hand, remainingUseTicks) }
+    override fun releaseUsing(
+        nmsItemStack: NmsItemStack,
+        nmsLevel: Level,
+        nmsEntity: NmsLivingEntity,
+        remainingTime: Int
+    ): Boolean {
+        val entity = nmsEntity.bukkitEntity
+        val hand = nmsEntity.usedItemHand.bukkitEquipmentSlot
+        
+        InteractionResult.Success(
+            swing = false,
+            action = runSafely("handle use finished", ItemAction.None) {
+                behaviors.mapNotNull { it.handleUseStopped(entity, nmsItemStack.asBukkitCopy(), hand, remainingTime) }
+                    .takeUnlessEmpty()
+                    ?.let(ItemAction::Composite)
+            }
+        ).performActions(entity, hand, true)
+        
+        return false
     }
     
-    /**
-     * Modifies the use [duration] of [itemStack] with this [NovaItem] for [entity].
-     */
-    fun modifyUseDuration(
-        entity: LivingEntity,
-        itemStack: ItemStack,
-        duration: Int
-    ): Int = runSafely("modify use duration", duration) {
-        behaviors.fold(duration) { currentDuration, behavior ->
-            behavior.modifyUseDuration(entity, itemStack.clone(), currentDuration)
+    override fun getUseDuration(
+        nmsItemStack: NmsItemStack,
+        nmsUser: NmsLivingEntity
+    ): Int {
+        val base = super.getUseDuration(nmsItemStack, nmsUser)
+        val user = nmsUser.bukkitEntity
+        return runSafely("modify use duration", base) {
+            behaviors.fold(base) { currentDuration, behavior ->
+                behavior.modifyUseDuration(user, nmsItemStack.asBukkitCopy(), currentDuration)
+            }
         }
     }
     

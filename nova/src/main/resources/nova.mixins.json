@@ -47,8 +47,6 @@
     "item.recipe.stonecutter.StonecutterMenuMixin",
     "item.use.PlayerMixin",
     "item.use.ServerPlayerGameModeMixin",
-    "item.using.ItemMixin",
-    "item.using.ItemStackMixin",
     "item.using.ServerGamePacketListenerImplMixin",
     "packet.broadcast.PlayerListMixin",
     "registry.events.BuiltInRegistriesMixin",

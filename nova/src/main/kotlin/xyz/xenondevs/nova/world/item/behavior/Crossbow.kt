@@ -213,6 +213,9 @@ class Crossbow(
         if (projectiles.isNotNullOrEmpty()) {
             val result = logic.shoot(entity, hand, itemStack.clone())
             return InteractionResult.Success(action = ItemAction.ConvertStack(result))
+        } else if (logic.canDraw(entity, itemStack.clone())) {
+            entity.startUsingItem(hand)
+            return InteractionResult.Success(swing = false, action = ItemAction.None)
         }
         
         return InteractionResult.Pass
@@ -224,20 +227,22 @@ class Crossbow(
         return 0
     }
     
-    override fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) {
+    override fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int): ItemAction? {
         val tick = USE_DURATION - remainingUseTicks
         logic.handleDrawTick(entity, itemStack.clone(), tick)
         
         if (tick >= logic.getDrawTime(entity, itemStack.clone()) && !isCharged(itemStack)) {
             val projectiles = logic.chooseProjectile(entity, itemStack.clone())
-                ?: return
+                ?: return ItemAction.None
             
             val chargedCrossbow = itemStack.clone().apply {
                 setData(DataComponentTypes.CHARGED_PROJECTILES, projectiles)
             }
             
-            entity.equipment?.setItem(hand, chargedCrossbow)
+            return ItemAction.ConvertStack(chargedCrossbow)
         }
+        
+        return null
     }
     
     override fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {

@@ -138,13 +138,19 @@ interface ItemBehavior : ItemBehaviorHolder {
     
     /**
      * Called every tick while an [itemStack] with this behavior is being used by [entity] in [hand], with [remainingUseTicks] left.
+     * 
+     * The returned [ItemAction] will be applied to the item. As with [InteractionResult.Success], `null` signifies that the item was
+     * NOT used (e.g. don't apply cooldown), whereas [ItemAction.None] signifies that the item was used but not transformed (applies cooldown, if any).
      */
-    fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) = Unit
+    fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int): ItemAction? = null
     
     /**
      * Called when [entity] stops using (multi-tick right-click action) an [itemStack] with this behavior in [hand], with [remainingUseTicks] left.
+     * 
+     * The returned [ItemAction] will be applied to the item. As with [InteractionResult.Success], `null` signifies that the item was
+     * NOT used (e.g. don't apply cooldown), whereas [ItemAction.None] signifies that the item was used but not transformed (applies cooldown, if any).
      */
-    fun handleUseStopped(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) = Unit
+    fun handleUseStopped(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int): ItemAction? = null
     
     /**
      * Called when [entity] finishes using (multi-tick right-click action) an [itemStack] with this behavior in [hand].
@@ -154,7 +160,6 @@ interface ItemBehavior : ItemBehaviorHolder {
     /**
      * Modifies the server-side use duration of [itemStack] with this behavior for [entity].
      * The initial value of [duration] may stem from [baseDataComponents].
-     * If the use duration is <= 0, the item has no right click and hold action.
      *
      * Note that the client may predict a different use duration, which this method does not handle.
      */

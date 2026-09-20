@@ -14,11 +14,15 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.registry.tags.ItemTypeTags
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.InteractionResult
+import xyz.xenondevs.nova.world.item.ItemAction
 import xyz.xenondevs.nova.world.item.itemType
 
 /**
@@ -123,20 +127,28 @@ private const val USE_DURATION: Int = 72000
  */
 class Bow(private val logic: BowLogic = BowLogic.Vanilla) : ItemBehavior {
     
+    override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {
+        val entity = ctx[ItemUse.SOURCE_LIVING_ENTITY] ?: return InteractionResult.Pass
+        val hand = ctx[ItemUse.HELD_HAND] ?: return InteractionResult.Pass
+        entity.startUsingItem(hand)
+        return InteractionResult.Success(swing = false, action = ItemAction.None)
+    }
+    
     override fun modifyUseDuration(entity: LivingEntity, itemStack: ItemStack, duration: Int): Int {
         if (logic.canDraw(entity, itemStack.clone()))
             return USE_DURATION
         return 0
     }
     
-    override fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) {
+    override fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int): ItemAction? {
         val tick = USE_DURATION - remainingUseTicks
         logic.handleDrawTick(entity, itemStack.clone(), tick)
+        return null
     }
     
-    override fun handleUseStopped(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) {
+    override fun handleUseStopped(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int): ItemAction {
         val result = logic.shoot(entity, hand, itemStack.clone(), USE_DURATION - remainingUseTicks)
-        entity.equipment?.setItem(hand, result)
+        return ItemAction.ConvertStack(result)
     }
     
     //<editor-fold desc="disabling client-side prediction if necessary">
