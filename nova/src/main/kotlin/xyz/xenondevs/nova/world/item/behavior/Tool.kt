@@ -31,39 +31,39 @@ import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 /**
  * Creates a factory for [Tool] behaviors using the given values, if not specified otherwise in the item's config.
  *
- * @param rules The ordered rules defining special mining behavior for matching blocks.
+ * @param toolRules The ordered rules defining special mining behavior for matching blocks.
  * Each rule matches [Rule.blocks] and may override [Rule.speed] and [Rule.correctForDrops].
  * For each value, the first matching rule that specifies it wins. Speed falls back to
  * [defaultBreakSpeed], while correctness falls back to `false`. Configured rules use the
  * `blocks`, optional `speed`, and optional `correct_for_drops` fields.
  * Defaults to an empty list.
- * Used when `rules` is not specified in the item's config.
+ * Used when `tool_rules` is not specified in the item's config.
  *
  * @param defaultBreakSpeed The mining speed used when no matching rule overrides it.
  * Defaults to `1.0`.
- * Used when neither `default_break_speed` nor `default_mining_speed` is specified in the item's config.
+ * Used when `default_break_speed` is not specified in the item's config.
  *
  * @param itemDamageOnBreakBlock The durability removed whenever a block is broken. Must be
  * non-negative.
  * Defaults to `1`.
- * Used when neither `item_damage_on_break_block` nor `damage_per_block` is specified in the item's config.
+ * Used when `item_damage_on_break_block` is not specified in the item's config.
  *
  * @param canBreakBlocksInCreative Whether players can break blocks in Creative mode while holding
  * this tool.
  * Defaults to `true`.
- * Used when neither `can_break_blocks_in_creative` nor `can_destroy_blocks_in_creative` is specified in the item's config.
+ * Used when `can_break_blocks_in_creative` is not specified in the item's config.
  */
 fun Tool(
-    rules: List<Tool.Rule>,
+    toolRules: List<Tool.Rule>,
     defaultBreakSpeed: Float = 1f,
     itemDamageOnBreakBlock: Int = 1,
     canBreakBlocksInCreative: Boolean = true
 ) = ItemBehaviorFactory { _, cfg ->
     Tool(
-        cfg.entry<List<Tool.Rule>>(rules, "rules"),
-        cfg.entry(defaultBreakSpeed, ["default_break_speed"], ["default_mining_speed"]), // vanilla name "default_mining_speed" as fallback
-        cfg.entry(itemDamageOnBreakBlock, ["item_damage_on_break_block"], ["damage_per_block"]), // vanilla name "damage_per_block" as fallback
-        cfg.entry(canBreakBlocksInCreative, ["can_break_blocks_in_creative"], ["can_destroy_blocks_in_creative"]) // vanilla name "destroy" as fallback
+        cfg.entry<List<Tool.Rule>>(toolRules, "tool_rules"),
+        cfg.entry(defaultBreakSpeed, "default_break_speed"),
+        cfg.entry(itemDamageOnBreakBlock, "item_damage_on_break_block"),
+        cfg.entry(canBreakBlocksInCreative, "can_break_blocks_in_creative") 
     )
 }
 
@@ -103,11 +103,11 @@ private data class ResolvedToolCategory(
  *
  * @param itemDamageOnBreakBlock The durability removed whenever a block is broken.
  * Defaults to `1`.
- * Used when neither `item_damage_on_break_block` nor `damage_per_block` is specified in the item's config.
+ * Used when neither `item_damage_on_break_block` is not specified in the item's config.
  *
  * @param canBreakBlocksInCreative Whether players can break blocks in creative mode while holding this tool.
  * Defaults to `true`.
- * Used when neither `can_break_blocks_in_creative` nor `can_destroy_blocks_in_creative` is specified in the item's config.
+ * Used when `can_break_blocks_in_creative` is not specified in the item's config.
  */
 fun Tool(
     toolTier: Key = Key.key("wooden"),
@@ -192,18 +192,18 @@ fun Tool(
     }
     
     Tool(
-        rules = cfg.entry(inferredRules, "rules"),
+        toolRules = cfg.entry(inferredRules, "tool_rules"),
         itemTags = toolCategories.mapEachTo(HashSet<*>::newHashSet) { it.itemTag },
-        defaultBreakSpeed = cfg.entry(1f, ["default_break_speed"], ["default_mining_speed"]),
-        itemDamageOnBreakBlock = cfg.entry(itemDamageOnBreakBlock, ["item_damage_on_break_block"], ["damage_per_block"]), // vanilla name "damage_per_block" as fallback
-        canBreakBlocksInCreative = cfg.entry(canBreakBlocksInCreative, ["can_break_blocks_in_creative"], ["can_destroy_blocks_in_creative"]) // vanilla name "destroy" as fallback
+        defaultBreakSpeed = cfg.entry(1f, "default_break_speed"),
+        itemDamageOnBreakBlock = cfg.entry(itemDamageOnBreakBlock, "item_damage_on_break_block"),
+        canBreakBlocksInCreative = cfg.entry(canBreakBlocksInCreative, "can_break_blocks_in_creative")
     )
 }
 
 /**
  * Allows items to mine blocks using configurable mining rules.
  *
- * @param rules The ordered rules defining special mining behavior for matching blocks.
+ * @param toolRules The ordered rules defining special mining behavior for matching blocks.
  * For each value, the first matching rule that specifies it wins. Speed falls back to
  * [defaultBreakSpeed], while correctness falls back to `false`.
  *
@@ -213,7 +213,7 @@ fun Tool(
  * this tool.
  */
 class Tool internal constructor(
-    rules: Provider<List<Rule>>,
+    toolRules: Provider<List<Rule>>,
     defaultBreakSpeed: Provider<Float>,
     itemDamageOnBreakBlock: Provider<Int>,
     canBreakBlocksInCreative: Provider<Boolean>,
@@ -228,15 +228,12 @@ class Tool internal constructor(
     ) : this(rules, defaultBreakSpeed, itemDamageOnBreakBlock, canBreakBlocksInCreative, provider(emptySet()))
     
     /**
-     * The ordered rules defining special mining behavior for matching blocks.
-     *
-     * Each rule may override mining speed, correctness for drops, or both. If multiple matching
-     * rules override the same property, the first one takes precedence.
+     * The rules of this tool.
      */
-    val rules: List<Rule> by rules
+    val toolRules: List<Rule> by toolRules
     
     /**
-     * The mining speed used when no matching [rule][rules] overrides it.
+     * The mining speed used when no matching [rule][toolRules] overrides it.
      */
     val defaultBreakSpeed: Float by defaultBreakSpeed
     
@@ -254,7 +251,7 @@ class Tool internal constructor(
     
     override val baseDataComponents = buildDataComponentMapProvider {
         this[DataComponentTypes.TOOL] = combinedProvider(
-            defaultBreakSpeed, itemDamageOnBreakBlock, canBreakBlocksInCreative, rules
+            defaultBreakSpeed, itemDamageOnBreakBlock, canBreakBlocksInCreative, toolRules
         ) { defaultBreakSpeed, itemDamageOnBreakBlock, canBreakBlocksInCreative, rules ->
             tool()
                 .defaultMiningSpeed(defaultBreakSpeed)
@@ -267,7 +264,7 @@ class Tool internal constructor(
     
     override fun toString(itemStack: ItemStack): String {
         return "Tool(" +
-            "rules=$rules, " +
+            "toolRules=$toolRules, " +
             "defaultBreakSpeed=$defaultBreakSpeed, " +
             "itemDamageOnBreakBlock=$itemDamageOnBreakBlock, " +
             "canBreakBlocksInCreative=$canBreakBlocksInCreative" +
