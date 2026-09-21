@@ -16,7 +16,6 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.NULL_PROVIDER
@@ -27,7 +26,6 @@ import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.registry.RegistryEntry
-import xyz.xenondevs.nova.util.asBukkitMirror
 import xyz.xenondevs.nova.util.component.adventure.toNmsStyle
 import xyz.xenondevs.nova.util.item.update
 import xyz.xenondevs.nova.util.nmsDirection
@@ -151,16 +149,6 @@ internal class DefaultItemBehavior(
         // this asserts that transformations are stored in the interaction result via transformedTo
         player.equipment.setItem(hand, itemStack)
         return result
-    }
-    
-    override fun handleUseFinished(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot): ItemAction {
-        // run default data component functionality (of consumable, etc.)
-        val nmsStack = itemStack.unwrap().copy()
-        val nmsEntity = entity.nmsEntity
-        val result = nmsStack.item.finishUsingItem(nmsStack, nmsEntity.level(), nmsEntity).asBukkitMirror()
-        if (result == itemStack)
-            return ItemAction.None
-        return ItemAction.ConvertStack(result)
     }
     
     override fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {
