@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.world.block.tileentity.network.node.safelyHandleNetworkUpdate
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
@@ -686,8 +687,8 @@ class NetworkState internal constructor(
             }
         }
         
-        endPoint.handleNetworkUpdate(this)
-        neighbor?.handleNetworkUpdate(this)
+        endPoint.safelyHandleNetworkUpdate(this)
+        neighbor?.safelyHandleNetworkUpdate(this)
     }
     
 }

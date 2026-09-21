@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.world.block.tileentity.network.node.safelyHandleNetworkLoaded
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
@@ -79,7 +80,11 @@ internal class LoadChunkTask(
                 
                 else -> {
                     // node is null or node and data type do not match
-                    LOGGER.error("Error while loading network chunk at $chunkPos: Node type and data type mismatch: $node does not match $data. (Removing from network data storage)")
+                    if (node == null) {
+                        LOGGER.error("Error while loading network chunk at $chunkPos: Expected node at $pos, but found none. (Removing from network data storage)")
+                    } else {
+                        LOGGER.error("Error while loading network chunk at $chunkPos: Node type and data type mismatch: $node does not match $data. (Removing from network data storage)")
+                    }
                     networkChunk.setData(pos, null)
                     continue
                 }
@@ -90,7 +95,7 @@ internal class LoadChunkTask(
         
         for ([network, nodes] in updatedNetworks) {
             for (node in nodes) {
-                node.handleNetworkLoaded(state)
+                node.safelyHandleNetworkLoaded(state)
             }
             
             network.cluster?.invalidate()

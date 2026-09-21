@@ -2,9 +2,29 @@ package xyz.xenondevs.nova.world.block.tileentity.network.node
 
 import org.bukkit.OfflinePlayer
 import org.bukkit.block.Block
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.format.NetworkState
+import java.util.concurrent.CancellationException
+
+internal suspend fun NetworkNode.safelyHandleNetworkLoaded(state: NetworkState) {
+    try {
+        handleNetworkLoaded(state)
+    } catch(t: Throwable) {
+        if (t is CancellationException) throw t
+        LOGGER.error("An exception occurred during handleNetworkLoaded for $this", t)
+    }
+}
+
+internal suspend fun NetworkNode.safelyHandleNetworkUpdate(state: NetworkState) {
+    try {
+        handleNetworkUpdate(state)
+    } catch(t: Throwable) {
+        if (t is CancellationException) throw t
+        LOGGER.error("An exception occurred during handleNetworkUpdate for $this", t)
+    }
+}
 
 /**
  * A node in a [Network].

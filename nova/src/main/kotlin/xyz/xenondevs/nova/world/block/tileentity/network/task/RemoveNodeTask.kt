@@ -1,8 +1,9 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.task
 
-import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.world.block.tileentity.network.node.safelyHandleNetworkUpdate
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.format.NetworkState
 
 internal abstract class RemoveNodeTask<T : NetworkNode>(
@@ -25,7 +26,7 @@ internal abstract class RemoveNodeTask<T : NetworkNode>(
         
         if (updateNodes) {
             for (node in nodesToUpdate) {
-                node.handleNetworkUpdate(state)
+                node.safelyHandleNetworkUpdate(state)
             }
         }
         
