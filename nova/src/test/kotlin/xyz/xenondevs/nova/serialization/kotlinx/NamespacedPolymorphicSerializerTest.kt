@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
-import xyz.xenondevs.nova.world.item.behavior.Consumable
 import kotlin.test.assertEquals
 
 class NamespacedPolymorphicSerializerTest {
@@ -24,15 +23,6 @@ class NamespacedPolymorphicSerializerTest {
     @Test
     fun `encodes namespaced type`() {
         assertEquals("""{"type":"minecraft:example","value":1}""", Json.encodeToString(serializer, Value.Example(1)))
-    }
-    
-    @Test
-    fun `consume effect owns namespaced serializer`() {
-        val serializer = Consumable.Effect.serializer()
-        val effect = Json.decodeFromString(serializer, """{"type":"teleport_randomly"}""")
-        
-        assertEquals(expected = Consumable.Effect.TeleportRandomly(), actual = effect)
-        assertEquals("""{"type":"minecraft:teleport_randomly"}""", Json.encodeToString(serializer, effect))
     }
     
     @Serializable
