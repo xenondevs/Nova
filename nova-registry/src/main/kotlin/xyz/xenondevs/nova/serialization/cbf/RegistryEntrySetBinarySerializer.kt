@@ -11,7 +11,6 @@ import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.cbf.serializer.BinarySerializer
 import xyz.xenondevs.nova.registry.NovaRegistry
 import xyz.xenondevs.nova.registry.NovaRegistryElement
-import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.registryEntrySetOf
 
@@ -71,7 +70,7 @@ class NovaRegistryEntrySetBinarySerializer<T : NovaRegistryElement<T>>(
  */
 class PaperRegistryEntrySetBinarySerializer<T : Keyed>(
     private val registryKey: RegistryKey<T>,
-    private val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
+    private val registryAccess: RegistryAccess
 ) : BinarySerializer<RegistryEntrySet.Paper<T>> {
     
     override fun read(reader: ByteReader): RegistryEntrySet.Paper<T>? {

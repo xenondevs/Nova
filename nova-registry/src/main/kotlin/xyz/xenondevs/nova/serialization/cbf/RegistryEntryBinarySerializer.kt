@@ -39,7 +39,7 @@ class NovaRegistryEntryBinarySerializer<T : NovaRegistryElement<T>>(
  */
 class PaperRegistryEntryBinarySerializer<T : Keyed>(
     private val registryKey: RegistryKey<T>,
-    private val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
+    private val registryAccess: RegistryAccess
 ) : UnversionedBinarySerializer<RegistryEntry.Paper<T>>() {
     
     override fun readUnversioned(reader: ByteReader): RegistryEntry.Paper<T> {

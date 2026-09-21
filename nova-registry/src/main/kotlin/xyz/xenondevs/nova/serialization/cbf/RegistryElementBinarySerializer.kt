@@ -35,16 +35,23 @@ class NovaRegistryElementBinarySerializer<T : NovaRegistryElement<T>>(
 
 /**
  * A binary serializer for Paper registry elements that serializes the element by its key.
+ * For registry elements that are also an enum, [enumEntries] can be used to provide the enum name mapping as a secondary input format.
  */
 class PaperRegistryElementBinarySerializer<T : Keyed>(
     registryKey: RegistryKey<T>,
-    registryAccess: RegistryAccess = RegistryAccess.registryAccess()
+    registryAccess: RegistryAccess,
+    private val enumEntries: Map<String, T> = emptyMap()
 ) : UnversionedBinarySerializer<T>() {
     
     private val registry: Registry<T> by lazy { registryAccess.getRegistry(registryKey) }
     
     override fun readUnversioned(reader: ByteReader): T {
-        val key = Key.key(reader.readString())
+        val s = reader.readString()
+        val enumEntry = enumEntries[s]
+        if (enumEntry != null)
+            return enumEntry
+        
+        val key = Key.key(s)
         return registry.getOrThrow(key)
     }
     

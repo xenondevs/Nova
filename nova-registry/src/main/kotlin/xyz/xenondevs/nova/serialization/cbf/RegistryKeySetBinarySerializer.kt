@@ -17,7 +17,7 @@ import xyz.xenondevs.cbf.serializer.BinarySerializer
  */
 class RegistryKeySetBinarySerializer<T : Keyed>(
     private val registryKey: RegistryKey<T>,
-    registryAccess: RegistryAccess = RegistryAccess.registryAccess()
+    registryAccess: RegistryAccess
 ) : BinarySerializer<RegistryKeySet<T>> {
     
     private val registry by lazy { registryAccess.getRegistry(registryKey) }
