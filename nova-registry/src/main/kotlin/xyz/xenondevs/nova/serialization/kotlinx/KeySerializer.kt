@@ -6,6 +6,7 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import org.bukkit.NamespacedKey
 
@@ -28,9 +29,11 @@ object KeySerializer : KSerializer<Key> {
      * Parses a [Key] from [s], throwing [SerializationException] if the key is invalid.
      */
     fun parseKey(s: String): Key {
-        if (!Key.parseable(s))
-            throw SerializationException("Invalid key: $s")
-        return Key.key(s)
+        try {
+            return Key.key(s)
+        } catch(e: InvalidKeyException) {
+            throw SerializationException(e.message)
+        }
     }
     
 }
