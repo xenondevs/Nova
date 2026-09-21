@@ -128,7 +128,8 @@ data class Model(
         val to: Vector3dc,
         val rotation: Rotation? = null,
         val faces: Map<Direction, Face>,
-        val shade: Boolean = true,
+        @SerialName("shade_direction_override")
+        val shadeDirectionOverride: Direction? = null,
         @SerialName("light_emission")
         val lightEmission: Int = 0
     ) {

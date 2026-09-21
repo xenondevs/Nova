@@ -40,10 +40,6 @@ sealed interface TintSource {
     class Potion(val default: Color) : TintSource
     
     @Serializable
-    @SerialName("minecraft:map_color")
-    class MapColor(val default: Color) : TintSource
-    
-    @Serializable
     @SerialName("minecraft:team")
     class Team(val default: Color) : TintSource
     

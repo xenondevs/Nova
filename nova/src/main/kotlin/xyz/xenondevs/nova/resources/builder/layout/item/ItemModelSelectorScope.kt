@@ -101,8 +101,7 @@ class ItemModelSelectorScope internal constructor(
                 Vector3d(-1.0, -1.0, -1.0),
                 Vector3d(17.0, 17.0, -1.0),
                 null,
-                mapOf(Direction.SOUTH to Face(Vector4d(0.0, 0.0, 16.0, 16.0), "#background")),
-                true
+                mapOf(Direction.SOUTH to Face(Vector4d(0.0, 0.0, 16.0, 16.0), "#background"))
             )
         }
         val from = if (stretched) -1.0 else 0.0
@@ -119,8 +118,7 @@ class ItemModelSelectorScope internal constructor(
                 Vector3d(from, from, (idx.toDouble() / layers.size.toDouble())),
                 Vector3d(to, to, (idx.toDouble() / layers.size.toDouble())),
                 null,
-                mapOf(Direction.SOUTH to Face(uv, name)),
-                true
+                mapOf(Direction.SOUTH to Face(uv, name))
             )
         }
         
