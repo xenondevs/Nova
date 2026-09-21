@@ -1,14 +1,12 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder
 
-import xyz.xenondevs.nova.world.*
-
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.entry
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.orElseLazily
 import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
@@ -38,11 +36,11 @@ class DefaultEnergyHolder(
     
     override var connectionConfig: CubeFaceMap<NetworkConnectionType>
         by compound.entry<CubeFaceMap<NetworkConnectionType>>("connectionConfig")
-            .orElse(
+            .orElseLazily {
                 defaultConnectionConfig.map { face, value ->
                     if (face !in blockedFaces) value else NetworkConnectionType.NONE
                 }
-            )
+            }
     
     /**
      * The maximum amount of energy this [EnergyHolder] can store.

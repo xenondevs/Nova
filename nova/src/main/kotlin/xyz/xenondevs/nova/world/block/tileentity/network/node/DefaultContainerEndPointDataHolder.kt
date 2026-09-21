@@ -5,6 +5,7 @@ import xyz.xenondevs.cbf.entry
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.orElseLazily
 import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
@@ -34,10 +35,10 @@ abstract class DefaultContainerEndPointDataHolder<C : EndPointContainer> interna
     
     final override var connectionConfig: CubeFaceMap<NetworkConnectionType>
         by compound.entry<CubeFaceMap<NetworkConnectionType>>("connectionConfig")
-            .orElse(
+            .orElseLazily {
                 (defaultConnectionConfig ?: containerConfig.map { containers[it]!! })
                     .map { f, t -> if (f !in blockedFaces) t else NetworkConnectionType.NONE }
-            )
+            }
     
     final override var channels: CubeFaceMap<Int>
         by compound.entry<CubeFaceMap<Int>>("channels")
