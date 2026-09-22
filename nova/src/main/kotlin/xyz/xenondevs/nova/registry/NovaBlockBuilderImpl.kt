@@ -6,14 +6,20 @@ import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.orElseBy
 import xyz.xenondevs.nova.config.CONFIGS
+import xyz.xenondevs.nova.registry.KnownRegistryEntries.BlockConfiguration
 import xyz.xenondevs.nova.world.block.NovaBlock
 
 internal open class NovaBlockBuilderImpl(
     entry: RegistryEntry.Paper<BlockType>
 ) : AbstractNovaBlockBuilder<NovaBlock>(entry) {
     
-    override fun build(lookup: RegistryOps.RegistryInfoLookup): NovaBlock =
-        ScopedValue
+    override fun build(lookup: RegistryOps.RegistryInfoLookup): NovaBlock {
+        KnownRegistryEntries.knownBlockStates[entry.key] = BlockConfiguration(
+            isTileEntity = false,
+            properties = effectiveStateProperties.map { BlockConfiguration.Property(it.key, it.name, it.stringValues) }
+        )
+        
+        return ScopedValue
             .where(NovaBlock.STATE_PROPERTIES, effectiveStateProperties)
             .call<NovaBlock, Nothing> {
                 NovaBlock(
@@ -32,6 +38,6 @@ internal open class NovaBlockBuilderImpl(
                     _showBreakAnimation
                 )
             }
-    
+    }
     
 }

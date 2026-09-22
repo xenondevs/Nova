@@ -6,6 +6,7 @@ import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
 import io.papermc.paper.tag.TagEntry
+import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import org.bukkit.Keyed
 import org.bukkit.scheduler.BukkitTask
@@ -25,6 +26,7 @@ import xyz.xenondevs.nova.registry.KnownRegistryEntries.knownRegistryEntries
 import xyz.xenondevs.nova.registry.RegistryLoader.novaBuilderFactories
 import xyz.xenondevs.nova.registry.RegistryLoader.novaBuilders
 import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.util.toResourceKey
@@ -418,14 +420,30 @@ object RegistryLoader {
 internal object KnownRegistryEntries {
     
     private const val KNOWN_REGISTRY_ENTRIES_KEY = "known_registry_entries"
-    private const val KNOWN_TILE_ENTITIES_KEY = "known_tile_entities"
+    private const val KNOWN_BLOCK_STATES = "known_block_states"
     val knownRegistryEntries: MutableMap<Key, MutableSet<Key>> = PermanentStorage.retrieve(KNOWN_REGISTRY_ENTRIES_KEY) ?: HashMap()
-    val knownTileEntities: MutableSet<Key> = PermanentStorage.retrieve(KNOWN_TILE_ENTITIES_KEY) ?: HashSet()
+    val knownBlockStates: MutableMap<Key, BlockConfiguration> = PermanentStorage.retrieve(KNOWN_BLOCK_STATES) ?: HashMap()
     
     @InitFun
     private fun storeKnownRegistryEntryKeys() {
         PermanentStorage.store(KNOWN_REGISTRY_ENTRIES_KEY, knownRegistryEntries)
-        PermanentStorage.store(KNOWN_TILE_ENTITIES_KEY, knownTileEntities)
+        PermanentStorage.store(KNOWN_BLOCK_STATES, knownBlockStates)
+    }
+    
+    @Serializable
+    data class BlockConfiguration(
+        val isTileEntity: Boolean,
+        val properties: List<Property>
+    ) {
+        
+        @Serializable
+        data class Property(
+            @Serializable(with = KeySerializer::class)
+            val novaKey: Key,
+            val nmsName: String,
+            val values: List<String>
+        )
+        
     }
     
 }

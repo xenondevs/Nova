@@ -3,9 +3,9 @@ package xyz.xenondevs.nova.world.block.state.property
 import ca.spottedleaf.moonrise.patches.blockstate_propertyaccess.PropertyAccess
 import com.google.common.collect.ImmutableMap
 import net.kyori.adventure.key.Key
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.level.block.state.properties.Property
-import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Keyed
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import xyz.xenondevs.nova.context.Context
@@ -68,8 +68,14 @@ abstract class BlockStateProperty<T : Comparable<T>>(
     /**
      * A list of all possible values that this property can have.
      */
-    open val values: List<T>
+    val values: List<T>
         get() = nmsProperty.possibleValues.map(::fromNmsValue)
+    
+    /**
+     * A list of all possible values that this property can have, as strings.
+     */
+    val stringValues: List<String>
+        get() = values.map(::valueToString)
     
     /**
      * Determines whether the given [value] is valid for this property.
@@ -295,65 +301,66 @@ class EnumProperty<E : Enum<E>> private constructor(
     
 }
 
+@Suppress("UNCHECKED_CAST")
 private class CustomInternalEnumProperty<T : Enum<T>>(
     name: String,
     clazz: Class<T>,
     values: List<T>
 ) : Property<T>(name, clazz), PropertyAccess<T> {
     
-    private val values: List<T>
+    private val values = values.toList()
     private val names: Map<String, T>
     private val ordinalToIndex: IntArray
-    private val idLookupTable: IntArray
     
     init {
         require(values.isNotEmpty()) { "Trying to make empty EnumProperty '$name'" }
         
-        this.values = values.toList()
-        
-        val allEnumValues = clazz.enumConstants
-        ordinalToIndex = IntArray(allEnumValues.size) { ordinal ->
-            this.values.indexOf(allEnumValues[ordinal])
-        }
-        
         val names = ImmutableMap.builder<String, T>()
-        for (value in this.values) {
-            names.put(value.name.lowercase(Locale.ROOT), value)
+        val byId = ReflectArray.newInstance(clazz, this.values.size) as Array<T>
+        
+        ordinalToIndex = IntArray(clazz.enumConstants.size) { -1 }
+        for ([id, value] in this.values.withIndex()) {
+            ordinalToIndex[value.ordinal] = id
+            byId[id] = value
+            names.put(getName(value), value)
         }
+        
         this.names = names.buildOrThrow()
         
-        idLookupTable = IntArray(allEnumValues.size) { -1 }
-        @Suppress("UNCHECKED_CAST")
-        val byId = ReflectArray.newInstance(clazz, this.values.size) as Array<T>
-        for ([id, value] in this.values.withIndex()) {
-            idLookupTable[value.ordinal] = id
-            byId[id] = value
-        }
         `moonrise$setById`(byId)
     }
     
-    override fun getPossibleValues(): List<T> =
-        values
-    
-    override fun getValue(name: String): Optional<T> =
-        Optional.ofNullable(names[name])
-    
-    override fun getName(value: T): String =
-        value.name.lowercase(Locale.ROOT)
-    
-    override fun getInternalIndex(value: T): Int =
-        ordinalToIndex[value.ordinal]
+    override fun getPossibleValues(): List<T> = values
+    override fun getValue(name: String): Optional<T> = Optional.ofNullable(names[name])
+    override fun getName(value: T): String = value.name.lowercase(Locale.ROOT)
+    override fun getInternalIndex(value: T): Int = ordinalToIndex[value.ordinal]
     
     override fun `moonrise$getIdFor`(value: T): Int {
         val target = valueClass
-        return if (value.javaClass != target && value.javaClass.declaringClass != target) {
-            -1
-        } else {
-            idLookupTable[value.ordinal]
-        }
+        if (value.javaClass !== target && value.declaringJavaClass !== target)
+            return -1
+        return ordinalToIndex[value.ordinal]
     }
     
-    override fun generateHashCode(): Int =
-        31 * super.generateHashCode() + values.hashCode()
+    override fun generateHashCode(): Int = 31 * super.generateHashCode() + values.hashCode()
+    
+}
+
+// string-based property for unknown block states
+internal class UnknownProperty(key: Key, name: String, strings: List<String>) : BlockStateProperty<String>(key, strings[0], { strings[0] }) {
+    
+    override val nmsProperty = object : Property<String>(name, String::class.java) {
+        
+        init {
+            `moonrise$setById`(strings.toTypedArray())
+        }
+        
+        override fun getPossibleValues(): List<String> = strings
+        override fun getName(s: String): String = s
+        override fun getValue(s: String): Optional<String> = if (s in strings) Optional.of(s) else Optional.empty()
+        override fun `moonrise$getIdFor`(s: String): Int = getInternalIndex(s)
+        override fun getInternalIndex(s: String): Int = strings.indexOf(s)
+        
+    }
     
 }

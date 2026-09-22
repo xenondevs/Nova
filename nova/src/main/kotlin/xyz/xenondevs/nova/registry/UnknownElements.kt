@@ -3,10 +3,12 @@ package xyz.xenondevs.nova.registry
 import io.papermc.paper.registry.RegistryKey
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.world.block.behavior.UnknownBlockBehavior
+import xyz.xenondevs.nova.world.block.state.property.UnknownProperty
 import xyz.xenondevs.nova.world.block.tileentity.UnknownTileEntity
 
 @InternalInit(
@@ -26,8 +28,8 @@ internal object UnknownElements {
         
         RegistryLoader.registerVanillaUnknown(
             RegistryKey.BLOCK,
-            { 
-                if (it.key in KnownRegistryEntries.knownTileEntities)
+            {
+                if (KnownRegistryEntries.knownBlockStates[it.key]?.isTileEntity == true)
                     NovaTileEntityBlockBuilderImpl(it, ::UnknownTileEntity)
                 else NovaBlockBuilderImpl(it)
             },
@@ -36,6 +38,11 @@ internal object UnknownElements {
                 style(NamedTextColor.RED)
                 entityBacked { createCubeModel("nova:block/unknown") }
                 behaviors(UnknownBlockBehavior)
+                
+                val rememberedProperties = KnownRegistryEntries.knownBlockStates[entry.key]?.properties
+                    ?.mapToArray { (novaKey, nmsName, values) -> UnknownProperty(novaKey, nmsName, values) }
+                    ?: emptyArray()
+                stateProperties(*rememberedProperties)
             }
         )
         

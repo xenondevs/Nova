@@ -143,17 +143,11 @@ abstract class Registrar internal constructor() : Namespaced {
     //</editor-fold>
     
     //<editor-fold desc="blocks">
-    fun tileEntity(name: String, constructor: TileEntityConstructor, tileEntity: NovaTileEntityBlockBuilder.() -> Unit): RegistryEntry.Paper<BlockType> {
-        val key = parseKey(name, this)
-        KnownRegistryEntries.knownTileEntities += key
-        return RegistryLoader.enqueueVanilla(RegistryKey.BLOCK, key, { NovaTileEntityBlockBuilderImpl(it, constructor) }, tileEntity)
-    }
+    fun tileEntity(name: String, constructor: TileEntityConstructor, tileEntity: NovaTileEntityBlockBuilder.() -> Unit): RegistryEntry.Paper<BlockType> =
+        RegistryLoader.enqueueVanilla(RegistryKey.BLOCK, parseKey(name, this), { NovaTileEntityBlockBuilderImpl(it, constructor) }, tileEntity)
     
-    fun block(name: String, block: NovaBlockBuilder.() -> Unit): RegistryEntry.Paper<BlockType> {
-        val key = parseKey(name, this)
-        KnownRegistryEntries.knownTileEntities -= key
-        return RegistryLoader.enqueueVanilla(RegistryKey.BLOCK, key, ::NovaBlockBuilderImpl, block)
-    }
+    fun block(name: String, block: NovaBlockBuilder.() -> Unit): RegistryEntry.Paper<BlockType> =
+        RegistryLoader.enqueueVanilla(RegistryKey.BLOCK, parseKey(name, this), ::NovaBlockBuilderImpl, block)
     
     fun blockTag(name: String, configure: TagBuilder.Paper<BlockType>.() -> Unit): RegistryEntrySet.Paper.Tag<BlockType> =
         tag(name, RegistryKey.BLOCK, configure)

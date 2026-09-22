@@ -10,6 +10,7 @@ import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.orElseBy
 import xyz.xenondevs.commons.provider.uninitializedProvider
 import xyz.xenondevs.nova.config.CONFIGS
+import xyz.xenondevs.nova.registry.KnownRegistryEntries.BlockConfiguration
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
@@ -36,6 +37,11 @@ internal class NovaTileEntityBlockBuilderImpl(
     }
     
     override fun build(lookup: RegistryOps.RegistryInfoLookup): NovaTileEntityBlock {
+        KnownRegistryEntries.knownBlockStates[entry.key] = BlockConfiguration(
+            isTileEntity = true,
+            properties = effectiveStateProperties.map { BlockConfiguration.Property(it.key, it.name, it.stringValues) }
+        )
+        
         val block = ScopedValue
             .where(NovaBlock.STATE_PROPERTIES, effectiveStateProperties) // cursed hack to pass state properties
             .call<NovaTileEntityBlock, Nothing> {
