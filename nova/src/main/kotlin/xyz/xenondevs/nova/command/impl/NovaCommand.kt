@@ -43,6 +43,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.command.Command
 import xyz.xenondevs.nova.command.argument.KeyArgumentType
+import xyz.xenondevs.nova.command.argument.KnownElementSuggestionProvider
 import xyz.xenondevs.nova.command.argument.NovaRegistryArgumentType
 import xyz.xenondevs.nova.command.argument.ResourcePackIdArgumentType
 import xyz.xenondevs.nova.command.argument.UpdatableFileSuggestionProvider
@@ -56,6 +57,7 @@ import xyz.xenondevs.nova.config.NovaConfigBackend
 import xyz.xenondevs.nova.packetentity.MAX_PACKET_ENTITY_RENDER_DISTANCE
 import xyz.xenondevs.nova.packetentity.MIN_PACKET_ENTITY_RENDER_DISTANCE
 import xyz.xenondevs.nova.packetentity.packetEntityRenderDistance
+import xyz.xenondevs.nova.registry.KnownRegistryEntries
 import xyz.xenondevs.nova.registry.MutableNovaRegistry
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
@@ -71,6 +73,7 @@ import xyz.xenondevs.nova.util.asBukkitMirror
 import xyz.xenondevs.nova.util.component.adventure.indent
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
 import xyz.xenondevs.nova.util.data.UpdatableFile
+import xyz.xenondevs.nova.util.data.WildcardUtils
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsBlock
@@ -251,10 +254,12 @@ internal object NovaCommand : Command() {
             .then(literal("file")
                 .then(argument("path", StringArgumentType.greedyString())
                     .suggests(UpdatableFileSuggestionProvider)
-                    .executes0(::resetFiles)
-                )
-            )
-        )
+                    .executes0(::resetFiles))))
+        .then(literal("forget")
+            .requiresPermission("command.nova.forget")
+            .then(argument("element", StringArgumentType.greedyString())
+                .suggests(KnownElementSuggestionProvider)
+                .executes0(::forgetElements)))
         .build()
     
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {
@@ -970,15 +975,38 @@ internal object NovaCommand : Command() {
             ctx.source.sender.sendMessage(Component.translatable(
                 "command.nova.reset.files.success",
                 NamedTextColor.GRAY,
-                Component.text(count).color(NamedTextColor.AQUA),
-                Component.text(path)
+                Component.text(count).color(NamedTextColor.AQUA)
             ))
         } else {
             ctx.source.sender.sendMessage(Component.translatable(
                 "command.nova.reset.files.no_files",
-                NamedTextColor.RED,
-                Component.text(path
-                )))
+                NamedTextColor.RED
+            ))
+        }
+    }
+    
+    private fun forgetElements(ctx: CommandContext<CommandSourceStack>) {
+        val regex = WildcardUtils.toRegex(ctx.get<String>("element"))
+        var count = 0
+        for ([registryKey, valueKeys] in KnownRegistryEntries.knownRegistryEntries) {
+            valueKeys.removeIf { valueKey ->
+                val s = "${registryKey.asString()}/${valueKey.asString()}"
+                regex.matches(s).also { if (it) count++ }
+            }
+        }
+        KnownRegistryEntries.store()
+        
+        if (count > 0) {
+            ctx.source.sender.sendMessage(Component.translatable(
+                "command.nova.forget.success",
+                NamedTextColor.GRAY,
+                Component.text(count).color(NamedTextColor.AQUA)
+            ))
+        } else {
+            ctx.source.sender.sendMessage(Component.translatable(
+                "command.nova.forget.no_elements",
+                NamedTextColor.RED
+            ))
         }
     }
     

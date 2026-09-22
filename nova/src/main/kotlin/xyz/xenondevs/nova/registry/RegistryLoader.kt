@@ -425,7 +425,7 @@ internal object KnownRegistryEntries {
     val knownBlockStates: MutableMap<Key, BlockConfiguration> = PermanentStorage.retrieve(KNOWN_BLOCK_STATES) ?: HashMap()
     
     @InitFun
-    private fun storeKnownRegistryEntryKeys() {
+    fun store() {
         PermanentStorage.store(KNOWN_REGISTRY_ENTRIES_KEY, knownRegistryEntries)
         PermanentStorage.store(KNOWN_BLOCK_STATES, knownBlockStates)
     }
