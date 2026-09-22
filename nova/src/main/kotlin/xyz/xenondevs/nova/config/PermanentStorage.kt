@@ -4,7 +4,6 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.serialization.kotlinx.NOVA_SERIALIZERS_MODULE
@@ -40,11 +39,11 @@ internal object PermanentStorage {
     
     @Suppress("UNCHECKED_CAST")
     fun <T> store(key: String, type: KType, data: T): Unit =
-        store(key, JSON.serializersModule.serializer(type) as KSerializer<T>, data)
+        store(key, JSON.serializersModule.contextualSerializer(type) as KSerializer<T>, data)
     
     @Suppress("UNCHECKED_CAST")
     fun <T> retrieve(key: String, type: KType): T? =
-        retrieve(key, JSON.serializersModule.serializer(type) as KSerializer<T>)
+        retrieve(key, JSON.serializersModule.contextualSerializer(type) as KSerializer<T>)
     
     inline fun <reified T> store(key: String, data: T): Unit =
         getPath(key).also { it.createParentDirectories() }.writeJson(data, JSON)

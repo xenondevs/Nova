@@ -8,7 +8,6 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.overwriteWith
-import kotlinx.serialization.serializer
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
@@ -218,7 +217,7 @@ class ConfigStorage(
             
             val serializer = try {
                 @Suppress("UNCHECKED_CAST")
-                json.serializersModule.serializer(type) as KSerializer<S>
+                json.serializersModule.contextualSerializer(type) as KSerializer<S>
             } catch (e: IllegalArgumentException) {
                 backend.onError(
                     configId,

@@ -2,6 +2,7 @@ plugins {
     id("nova.kotlin-conventions")
     id("nova.dokka-conventions")
     id("nova.publish-conventions-java")
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 dependencies {
