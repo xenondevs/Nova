@@ -40,3 +40,7 @@ If you're interested in creating a Nova addon, check out our [Addon API document
 # Translating
 
 If you would like to help translate Nova, you can do so [here](https://translate.xenondevs.xyz/).
+
+# License
+
+Nova is licensed under the GNU Lesser General Public License v3.0 or later (LGPL-3.0-or-later).
