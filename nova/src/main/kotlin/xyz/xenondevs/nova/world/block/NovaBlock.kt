@@ -109,7 +109,7 @@ private val BLOCK_STATE_CACHED_TYPE_ENTRY: VarHandle = MethodHandles
     .privateLookupIn(NmsBlockState::class.java, MethodHandles.lookup())
     .findVarHandle(NmsBlockState::class.java, $$"nova$cachedTypeEntry", Any::class.java)
 
-private val NmsBlockState.blockType: BlockType
+internal val NmsBlockState.blockType: BlockType
     get() {
         val cached = BLOCK_STATE_CACHED_TYPE.get(this)
         if (cached != null)

@@ -10,6 +10,7 @@
     "block.bukkit.CraftMagicNumbersMixin",
     "block.cache.BlockStateMixin",
     "block.correspondingitem.BlockMixin",
+    "block.correspondingitem.CraftBlockTypeMixin",
     "block.fluid.BucketItemMixin",
     "block.fluid.EmptyBucketDispenseItemBehaviorMixin",
     "block.fluid.FilledBucketDispenseItemBehaviorMixin",

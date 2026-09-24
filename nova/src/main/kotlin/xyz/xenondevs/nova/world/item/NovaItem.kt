@@ -87,7 +87,7 @@ private val ITEM_CACHED_GUI_ITEM_PROVIDER: VarHandle = MethodHandles
     .privateLookupIn(Item::class.java, MethodHandles.lookup())
     .findVarHandle(Item::class.java, $$"nova$guiItemProvider", Any::class.java)
 
-private val Item.itemType: ItemType
+internal val Item.itemType: ItemType
     get() {
         val cached = ITEM_CACHED_TYPE.get(this)
         if (cached != null)
