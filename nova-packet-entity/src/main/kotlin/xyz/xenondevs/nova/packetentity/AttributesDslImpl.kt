@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.packetentity
 
 import net.minecraft.core.Holder
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket.AttributeSnapshot
 import org.bukkit.attribute.Attribute
@@ -11,16 +10,9 @@ import xyz.xenondevs.commons.provider.dsl.DslProperty
 import java.util.concurrent.atomic.AtomicLong
 import net.minecraft.world.entity.ai.attributes.Attribute as NmsAttribute
 
-private val ATTRIBUTES: List<Pair<Attribute, Holder<NmsAttribute>>> = BuiltInRegistries.ATTRIBUTE.stream()
-    .map {
-        val holder = BuiltInRegistries.ATTRIBUTE.wrapAsHolder(it)
-        val bukkit = CraftAttribute.minecraftHolderToBukkit(holder)
-        bukkit to holder
-    }.toList()
-
 private data class AttributeEntry(
-    val attribute: Attribute,
     val holder: Holder<NmsAttribute>,
+    val index: Int,
     val value: DefaultEntityValue<Double?> = DefaultEntityValue(null)
 ) {
     
@@ -34,16 +26,29 @@ private data class AttributeEntry(
 
 internal class PacketEntityAttributes {
     
-    private val entries = ATTRIBUTES.map { [bukkit, holder] -> AttributeEntry(bukkit, holder) }
-    private val entriesByAttribute = entries.associateBy(AttributeEntry::attribute)
+    private var entries: HashMap<Attribute, AttributeEntry>? = null
     private val dirtyAttributes = AtomicLong(0)
     
-    fun get(attribute: Attribute): DslProperty<Double?> =
-        entriesByAttribute.getValue(attribute).value
+    @Volatile
+    private var observer: (() -> Unit)? = null
     
-    fun buildFullPacket(entityId: Int): ClientboundUpdateAttributesPacket? = entries
-        .mapNotNull { it.toAttributeSnapshotOrNull() }
-        .takeUnlessEmpty()
+    fun get(attribute: Attribute): DslProperty<Double?> {
+        val entries = entries ?: HashMap<Attribute, AttributeEntry>().also { this.entries = it }
+        return entries.getOrPut(attribute) {
+            val entry = AttributeEntry((attribute as CraftAttribute).holder, entries.size)
+            entry.value.observe {
+                observer?.let { observer ->
+                    markDirty(entry.index)
+                    observer()
+                }
+            }
+            entry
+        }.value
+    }
+    
+    fun buildFullPacket(entityId: Int): ClientboundUpdateAttributesPacket? = entries?.values
+        ?.mapNotNull { it.toAttributeSnapshotOrNull() }
+        ?.takeUnlessEmpty()
         ?.let { ClientboundUpdateAttributesPacket(entityId, it) }
     
     fun buildDirtyPacket(entityId: Int): ClientboundUpdateAttributesPacket? {
@@ -51,26 +56,19 @@ internal class PacketEntityAttributes {
         if (dirtyAttributes == 0L)
             return null
         
-        return entries.mapIndexedNotNull { i, entry ->
-            if ((dirtyAttributes and (1L shl i)) != 0L)
+        return entries?.values?.mapNotNull { entry ->
+            if ((dirtyAttributes and (1L shl entry.index)) != 0L)
                 entry.toAttributeSnapshot()
             else null
-        }.takeUnlessEmpty()?.let { ClientboundUpdateAttributesPacket(entityId, it) }
+        }?.takeUnlessEmpty()?.let { ClientboundUpdateAttributesPacket(entityId, it) }
     }
     
     fun observe(observer: () -> Unit) {
-        for ([i, entry] in entries.withIndex()) {
-            entry.value.observe {
-                markDirty(i)
-                observer()
-            }
-        }
+        this.observer = observer
     }
     
     fun unobserve() {
-        for ((value) in entries) {
-            value.unobserve()
-        }
+        observer = null
     }
     
     private fun markDirty(i: Int) {
