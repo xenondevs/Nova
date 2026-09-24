@@ -5,13 +5,13 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
 import net.minecraft.network.protocol.game.ClientboundBundlePacket
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
-import net.minecraft.network.protocol.game.VecDelta
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket
+import net.minecraft.network.protocol.game.VecDelta
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.PositionMoveRotation
@@ -58,7 +58,8 @@ internal open class PacketEntityNodeImpl<M : EntityMetadata>(
         collectGraphEntities(this)
     }
     private val passengerIds = passengerNodes.mapToIntArray(PacketEntityNodeImpl<*>::id)
-    val passengersPacket: ClientboundSetPassengersPacket = ClientboundSetPassengersPacket(id, passengerIds)
+    val passengersPacket: ClientboundSetPassengersPacket? =
+        if (passengerIds.isEmpty()) null else ClientboundSetPassengersPacket(id, passengerIds)
     
     private val dirtyFlags = AtomicInteger(0)
     private val dirtyMetadata = AtomicLong(0)
@@ -279,7 +280,7 @@ internal class PacketEntityImpl<M : EntityMetadata>(
         get() {
             return buildList {
                 graphEntities.forEach { addAll(it.spawnPackets(actualLocation)) }
-                graphEntities.forEach { add(it.passengersPacket) }
+                graphEntities.forEach { it.passengersPacket?.let(::add) }
             }
         }
     
