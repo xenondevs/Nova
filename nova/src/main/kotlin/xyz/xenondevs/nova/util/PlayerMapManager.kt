@@ -4,11 +4,11 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerQuitEvent
-import xyz.xenondevs.commons.collections.weakHashSet
+import xyz.xenondevs.commons.collections.concurrentHashSet
+import xyz.xenondevs.commons.guava.concurrentWeakIdentitySet
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -18,8 +18,8 @@ import java.util.concurrent.ConcurrentHashMap
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 object PlayerMapManager : Listener {
     
-    private val activeMaps = Collections.synchronizedSet(weakHashSet<MutableMap<Player, *>>())
-    private val activeSets = Collections.synchronizedSet(weakHashSet<MutableSet<Player>>())
+    private val activeMaps = concurrentWeakIdentitySet<MutableMap<Player, *>>()
+    private val activeSets = concurrentWeakIdentitySet<MutableSet<Player>>()
     
     @InitFun
     private fun init() {
@@ -63,22 +63,18 @@ object PlayerMapManager : Listener {
      * The set will automatically remove players that leave the server.
      */
     fun createConcurrentSet(): MutableSet<Player> {
-        val set = ConcurrentHashMap.newKeySet<Player>()
+        val set = concurrentHashSet<Player>()
         activeSets += set
         return set
     }
     
     @EventHandler
     private fun handleQuit(event: PlayerQuitEvent) {
-        synchronized(activeMaps) {
-            for (map in activeMaps) {
-                map.remove(event.player)
-            }
+        for (map in activeMaps) {
+            map.remove(event.player)
         }
-        synchronized(activeSets) {
-            for (set in activeSets) {
-                set.remove(event.player)
-            }
+        for (set in activeSets) {
+            set.remove(event.player)
         }
     }
     
