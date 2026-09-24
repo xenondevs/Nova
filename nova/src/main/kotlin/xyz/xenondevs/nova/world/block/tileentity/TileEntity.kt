@@ -11,6 +11,7 @@ import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.invui.inventory.VirtualInventory
@@ -73,7 +74,7 @@ abstract class TileEntity(
     /**
      * The [UUID] of this [TileEntity].
      */
-    val uuid: UUID by storedValue("uuid") { UUID.randomUUID() }
+    val uuid: UUID by storedValue("uuid") { insecureRandomUuid() }
     
     private var _ownerUuid = storedValue<UUID>("ownerUuid")
     

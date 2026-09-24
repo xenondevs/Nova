@@ -23,6 +23,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.joml.Vector3dc
 import xyz.xenondevs.commons.collections.mapToIntArray
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
 import xyz.xenondevs.nova.network.packet.ClientboundSetPassengersPacket
@@ -45,7 +46,7 @@ internal open class PacketEntityNodeImpl<M : EntityMetadata>(
 ) : PacketEntityNode<M> {
     
     final override val id: Int = (world as CraftWorld).handle.nextEntityId
-    final override val uuid: UUID = UUID.randomUUID()
+    final override val uuid: UUID = insecureRandomUuid()
     final override val equipment: PacketEntityEquipment = PacketEntityEquipmentImpl(state.equipment)
     private val passengerNodes = state.passengers.map { it.createNode(world) }
     final override val passengers: List<PacketEntityNode<*>> = passengerNodes

@@ -30,6 +30,7 @@ import org.joml.Vector3d
 import org.joml.Vector3dc
 import org.joml.primitives.AABBdc
 import org.joml.primitives.Rayd
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import java.io.ByteArrayInputStream
@@ -103,7 +104,7 @@ val BukkitEntity.eyeInWater: Boolean
 
 object EntityUtils {
     
-    internal val DUMMY_PLAYER = createFakePlayer(Location(Bukkit.getWorlds()[0], 0.0, 0.0, 0.0), UUID.randomUUID(), "Nova Dummy Player")
+    internal val DUMMY_PLAYER = createFakePlayer(Location(Bukkit.getWorlds()[0], 0.0, 0.0, 0.0), insecureRandomUuid(), "Nova Dummy Player")
     private val DEFAULT_DESERIALIZATION_DISALLOWED_ENTITY_TYPES: Set<EntityType> = buildSet {
         add(EntityType.COMMAND_BLOCK_MINECART)
         add(EntityType.FALLING_BLOCK) // command block falling block (for good measure, command doesn't seem to be there after landing)
@@ -213,7 +214,7 @@ object EntityUtils {
         val entities = ArrayList<MojangEntity>()
         NMSEntityType.loadEntityRecursive(compoundTag, level, EntitySpawnRequest(spawnReason, false)) { entity ->
             // assign new uuid
-            entity.uuid = UUID.randomUUID()
+            entity.uuid = insecureRandomUuid()
             
             // (deferred) add entity to world
             entities += entity
@@ -233,7 +234,7 @@ object EntityUtils {
      */
     fun createFakePlayer(
         location: Location,
-        uuid: UUID = UUID.randomUUID(),
+        uuid: UUID = insecureRandomUuid(),
         name: String = "Nova FakePlayer",
         hasEvents: Boolean = false
     ): ServerPlayer {

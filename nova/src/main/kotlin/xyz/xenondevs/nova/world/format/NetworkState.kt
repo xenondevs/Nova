@@ -13,6 +13,7 @@ import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.commons.guava.set
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.ChunkPos
@@ -148,7 +149,7 @@ class NetworkState internal constructor(
      * Creates a new [ProtoNetwork] with the given [type] and a random UUID.
      */
     fun <T : Network<T>> createNetwork(type: NetworkType<T>): ProtoNetwork<T> {
-        val networkId = UUID.randomUUID()
+        val networkId = insecureRandomUuid()
         val network = ProtoNetwork(this, type, networkId)
         networksById[networkId] = network
         return network
@@ -159,7 +160,7 @@ class NetworkState internal constructor(
      *
      * @throws IllegalArgumentException If a network with the same [networkId] exists, but is not of the given [type].
      */
-    fun <T : Network<T>> getOrCreateNetwork(type: NetworkType<T>, networkId: UUID = UUID.randomUUID()): ProtoNetwork<T> {
+    fun <T : Network<T>> getOrCreateNetwork(type: NetworkType<T>, networkId: UUID = insecureRandomUuid()): ProtoNetwork<T> {
         val network = networksById.computeIfAbsent(networkId) { ProtoNetwork(this, type, networkId) }
         if (network.type != type)
             throw IllegalArgumentException("Network with id $networkId exists, but is not of type $type")

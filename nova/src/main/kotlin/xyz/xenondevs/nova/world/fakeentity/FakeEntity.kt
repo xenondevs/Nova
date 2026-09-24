@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.collections.weakHashSet
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.network.RegistryFriendlyByteBuf
 import xyz.xenondevs.nova.network.packet.PacketIds
@@ -47,7 +48,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         field = weakHashSet<Player>()
     
     val entityId = location.world.serverLevel.nextEntityId
-    private val uuid = UUID.randomUUID()
+    private val uuid = insecureRandomUuid()
     
     private var spawnBuf: FriendlyByteBuf? = null
     private var dataBuf: FriendlyByteBuf? = null

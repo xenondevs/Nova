@@ -6,6 +6,7 @@ import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
@@ -22,7 +23,7 @@ import java.util.*
 class ProtoNetwork<T : Network<T>>(
     private val state: NetworkState,
     override val type: NetworkType<T>,
-    override val uuid: UUID = UUID.randomUUID(),
+    override val uuid: UUID = insecureRandomUuid(),
     override val nodes: MutableMap<Block, NetworkNodeConnection> = HashMap()
 ) : NetworkData<T> {
     

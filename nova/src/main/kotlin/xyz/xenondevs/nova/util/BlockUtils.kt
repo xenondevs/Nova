@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.util
 
-import xyz.xenondevs.nova.util.asBukkitMirror
 import io.papermc.paper.math.BlockPosition
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
@@ -54,6 +53,7 @@ import org.joml.Vector3i
 import org.joml.primitives.AABBd
 import org.joml.primitives.AABBf
 import org.joml.primitives.AABBi
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
@@ -73,7 +73,6 @@ import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.item.itemType
-import java.util.*
 import kotlin.math.floor
 import kotlin.random.Random
 import net.minecraft.core.BlockPos as MojangBlockPos
@@ -261,7 +260,7 @@ object BlockUtils {
             if (itemStack != null && itemStack.itemType.hasBlockType()) {
                 val fakePlayer = EntityUtils.createFakePlayer(
                     ctx[BlockPlace.SOURCE_LOCATION] ?: block.location,
-                    UUID.randomUUID(), ""
+                    insecureRandomUuid(), ""
                 )
                 
                 return@exec placeVanillaBlock(

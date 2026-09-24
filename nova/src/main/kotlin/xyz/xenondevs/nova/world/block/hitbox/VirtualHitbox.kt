@@ -7,6 +7,7 @@ import org.joml.Vector3f
 import org.joml.Vector3fc
 import xyz.xenondevs.nova.util.toVector3f
 import org.bukkit.block.Block
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import java.util.*
 import kotlin.math.floor
 
@@ -44,7 +45,7 @@ class VirtualHitbox internal constructor(
     xWidth: Float, zWidth: Float, height: Float
 ) : Hitbox<ClickAtLocationHandler, ClickAtLocationHandler>(world, baseCenter, center, from, to, xWidth, zWidth, height) {
     
-    internal val uuid = UUID.randomUUID() // region id for visualization
+    internal val uuid = insecureRandomUuid() // region id for visualization
     
     internal val blocks: Set<Block> = getBlocksBetween(world, from, to)
     internal var qualifier: HitboxQualifier? = null

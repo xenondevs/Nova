@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
@@ -82,7 +83,7 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
  */
 class ProtoNetworkCluster : Iterable<ProtoNetwork<*>> {
     
-    val uuid: UUID = UUID.randomUUID()
+    val uuid: UUID = insecureRandomUuid()
     private val networks = HashSet<ProtoNetwork<*>>()
     
     lateinit var cluster: NetworkCluster

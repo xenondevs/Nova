@@ -12,6 +12,7 @@ dependencies {
     api(project(":nova-network"))
     api(libs.bundles.kotlin)
     implementation(libs.commons.collections)
+    implementation(libs.commons.math)
     ksp(project(":nova-ksp:processor:packet-entity"))
 }
 
