@@ -886,7 +886,7 @@ internal object PacketItems : PacketListener {
         // to be reflected in the tooltip, except for the item lore itself
         val itemStackToGenerateTooltipOf = serverSideStack.copy()
         itemStackToGenerateTooltipOf.set(DataComponents.LORE, clientSideStack.get(DataComponents.LORE))
-        applyServerSideTooltip(clientSideStack, generateTooltipLore(player, serverSideStack))
+        applyServerSideTooltip(clientSideStack, generateTooltipLore(player, itemStackToGenerateTooltipOf))
         
         // save server-side nbt data (for creative mode)
         // this also drops existing custom data, which is ignored by the client anyway
