@@ -24,14 +24,19 @@ internal class AddEndPointTask(
     @Name("xyz.xenondevs.AddEndPoint")
     @Label("Add EndPoint")
     @Category("Nova", "TileEntity Network")
-    private inner class AddEndPointTaskEvent : Event() {
+    private class AddEndPointTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = node.block.toString()
+        var pos: String = ""
         
     }
     
-    override val event: Event = AddEndPointTaskEvent()
+    override val event: Event
+        get() = AddEndPointTaskEvent()
+    
+    override fun populateEvent(event: Event) {
+        (event as AddEndPointTaskEvent).pos = node.block.toString()
+    }
     //</editor-fold>
     
     override suspend fun add() {

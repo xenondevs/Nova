@@ -17,9 +17,10 @@ internal class CustomWriteTask(
     @Name("xyz.xenondevs.CustomWriteTask")
     @Label("Custom Write")
     @Category("Nova", "TileEntity Network")
-    private inner class CustomWriteTaskEvent : Event()
+    private class CustomWriteTaskEvent : Event()
     
-    override val event: Event = CustomWriteTaskEvent()
+    override val event: Event
+        get() = CustomWriteTaskEvent()
     //</editor-fold>
     
     override suspend fun run(): Boolean {
@@ -39,9 +40,10 @@ internal class CustomReadTask(
     @Name("xyz.xenondevs.CustomRead")
     @Label("Custom Read")
     @Category("Nova", "TileEntity Network")
-    private inner class CustomReadTaskEvent : Event()
+    private class CustomReadTaskEvent : Event()
     
-    override val event: Event = CustomReadTaskEvent()
+    override val event: Event
+        get() = CustomReadTaskEvent()
     //</editor-fold>
     
     override suspend fun run(): Boolean {
@@ -61,9 +63,10 @@ internal class CustomUncertainTask(
     @Name("xyz.xenondevs.CustomUncertain")
     @Label("Custom Read or Write")
     @Category("Nova", "TileEntity Network")
-    private inner class CustomUncertainTaskEvent : Event()
+    private class CustomUncertainTaskEvent : Event()
     
-    override val event: Event = CustomUncertainTaskEvent()
+    override val event: Event
+        get() = CustomUncertainTaskEvent()
     //</editor-fold>
     
     override suspend fun run(): Boolean {

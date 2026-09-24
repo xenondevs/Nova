@@ -31,14 +31,19 @@ internal class LoadChunkTask(
     @Name("xyz.xenondevs.LoadChunk")
     @Label("Load Chunk")
     @Category("Nova", "TileEntity Network")
-    private inner class LoadChunkTaskEvent : Event() {
+    private class LoadChunkTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = chunkPos.toString()
+        var pos: String = ""
         
     }
     
-    override val event: Event = LoadChunkTaskEvent()
+    override val event: Event
+        get() = LoadChunkTaskEvent()
+    
+    override fun populateEvent(event: Event) {
+        (event as LoadChunkTaskEvent).pos = chunkPos.toString()
+    }
     //</editor-fold>
     
     override suspend fun run(): Boolean {

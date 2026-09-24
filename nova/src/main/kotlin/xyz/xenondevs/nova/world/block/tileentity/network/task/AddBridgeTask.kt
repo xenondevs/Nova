@@ -31,14 +31,19 @@ internal class AddBridgeTask(
     @Name("xyz.xenondevs.AddBridge")
     @Label("Add Bridge")
     @Category("Nova", "TileEntity Network")
-    private inner class AddBridgeTaskEvent : Event() {
+    private class AddBridgeTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = node.block.toString()
+        var pos: String = ""
         
     }
     
-    override val event: Event = AddBridgeTaskEvent()
+    override val event: Event
+        get() = AddBridgeTaskEvent()
+    
+    override fun populateEvent(event: Event) {
+        (event as AddBridgeTaskEvent).pos = node.block.toString()
+    }
     //</editor-fold>
     
     override suspend fun add() {

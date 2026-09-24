@@ -13,6 +13,8 @@ internal sealed class NetworkTask(protected val state: NetworkState) {
     
     abstract val event: Event
     
+    open fun populateEvent(event: Event) = Unit
+    
     abstract suspend fun run(): Boolean
     
 }

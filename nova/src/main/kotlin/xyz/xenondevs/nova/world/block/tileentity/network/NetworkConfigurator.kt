@@ -97,9 +97,14 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
                     // Work off all tasks first, then build dirty networks
                     taskChannel.onReceive { task ->
                         try {
-                            task.event.begin()
+                            val event = task.event
+                            event.begin()
                             processTask(task)
-                            task.event.commit()
+                            event.end()
+                            if (event.shouldCommit()) {
+                                task.populateEvent(event)
+                                event.commit()
+                            }
                         } catch (e: Exception) {
                             LOGGER.error("An exception occurred trying to process NetworkTask: $task", e)
                         }

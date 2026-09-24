@@ -4,8 +4,8 @@ import jdk.jfr.Category
 import jdk.jfr.Event
 import jdk.jfr.Label
 import jdk.jfr.Name
-import org.bukkit.block.BlockFace
 import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
@@ -29,14 +29,19 @@ internal class RemoveBridgeTask(
     @Name("xyz.xenondevs.RemoveBridge")
     @Label("Remove Bridge")
     @Category("Nova", "TileEntity Network")
-    private inner class AddBridgeTaskEvent : Event() {
+    private class RemoveBridgeTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = node.block.toString()
+        var pos: String = ""
         
     }
     
-    override val event: Event = AddBridgeTaskEvent()
+    override val event: Event
+        get() = RemoveBridgeTaskEvent()
+    
+    override fun populateEvent(event: Event) {
+        (event as RemoveBridgeTaskEvent).pos = node.block.toString()
+    }
     //</editor-fold>
     
     override suspend fun remove() {

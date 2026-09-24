@@ -22,14 +22,19 @@ internal class RemoveEndPointTask(
     @Name("xyz.xenondevs.RemoveEndPoint")
     @Label("Remove EndPoint")
     @Category("Nova", "TileEntity Network")
-    private inner class RemoveEndPointTaskEvent : Event() {
+    private class RemoveEndPointTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = node.block.toString()
+        var pos: String = ""
         
     }
     
-    override val event: Event = RemoveEndPointTaskEvent()
+    override val event: Event
+        get() = RemoveEndPointTaskEvent()
+    
+    override fun populateEvent(event: Event) {
+        (event as RemoveEndPointTaskEvent).pos = node.block.toString()
+    }
     //</editor-fold>
     
     override suspend fun remove() {

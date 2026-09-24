@@ -18,14 +18,19 @@ internal class UnloadChunkTask(
     @Name("xyz.xenondevs.UnloadChunkTask")
     @Label("Unload Chunk")
     @Category("Nova", "TileEntity Network")
-    private inner class UnloadChunkTaskEvent : Event() {
+    private class UnloadChunkTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = chunkPos.toString()
+        var pos: String = ""
         
     }
     
-    override val event: Event = UnloadChunkTaskEvent()
+    override val event: Event
+        get() = UnloadChunkTaskEvent()
+    
+    override fun populateEvent(event: Event) {
+        (event as UnloadChunkTaskEvent).pos = chunkPos.toString()
+    }
     //</editor-fold>
     
     override suspend fun run(): Boolean {
