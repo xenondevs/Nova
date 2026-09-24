@@ -779,10 +779,7 @@ internal open class NovaBlock(
     
     override fun toString(): String = key.asString()
     
-    @InternalInit(
-        stage = InternalInitStage.PRE_WORLD,
-        runAfter = [ResourceGeneration.PreWorld::class]
-    )
+    @InternalInit(stage = InternalInitStage.POST_WORLD)
     companion object {
         
         // hack to make properties available in createBlockStateDefinition 
