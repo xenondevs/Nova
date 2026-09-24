@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.world.block
 
 import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.core.BlockPos
@@ -187,7 +186,7 @@ internal class NovaTileEntityProxy(
         
         if (tileEntity.isTicking) {
             tileEntity.isTicking = false
-            tileEntity.coroutineSupervisor?.cancel("TileEntity disabled")
+            tileEntity.coroutineSupervisor?.cancel()
             tileEntity.coroutineSupervisor = null
             tileEntity.handleDisableTicking()
         }

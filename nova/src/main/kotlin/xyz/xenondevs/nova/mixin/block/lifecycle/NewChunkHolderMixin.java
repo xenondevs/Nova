@@ -18,7 +18,6 @@ import xyz.xenondevs.nova.world.block.NovaTileEntityProxy;
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity;
 
 import java.util.List;
-import java.util.concurrent.CancellationException;
 
 @Mixin(NewChunkHolder.class)
 abstract class NewChunkHolderMixin {
@@ -75,7 +74,7 @@ abstract class NewChunkHolderMixin {
                 }
             }
         }
-        nova$coroutineSupervisor.cancel(new CancellationException("Ticking disabled for chunk"));
+        nova$coroutineSupervisor.cancel(null);
         nova$coroutineSupervisor = null;
     }
     
