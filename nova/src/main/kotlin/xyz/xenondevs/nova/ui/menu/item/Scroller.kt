@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.ui.menu.item
 
-import xyz.xenondevs.nova.util.asBukkitMirror
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.BundleContents.bundleContents
 import io.papermc.paper.datacomponent.item.CustomModelData.customModelData
@@ -20,6 +19,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.repeated
+import xyz.xenondevs.commons.guava.concurrentWeakIdentityMap
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
@@ -45,6 +45,7 @@ import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.util.ItemUtils
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.registry.tags.ItemTypeTags
+import xyz.xenondevs.nova.util.asBukkitMirror
 import xyz.xenondevs.nova.util.item.isNullOrEmpty
 import xyz.xenondevs.nova.util.toNmsTemplate
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
@@ -480,7 +481,7 @@ fun scrollableItemProvider(itemProvider: ItemProvider): ItemProvider =
 //<editor-fold desc="scroll logic">
 private data class ScrollData(val previousWindowState: Int, val previousSlot: Int)
 
-private val trackedScrollData = Collections.synchronizedMap(WeakHashMap<Window, ScrollData>())
+private val trackedScrollData = concurrentWeakIdentityMap<Window, ScrollData>()
 
 private fun getScrollData(window: Window): ScrollData {
     return trackedScrollData.computeIfAbsent(window) { ScrollData(0, -1) }
