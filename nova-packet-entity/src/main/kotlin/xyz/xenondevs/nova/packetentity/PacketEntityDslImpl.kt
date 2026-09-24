@@ -24,7 +24,7 @@ internal open class PacketEntityState<M : EntityMetadataState>(val metadata: M) 
     
     val attributes = PacketEntityAttributes()
     val equipment = PacketEntityEquipmentState()
-    val components: List<ReactiveDataValue<*>> = buildList(metadata::addComponents)
+    val components: List<ReactiveDataValue<*>> = buildList(32, metadata::addComponents)
     val passengers = ArrayList<PacketEntityPassengerData<*>>()
     val attackHandlers = ArrayList<AttackDsl.() -> Unit>()
     val attackAsyncHandlers = ArrayList<(ServerboundAttackPacketEvent) -> Unit>()
