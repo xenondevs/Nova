@@ -189,6 +189,10 @@ internal object PacketItems : PacketListener {
     const val SERVER_SIDE_COMPONENTS_TAG = "NovaServerSideComponents"
     const val SERVER_SIDE_ITEM_TYPE_TAG = "NovaServerSideType"
     
+    private val TOOLTIP_HIDDEN_DATA_COMPONENTS = BuiltInRegistries.DATA_COMPONENT_TYPE.filterTo(LinkedHashSet()) { 
+        it != DataComponents.BUNDLE_CONTENTS && it != DataComponents.LORE
+    }
+    
     @InitFun
     private fun init() {
         registerPacketListener()
@@ -1019,7 +1023,7 @@ internal object PacketItems : PacketListener {
     private fun disableClientSideTooltip(itemStack: MojangStack) {
         itemStack.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(
             itemStack.get(DataComponents.TOOLTIP_DISPLAY)?.hideTooltip == true,
-            BuiltInRegistries.DATA_COMPONENT_TYPE.filterTo(LinkedHashSet()) { it != DataComponents.BUNDLE_CONTENTS && it != DataComponents.LORE }
+            TOOLTIP_HIDDEN_DATA_COMPONENTS
         ))
     }
     //</editor-fold>
