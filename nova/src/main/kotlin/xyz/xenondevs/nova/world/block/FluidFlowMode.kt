@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block
 
-import xyz.xenondevs.nova.world.block.behavior.Waterloggable
+import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.WATERLOGGED
 
 /**
  * Controls how fluid flows into and out of a block.
@@ -48,7 +48,7 @@ enum class FluidFlowMode(
      * Allows incoming water to waterlog the block, but prevents the stored water from flowing out.
      * Note that the block will stay waterlogged, even when fluid stops flowing into it.
      *
-     * Requires the [Waterloggable] behavior.
+     * Requires the [WATERLOGGED] state property.
      */
     WATERLOG_IN(
         allowsIncomingFlow = true,
@@ -60,7 +60,7 @@ enum class FluidFlowMode(
     /**
      * Prevents flowing water from entering the block, but allows stored water to flow out.
      *
-     * Requires the [Waterloggable] behavior.
+     * Requires the [WATERLOGGED] state property.
      */
     WATERLOG_OUT(
         allowsIncomingFlow = false,
@@ -73,7 +73,7 @@ enum class FluidFlowMode(
      * Allows incoming water to waterlog the block and stored water to flow out.
      * Note that this essentially creates new source blocks.
      *
-     * Requires the [Waterloggable] behavior.
+     * Requires the [WATERLOGGED] state property.
      */
     WATERLOG_IN_OUT(
         allowsIncomingFlow = true,

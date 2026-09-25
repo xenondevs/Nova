@@ -101,7 +101,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
-import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.world.item.itemType
 import xyz.xenondevs.nova.world.item.logic.AdvancedTooltips
 import xyz.xenondevs.nova.world.item.logic.PacketItems
@@ -496,12 +495,9 @@ internal object NovaCommand : Command() {
                 }
                 
                 val modelComponents = info.models
-                    .mapTo(ArrayList(info.models.size + 1)) { model ->
+                    .mapTo(ArrayList(info.models.size)) { model ->
                         createModelComponent(model.model, Matrix4f(model.transform))
                     }
-                if (info.waterlogged) {
-                    modelComponents += createModelComponent(DefaultBlockOverlays.WATERLOGGED.key, Matrix4f())
-                }
                 val colliderComponents = info.extraColliders.map { cube ->
                     Component.translatable(
                         "command.nova.show_block_model_data.display_entity.extra_collider",

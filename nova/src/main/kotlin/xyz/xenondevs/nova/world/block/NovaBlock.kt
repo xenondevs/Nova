@@ -600,9 +600,11 @@ internal open class NovaBlock(
         val blockState: NovaBlockState = NovaBlockStateImpl(nmsBlockState)
         val neighborBlock = nmsNeighbourPos.toBlock(nmsLevel.world)
         val neighborBlockState = nmsNeighbourState.bukkitBlockData
-        return runSafely("update shape", blockState) {
+        val updatedState = runSafely("update shape", blockState) {
             behaviors.fold(blockState) { acc, behavior -> behavior.updateShape(block, acc, neighborBlock, neighborBlockState) }
         }.nmsBlockState
+        NovaWaterloggingBridge.scheduleWaterTickIfWaterlogged(updatedState, nmsLevel, nmsPos)
+        return updatedState
     }
     
     override fun randomTick(

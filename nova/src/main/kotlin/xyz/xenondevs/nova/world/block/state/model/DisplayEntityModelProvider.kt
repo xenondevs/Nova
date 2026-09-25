@@ -11,11 +11,11 @@ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
-import org.bukkit.Fluid
 import org.bukkit.Location
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
@@ -36,7 +36,6 @@ import org.joml.Matrix4fc
 import org.joml.Vector2d
 import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -62,17 +61,13 @@ import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.nmsDirection
 import xyz.xenondevs.nova.util.nmsEntity
-import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.ColliderCube
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.chunkPos
-import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.world.pos
-import java.awt.Color
 
 @Serializable(DisplayEntityBlockModelDataSerializer::class)
 internal class DisplayEntityBlockModelData(
@@ -110,7 +105,12 @@ internal class DisplayEntityBlockModelData(
 internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModelData) : BlockModelProvider {
     
     override val clientsideBlockState: BlockState
-        get() = info.collider.nmsBlockState
+        get() = info.collider.nmsBlockState.let { state ->
+            if (state.hasProperty(BlockStateProperties.WATERLOGGED))
+                state.setValue(BlockStateProperties.WATERLOGGED, info.waterlogged)
+            else
+                state
+        }
     
     override fun load(block: Block) {
         if (DisplayEntityModelProviderManager.hasEntities(block)) {
@@ -119,8 +119,6 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         }
         
         val models = info.models.mapTo(ArrayList()) { createDisplay(block, it) }
-        if (info.waterlogged)
-            models += createWaterlogDisplay(block)
         
         DisplayEntityModelProviderManager.setEntities(block, models, createColliderEntities(block))
     }
@@ -145,11 +143,6 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
                 ?.also { prevEntity -> setMetadata(prevEntity.metadata, model) }
                 ?: createDisplay(block, model)
         }
-        if (info.waterlogged) {
-            newEntities += prevEntities.getOrNull(i++)
-                ?.also { prevEntity -> setWaterlogMetadata(prevEntity.metadata, block) }
-                ?: createWaterlogDisplay(block)
-        }
         
         for (j in i..<prevEntities.size)
             prevEntities[j].despawn()
@@ -163,13 +156,6 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         }
         
         DisplayEntityModelProviderManager.setEntities(block, newEntities, newColliderEntities)
-    }
-    
-    fun updateWaterlogEntity(block: Block) {
-        DisplayEntityModelProviderManager.getDisplayEntities(block)
-            ?.lastOrNull()
-            ?.metadata
-            ?.let { setWaterlogMetadata(it, block) }
     }
     
     fun createFallingModel(entity: FallingBlock): FallingBlockModel {
@@ -199,13 +185,6 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         location by block.location.toCenterLocation()
     }.apply {
         setMetadata(metadata, model)
-        spawn()
-    }
-    
-    private fun createWaterlogDisplay(pos: Block) = packetItemDisplay {
-        location by pos.location.toCenterLocation()
-    }.apply {
-        setWaterlogMetadata(metadata, pos)
         spawn()
     }
     
@@ -291,16 +270,6 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
             val packet = ServerboundUseItemOnPacket(InteractionHand.MAIN_HAND, hitResult, 0, System.currentTimeMillis())
             player.packetHandler?.injectIncoming(packet)
         }
-    }
-    
-    private fun setWaterlogMetadata(data: ItemDisplayMetadata, pos: Block) {
-        data.brightnessOverride = null
-        @Suppress("DEPRECATION")
-        data.itemStack = ItemBuilder(DefaultBlockOverlays.WATERLOGGED.get())
-            .setCustomModelData(0, pos.world.getFluidData(pos.x, pos.y + 1, pos.z).fluidType == Fluid.WATER)
-            .setCustomModelData(0, Color(pos.world.serverLevel.getBiome(pos.nmsPos).value().waterColor))
-            .build()
-        data.transform = Matrix4f()
     }
     
     private fun setMetadata(data: ItemDisplayMetadata, model: DisplayEntityBlockModelData.Model) {

@@ -10,8 +10,6 @@ import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.data.ItemModel
-import xyz.xenondevs.nova.resources.builder.data.TintSource
-import xyz.xenondevs.nova.resources.builder.layout.item.ConditionItemModelProperty
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelCreationScope
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
@@ -309,24 +307,6 @@ object DefaultBlockOverlays {
      */
     val TRANSPARENT_BLOCK = hiddenItem("transparent_block") {
         model = buildModel { getModel("nova:block/transparent") }
-    }
-    
-    /**
-     * The overlay used for the [Waterloggable] behavior in case the block is entity-backed.
-     * * `customModelData.flags[0]`: true=fully submerged, false=partially submerged
-     * * `customModelData.colors[0]`: biome water tint
-     */
-    val WATERLOGGED = hiddenItem("waterlogged") {
-        model = condition(ConditionItemModelProperty.CustomModelData(0)) {
-            onTrue = model {
-                model = { getModel("block/waterlogged/full") }
-                tintSource[0] = TintSource.CustomModelData(Color.WHITE, 0)
-            }
-            onFalse = model {
-                model = { getModel("block/waterlogged/half") }
-                tintSource[0] = TintSource.CustomModelData(Color.WHITE, 0)
-            }
-        }
     }
     
 }
