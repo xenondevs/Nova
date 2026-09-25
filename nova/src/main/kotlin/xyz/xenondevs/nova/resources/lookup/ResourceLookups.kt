@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.item.Equipment
 import kotlin.reflect.typeOf
 
@@ -39,6 +40,18 @@ internal object ResourceLookups {
      */
     var blockModel: Map<ProtoBlockState, BlockModelProvider>
         by blockModelLookup
+    
+    /**
+     * Display models for vanilla block states whose pack models were hidden.
+     */
+    val vanillaBlockModelLookup: MutableProvider<Map<ProtoBlockState, DisplayEntityBlockModelProvider>> =
+        resourceLookup("vanilla_block_models", emptyMap())
+    
+    /**
+     * Map of vanilla block states to the display models used in place of their pack models.
+     */
+    var vanillaBlockModel: Map<ProtoBlockState, DisplayEntityBlockModelProvider>
+        by vanillaBlockModelLookup
     
     /**
      * Lookup containing texture and camera overlay locations for every [Equipment].

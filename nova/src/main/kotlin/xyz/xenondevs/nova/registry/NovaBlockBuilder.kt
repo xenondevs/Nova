@@ -89,7 +89,9 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
     )
     
     /**
-     * Configures the model and hitboxes and colliders of this entity-based block model via [modelSelector], [stateSelector], [extraColliderSelector] and [extraHitboxSelector].
+     * Configures the model, hitboxes and colliders of this entity-based block model via [modelSelector], [stateSelector], [extraColliderSelector] and [extraHitboxSelector].
+     * 
+     * If [eraseSelectedVanillaModels] is enabled, the states selected by [stateSelector] will be made invisible, making the vanilla blocks entity-backed as well.
      *
      * Entity-backed custom block models are less performant than state-backed models, but a lot more flexible:
      *
@@ -103,6 +105,7 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
      */
     fun entityBacked(
         stateSelector: BlockSelectorScope.() -> BlockData = DEFAULT_BLOCK_STATE_SELECTOR,
+        eraseSelectedVanillaModels: Boolean = false,
         extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube> = DEFAULT_EXTRA_COLLIDER_SELECTOR,
         extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid> = { extraColliderSelector().map(HitboxCuboid::fromCollider) },
         modelSelector: BlockModelSelectorScope.() -> ModelBuilder = DEFAULT_BLOCK_MODEL_SELECTOR
@@ -110,6 +113,8 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
     
     /**
      * Configures the model and hitboxes and colliders of this entity-based block model via [itemSelector], [stateSelector], [extraColliderSelector] and [extraHitboxSelector].
+     * 
+     * If [eraseSelectedVanillaModels] is enabled, the states selected by [stateSelector] will be made invisible, making the vanilla blocks entity-backed as well.
      *
      * Entity-backed custom block models based on custom item definitions are less performant than state-backed models, but a lot more flexible.
      * In contrast to [entityBacked], models defined via custom item definitions cannot benefit from display entity transformations, as some
@@ -126,6 +131,7 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
      */
     fun entityItemBacked(
         stateSelector: BlockSelectorScope.() -> BlockData = DEFAULT_BLOCK_STATE_SELECTOR,
+        eraseSelectedVanillaModels: Boolean = false,
         extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube> = DEFAULT_EXTRA_COLLIDER_SELECTOR,
         extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid> = { extraColliderSelector().map(HitboxCuboid::fromCollider) },
         itemSelector: ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit = DEFAULT_CONFIGURE_BLOCK_MODEL_SELECTOR

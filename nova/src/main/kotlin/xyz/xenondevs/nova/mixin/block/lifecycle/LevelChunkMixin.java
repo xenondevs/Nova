@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xyz.xenondevs.nova.world.block.NovaBlock;
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock;
 import xyz.xenondevs.nova.world.block.NovaTileEntityProxy;
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityModelProviderManager;
 import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntityManager;
 
 @Mixin(LevelChunk.class)
@@ -64,11 +65,18 @@ abstract class LevelChunkMixin {
         );
         
         if (oldBlock == newBlock) {
-            if (oldState != state && oldBlock instanceof NovaBlock novaBlock) {
-                novaBlock.nmsHandleStateChange(oldState, state, level, pos);
+            if (oldState != state) {
+                if (oldBlock instanceof NovaBlock novaBlock) {
+                    novaBlock.nmsHandleStateChange(oldState, state, level, pos);
+                } else {
+                    DisplayEntityModelProviderManager.updateVanillaModel(level, pos, oldState, state);
+                }
             }
             return;
         }
+        
+        if (!(oldBlock instanceof NovaBlock) && newBlock instanceof NovaBlock)
+            DisplayEntityModelProviderManager.updateVanillaModel(level, pos, oldState, state);
         
         if (oldBlock instanceof NovaTileEntityBlock oldNovaBlock) {
             oldNovaBlock.nmsHandleBreak(oldState, level, pos, state, (NovaTileEntityProxy) previousBlockEntity);
@@ -82,6 +90,9 @@ abstract class LevelChunkMixin {
         } else if (newBlock instanceof NovaBlock newNovaBlock) {
             newNovaBlock.nmsHandlePlace(state, level, pos, oldState);
         }
+        
+        if (!(newBlock instanceof NovaBlock))
+            DisplayEntityModelProviderManager.updateVanillaModel(level, pos, oldState, state);
         
     }
     

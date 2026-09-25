@@ -5,6 +5,8 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import io.papermc.paper.math.BlockPosition
 import io.papermc.paper.math.Position.block
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
@@ -21,6 +23,7 @@ import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldUnloadEvent
 import xyz.xenondevs.commons.collections.mapToIntArray
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -29,6 +32,8 @@ import xyz.xenondevs.nova.packetentity.PacketBlockDisplay
 import xyz.xenondevs.nova.packetentity.PacketInteraction
 import xyz.xenondevs.nova.packetentity.PacketItemDisplay
 import xyz.xenondevs.nova.packetentity.isGlowing
+import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.registerEvents
@@ -36,7 +41,7 @@ import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.pos
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicReference
@@ -191,11 +196,18 @@ internal class DisplayEntityModelProviderManager private constructor(private val
     }
     
     
-    @InternalInit(stage = InternalInitStage.POST_WORLD)
+    @InternalInit(stage = InternalInitStage.POST_WORLD, runAfter = [ResourceGeneration.PostWorld::class])
     companion object : Listener {
         
         private val managers = ConcurrentHashMap<World, DisplayEntityModelProviderManager>()
         private val fallingBlocks = HashMap<FallingBlock, DisplayEntityModelProviderManager>()
+        private val vanillaProviders: Provider<Map<BlockState, DisplayEntityBlockModelProvider>> =
+            ResourceLookups.vanillaBlockModelLookup.map { lookup ->
+                lookup.entries.associateTo(IdentityHashMap()) { [state, provider] -> state.toBlockState() to provider }
+            }
+        
+        @Volatile
+        private var ready = false
         
         @Volatile
         var colliderOutlinesEnabled = false
@@ -206,6 +218,7 @@ internal class DisplayEntityModelProviderManager private constructor(private val
         
         @InitFun
         private fun init() {
+            ready = true
             registerEvents()
             Bukkit.getWorlds().forEach { world ->
                 world.loadedChunks.forEach(::loadChunk)
@@ -241,6 +254,22 @@ internal class DisplayEntityModelProviderManager private constructor(private val
             get(block.world).remove(block(block.x, block.y, block.z))
         }
         
+        @JvmStatic
+        fun updateVanillaModel(level: ServerLevel, pos: BlockPos, oldState: BlockState, newState: BlockState) {
+            if (!ready)
+                return
+            val providers = vanillaProviders.get()
+            val oldProvider = providers[oldState]
+            val newProvider = providers[newState]
+            if (oldProvider === newProvider)
+                return
+            val world = level.world
+            val position = block(pos.x, pos.y, pos.z)
+            if (newProvider != null)
+                get(world).load(position, newProvider)
+            else get(world).remove(position)
+        }
+        
         fun getDisplayEntities(block: Block): List<PacketItemDisplay>? =
             managers[block.world]?.getDisplayEntities(block(block.x, block.y, block.z))
         
@@ -274,9 +303,10 @@ internal class DisplayEntityModelProviderManager private constructor(private val
         private fun loadChunk(chunk: Chunk) {
             val levelChunk = chunk.levelChunk
             val providerMaps = HashMap<NovaBlock, Map<BlockState, BlockModelProvider>>()
+            val vanillaProviderMap = vanillaProviders.get()
             
             fun getProvider(state: BlockState): DisplayEntityBlockModelProvider? {
-                val block = state.block as? NovaBlock ?: return null
+                val block = state.block as? NovaBlock ?: return vanillaProviderMap[state]
                 val providers = providerMaps.getOrPut(block) { block.modelProviders.get() }
                 return providers[state] as? DisplayEntityBlockModelProvider
             }

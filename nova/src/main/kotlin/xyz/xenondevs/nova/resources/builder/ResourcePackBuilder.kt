@@ -50,6 +50,7 @@ import xyz.xenondevs.nova.resources.builder.task.SoundOverridesContent
 import xyz.xenondevs.nova.resources.builder.task.TextureContent
 import xyz.xenondevs.nova.resources.builder.task.TextureIconContent
 import xyz.xenondevs.nova.resources.builder.task.TooltipStyleTask
+import xyz.xenondevs.nova.resources.builder.task.VanillaBlockModelOverrideTask
 import xyz.xenondevs.nova.resources.builder.task.WailaOverlayTextureTask
 import xyz.xenondevs.nova.resources.builder.task.WailaTask
 import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
@@ -164,6 +165,7 @@ class ResourcePackBuilder internal constructor(
                 registerTask(::WailaOverlayTextureTask)
                 registerTask(::WailaTask)
                 registerTask(::BlockModelTask)
+                registerTask(::VanillaBlockModelOverrideTask)
                 registerTask(::EntityVariantTask)
                 registerTask(::EquipmentTask)
                 registerTask(::ExtractTask)

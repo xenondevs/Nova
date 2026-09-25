@@ -56,6 +56,7 @@ internal object ResourceGeneration {
             resourcesHash = calculateResourcesHash()
             if (System.getProperty(FORCE_REBUILD_FLAG) != null
                 || PermanentStorage.retrieve<String>(RESOURCES_HASH) != resourcesHash
+                || !ResourceLookups.hasAll()
             ) {
                 // Build resource pack
                 LOGGER.info("Building resource pack(s)")

@@ -29,12 +29,14 @@ internal sealed interface BlockModelLayout {
     
     sealed interface EntityBacked : BlockModelLayout {
         val stateSelector: BlockSelectorScope.() -> BlockData
+        val eraseSelectedVanillaModels: Boolean
         val extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>
         val extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid>
     }
     
     class SimpleEntityBacked(
         override val stateSelector: BlockSelectorScope.() -> BlockData,
+        override val eraseSelectedVanillaModels: Boolean,
         override val extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>,
         override val extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid>,
         val modelSelector: BlockModelSelectorScope.() -> ModelBuilder
@@ -42,6 +44,7 @@ internal sealed interface BlockModelLayout {
     
     class ItemEntityBacked(
         override val stateSelector: BlockSelectorScope.() -> BlockData,
+        override val eraseSelectedVanillaModels: Boolean,
         override val extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>,
         override val extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid>,
         val definitionConfigurator: ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit
@@ -55,6 +58,7 @@ internal sealed interface BlockModelLayout {
         
         val DEFAULT = SimpleEntityBacked(
             DEFAULT_BLOCK_STATE_SELECTOR,
+            false,
             DEFAULT_EXTRA_COLLIDER_SELECTOR,
             { emptyList() },
             DEFAULT_BLOCK_MODEL_SELECTOR

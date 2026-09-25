@@ -30,6 +30,9 @@ import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuild
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.BlockModelTask
 import xyz.xenondevs.nova.serialization.kotlinx.BlockTypeEntrySerializer
+import xyz.xenondevs.nova.util.bukkitBlockData
+import xyz.xenondevs.nova.util.nmsBlock
+import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.nmsNoteBlockInstrument
 import xyz.xenondevs.nova.util.nmsPushReaction
 import xyz.xenondevs.nova.util.toNmsMapColor
@@ -45,6 +48,7 @@ import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorFactory
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.behavior.DefaultBlockBehavior
 import xyz.xenondevs.nova.world.block.behavior.DefaultTileEntityBlockBehavior
+import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
@@ -273,20 +277,22 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     
     override fun entityBacked(
         stateSelector: BlockSelectorScope.() -> BlockData,
+        eraseSelectedVanillaModels: Boolean,
         extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>,
         extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid>,
         modelSelector: BlockModelSelectorScope.() -> ModelBuilder
     ) {
-        layout = BlockModelLayout.SimpleEntityBacked(stateSelector, extraColliderSelector, extraHitboxSelector, modelSelector)
+        layout = BlockModelLayout.SimpleEntityBacked(stateSelector, eraseSelectedVanillaModels, extraColliderSelector, extraHitboxSelector, modelSelector)
     }
     
     override fun entityItemBacked(
         stateSelector: BlockSelectorScope.() -> BlockData,
+        eraseSelectedVanillaModels: Boolean,
         extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>,
         extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid>,
         itemSelector: ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit
     ) {
-        layout = BlockModelLayout.ItemEntityBacked(stateSelector, extraColliderSelector, extraHitboxSelector, itemSelector)
+        layout = BlockModelLayout.ItemEntityBacked(stateSelector, eraseSelectedVanillaModels, extraColliderSelector, extraHitboxSelector, itemSelector)
     }
     
     override fun modelLess(stateSelector: BlockSelectorScope.() -> BlockData) {
@@ -324,7 +330,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
 }
 
 @Serializable
-internal class ProtoBlockState(
+internal data class ProtoBlockState(
     @Serializable(with = BlockTypeEntrySerializer::class)
     val entry: RegistryEntry.Paper<BlockType>,
     val properties: Map<String, String>
@@ -337,7 +343,10 @@ internal class ProtoBlockState(
     fun <T : Comparable<T>> getOrThrow(property: BlockStateProperty<T>): T =
         get(property) ?: throw NoSuchElementException("Property $property not present")
     
-    fun toBlockState(defaultBlockState: BlockState): BlockState {
+    /**
+     * Converts this state to an NMS block state.
+     */
+    fun toBlockState(defaultBlockState: BlockState = entry.get().nmsBlock.defaultBlockState): BlockState {
         var blockState = defaultBlockState
         
         @Suppress("UNCHECKED_CAST")
@@ -352,7 +361,18 @@ internal class ProtoBlockState(
         return blockState
     }
     
+    /**
+     * Converts this state to Bukkit block data.
+     */
+    fun toBlockData(): BlockData = toBlockState().bukkitBlockData
+    
     companion object {
+        
+        /**
+         * Creates a proto block state from [blockData].
+         */
+        fun from(blockData: BlockData): ProtoBlockState =
+            ProtoBlockState(blockData.blockType.entry, blockData.nmsBlockState.toPropertyStringMap())
         
         fun createBlockStates(
             entry: RegistryEntry.Paper<BlockType>,
