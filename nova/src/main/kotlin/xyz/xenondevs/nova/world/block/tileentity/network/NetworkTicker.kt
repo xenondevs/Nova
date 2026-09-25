@@ -1,15 +1,14 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.bukkit.World
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.serverTick
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.Executors
+import java.util.concurrent.Phaser
 
 private val PARALLEL_TICKING by MAIN_CONFIG.entry<Boolean>("network", "parallel_ticking")
 
@@ -26,7 +25,7 @@ internal sealed interface NetworkTicker {
     val networks: Sequence<Network<*>>
     
     /**
-     * Replaces the networks to tick for [world] with [clusters]. Thread-safe.
+     * Queues a replacement of the networks to tick for [world] with [clusters]. Thread-safe.
      */
     fun submit(world: World, clusters: Iterable<NetworkCluster>)
     
@@ -52,12 +51,16 @@ internal sealed interface NetworkTicker {
     
 }
 
+private data class ClusterSubmission(val world: World, val clusters: Iterable<NetworkCluster>)
+
 /**
  * A [NetworkTicker] implementation for server software that has a single main thread.
  */
 private class PaperNetworkTicker : NetworkTicker {
     
-    private val worlds = ConcurrentHashMap<World, Iterable<NetworkCluster>>()
+    private val worlds = HashMap<World, Iterable<NetworkCluster>>()
+    private val pendingSubmissions = ConcurrentLinkedQueue<ClusterSubmission>()
+    private val executor = Executors.newWorkStealingPool()
     
     override val clusters: Sequence<NetworkCluster>
         get() = worlds.values.asSequence().flatten()
@@ -66,10 +69,16 @@ private class PaperNetworkTicker : NetworkTicker {
         get() = clusters.flatMap { cluster -> cluster.networks }
     
     override fun submit(world: World, clusters: Iterable<NetworkCluster>) {
-        worlds[world] = clusters
+        pendingSubmissions += ClusterSubmission(world, clusters)
     }
     
-    override fun tick() = runBlocking {
+    override fun tick() {
+        // apply pending submissions
+        while (true) {
+            val submission = pendingSubmissions.poll() ?: break
+            worlds[submission.world] = submission.clusters
+        }
+        
         val tick = serverTick
         
         if (PARALLEL_TICKING) {
@@ -80,7 +89,10 @@ private class PaperNetworkTicker : NetworkTicker {
     }
     
     private fun tickSequential(tick: Int) {
-        clusters.forEach { it.preTickSync(tick) }
+        clusters.forEach {
+            it.updateIsValid()
+            it.preTickSync(tick)
+        }
         clusters.forEach { cluster ->
             cluster.preTick(tick)
             cluster.tick(tick)
@@ -89,17 +101,37 @@ private class PaperNetworkTicker : NetworkTicker {
         clusters.forEach { it.postTickSync(tick) }
     }
     
-    private suspend fun tickParallel(tick: Int) {
-        clusters.forEach { it.preTickSync(tick) }
-        coroutineScope {
-            clusters.forEach { cluster ->
-                launch(Dispatchers.Default) {
-                    cluster.preTick(tick)
-                    cluster.tick(tick)
-                    cluster.postTick(tick)
+    private fun tickParallel(tick: Int) {
+        val completion = Phaser(1)
+        clusters.forEach { cluster ->
+            completion.register()
+            executor.execute {
+                try {
+                    cluster.updateIsValid()
+                } finally {
+                    completion.arriveAndDeregister()
                 }
             }
         }
+        completion.arriveAndAwaitAdvance()
+        
+        clusters.forEach { it.preTickSync(tick) }
+        
+        clusters.forEach { cluster ->
+            completion.register()
+            executor.execute {
+                try {
+                    cluster.preTick(tick)
+                    cluster.tick(tick)
+                    cluster.postTick(tick)
+                } catch (t: Throwable) {
+                    LOGGER.error("An exception occurred while ticking a network cluster", t)
+                } finally {
+                    completion.arriveAndDeregister()
+                }
+            }
+        }
+        completion.arriveAndAwaitAdvance()
         clusters.forEach { it.postTickSync(tick) }
     }
     

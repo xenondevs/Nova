@@ -17,7 +17,6 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     private val groups = networks.groupBy { it.type }
         .map { [type, networks] -> createGroup(type, networks) }
     
-    @Volatile
     private var isValid: Boolean = false
     
     init {
@@ -26,7 +25,6 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     }
     
     fun preTickSync(tick: Int) {
-        updateIsValid()
         tickNetworks(tick, NetworkGroup<*>::preTickSync)
     }
     
@@ -41,7 +39,7 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
         return (type as NetworkType<T>).createGroup(data)
     }
     
-    private fun updateIsValid() {
+    fun updateIsValid() {
         for (network in networks) {
             if (!network.isValid()) {
                 isValid = false
