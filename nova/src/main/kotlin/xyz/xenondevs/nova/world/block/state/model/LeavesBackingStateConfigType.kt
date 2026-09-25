@@ -171,3 +171,39 @@ internal class PaleOakLeavesBackingStateConfig(
         override val particleType = "pale_oak_leaves"
     }
 }
+
+internal class RedPoplarLeavesBackingStateConfig(
+    distance: Int,
+    persistent: Boolean,
+    waterlogged: Boolean
+) : LeavesBackingStateConfig(BlockTypeEntries.RED_POPLAR_LEAVES, distance, persistent, waterlogged) {
+    override val type = RedPoplarLeavesBackingStateConfig
+    
+    companion object : LeavesBackingStateConfigType<RedPoplarLeavesBackingStateConfig>(::RedPoplarLeavesBackingStateConfig, "red_poplar_leaves") {
+        override val particleType = "red_poplar_leaves"
+    }
+}
+
+internal class OrangePoplarLeavesBackingStateConfig(
+    distance: Int,
+    persistent: Boolean,
+    waterlogged: Boolean
+) : LeavesBackingStateConfig(BlockTypeEntries.ORANGE_POPLAR_LEAVES, distance, persistent, waterlogged) {
+    override val type = OrangePoplarLeavesBackingStateConfig
+    
+    companion object : LeavesBackingStateConfigType<OrangePoplarLeavesBackingStateConfig>(::OrangePoplarLeavesBackingStateConfig, "orange_poplar_leaves") {
+        override val particleType = "orange_poplar_leaves"
+    }
+}
+
+internal class YellowPoplarLeavesBackingStateConfig(
+    distance: Int,
+    persistent: Boolean,
+    waterlogged: Boolean
+) : LeavesBackingStateConfig(BlockTypeEntries.YELLOW_POPLAR_LEAVES, distance, persistent, waterlogged) {
+    override val type = YellowPoplarLeavesBackingStateConfig
+    
+    companion object : LeavesBackingStateConfigType<YellowPoplarLeavesBackingStateConfig>(::YellowPoplarLeavesBackingStateConfig, "yellow_poplar_leaves") {
+        override val particleType = "yellow_poplar_leaves"
+    }
+}

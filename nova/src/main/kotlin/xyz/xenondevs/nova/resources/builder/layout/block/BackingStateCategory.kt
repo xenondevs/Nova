@@ -18,10 +18,13 @@ import xyz.xenondevs.nova.world.block.state.model.MangroveLeavesBackingStateConf
 import xyz.xenondevs.nova.world.block.state.model.MushroomStemBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.OakLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.OrangePoplarLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.PaleOakLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.RedPoplarLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.SpruceLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.TripwireBackingStateConfigType
+import xyz.xenondevs.nova.world.block.state.model.YellowPoplarLeavesBackingStateConfig
 
 /**
  * Represent the different block types whose states can be used to display a custom block model.
@@ -64,9 +67,9 @@ enum class BackingStateCategory(
     ),
     
     /**
-     * The block model uses leave block states.
+     * The block model uses leaf block states.
      *
-     * - Limited to 153 different models
+     * - Limited to 182 different models
      * - Models can be transparent, translucent textures are disabled on "fancy" graphics setting
      * - Full block hitbox
      * - Full block collider
@@ -78,7 +81,8 @@ enum class BackingStateCategory(
         OakLeavesBackingStateConfig, SpruceLeavesBackingStateConfig, BirchLeavesBackingStateConfig,
         JungleLeavesBackingStateConfig, AcaciaLeavesBackingStateConfig, DarkOakLeavesBackingStateConfig,
         MangroveLeavesBackingStateConfig, AzaleaLeavesBackingStateConfig, FloweringAzaleaLeavesBackingStateConfig,
-        CherryLeavesBackingStateConfig, PaleOakLeavesBackingStateConfig
+        CherryLeavesBackingStateConfig, PaleOakLeavesBackingStateConfig,
+        RedPoplarLeavesBackingStateConfig, OrangePoplarLeavesBackingStateConfig, YellowPoplarLeavesBackingStateConfig
     ),
     
     /**
