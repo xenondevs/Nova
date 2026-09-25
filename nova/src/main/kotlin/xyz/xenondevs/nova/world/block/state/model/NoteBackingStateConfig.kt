@@ -40,7 +40,7 @@ internal data class NoteBackingStateConfig(
         require(note in 0..24)
     }
     
-    companion object : DynamicDefaultingBackingStateConfigType<NoteBackingStateConfig>(2024, "note_block") {
+    companion object : DynamicDefaultingBackingStateConfigType<NoteBackingStateConfig>(1349, "note_block") {
         
         override val properties = hashSetOf("instrument", "note", "powered")
         override val isWaterloggable = false

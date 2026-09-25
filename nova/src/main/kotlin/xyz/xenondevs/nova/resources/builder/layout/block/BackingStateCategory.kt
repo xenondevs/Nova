@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.resources.builder.layout.block
 
-import xyz.xenondevs.nova.world.*
-
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
 import xyz.xenondevs.commons.provider.Provider
@@ -39,7 +37,7 @@ enum class BackingStateCategory(
     /**
      * The block model uses note block states.
      *
-     * - Limited to 2024 different models
+     * - Limited to 1349 different models
      * - Models cannot be transparent
      * - Full block hitbox
      * - Full block collider
