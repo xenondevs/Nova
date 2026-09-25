@@ -5,6 +5,7 @@ import org.bukkit.block.data.BlockData
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.world.block.ColliderCube
+import xyz.xenondevs.nova.world.block.HitboxCuboid
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
 
 internal val DEFAULT_BLOCK_STATE_SELECTOR: BlockSelectorScope.() -> BlockData = { BlockType.BARRIER.createBlockData() }
@@ -27,17 +28,20 @@ internal sealed interface BlockModelLayout {
     sealed interface EntityBacked : BlockModelLayout {
         val stateSelector: BlockSelectorScope.() -> BlockData
         val extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>
+        val extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid>
     }
     
     class SimpleEntityBacked(
         override val stateSelector: BlockSelectorScope.() -> BlockData,
         override val extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>,
+        override val extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid>,
         val modelSelector: BlockModelSelectorScope.() -> ModelBuilder
     ) : EntityBacked
     
     class ItemEntityBacked(
         override val stateSelector: BlockSelectorScope.() -> BlockData,
         override val extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>,
+        override val extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid>,
         val definitionConfigurator: ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit
     ) : EntityBacked
     
@@ -50,6 +54,7 @@ internal sealed interface BlockModelLayout {
         val DEFAULT = SimpleEntityBacked(
             DEFAULT_BLOCK_STATE_SELECTOR,
             DEFAULT_EXTRA_COLLIDER_SELECTOR,
+            { emptyList() },
             DEFAULT_BLOCK_MODEL_SELECTOR
         )
         

@@ -132,6 +132,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
                     blockState[WATERLOGGED] == true,
                     assignModelToItem(modelBuilder),
                     provider { DEFAULT_BLOCK_STATE_SELECTOR(scope) },
+                    emptyList(),
                     emptyList()
                 )
                 lookup[blockState] = DisplayEntityBlockModelProvider(data)
@@ -149,7 +150,8 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
                 blockState[WATERLOGGED] == true,
                 models,
                 provider { layout.stateSelector(scope) },
-                layout.extraColliderSelector(scope)
+                layout.extraColliderSelector(scope),
+                layout.extraHitboxSelector(scope)
             )
             lookup[blockState] = DisplayEntityBlockModelProvider(data)
             soundOverridesContent.useBlockData(data.colliderProvider)

@@ -28,6 +28,8 @@ import org.joml.Matrix4fc
 import org.joml.Vector2d
 import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
 import xyz.xenondevs.nova.network.packet.ClientboundSetPassengersPacket
 import xyz.xenondevs.nova.network.packetHandler
 import xyz.xenondevs.nova.network.send
@@ -35,10 +37,12 @@ import xyz.xenondevs.nova.packetentity.ItemDisplayMetadata
 import xyz.xenondevs.nova.packetentity.PacketBlockDisplay
 import xyz.xenondevs.nova.packetentity.PacketEntityPassengersDsl
 import xyz.xenondevs.nova.packetentity.PacketEntityVisibility
+import xyz.xenondevs.nova.packetentity.PacketInteraction
 import xyz.xenondevs.nova.packetentity.PacketItemDisplay
 import xyz.xenondevs.nova.packetentity.isGlowing
 import xyz.xenondevs.nova.packetentity.isInvisible
 import xyz.xenondevs.nova.packetentity.packetBlockDisplay
+import xyz.xenondevs.nova.packetentity.packetInteraction
 import xyz.xenondevs.nova.packetentity.packetItemDisplay
 import xyz.xenondevs.nova.packetentity.transform
 import xyz.xenondevs.nova.serialization.kotlinx.DisplayEntityBlockModelDataSerializer
@@ -49,7 +53,8 @@ import xyz.xenondevs.nova.util.item.requiresLight
 import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.nmsDirection
 import xyz.xenondevs.nova.world.block.ColliderCube
-import java.util.UUID
+import xyz.xenondevs.nova.world.block.HitboxCuboid
+import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 @Serializable(DisplayEntityBlockModelDataSerializer::class)
@@ -57,7 +62,8 @@ internal class DisplayEntityBlockModelData(
     val waterlogged: Boolean,
     val models: List<Model>,
     val colliderProvider: Provider<BlockData>,
-    val extraColliders: List<ColliderCube>
+    val extraColliders: List<ColliderCube>,
+    val extraHitboxes: List<HitboxCuboid>
 ) {
     
     val collider: BlockData by colliderProvider
@@ -185,72 +191,96 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         colliderPosition: Location,
         cube: ColliderCube
     ) = shulker {
-        val x = pos.blockX()
-        val y = pos.blockY()
-        val z = pos.blockZ()
-        val nmsPos = BlockPos(x, y, z)
+        val hitbox = HitboxCuboid.fromCollider(cube)
         attributes[Attribute.SCALE] by cube.size
-        
         metadata {
             isGlowing by DisplayEntityModelProviderManager.colliderOutlinesEnabled
             isInvisible by true
         }
-        
-        onAttackAsync { event ->
-            event.isCancelled = true
-            
-            val player = event.player
-            val eye = player.eyeLocation
-            val direction = eye.direction
-            val distances = Vector2d()
-            val hit = Intersectiond.intersectRayAab(
-                eye.x, eye.y, eye.z,
-                direction.x, direction.y, direction.z,
-                x + cube.minX, y + cube.minY, z + cube.minZ,
-                x + cube.maxX, y + cube.maxY, z + cube.maxZ,
-                distances
-            )
-            if (!hit)
-                return@onAttackAsync
-            
-            val distance = if (distances.x >= 0.0) distances.x else distances.y
-            val hitDirection = BlockFaceUtils.determineBlockFace(
-                eye.x + direction.x * distance - x - cube.centerX,
-                eye.y + direction.y * distance - y - cube.centerY,
-                eye.z + direction.z * distance - z - cube.centerZ
-            ).nmsDirection
-            
-            val packet = ServerboundPlayerActionPacket(START_DESTROY_BLOCK, nmsPos, hitDirection, 0)
-            player.packetHandler?.injectIncoming(packet)
-        }
-        
-        onInteractAsync { event ->
-            event.isCancelled = true
-            // Only main hand packet is relevant. This starts the consistent use loop.
-            if (event.hand != InteractionHand.MAIN_HAND)
-                return@onInteractAsync
-            
-            val player = event.player
-            val relativeHit = event.location
-            val hitLocation = Vec3(
-                colliderPosition.x + relativeHit.x(),
-                colliderPosition.y + relativeHit.y(),
-                colliderPosition.z + relativeHit.z()
-            )
-            val hitResult = BlockHitResult(
-                hitLocation,
-                BlockFaceUtils.determineBlockFace(
-                    relativeHit.x(),
-                    relativeHit.y() - cube.size / 2.0,
-                    relativeHit.z()
-                ).nmsDirection,
-                nmsPos,
-                false
-            )
-            val packet = ServerboundUseItemOnPacket(InteractionHand.MAIN_HAND, hitResult, 0, System.currentTimeMillis())
-            player.packetHandler?.injectIncoming(packet)
-        }
+        onAttackAsync { event -> handleColliderAttack(event, pos, hitbox) }
+        onInteractAsync { event -> handleColliderInteract(event, pos, colliderPosition, hitbox) }
     }
+    
+    internal fun createInteractionEntities(world: World, pos: BlockPosition): List<PacketInteraction> =
+        info.extraHitboxes.map { hitbox ->
+            val hitboxPosition = Location(world, pos.blockX() + hitbox.centerX, pos.blockY() + hitbox.minY, pos.blockZ() + hitbox.centerZ)
+            packetInteraction {
+                location by hitboxPosition
+                metadata {
+                    width by hitbox.width.toFloat()
+                    height by hitbox.height.toFloat()
+                }
+                onAttackAsync { event -> handleColliderAttack(event, pos, hitbox) }
+                onInteractAsync { event -> handleColliderInteract(event, pos, hitboxPosition, hitbox) }
+            }.apply { spawn() }
+        }
+    
+    private fun handleColliderAttack(event: ServerboundAttackPacketEvent, pos: BlockPosition, hitbox: HitboxCuboid) {
+        event.isCancelled = true
+        
+        val x = pos.blockX()
+        val y = pos.blockY()
+        val z = pos.blockZ()
+        val player = event.player
+        val eye = player.eyeLocation
+        val direction = eye.direction
+        val distances = Vector2d()
+        val hit = Intersectiond.intersectRayAab(
+            eye.x, eye.y, eye.z,
+            direction.x, direction.y, direction.z,
+            x + hitbox.minX, y + hitbox.minY, z + hitbox.minZ,
+            x + hitbox.maxX, y + hitbox.maxY, z + hitbox.maxZ,
+            distances
+        )
+        if (!hit)
+            return
+        
+        val distance = if (distances.x >= 0.0) distances.x else distances.y
+        val hitDirection = determineHitboxFace(
+            eye.x + direction.x * distance - x - hitbox.centerX,
+            eye.y + direction.y * distance - y - hitbox.centerY,
+            eye.z + direction.z * distance - z - hitbox.centerZ,
+            hitbox
+        )
+        
+        val packet = ServerboundPlayerActionPacket(START_DESTROY_BLOCK, BlockPos(x, y, z), hitDirection, 0)
+        player.packetHandler?.injectIncoming(packet)
+    }
+    
+    private fun handleColliderInteract(
+        event: ServerboundInteractPacketEvent,
+        pos: BlockPosition,
+        entityPosition: Location,
+        hitbox: HitboxCuboid
+    ) {
+        event.isCancelled = true
+        // Only main hand packet is relevant. This starts the consistent use loop.
+        if (event.hand != InteractionHand.MAIN_HAND)
+            return
+        
+        val relativeHit = event.location
+        val hitLocation = Vec3(
+            entityPosition.x + relativeHit.x(),
+            entityPosition.y + relativeHit.y(),
+            entityPosition.z + relativeHit.z()
+        )
+        val hitResult = BlockHitResult(
+            hitLocation,
+            determineHitboxFace(
+                relativeHit.x(),
+                relativeHit.y() - hitbox.height / 2.0,
+                relativeHit.z(),
+                hitbox
+            ),
+            BlockPos(pos.blockX(), pos.blockY(), pos.blockZ()),
+            false
+        )
+        val packet = ServerboundUseItemOnPacket(InteractionHand.MAIN_HAND, hitResult, 0, System.currentTimeMillis())
+        event.player.packetHandler?.injectIncoming(packet)
+    }
+    
+    private fun determineHitboxFace(x: Double, y: Double, z: Double, hitbox: HitboxCuboid) =
+        BlockFaceUtils.determineBlockFace(x / hitbox.width, y / hitbox.height, z / hitbox.width).nmsDirection
     
     private fun setMetadata(data: ItemDisplayMetadata, model: DisplayEntityBlockModelData.Model) {
         // TODO: proper light level

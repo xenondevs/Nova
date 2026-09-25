@@ -36,6 +36,7 @@ import xyz.xenondevs.nova.util.toNmsMapColor
 import xyz.xenondevs.nova.util.toPropertyStringMap
 import xyz.xenondevs.nova.util.toResourceKey
 import xyz.xenondevs.nova.world.block.ColliderCube
+import xyz.xenondevs.nova.world.block.HitboxCuboid
 import xyz.xenondevs.nova.world.block.FluidFlowMode
 import xyz.xenondevs.nova.world.block.NoteBlockInstrument
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -272,17 +273,19 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     override fun entityBacked(
         stateSelector: BlockSelectorScope.() -> BlockData,
         extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>,
+        extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid>,
         modelSelector: BlockModelSelectorScope.() -> ModelBuilder
     ) {
-        layout = BlockModelLayout.SimpleEntityBacked(stateSelector, extraColliderSelector, modelSelector)
+        layout = BlockModelLayout.SimpleEntityBacked(stateSelector, extraColliderSelector, extraHitboxSelector, modelSelector)
     }
     
     override fun entityItemBacked(
         stateSelector: BlockSelectorScope.() -> BlockData,
         extraColliderSelector: BlockSelectorScope.() -> List<ColliderCube>,
+        extraHitboxSelector: BlockSelectorScope.() -> List<HitboxCuboid>,
         itemSelector: ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit
     ) {
-        layout = BlockModelLayout.ItemEntityBacked(stateSelector, extraColliderSelector, itemSelector)
+        layout = BlockModelLayout.ItemEntityBacked(stateSelector, extraColliderSelector, extraHitboxSelector, itemSelector)
     }
     
     override fun modelLess(stateSelector: BlockSelectorScope.() -> BlockData) {

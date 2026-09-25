@@ -26,11 +26,11 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.packetentity.PacketBlockDisplay
+import xyz.xenondevs.nova.packetentity.PacketInteraction
 import xyz.xenondevs.nova.packetentity.PacketItemDisplay
 import xyz.xenondevs.nova.packetentity.isGlowing
 import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.nmsEntity
-import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.ChunkPos
@@ -44,12 +44,14 @@ import java.util.concurrent.atomic.AtomicReference
 private class DisplayEntities(
     val provider: DisplayEntityBlockModelProvider,
     val displayEntities: List<PacketItemDisplay>,
-    val colliderEntities: List<PacketBlockDisplay>
+    val colliderEntities: List<PacketBlockDisplay>,
+    val interactionEntities: List<PacketInteraction>
 ) {
     
     fun despawn() {
         displayEntities.forEach(PacketItemDisplay::despawn)
         colliderEntities.forEach(PacketBlockDisplay::despawn)
+        interactionEntities.forEach(PacketInteraction::despawn)
     }
     
 }
@@ -113,7 +115,13 @@ internal class DisplayEntityModelProviderManager private constructor(private val
             previous?.colliderEntities?.forEach(PacketBlockDisplay::despawn)
             provider.createColliderEntities(world, pos)
         }
-        val entities = DisplayEntities(provider, displays, colliders)
+        val interactions = if (previous?.provider?.info?.extraHitboxes == provider.info.extraHitboxes) {
+            previous.interactionEntities
+        } else {
+            previous?.interactionEntities?.forEach(PacketInteraction::despawn)
+            provider.createInteractionEntities(world, pos)
+        }
+        val entities = DisplayEntities(provider, displays, colliders, interactions)
         blocks[pos] = entities
         displayEntities[pos] = entities.displayEntities.toList()
     }
