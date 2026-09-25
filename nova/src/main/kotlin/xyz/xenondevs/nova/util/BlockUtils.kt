@@ -28,6 +28,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
+import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
@@ -117,6 +118,12 @@ val Block.center: Location
  */
 val Block.novaSoundGroup: SoundGroup
     get() = SoundGroup.from(nmsBlockState.soundType)
+
+/**
+ * The water color of the biome at this block's position.
+ */
+val Block.waterColor: Color
+    get() = Color.fromARGB(world.serverLevel.getBiome(nmsPos).value().waterColor)
 
 @Deprecated("Use Bukkit equivalent", ReplaceWith("getRelative(x, y, z)"))
 fun Block.add(x: Int, y: Int, z: Int): Block =
