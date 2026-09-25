@@ -36,8 +36,8 @@ import xyz.xenondevs.nova.util.toNmsMapColor
 import xyz.xenondevs.nova.util.toPropertyStringMap
 import xyz.xenondevs.nova.util.toResourceKey
 import xyz.xenondevs.nova.world.block.ColliderCube
-import xyz.xenondevs.nova.world.block.HitboxCuboid
 import xyz.xenondevs.nova.world.block.FluidFlowMode
+import xyz.xenondevs.nova.world.block.HitboxCuboid
 import xyz.xenondevs.nova.world.block.NoteBlockInstrument
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
@@ -266,6 +266,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         layout = BlockModelLayout.StateBacked(
             priority,
             listOf(category, *categories).flatMap { it.backingStateConfigTypes },
+            category.fallbackCollider,
             modelSelector
         )
     }

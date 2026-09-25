@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.resources.builder.layout.block
 
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.world.block.ColliderCube
@@ -17,6 +18,7 @@ internal sealed interface BlockModelLayout {
     class StateBacked(
         val priority: Int,
         val configTypes: List<BackingStateConfigType<*>>,
+        val fallbackCollider: Provider<BlockData>,
         val modelSelector: BlockModelSelectorScope.() -> ModelBuilder
     ) : BlockModelLayout {
         

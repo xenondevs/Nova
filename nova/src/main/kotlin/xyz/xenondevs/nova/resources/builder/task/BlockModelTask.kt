@@ -21,7 +21,6 @@ import xyz.xenondevs.nova.resources.builder.data.ParticleDefinition
 import xyz.xenondevs.nova.resources.builder.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
-import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_STATE_SELECTOR
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
@@ -131,7 +130,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
                 val data = DisplayEntityBlockModelData(
                     blockState[WATERLOGGED] == true,
                     assignModelToItem(modelBuilder),
-                    provider { DEFAULT_BLOCK_STATE_SELECTOR(scope) },
+                    layout.fallbackCollider,
                     emptyList(),
                     emptyList()
                 )
