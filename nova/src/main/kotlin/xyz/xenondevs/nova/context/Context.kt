@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.context
 
-import xyz.xenondevs.nova.context.Context.Companion.intention
-
 /**
  * A context maps [ContextParamTypes][ContextParamType] to a values.
  * Each context has an [intention] that defines which parameters are allowed and required.
@@ -30,7 +28,7 @@ interface Context<I : ContextIntention<I>> {
     /**
      * Returns the value of the given [paramType].
      * 
-     * @throws IllegalArgumentException If [paramType] is not a [ContextIntention.required] param type of [intention].
+     * @throws IllegalArgumentException If [paramType] is not a required param type of [intention].
      */
     operator fun <V : Any> get(paramType: RequiredContextParamType<V, I>): V
     

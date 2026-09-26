@@ -1,13 +1,10 @@
 package xyz.xenondevs.nova.context
 
-import xyz.xenondevs.commons.collections.removeIf
-
 internal class ContextImpl<I : ContextIntention<I>> private constructor(
     override val intention: I,
-    private val explicitParams: Map<ContextParamType<*, I>, Any>,
+    private val params: Array<Any?>,
+    private val explicitParams: Array<Any?>,
 ) : Context<I> {
-    
-    private val resolvedParams: MutableMap<ContextParamType<*, I>, Any?> = HashMap()
     
     override operator fun <V : Any> get(paramType: ContextParamType<V, I>): V? =
         getParam(paramType)?.let { paramType.copy(it) }
@@ -16,107 +13,82 @@ internal class ContextImpl<I : ContextIntention<I>> private constructor(
         paramType.copy(getParam(paramType) ?: paramType.default)
     
     override operator fun <V : Any> get(paramType: RequiredContextParamType<V, I>): V {
-        val result = getParam(paramType)?.let { paramType.copy(it) }
-        if (result == null) {
-            require(paramType in intention.required) { "$paramType is not registered as required in $intention" }
-            throw AssertionError() // otherwise, presence should be verified on .build()
-        }
-        return result
+        val result = requireNotNull(getParam(paramType)) { "$paramType is/was not registered as required in $intention" }
+        return paramType.copy(result)
     }
     
     @Suppress("UNCHECKED_CAST")
-    private fun <V : Any> getParam(paramType: ContextParamType<V, I>): V? {
-        if (paramType in explicitParams)
-            return explicitParams[paramType] as V?
-        
-        if (paramType in resolvedParams)
-            return resolvedParams[paramType] as V?
-        
-        return resolveParam(paramType)
-    }
+    private fun <V : Any> getParam(paramType: ContextParamType<V, I>): V? =
+        params.getOrNull(paramType.id) as V?
     
-    private fun <V : Any> resolveParam(paramType: ContextParamType<V, I>): V? {
-        if (paramType in explicitParams)
-            throw IllegalStateException("Context parameter $paramType is already set")
-        if (paramType in resolvedParams)
-            throw IllegalStateException("Context parameter $paramType is already resolved")
-        
-        // preemptively set this to null to prevent recursive call chains
-        resolvedParams[paramType] = null
-        
-        // try to resolve value through autofillers
-        val autofillers = intention.getAutofillers(paramType)
-        var value: V? = null
-        for (autofiller in autofillers) {
-            when (autofiller) {
-                is Autofiller.FromParams -> {
-                    val requiredParamTypes = autofiller.requiredParamTypes
-                    
-                    // load params required by autofiller
-                    val requiredParamValues = Array(requiredParamTypes.size) {
-                        getParam(requiredParamTypes[it])
-                            ?: continue
-                    }
-                    
-                    // run autofiller function
-                    value = autofiller.fill(requiredParamValues)
-                        ?: continue
-                    
-                    paramType.validate(value)
-                    break
-                }
-                is Autofiller.FromContext -> {
-                    value = autofiller.fill(this)
-                        ?: continue
-                    paramType.validate(value)
-                    break
-                }
-            }
-        }
-        
-        // otherwise, use default value if present
-        if (value == null && paramType is DefaultingContextParamType)
-            value = paramType.default
-        
-        resolvedParams[paramType] = value
-        
-        // remove all remembered resolve failures as they may succeed now that a new value is available
-        if (value != null)
-            resolvedParams.removeIf { it.value == null }
-        
-        return value
-    }
-    
-    override fun toBuilder(): Context.Builder<I> {
-        return Builder(intention, HashMap(explicitParams))
-    }
+    override fun toBuilder(): Context.Builder<I> =
+        Builder(intention, explicitParams.copyOf(intention.paramTypes.size))
     
     class Builder<I : ContextIntention<I>> internal constructor(
         private val intention: I,
-        private val explicitParams: MutableMap<ContextParamType<*, I>, Any> = HashMap()
+        private val explicitParams: Array<Any?> = arrayOfNulls(intention.paramTypes.size)
     ) : Context.Builder<I> {
         
         override fun <V : Any> param(paramType: ContextParamType<V, I>, value: V?): Builder<I> {
-            if (value == null) {
-                explicitParams.remove(paramType)
-            } else {
-                paramType.validate(value)
-                explicitParams[paramType] = paramType.copy(value)
-            }
-            
+            if (value != null)
+                require(paramType.validate(value)) { "Invalid value $value for context parameter ${paramType.id}" }
+            explicitParams[paramType.id] = value
             return this
         }
         
         override fun build(): Context<I> {
-            val context = ContextImpl(intention, HashMap(explicitParams))
+            return ContextImpl(
+                intention = intention,
+                params = Session().resolveAndValidate(),
+                explicitParams = explicitParams.clone()
+            )
+        }
+        
+        private inner class Session : ContextParamResolver<I> {
             
-            // verify presence of all required params
-            for (requiredParam in intention.required) {
-                if (context.getParam(requiredParam) == null)
-                    throw IllegalStateException("Required context parameter $requiredParam is not present")
+            private val resolvedParams = explicitParams.clone()
+            private val inProgress = BooleanArray(resolvedParams.size)
+            
+            @Suppress("UNCHECKED_CAST")
+            override fun <V : Any> resolve(paramType: ContextParamType<V, I>): V? {
+                val id = paramType.id
+                val existingValue = resolvedParams[id]
+                if (existingValue != null)
+                    return existingValue as V
+                if (inProgress[id])
+                    return null
+                
+                inProgress[id] = true
+                try {
+                    for (autofiller in intention.getAutofillers(paramType)) {
+                        val value = autofiller.fill(this)
+                            ?: continue
+                        check(paramType.validate(value)) { "Autofiller produced invalid value $value for context parameter $id" }
+                        resolvedParams[id] = value
+                        return value
+                    }
+                    return null
+                } finally {
+                    inProgress[id] = false
+                }
             }
             
-            return context
+            fun resolveAndValidate(): Array<Any?> {
+                while (true) {
+                    val resolvedBefore = resolvedParams.count { it != null }
+                    for (paramType in intention.paramTypes)
+                        resolve(paramType)
+                    if (resolvedParams.count { it != null } == resolvedBefore)
+                        break
+                }
+                
+                for (paramType in intention.requiredParamTypes) {
+                    if (resolvedParams[paramType.id] == null)
+                        throw IllegalStateException("Required context parameter $paramType is not present")
+                }
+                return resolvedParams
+            }
+            
         }
         
     }

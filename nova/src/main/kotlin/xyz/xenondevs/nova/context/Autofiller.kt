@@ -1,44 +1,44 @@
 package xyz.xenondevs.nova.context
 
-import xyz.xenondevs.commons.reflection.call
+/**
+ * The scope with which an [Autofiller] is executed. Allows resolving other param types.
+ */
+interface ContextParamResolver<I : ContextIntention<I>> {
+    
+    /**
+     * Resolves [paramType] through explicit values or autofillers, returning `null` if unavailable.
+     * Default values are not available to autofillers.
+     */
+    fun <V : Any> resolve(paramType: ContextParamType<V, I>): V?
+    
+}
 
 /**
  * Infers context values from other context values.
  */
-sealed interface Autofiller<out V, I : ContextIntention<I>> {
+fun interface Autofiller<out V, I : ContextIntention<I>> {
     
     /**
-     * Infer a context value from an explicit set of other parameter types.
+     * Fills the value [V] based on the existing values resolvable through [ctx].
      */
-    interface FromParams<out V, I : ContextIntention<I>> : Autofiller<V, I> {
-        
-        /**
-         * The context parameters types required by this autofiller to create a value of type [V].
-         */
-        val requiredParamTypes: List<ContextParamType<*, I>>
-        
-        /**
-         * Generates a value of type [V] based on [values], which is expected to be an
-         * array with the same length as [requiredParamTypes], where each entry corresponds to the
-         * value of the parameter type at the same index in [requiredParamTypes].
-         */
-        fun fill(values: Array<Any>): V?
-        
-    }
-    
-    /**
-     * Infers a context value using the entire context.
-     */
-    interface FromContext<out V, I : ContextIntention<I>> : Autofiller<V, I> {
-        
-        /**
-         * Generates a value of type [V] based on the given [context].
-         */
-        fun fill(context: Context<I>): V?
-        
-    }
+    fun fill(ctx: ContextParamResolver<I>): V?
     
     companion object {
+        
+        /**
+         * Creates an [Autofiller] that generates a value of type [V] using [fillValue] and
+         * values available through the provided [ContextParamResolver].
+         */
+        fun <V : Any, I : ContextIntention<I>> dynamic(
+            fillValue: ContextParamResolver<I>.() -> V?
+        ): Autofiller<V, I> = Autofiller { ctx -> ctx.fillValue() }
+        
+        /**
+         * Creates an [Autofiller] that generates a value of type [V] using [fillValue].
+         */
+        fun <V : Any, I : ContextIntention<I>> from(
+            fillValue: () -> V?
+        ): Autofiller<V, I> = Autofiller { fillValue() } 
         
         /**
          * Creates an [Autofiller] that uses [paramTypeA] to generate a value
@@ -47,8 +47,10 @@ sealed interface Autofiller<out V, I : ContextIntention<I>> {
         fun <V : Any, A : Any, I : ContextIntention<I>> from(
             paramTypeA: ContextParamType<A, I>,
             fillValue: (A) -> V?
-        ): Autofiller<V, I> = from(listOf(paramTypeA), fillValue)
-        
+        ): Autofiller<V, I> = Autofiller { ctx ->
+            val a = ctx.resolve(paramTypeA) ?: return@Autofiller null
+            fillValue(a)
+        }
         /**
          * Creates an [Autofiller] that uses [paramTypeA] and [paramTypeB] to
          * generate a value of type [V] using [fillValue].
@@ -57,8 +59,11 @@ sealed interface Autofiller<out V, I : ContextIntention<I>> {
             paramTypeA: ContextParamType<A, I>,
             paramTypeB: ContextParamType<B, I>,
             fillValue: (A, B) -> V?
-        ): Autofiller<V, I> = from(listOf(paramTypeA, paramTypeB), fillValue)
-        
+        ): Autofiller<V, I> = Autofiller { ctx ->
+            val a = ctx.resolve(paramTypeA) ?: return@Autofiller null
+            val b = ctx.resolve(paramTypeB) ?: return@Autofiller null
+            fillValue(a, b)
+        }
         /**
          * Creates an [Autofiller] that uses [paramTypeA], [paramTypeB] and
          * [paramTypeC] to generate a value of type [V] using [fillValue].
@@ -68,8 +73,12 @@ sealed interface Autofiller<out V, I : ContextIntention<I>> {
             paramTypeB: ContextParamType<B, I>,
             paramTypeC: ContextParamType<C, I>,
             fillValue: (A, B, C) -> V?
-        ): Autofiller<V, I> = from(listOf(paramTypeA, paramTypeB, paramTypeC), fillValue)
-        
+        ): Autofiller<V, I> = Autofiller { ctx ->
+            val a = ctx.resolve(paramTypeA) ?: return@Autofiller null
+            val b = ctx.resolve(paramTypeB) ?: return@Autofiller null
+            val c = ctx.resolve(paramTypeC) ?: return@Autofiller null
+            fillValue(a, b, c)
+        }
         /**
          * Creates an [Autofiller] that uses [paramTypeA], [paramTypeB], [paramTypeC]
          * and [paramTypeD] to generate a value of type [V] using [fillValue].
@@ -80,29 +89,14 @@ sealed interface Autofiller<out V, I : ContextIntention<I>> {
             paramTypeC: ContextParamType<C, I>,
             paramTypeD: ContextParamType<D, I>,
             fillValue: (A, B, C, D) -> V?
-        ): Autofiller<V, I> = from(listOf(paramTypeA, paramTypeB, paramTypeC, paramTypeD), fillValue)
-        
-        /**
-         * Creates an [Autofiller] that uses the entire context to generate a value of type [V] using [fillValue].
-         */
-        fun <V : Any, I : ContextIntention<I>> fromContext(
-            fillValue: (Context<I>) -> V?
-        ): Autofiller<V, I> = object : FromContext<V, I> {
-            override fun fill(context: Context<I>) = fillValue.call(context)
-            override fun toString() = "Autofiller(context)"
-        }
-        
-        private fun <V : Any, I : ContextIntention<I>> from(
-            paramTypes: List<ContextParamType<*, I>>,
-            fillValue: Function<V?>,
-            vararg lazyParamTypes: () -> ContextParamType<*, I>
-        ) = object : FromParams<V, I> {
-            override val requiredParamTypes = paramTypes
-            override fun fill(values: Array<Any>): V? = fillValue.call(*values)
-            override fun toString() = "Autofiller(${requiredParamTypes.joinToString()})"
+        ): Autofiller<V, I> = Autofiller { ctx ->
+            val a = ctx.resolve(paramTypeA) ?: return@Autofiller null
+            val b = ctx.resolve(paramTypeB) ?: return@Autofiller null
+            val c = ctx.resolve(paramTypeC) ?: return@Autofiller null
+            val d = ctx.resolve(paramTypeD) ?: return@Autofiller null
+            fillValue(a, b, c, d)
         }
         
     }
     
 }
-

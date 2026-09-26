@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.api.material.NovaMaterial
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
-import xyz.xenondevs.nova.context.intention.HasOptionalSource
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.blockType
@@ -39,12 +38,19 @@ internal object ApiBlockManager : IBlockManager {
     
     override fun placeBlock(location: Location, block: INovaBlock, source: Any?, playSound: Boolean) {
         require(block is ApiBlockWrapper) { "block must be ApiBlockWrapper" }
+        val targetBlock = location.block
         
         val ctxBuilder = Context.intention(BlockPlace)
-            .param(BlockPlace.BLOCK, location.block)
+            .param(BlockPlace.BLOCK, targetBlock)
             .param(BlockPlace.BLOCK_TYPE, block.block.entry.get())
+            .param(BlockPlace.PREVIOUS_BLOCK_STATE, targetBlock.blockData)
             .param(BlockPlace.BLOCK_PLACE_EFFECTS, playSound)
-        setSourceParam(ctxBuilder, source)
+        when (source) {
+            is Entity -> ctxBuilder.param(BlockPlace.SOURCE_ENTITY, source)
+            is ApiTileEntityWrapper -> ctxBuilder.param(BlockPlace.SOURCE_TILE_ENTITY, source.tileEntity)
+            is Location -> ctxBuilder.param(BlockPlace.SOURCE_LOCATION, source)
+            is UUID -> ctxBuilder.param(BlockPlace.SOURCE_UUID, source)
+        }
         BlockUtils.placeBlock(ctxBuilder.build())
     }
     
@@ -57,7 +63,12 @@ internal object ApiBlockManager : IBlockManager {
         val ctxBuilder = Context.intention(BlockBreak)
             .param(BlockBreak.BLOCK, location.block)
             .param(BlockBreak.TOOL_ITEM_STACK, tool)
-        setSourceParam(ctxBuilder, source)
+        when (source) {
+            is Entity -> ctxBuilder.param(BlockBreak.SOURCE_ENTITY, source)
+            is ApiTileEntityWrapper -> ctxBuilder.param(BlockBreak.SOURCE_TILE_ENTITY, source.tileEntity)
+            is Location -> ctxBuilder.param(BlockBreak.SOURCE_LOCATION, source)
+            is UUID -> ctxBuilder.param(BlockBreak.SOURCE_UUID, source)
+        }
         return BlockUtils.getDrops(ctxBuilder.build())
     }
     
@@ -65,22 +76,15 @@ internal object ApiBlockManager : IBlockManager {
         val ctxBuilder = Context.intention(BlockBreak)
             .param(BlockBreak.BLOCK, location.block)
             .param(BlockBreak.BLOCK_BREAK_EFFECTS, breakEffects)
-        setSourceParam(ctxBuilder, source)
+        when (source) {
+            is Entity -> ctxBuilder.param(BlockBreak.SOURCE_ENTITY, source)
+            is ApiTileEntityWrapper -> ctxBuilder.param(BlockBreak.SOURCE_TILE_ENTITY, source.tileEntity)
+            is Location -> ctxBuilder.param(BlockBreak.SOURCE_LOCATION, source)
+            is UUID -> ctxBuilder.param(BlockBreak.SOURCE_UUID, source)
+        }
         BlockUtils.breakBlock(ctxBuilder.build())
         return true
         
-    }
-    
-    private fun <I : HasOptionalSource<I>> setSourceParam(builder: Context.Builder<I>, source: Any?) {
-        if (source == null)
-            return
-        
-        when (source) {
-            is Entity -> builder.param(HasOptionalSource.sourceEntity(), source)
-            is ApiTileEntityWrapper -> builder.param(HasOptionalSource.sourceTileEntity(), source.tileEntity)
-            is Location -> builder.param(HasOptionalSource.sourceLocation(), source)
-            is UUID -> builder.param(HasOptionalSource.sourceUuid(), source)
-        }
     }
     
 }

@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.level.block.state.properties.Property
 import org.bukkit.Keyed
 import org.bukkit.craftbukkit.block.data.CraftBlockData
-import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.util.toNamespacedKey
 import java.util.*
@@ -37,7 +37,7 @@ abstract class BlockStateProperty<T : Comparable<T>>(
     /**
      * Selects the property's value when a block is placed.
      */
-    val initializer: (Context<BlockPlace>) -> T
+    val initializer: Autofiller<T, BlockPlace>
 ) : Keyed {
     
     internal abstract val nmsProperty: Property<*>
@@ -117,7 +117,7 @@ internal class MappedProperty<T : Comparable<T>, N : Comparable<N>>(
     default: T,
     private val fromNms: (N) -> T,
     private val toNms: (T) -> N,
-    initializer: (Context<BlockPlace>) -> T
+    initializer: Autofiller<T, BlockPlace>
 ) : BlockStateProperty<T>(Key.key("minecraft", nmsProperty.name), default, initializer) {
     
     @Suppress("UNCHECKED_CAST")
@@ -135,32 +135,32 @@ internal class MappedProperty<T : Comparable<T>, N : Comparable<N>>(
 class BooleanProperty private constructor(
     id: Key,
     defaultValue: Boolean,
-    initializer: (Context<BlockPlace>) -> Boolean,
+    initializer: Autofiller<Boolean, BlockPlace>,
     override val nmsProperty: NmsBooleanProperty,
 ) : BlockStateProperty<Boolean>(id, defaultValue, initializer) {
     
     /**
      * Creates a boolean property that defaults to `false` and uses [initializer] during placement.
      */
-    constructor(id: Key, initializer: (Context<BlockPlace>) -> Boolean) :
+    constructor(id: Key, initializer:  Autofiller<Boolean, BlockPlace>) :
         this(id, false, initializer, NmsBooleanProperty.create(id.asPropertyString()))
     
     /**
      * Creates a boolean property with the given [default] and placement [initializer].
      */
-    constructor(id: Key, default: Boolean, initializer: (Context<BlockPlace>) -> Boolean) :
+    constructor(id: Key, default: Boolean, initializer:  Autofiller<Boolean, BlockPlace>) :
         this(id, default, initializer, NmsBooleanProperty.create(id.asPropertyString()))
     
     /**
      * Creates a boolean property that always uses [default].
      */
     constructor(id: Key, default: Boolean = false) :
-        this(id, default, { default }, NmsBooleanProperty.create(id.asPropertyString()))
+        this(id, default, Autofiller.from { default }, NmsBooleanProperty.create(id.asPropertyString()))
     
     internal constructor(
         nmsProperty: NmsBooleanProperty,
         default: Boolean = false,
-        initializer: (Context<BlockPlace>) -> Boolean = { default }
+        initializer: Autofiller<Boolean, BlockPlace> = Autofiller.from { default }
     ) : this(Key.key("minecraft", nmsProperty.name), default, initializer, nmsProperty)
     
 }
@@ -171,7 +171,7 @@ class BooleanProperty private constructor(
 class IntProperty private constructor(
     id: Key,
     defaultValue: Int,
-    initializer: (Context<BlockPlace>) -> Int,
+    initializer: Autofiller<Int, BlockPlace>,
     override val nmsProperty: IntegerProperty
 ) : BlockStateProperty<Int>(id, defaultValue, initializer) {
     
@@ -188,7 +188,7 @@ class IntProperty private constructor(
     constructor(
         id: Key,
         range: IntRange,
-        initializer: (Context<BlockPlace>) -> Int = { range.first }
+        initializer: Autofiller<Int, BlockPlace> = Autofiller.from { range.first }
     ) : this(id, range.first, initializer, IntegerProperty.create(id.asPropertyString(), range.first, range.last))
     
     /**
@@ -200,13 +200,13 @@ class IntProperty private constructor(
         id: Key,
         range: IntRange,
         default: Int,
-        initializer: (Context<BlockPlace>) -> Int
+        initializer: Autofiller<Int, BlockPlace>
     ) : this(id, default, initializer, IntegerProperty.create(id.asPropertyString(), range.first, range.last))
     
     internal constructor(
         nmsProperty: IntegerProperty,
         default: Int = nmsProperty.possibleValues.first(),
-        initializer: (Context<BlockPlace>) -> Int = { default }
+        initializer: Autofiller<Int, BlockPlace> = Autofiller.from { default }
     ) : this(Key.key("minecraft", nmsProperty.name), default, initializer, nmsProperty)
     
 }
@@ -222,7 +222,7 @@ inline fun <reified E : Enum<E>> EnumProperty(
     id: Key,
     vararg values: E,
     default: E = values.firstOrNull() ?: E::class.java.enumConstants[0],
-    noinline initializer: (Context<BlockPlace>) -> E = { default }
+    initializer: Autofiller<E, BlockPlace> = Autofiller.from { default }
 ): EnumProperty<E> = EnumProperty(id, E::class.java, values.toSet(), default, initializer)
 
 /**
@@ -231,7 +231,7 @@ inline fun <reified E : Enum<E>> EnumProperty(
 class EnumProperty<E : Enum<E>> private constructor(
     id: Key,
     defaultValue: E,
-    initializer: (Context<BlockPlace>) -> E,
+    initializer: Autofiller<E, BlockPlace>,
     override val nmsProperty: Property<E>
 ) : BlockStateProperty<E>(id, defaultValue, initializer) {
     
@@ -249,7 +249,7 @@ class EnumProperty<E : Enum<E>> private constructor(
         id: Key,
         enumClass: Class<E>,
         values: Set<E>,
-        initializer: (Context<BlockPlace>) -> E
+        initializer: Autofiller<E, BlockPlace>
     ) : this(
         id,
         values.firstOrNull() ?: enumClass.enumConstants[0],
@@ -271,7 +271,7 @@ class EnumProperty<E : Enum<E>> private constructor(
         enumClass: Class<E>,
         values: Set<E>,
         default: E,
-        initializer: (Context<BlockPlace>) -> E
+        initializer: Autofiller<E, BlockPlace>
     ) : this(
         id,
         default,
@@ -286,12 +286,12 @@ class EnumProperty<E : Enum<E>> private constructor(
     /**
      * Creates an enum property containing all constants from [enumClass].
      */
-    constructor(id: Key, enumClass: Class<E>) : this(id, enumClass, emptySet(), { enumClass.enumConstants[0] })
+    constructor(id: Key, enumClass: Class<E>) : this(id, enumClass, emptySet(), Autofiller.from { enumClass.enumConstants[0] })
     
     internal constructor(
         nmsProperty: Property<E>,
         default: E = nmsProperty.possibleValues.first(),
-        initializer: (Context<BlockPlace>) -> E = { default }
+        initializer: Autofiller<E, BlockPlace> = Autofiller.from { default }
     ) : this(
         Key.key("minecraft", nmsProperty.name),
         default,
@@ -347,7 +347,7 @@ private class CustomInternalEnumProperty<T : Enum<T>>(
 }
 
 // string-based property for unknown block states
-internal class UnknownProperty(key: Key, name: String, strings: List<String>) : BlockStateProperty<String>(key, strings[0], { strings[0] }) {
+internal class UnknownProperty(key: Key, name: String, strings: List<String>) : BlockStateProperty<String>(key, strings[0], Autofiller.from { strings[0] }) {
     
     override val nmsProperty = object : Property<String>(name, String::class.java) {
         

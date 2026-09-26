@@ -1,37 +1,68 @@
 package xyz.xenondevs.nova.context
 
-import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 private data object TestIntention : AbstractContextIntention<TestIntention>() {
     
-    val STRING_PARENT = ContextParamType<String, TestIntention>(Key.key("nova", "string_parent"))
-    val STRING = RequiredContextParamType<String, TestIntention>(Key.key("nova", "string"))
-    val STRING_LENGTH = ContextParamType<Int, TestIntention>(Key.key("nova", "string_length"))
-    val STRING_LENGTH_AS_STRING = ContextParamType<String, TestIntention>(Key.key("nova", "string_length_as_string"))
-    val BOOLEAN = DefaultingContextParamType<Boolean, TestIntention>(Key.key("nova", "boolean"), false)
+    val STRING_PARENT = addOptionalParamType<String>()
+    val STRING = addRequiredParamType<String>()
+    val STRING_LENGTH = addOptionalParamType<Int>()
+    val STRING_LENGTH_AS_STRING = addOptionalParamType<String>()
+    val BOOLEAN = addDefaultingParamType(default = false)
     
     init {
-        require(STRING)
         addAutofiller(STRING, Autofiller.from(STRING_PARENT) { it })
+        addAutofiller(STRING, Autofiller.from(STRING_PARENT) { "overruled: $it" })
+        
         addAutofiller(STRING_LENGTH, Autofiller.from(STRING) { it.length })
-        addAutofiller(STRING_LENGTH_AS_STRING, Autofiller.from(STRING_LENGTH) { it.toString() })
+        
+        addAutofiller(STRING_LENGTH_AS_STRING, Autofiller.dynamic { resolve(STRING_LENGTH)?.toString() ?: "missing" })
     }
     
 }
 
 private data object TestIntention2 : AbstractContextIntention<TestIntention2>() {
     
-    val STRING_SOURCE = ContextParamType<String, TestIntention2>(Key.key("nova", "string_source"))
-    val STRING = ContextParamType<String, TestIntention2>(Key.key("nova", "string"))
-    val STRING_MIRROR = ContextParamType<String, TestIntention2>(Key.key("nova", "string_mirror"))
+    val STRING_SOURCE = addOptionalParamType<String>()
+    val STRING = addOptionalParamType<String>()
+    val STRING_MIRROR = addOptionalParamType<String>()
     
     init {
         addAutofiller(STRING, Autofiller.from(STRING_MIRROR) { it })
-        addAutofiller(STRING_MIRROR, Autofiller.from(STRING) { it } )
-        addAutofiller(STRING, Autofiller.from(STRING_SOURCE) { it } )
+        addAutofiller(STRING_MIRROR, Autofiller.from(STRING) { it })
+        addAutofiller(STRING, Autofiller.from(STRING_SOURCE) { it })
+    }
+    
+}
+
+private data object DefaultingIntention : AbstractContextIntention<DefaultingIntention>() {
+    
+    val DERIVED_FROM_TYPE = addOptionalParamType<String>()
+    val TYPE = addDefaultingParamType(default = "air")
+    val STACK = addDefaultingParamType(default = "empty")
+    val SOURCE = addOptionalParamType<String>()
+    
+    init {
+        addAutofiller(STACK, Autofiller.from(TYPE) { "stack:$it" })
+        addAutofiller(STACK, Autofiller.from(SOURCE) { "stack:$it" })
+        
+        addAutofiller(TYPE, Autofiller.from(STACK) { it.removePrefix("stack:") })
+        
+        addAutofiller(DERIVED_FROM_TYPE, Autofiller.from(TYPE) { "derived:$it" })
+    }
+    
+}
+
+private data object ValidationIntention : AbstractContextIntention<ValidationIntention>() {
+    
+    val SOURCE = addOptionalParamType<Int>()
+    val POSITIVE = addOptionalParamType<Int>(validate = { it > 0 })
+    
+    init {
+        addAutofiller(POSITIVE, Autofiller.from(SOURCE) { -it })
     }
     
 }
@@ -58,7 +89,7 @@ class ContextTest {
     }
     
     @Test
-    fun testAutofillChain() {
+    fun testDynamicAutofillChain() {
         val context = Context.intention(TestIntention)
             .param(TestIntention.STRING, "Hello")
             .build()
@@ -87,7 +118,7 @@ class ContextTest {
     }
     
     @Test
-    fun testDoesNotFailWhenRequiredParamsAreResolvable() {
+    fun testRequiredParamAutofillUsesFirstSuccessfulAutofiller() {
         val context = Context.intention(TestIntention)
             .param(TestIntention.STRING_PARENT, "Hello")
             .build()
@@ -96,20 +127,50 @@ class ContextTest {
     }
     
     @Test
-    fun `test that failing autofiller is not remembered after value becomes available`() {
+    fun testAutofillCycleUsesAvailableFallback() {
         val ctx = Context.intention(TestIntention2)
             .param(TestIntention2.STRING_SOURCE, "ABC")
             .build()
         
-        // When querying STRING, the autofiller will first try STRING_MIRROR, which is not set and cannot be 
-        // filled by STRING as well, setting STRING_MIRROR to null.
-        // Then, STRING queries STRING_SOURCE and copies its value
-        // It is expected that STRING_MIRROR can now correctly retrieve the value from STRING
-        // and does not remember the previous failure
+        assertEquals("ABC", ctx[TestIntention2.STRING_SOURCE])
+        assertEquals("ABC", ctx[TestIntention2.STRING])
+        assertEquals("ABC", ctx[TestIntention2.STRING_MIRROR])
+    }
+    
+    @Test
+    fun testAutofillersUseDerivedValuesBeforeDefaults() {
+        val context = Context.intention(DefaultingIntention)
+            .param(DefaultingIntention.SOURCE, "diamond")
+            .build()
         
-        assertEquals(ctx[TestIntention2.STRING_SOURCE], "ABC")
-        assertEquals(ctx[TestIntention2.STRING], "ABC")
-        assertEquals(ctx[TestIntention2.STRING_MIRROR], "ABC")
+        assertEquals("stack:diamond", context[DefaultingIntention.STACK])
+        assertEquals("diamond", context[DefaultingIntention.TYPE])
+        assertEquals("derived:diamond", context[DefaultingIntention.DERIVED_FROM_TYPE])
+    }
+    
+    @Test
+    fun testDefaultsAreNotAutofillerInputs() {
+        val context = Context.intention(DefaultingIntention).build()
+        
+        assertEquals("empty", context[DefaultingIntention.STACK])
+        assertEquals("air", context[DefaultingIntention.TYPE])
+        assertNull(context[DefaultingIntention.DERIVED_FROM_TYPE])
+    }
+    
+    @Test
+    fun testInvalidExplicitValueThrows() {
+        assertThrows<IllegalArgumentException> {
+            Context.intention(ValidationIntention).param(ValidationIntention.POSITIVE, -1)
+        }
+    }
+    
+    @Test
+    fun testInvalidAutofilledValueThrows() {
+        assertThrows<IllegalStateException> {
+            Context.intention(ValidationIntention)
+                .param(ValidationIntention.SOURCE, 1)
+                .build()
+        }
     }
     
 }

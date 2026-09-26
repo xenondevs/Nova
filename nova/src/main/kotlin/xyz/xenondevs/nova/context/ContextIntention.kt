@@ -8,14 +8,38 @@ interface ContextIntention<I : ContextIntention<I>> {
     /**
      * The parameter types that must be present in a context with this intention.
      */
-    val required: Set<RequiredContextParamType<*, I>>
+    val requiredParamTypes: List<RequiredContextParamType<*, I>>
     
     /**
-     * Adds [paramType] as a required context parameter type for this intention,
-     * forcing all contexts with this intention to have a parameter of this type,
-     * either through explicit specification or through autofilling.
+     * All parameter types that can be present in a context with this intention,
+     * including required, defaulting and optional parameter types.
      */
-    fun require(paramType: RequiredContextParamType<*, I>)
+    val paramTypes: List<ContextParamType<*, I>>
+    
+    /**
+     * Creates a new [RequiredContextParamType] with [validate] and [copy] and registers it with this intention.
+     */
+    fun <V : Any> addRequiredParamType(
+        validate: (V) -> Boolean = { true },
+        copy: (V) -> V = { it }
+    ): RequiredContextParamType<V, I>
+    
+    /**
+     * Creates a new [DefaultingContextParamType] with [default], [validate] and [copy] and registers it with this intention.
+     */
+    fun <V : Any> addDefaultingParamType(
+        default: V,
+        validate: (V) -> Boolean = { true },
+        copy: (V) -> V = { it }
+    ): DefaultingContextParamType<V, I>
+    
+    /**
+     * Creates a new [ContextParamType] with [validate] and [copy] and registers it with this intention.
+     */
+    fun <V : Any> addOptionalParamType(
+        validate: (V) -> Boolean = { true },
+        copy: (V) -> V = { it }
+    ): ContextParamType<V, I>
     
     /**
      * Adds an [autofiller] for [paramType] to this intention, 

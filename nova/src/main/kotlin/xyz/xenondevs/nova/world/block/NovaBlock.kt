@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.world.block
 
-import xyz.xenondevs.nova.util.asBukkitCopy
 import io.papermc.paper.registry.RegistryKey
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -47,6 +46,7 @@ import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.ContextParamResolver
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
@@ -60,9 +60,9 @@ import xyz.xenondevs.nova.registry.FlammableSettings
 import xyz.xenondevs.nova.registry.ProtoBlockState
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.bootstrapFlatMap
-import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockSelectorScope
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.util.asBukkitCopy
 import xyz.xenondevs.nova.util.blockFace
 import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
@@ -371,11 +371,18 @@ internal open class NovaBlock(
     /**
      * Chooses the appropriate [NovaBlockState] for placement given the [ctx].
      */
-    fun chooseBlockState(ctx: Context<BlockPlace>): NovaBlockState {
+    context(ctx: ContextParamResolver<BlockPlace>)
+    fun chooseBlockState(): NovaBlockState {
         var blockState = defaultBlockState
         
+        fun <T : Comparable<T>> applyProperty(property: BlockStateProperty<T>) {
+            val value = property.initializer.fill(ctx)
+                ?: return
+            blockState = blockState.setValue(property, value)
+        }
+        
         for (property in stateProperties) {
-            blockState = blockState.setValue(property, property.initializer(ctx))
+            applyProperty(property)
         }
         
         return NovaBlockStateImpl(blockState)
@@ -482,6 +489,7 @@ internal open class NovaBlock(
             .param(BlockBreak.BLOCK, block)
             .param(BlockBreak.BLOCK_STATE, blockState)
             .param(BlockBreak.SOURCE_ENTITY, nmsPlayer.bukkitEntity)
+            .param(BlockBreak.TOOL_ITEM_STACK, nmsPlayer.getItemInHand(InteractionHand.MAIN_HAND).asBukkitCopy())
             .build()
         
         runSafely("handle attack") {

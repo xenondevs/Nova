@@ -149,19 +149,18 @@ internal class NovaTileEntityProxy(
     
     private val tickOffset = Math.floorMod(worldPosition.hashCode(), 20)
     
-    val data: Compound
+    val data = Compound()
     var tileEntity: TileEntity? = null
         private set
     
     init {
         val ctx = ImplicitIntentions.BLOCK_PLACE.getOrNull()
         if (ctx != null) {
-            data = ctx[BlockPlace.TILE_ENTITY_DATA_NOVA] ?: Compound()
+            val persistent = ctx[BlockPlace.TILE_ENTITY_DATA_NOVA]
+                data["persistent"] = persistent
             val owner = ctx[BlockPlace.RESPONSIBLE_PLAYER]
             if (owner != null)
                 data["ownerUuid"] = owner.uniqueId
-        } else {
-            data = Compound()
         }
     }
     

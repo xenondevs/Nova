@@ -22,7 +22,7 @@ object DefaultBlockStateProperties {
     val WATERLOGGED: BooleanProperty = BooleanProperty(
         BlockStateProperties.WATERLOGGED
     ) { ctx ->
-        val pos = ctx[BlockPlace.BLOCK]
+        val pos = requireNotNull(ctx.resolve(BlockPlace.BLOCK))
         pos.world.getFluidData(pos.x, pos.y, pos.z).fluidType == Fluid.WATER
     }
     
@@ -30,7 +30,7 @@ object DefaultBlockStateProperties {
      * A property for the redstone powered state of a block.
      */
     val POWERED: BooleanProperty = BooleanProperty(BlockStateProperties.POWERED) { ctx ->
-        ctx[BlockPlace.BLOCK].isBlockIndirectlyPowered
+        requireNotNull(ctx.resolve(BlockPlace.BLOCK)).isBlockIndirectlyPowered
     }
     
     /**
@@ -44,7 +44,7 @@ object DefaultBlockStateProperties {
             CraftBlock::notchToBlockFace,
             { CraftBlock.blockFaceToNotch(it) ?: throw IllegalArgumentException("Invalid block face: $it") }
         ) { ctx ->
-            ctx[BlockPlace.SOURCE_DIRECTION]
+            ctx.resolve(BlockPlace.SOURCE_DIRECTION)
                 ?.calculateYaw()
                 ?.let { BlockFaceUtils.toCartesianFace(it) }
                 ?.oppositeFace
@@ -56,7 +56,7 @@ object DefaultBlockStateProperties {
      */
     val FACING_VERTICAL: BlockStateProperty<BlockFace> =
         EnumProperty(Key.key("nova", "facing"), BlockFace.UP, BlockFace.DOWN) { ctx ->
-            ctx[BlockPlace.SOURCE_DIRECTION]?.calculateYawPitch()
+            ctx.resolve(BlockPlace.SOURCE_DIRECTION)?.calculateYawPitch()
                 ?.let { [_, pitch] -> if (pitch < 0) BlockFace.UP else BlockFace.DOWN }
                 ?: BlockFace.UP
         }
@@ -72,7 +72,7 @@ object DefaultBlockStateProperties {
             CraftBlock::notchToBlockFace,
             { CraftBlock.blockFaceToNotch(it) ?: throw IllegalArgumentException("Invalid block face: $it") }
         ) { ctx ->
-            ctx[BlockPlace.SOURCE_DIRECTION]
+            ctx.resolve(BlockPlace.SOURCE_DIRECTION)
                 ?.calculateYawPitch()
                 ?.let { [yaw, pitch] -> BlockFaceUtils.toCartesianFace(yaw, pitch) }
                 ?.oppositeFace
@@ -93,7 +93,7 @@ object DefaultBlockStateProperties {
             { CraftBlockData.ROTATION_CYCLE[it] },
             { CraftBlockData.ROTATION_CYCLE.indexOf(it).also { index -> require(index >= 0) } }
         ) { ctx ->
-            ctx[BlockPlace.SOURCE_DIRECTION]
+            ctx.resolve(BlockPlace.SOURCE_DIRECTION)
                 ?.calculateYaw()
                 ?.let { BlockFaceUtils.toFace(it) }
                 ?.oppositeFace
@@ -110,7 +110,7 @@ object DefaultBlockStateProperties {
             { Axis.valueOf(it.name) },
             { Direction.Axis.valueOf(it.name) }
         ) { ctx ->
-            ctx[BlockPlace.CLICKED_BLOCK_FACE]?.axis ?: Axis.Y
+            ctx.resolve(BlockPlace.CLICKED_BLOCK_FACE)?.axis ?: Axis.Y
         }
     
     /**
@@ -123,7 +123,7 @@ object DefaultBlockStateProperties {
             { Axis.valueOf(it.name) },
             { Direction.Axis.valueOf(it.name) }
         ) { ctx ->
-            ctx[BlockPlace.CLICKED_BLOCK_FACE]?.axis ?: Axis.X
+            ctx.resolve(BlockPlace.CLICKED_BLOCK_FACE)?.axis ?: Axis.X
         }
     
     val FACING_PROPERTIES = listOf(

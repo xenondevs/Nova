@@ -17,7 +17,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockDamageEvent
 import org.bukkit.event.block.BlockExpEvent
-import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
@@ -181,7 +180,6 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             .param(BlockBreak.BLOCK, block)
             .param(BlockBreak.SOURCE_ENTITY, player)
             .param(BlockBreak.TOOL_ITEM_STACK, tool)
-            .param(BlockBreak.HELD_HAND, EquipmentSlot.HAND) // block breaking is always main-hand
             .param(BlockBreak.HELD_ITEM_STACK, tool)
         val ctx = ctxBuilder.build()
         

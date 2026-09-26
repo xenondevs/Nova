@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.context
 
-import net.kyori.adventure.key.Key
-
 /**
  * A context parameter type.
  */
@@ -9,7 +7,7 @@ open class ContextParamType<V : Any, I : ContextIntention<I>>(
     /**
      * The id of this parameter type, should be unique for [I].
      */
-    val id: Key,
+    val id: Int,
     
     /**
      * Validates whether a value meets the requirements of this parameter type.
@@ -20,24 +18,13 @@ open class ContextParamType<V : Any, I : ContextIntention<I>>(
      * Copies a value.
      */
     val copy: (V) -> V = { it }
-) {
-    
-    override fun equals(other: Any?): Boolean =
-        this === other || (other is ContextParamType<*, *> && id == other.id)
-    
-    override fun hashCode(): Int =
-        id.hashCode()
-    
-    override fun toString(): String =
-        id.asString()
-    
-}
+)
 
 /**
  * A context parameter type that has a default value instead of null.
  */
 class DefaultingContextParamType<V : Any, I : ContextIntention<I>>(
-    id: Key,
+    id: Int,
     /**
      * The default value of this parameter type.
      * Used when no explicit value is defined and no autofiller could fill it.
@@ -51,7 +38,7 @@ class DefaultingContextParamType<V : Any, I : ContextIntention<I>>(
  * A context parameter type that is required in the intention it belongs to.
  */
 class RequiredContextParamType<V : Any, I : ContextIntention<I>>(
-    id: Key,
+    id: Int,
     validate: (V) -> Boolean = { true },
     copy: (V) -> V = { it }
 ) : ContextParamType<V, I>(id, validate, copy)
