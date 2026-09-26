@@ -65,6 +65,7 @@ internal data class ScaleTransform(
         
         val elementSize = Vector3d(to).sub(from)
         val relPivot = Vector3d(pivot)
+            .sub(from)
             .div(elementSize)
             .sub(uv0)
         val uvSize = Vector2d(uv.z(), uv.w()).sub(uv.x(), uv.y())

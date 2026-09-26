@@ -46,17 +46,27 @@ class ModelBuilderTest {
                 .scale(Vector3d(0.0, 0.0, 0.0), Vector3d(0.5, 1.0, 0.25), true)
                 .buildScaled(null)
             assertEquals(deserializeModel("arrow_cube/$rot/scaled/pillar_0_0"), m1)
-
+            
             val m2 = ModelBuilder(model)
                 .scale(Vector3d(16.0, 0.0, 16.0), Vector3d(0.5, 1.0, 0.25), true)
                 .buildScaled(null)
             assertEquals(deserializeModel("arrow_cube/$rot/scaled/pillar_16_16"), m2)
-
+            
             val m3 = ModelBuilder(model)
                 .scale(Vector3d(8.0, 8.0, 8.0), Vector3d(0.5, 0.5, 0.5), true)
                 .buildScaled(null)
             assertEquals(deserializeModel("arrow_cube/$rot/scaled/cube_centered"), m3)
         }
+    }
+    
+    @Test
+    fun testScaleUVAtNonzeroElementOrigin() {
+        val model = deserializeModel("offset_cube/model")
+        val halfHeight = ModelBuilder(model)
+            .scale(Vector3d(0.0, 1.0, 0.0), Vector3d(1.0, 0.5, 1.0), true)
+            .buildScaled(null)
+        
+        assertEquals(deserializeModel("offset_cube/scaled/half_height"), halfHeight)
     }
     
     @Test
@@ -175,14 +185,14 @@ class ModelBuilderTest {
         builder.rotateZ(67.5)
         assertEquals(deserializeModel("half_cube/rotated/y22.5_x180.0_y67.5_z67.5"), builder.buildScaled(null))
     }
-
+    
     @Test
     fun testRotateMultiAxisElementRotation() {
         val builder = ModelBuilder(deserializeModel("multi_axis_rotation/model"))
         builder.rotateY(22.5)
         assertEquals(deserializeModel("multi_axis_rotation/rotated/y22.5"), builder.buildScaled(null))
     }
-
+    
     @Test
     fun testRotateMultiAxisElementRotationByRightAngle() {
         val builder = ModelBuilder(deserializeModel("multi_axis_rotation/model"))
