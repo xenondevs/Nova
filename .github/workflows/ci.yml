@@ -50,6 +50,7 @@ jobs:
         with:
           arguments: |
             pluginPublish
+            -Prelease
             --githubReleaseId ${{ github.event.release.id }}
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
