@@ -26,6 +26,7 @@ import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPickItemFromEntityPacketEvent
 import xyz.xenondevs.nova.network.packet.ClientboundSetPassengersPacket
 import xyz.xenondevs.nova.world.InteractionResult
 import java.util.*
@@ -52,6 +53,7 @@ internal open class PacketEntityNodeImpl<M : EntityMetadata>(
     final override val passengers: List<PacketEntityNode<*>> = passengerNodes
     private val attackHandlers = state.attackHandlers
     private val attackAsyncHandlers = state.attackAsyncHandlers
+    private val pickAsyncHandlers = state.pickAsyncHandlers
     private val interactHandlers = state.interactHandlers
     private val interactAsyncHandlers = state.interactAsyncHandlers
     val graphEntities: List<PacketEntityNodeImpl<*>> = buildList {
@@ -200,6 +202,16 @@ internal open class PacketEntityNodeImpl<M : EntityMetadata>(
         }
     }
     
+    fun runPickAsyncHandlers(event: ServerboundPickItemFromEntityPacketEvent) {
+        for (handler in pickAsyncHandlers) {
+            try {
+                handler(event)
+            } catch (e: Exception) {
+                PacketEntityManager.logger.error("Exception in async PacketEntity pick handler", e)
+            }
+        }
+    }
+    
     fun runInteractHandlers(player: Player, hand: EquipmentSlot, interactLocation: Vector3dc): InteractionResult {
         if (interactHandlers.isEmpty())
             return InteractionResult.Pass
@@ -256,6 +268,7 @@ internal class PacketEntityImpl<M : EntityMetadata>(
     override val despawnHandlers: MutableList<(Player) -> Unit> = rootState.despawnHandlers
     override val attackHandlers: MutableList<AttackDsl.() -> Unit> = rootState.attackHandlers
     override val attackAsyncHandlers: MutableList<(ServerboundAttackPacketEvent) -> Unit> = rootState.attackAsyncHandlers
+    override val pickAsyncHandlers: MutableList<(ServerboundPickItemFromEntityPacketEvent) -> Unit> = rootState.pickAsyncHandlers
     override val interactHandlers: MutableList<InteractDsl.() -> InteractionResult> = rootState.interactHandlers
     override val interactAsyncHandlers: MutableList<(ServerboundInteractPacketEvent) -> Unit> = rootState.interactAsyncHandlers
     override var location by rootState.location

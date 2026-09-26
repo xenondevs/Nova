@@ -5,6 +5,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.joml.Vector3dc
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPickItemFromEntityPacketEvent
 import xyz.xenondevs.nova.world.InteractionResult
 import java.util.*
 
@@ -28,6 +29,7 @@ internal open class PacketEntityState<M : EntityMetadataState>(val metadata: M) 
     val passengers = ArrayList<PacketEntityPassengerData<*>>()
     val attackHandlers = ArrayList<AttackDsl.() -> Unit>()
     val attackAsyncHandlers = ArrayList<(ServerboundAttackPacketEvent) -> Unit>()
+    val pickAsyncHandlers = ArrayList<(ServerboundPickItemFromEntityPacketEvent) -> Unit>()
     val interactHandlers = ArrayList<InteractDsl.() -> InteractionResult>()
     val interactAsyncHandlers = ArrayList<(ServerboundInteractPacketEvent) -> Unit>()
     
@@ -113,6 +115,10 @@ internal abstract class PacketEntityDslBase<M : EntityMetadataDsl>(
     
     open fun onAttackAsync(handler: (ServerboundAttackPacketEvent) -> Unit) {
         packetState.attackAsyncHandlers += handler
+    }
+    
+    open fun onPickAsync(handler: (ServerboundPickItemFromEntityPacketEvent) -> Unit) {
+        packetState.pickAsyncHandlers += handler
     }
     
     open fun onInteract(handler: InteractDsl.() -> InteractionResult) {

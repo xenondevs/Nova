@@ -6,6 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.minecraft.core.BlockPos
+import net.minecraft.network.protocol.game.ServerboundPickItemFromBlockPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
@@ -30,6 +31,7 @@ import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPickItemFromEntityPacketEvent
 import xyz.xenondevs.nova.network.packet.ClientboundSetPassengersPacket
 import xyz.xenondevs.nova.network.packetHandler
 import xyz.xenondevs.nova.network.send
@@ -199,6 +201,7 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         }
         onAttackAsync { event -> handleColliderAttack(event, pos, hitbox) }
         onInteractAsync { event -> handleColliderInteract(event, pos, colliderPosition, hitbox) }
+        onPickAsync { event -> handleColliderPick(event, pos) }
     }
     
     internal fun createInteractionEntities(world: World, pos: BlockPosition): List<PacketInteraction> =
@@ -212,6 +215,7 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
                 }
                 onAttackAsync { event -> handleColliderAttack(event, pos, hitbox) }
                 onInteractAsync { event -> handleColliderInteract(event, pos, hitboxPosition, hitbox) }
+                onPickAsync { event -> handleColliderPick(event, pos) }
             }.apply { spawn() }
         }
     
@@ -276,6 +280,12 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
             false
         )
         val packet = ServerboundUseItemOnPacket(InteractionHand.MAIN_HAND, hitResult, 0, System.currentTimeMillis())
+        event.player.packetHandler?.injectIncoming(packet)
+    }
+    
+    private fun handleColliderPick(event: ServerboundPickItemFromEntityPacketEvent, pos: BlockPosition) {
+        event.isCancelled = true
+        val packet = ServerboundPickItemFromBlockPacket(BlockPos(pos.blockX(), pos.blockY(), pos.blockZ()), event.includeData)
         event.player.packetHandler?.injectIncoming(packet)
     }
     

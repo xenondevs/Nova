@@ -4,6 +4,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPickItemFromEntityPacketEvent
 import xyz.xenondevs.nova.world.InteractionResult
 import java.util.*
 
@@ -83,6 +84,11 @@ sealed interface PacketEntity<M : EntityMetadata> : PacketEntityNode<M> {
      * Handlers that are called on the player's Netty event-loop thread when they attack this entity (left click).
      */
     val attackAsyncHandlers: MutableList<(ServerboundAttackPacketEvent) -> Unit>
+    
+    /**
+     * Handlers that are called on the player's Netty event-loop thread when they pick this entity (middle click).
+     */
+    val pickAsyncHandlers: MutableList<(ServerboundPickItemFromEntityPacketEvent) -> Unit>
     
     /**
      * Handlers that are called on the main thread when a player interacts with this entity (right click).

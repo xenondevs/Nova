@@ -25,6 +25,7 @@ import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPickItemFromEntityPacketEvent
 import xyz.xenondevs.nova.network.send
 import xyz.xenondevs.nova.world.InteractionResult
 import java.util.*
@@ -447,6 +448,13 @@ internal class PacketEntityManager(private val world: World) {
             val manager = managers[event.player.world] ?: return
             val entity = manager.getEntity(event.entityId) ?: return
             entity.runAttackAsyncHandlers(event)
+        }
+        
+        @PacketHandler
+        private fun handlePick(event: ServerboundPickItemFromEntityPacketEvent) {
+            val manager = managers[event.player.world] ?: return
+            val entity = manager.getEntity(event.id) ?: return
+            entity.runPickAsyncHandlers(event)
         }
         
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

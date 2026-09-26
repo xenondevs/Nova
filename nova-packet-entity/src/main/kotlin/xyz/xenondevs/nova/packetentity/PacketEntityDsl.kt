@@ -7,6 +7,7 @@ import org.joml.Vector3dc
 import xyz.xenondevs.commons.provider.dsl.DslProperty
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPickItemFromEntityPacketEvent
 import xyz.xenondevs.nova.world.InteractionResult
 import java.util.*
 
@@ -188,6 +189,11 @@ sealed interface PacketEntityDsl<M : EntityMetadataDsl> {
     fun onAttackAsync(handler: (ServerboundAttackPacketEvent) -> Unit)
     
     /**
+     * Registers a handler called on the player's Netty event-loop thread when they pick this entity (middle click).
+     */
+    fun onPickAsync(handler: (ServerboundPickItemFromEntityPacketEvent) -> Unit)
+    
+    /**
      * Registers a handler called on the main server thread when a player interacts with this entity (right click).
      */
     fun onInteract(handler: InteractDsl.() -> InteractionResult)
@@ -244,23 +250,28 @@ sealed interface PassengerPacketEntityDsl<M : EntityMetadataDsl> {
     fun passengers(passengers: PacketEntityPassengersDsl.() -> Unit)
     
     /**
-     * Registers a handler called on the main server thread when a player attacks this passenger.
+     * Registers a handler called on the main server thread when a player attacks this passenger (left click).
      */
     fun onAttack(handler: AttackDsl.() -> Unit)
     
     /**
-     * Registers a handler called on the player's Netty event-loop thread when they attack this passenger.
+     * Registers a handler called on the player's Netty event-loop thread when they attack this passenger (left click).
      */
     fun onAttackAsync(handler: (ServerboundAttackPacketEvent) -> Unit)
     
     /**
-     * Registers a handler called on the main server thread when a player interacts with this passenger.
+     * Registers a handler called on the player's Netty event-loop thread when they pick this passenger (middle click).
+     */
+    fun onPickAsync(handler: (ServerboundPickItemFromEntityPacketEvent) -> Unit)
+    
+    /**
+     * Registers a handler called on the main server thread when a player interacts with this passenger (right click).
      */
     fun onInteract(handler: InteractDsl.() -> InteractionResult)
     
     /**
      * Registers a handler called on the player's Netty event-loop thread when they interact with this
-     * passenger.
+     * passenger (right click).
      */
     fun onInteractAsync(handler: (ServerboundInteractPacketEvent) -> Unit)
     
