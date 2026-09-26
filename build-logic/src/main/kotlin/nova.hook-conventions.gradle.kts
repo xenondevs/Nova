@@ -6,6 +6,10 @@ plugins {
 
 val libs = the<LibrariesForLibs>()
 
+repositories {
+    maven("https://repo.xenondevs.xyz/public/")
+}
+
 dependencies {
     implementation(project(":nova"))
     implementation(project(":nova-api"))
