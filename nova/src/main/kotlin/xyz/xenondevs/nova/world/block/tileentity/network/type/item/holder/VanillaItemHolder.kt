@@ -75,7 +75,7 @@ internal abstract class VanillaItemHolder(
             blockEntity.setChanged()
         }
     
-    private companion object {
+    companion object {
         val CONNECTION_CONFIG = Key.key("nova", "item_connection_config")
         val INSERT_FILTERS = Key.key("nova", "item_insert_filters")
         val EXTRACT_FILTERS = Key.key("nova", "item_extract_filters")

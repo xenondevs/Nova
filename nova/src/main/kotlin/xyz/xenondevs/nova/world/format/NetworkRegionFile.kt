@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.world.format
 
 import xyz.xenondevs.nova.world.format.chunk.NetworkChunk
-import xyz.xenondevs.nova.world.format.legacy.v1.LegacyNetworkRegionFileReaderV1
+import xyz.xenondevs.nova.world.format.legacy.network.v1.LegacyNetworkRegionFileReaderV1
 
 private const val MAGIC = 0x4E564E52 // NVNR
 private const val VERSION = 2.toByte()

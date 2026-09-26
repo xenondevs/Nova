@@ -11,7 +11,7 @@ dependencyResolutionManagement {
             from(files("../gradle/libs.versions.toml"))
         }
         create("origamiLibs") {
-            from("xyz.xenondevs.origami:origami-catalog:0.5.0") // !!! also change in root settings !!!
+            from("xyz.xenondevs.origami:origami-catalog:0.5.1") // !!! also change in root settings !!!
         }
     }
 }

@@ -65,7 +65,7 @@ internal class VanillaFluidHolder(
             blockEntity.setChanged()
         }
     
-    private companion object {
+    companion object {
         
         val CONNECTION_CONFIG = Key.key("nova", "fluid_connection_config")
         val CHANNELS = Key.key("nova", "fluid_channels")

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.format.legacy.v1
+package xyz.xenondevs.nova.world.format.legacy.network.v1
 
 import org.bukkit.block.BlockFace
 import org.junit.jupiter.api.Test

@@ -29,12 +29,12 @@ import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.context.intention.ImplicitIntentions
 import xyz.xenondevs.nova.registry.FlammableSettings
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.resources.builder.layout.block.BlockSelectorScope
 import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.getOrNull
 import xyz.xenondevs.nova.util.toBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
-import xyz.xenondevs.nova.resources.builder.layout.block.BlockSelectorScope
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.VarHandle
@@ -149,7 +149,7 @@ internal class NovaTileEntityProxy(
     
     private val tickOffset = Math.floorMod(worldPosition.hashCode(), 20)
     
-    private val data: Compound
+    val data: Compound
     var tileEntity: TileEntity? = null
         private set
     
