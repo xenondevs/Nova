@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.integration.customitems
 
-import xyz.xenondevs.nova.world.*
-
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
@@ -11,14 +9,9 @@ import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 
-internal const val CUSTOM_ITEM_SERVICE_DEPRECATION = """
-    Custom item services are deprecated with no replacement and will be fully removed in a future version.
-"""
-
 enum class CustomBlockType { NORMAL, CROP }
 enum class CustomItemType { NORMAL, SEED }
 
-@Deprecated(CUSTOM_ITEM_SERVICE_DEPRECATION)
 interface CustomItemService {
     
     /**

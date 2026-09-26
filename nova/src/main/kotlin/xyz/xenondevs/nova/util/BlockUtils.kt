@@ -59,6 +59,7 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.context.intention.ImplicitIntentions
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.particle.block
@@ -264,6 +265,9 @@ object BlockUtils {
             // TODO: respect block update flags
             val itemStack: ItemStack? = ctx[BlockPlace.BLOCK_ITEM_STACK]
             val placeEffects = ctx[BlockPlace.BLOCK_PLACE_EFFECTS]
+            if (itemStack != null && CustomItemServiceManager.placeBlock(itemStack, block.location, placeEffects))
+                return@exec true
+            
             if (itemStack != null && itemStack.itemType.hasBlockType()) {
                 val fakePlayer = EntityUtils.createFakePlayer(
                     ctx[BlockPlace.SOURCE_LOCATION] ?: block.location,
@@ -369,34 +373,44 @@ object BlockUtils {
         return breakBlockInternal(ctx, true)
     }
     
-    internal fun breakBlockInternal(ctx: Context<BlockBreak>, sendEffectsToBreaker: Boolean): List<ItemStack> = ScopedValue.where(ImplicitIntentions.BLOCK_BREAK, ctx).exec {
+    internal fun breakBlockInternal(ctx: Context<BlockBreak>, sendEffectsToBreaker: Boolean): List<ItemStack> {
         val block = ctx[BlockBreak.BLOCK]
-        val blockState = ctx[BlockBreak.BLOCK_STATE]
-        if (blockState is NovaBlockState) {
-            val novaBlock = blockState.novaBlock
-            val drops = novaBlock.getDrops(block, blockState, ctx)
-            val level = block.world.serverLevel
-            val pos = block.nmsPos
-            
-            if (ctx[BlockBreak.BLOCK_BREAK_EFFECTS]) {
-                playBreakEffects(
-                    blockState,
+        if (CustomItemServiceManager.getId(block) != null) {
+            val drops = if (ctx[BlockBreak.BLOCK_DROPS])
+                CustomItemServiceManager.getDrops(block, ctx[BlockBreak.TOOL_ITEM_STACK]) ?: emptyList()
+            else emptyList()
+            CustomItemServiceManager.removeBlock(block, ctx[BlockBreak.BLOCK_BREAK_EFFECTS])
+            return drops
+        }
+        
+        return ScopedValue.where(ImplicitIntentions.BLOCK_BREAK, ctx).exec {
+            val blockState = ctx[BlockBreak.BLOCK_STATE]
+            if (blockState is NovaBlockState) {
+                val novaBlock = blockState.novaBlock
+                val drops = novaBlock.getDrops(block, blockState, ctx)
+                val level = block.world.serverLevel
+                val pos = block.nmsPos
+                
+                if (ctx[BlockBreak.BLOCK_BREAK_EFFECTS]) {
+                    playBreakEffects(
+                        blockState,
+                        block,
+                        if (sendEffectsToBreaker) null else ctx[BlockBreak.SOURCE_ENTITY] as? Player
+                    )
+                }
+                
+                level.setBlock(pos, level.getFluidState(pos).createLegacyBlock(), ctx[BlockBreak.BLOCK_UPDATE_FLAGS].value)
+                return@exec drops
+            } else {
+                return@exec breakVanillaBlock(
                     block,
-                    if (sendEffectsToBreaker) null else ctx[BlockBreak.SOURCE_ENTITY] as? Player
+                    ctx[BlockBreak.SOURCE_ENTITY]?.nmsEntity as? ServerPlayer ?: EntityUtils.DUMMY_PLAYER,
+                    ctx[BlockBreak.TOOL_ITEM_STACK],
+                    ctx[BlockBreak.BLOCK_DROPS],
+                    ctx[BlockBreak.BLOCK_BREAK_EFFECTS],
+                    sendEffectsToBreaker
                 )
             }
-            
-            level.setBlock(pos, level.getFluidState(pos).createLegacyBlock(), ctx[BlockBreak.BLOCK_UPDATE_FLAGS].value)
-            return@exec drops
-        } else {
-            return@exec breakVanillaBlock(
-                block,
-                ctx[BlockBreak.SOURCE_ENTITY]?.nmsEntity as? ServerPlayer ?: EntityUtils.DUMMY_PLAYER,
-                ctx[BlockBreak.TOOL_ITEM_STACK],
-                ctx[BlockBreak.BLOCK_DROPS],
-                ctx[BlockBreak.BLOCK_BREAK_EFFECTS],
-                sendEffectsToBreaker
-            )
         }
     }
     
@@ -510,6 +524,10 @@ object BlockUtils {
         val pos = ctx[BlockBreak.BLOCK]
         val state = ctx[BlockBreak.BLOCK_STATE]
         val tool = ctx[BlockBreak.TOOL_ITEM_STACK]
+        
+        // fixme: custom item services ignore block & storage drops params
+        if (CustomItemServiceManager.getBlockType(pos) != null)
+            return CustomItemServiceManager.getDrops(pos, tool) ?: emptyList()
         
         if (state is NovaBlockState)
             return state.novaBlock.getDrops(pos, state, ctx)

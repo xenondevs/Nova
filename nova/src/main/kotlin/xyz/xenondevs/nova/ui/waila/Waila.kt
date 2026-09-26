@@ -115,7 +115,9 @@ internal class Waila(
     
     private fun tryUpdate(block: Block?): Boolean {
         if (block != null) {
-            if (isBlacklisted(block.blockType.key))
+            val blockId = CustomItemServiceManager.getId(block)?.let { runCatching { Key.key(it) }.getOrNull() }
+                ?: block.blockType.key
+            if (isBlacklisted(blockId))
                 return false
             
             val info = getInfo(player, block)
