@@ -51,7 +51,7 @@ object Bucketable : BlockBehavior {
             container.takeFluid(1000)
             if (player.gameMode != GameMode.CREATIVE)
                 fillBucketInHand(player, hand, fluidType)
-            val sound = when (container.type) {
+            val sound = when (fluidType) {
                 FluidType.LAVA -> Sound.ITEM_BUCKET_FILL_LAVA
                 else -> Sound.ITEM_BUCKET_FILL
             }
