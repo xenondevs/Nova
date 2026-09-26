@@ -670,7 +670,9 @@ internal open class NovaBlock(
     
     override fun isRandomlyTicking(nmsBlockState: NmsBlockState): Boolean {
         val blockState = NovaBlockStateImpl(nmsBlockState)
-        return behaviors.any { it.ticksRandomly(blockState) }
+        return runSafely("check random ticking", false, allowOffMain = true) {
+            behaviors.any { it.ticksRandomly(blockState) }
+        }
     }
     
     override fun entityInside(
@@ -754,10 +756,12 @@ internal open class NovaBlock(
         }.unwrap()
     }
     
-    private inline fun runSafely(name: String, run: () -> Unit) = runSafely(name, Unit, run)
+    protected inline fun runSafely(name: String, allowOffMain: Boolean = false, run: () -> Unit) =
+        runSafely(name, Unit, allowOffMain, run)
     
-    private inline fun <T> runSafely(name: String, fallback: T, run: () -> T): T {
-        checkServerThread()
+    private inline fun <T> runSafely(name: String, fallback: T, allowOffMain: Boolean = false, run: () -> T): T {
+        if (!allowOffMain)
+            checkServerThread()
         try {
             return run()
         } catch (t: Throwable) {
@@ -766,8 +770,9 @@ internal open class NovaBlock(
         return fallback
     }
     
-    private inline fun <T> runSafely(name: String, lazyFallback: () -> T, run: () -> T): T {
-        checkServerThread()
+    private inline fun <T> runSafely(name: String, lazyFallback: () -> T, allowOffMain: Boolean = false, run: () -> T): T {
+        if (!allowOffMain)
+            checkServerThread()
         try {
             return run()
         } catch (t: Throwable) {

@@ -27,7 +27,11 @@ abstract class ServerLevelMixin {
             return;
         
         te.setEnabled$nova(true);
-        te.handleEnable();
+        try {
+            te.handleEnable();
+        } catch (Throwable t) {
+            NovaBootstrapperKt.getLOGGER().error("Failed to enable {}", te, t);
+        }
         
         var pos = blockEntity.getBlockPos();
         var chunk = moonrise$getFullChunkIfLoaded(pos.getX() >> 4, pos.getZ() >> 4);

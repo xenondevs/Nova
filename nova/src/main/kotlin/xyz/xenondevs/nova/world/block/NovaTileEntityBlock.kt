@@ -97,7 +97,9 @@ internal class NovaTileEntityBlock(
                 .param(BlockPlace.PREVIOUS_BLOCK_STATE, nmsOldBlockState.bukkitBlockData)
                 .build()
         
-        tileEntityProxy?.tileEntity?.handlePlace(ctx)
+        runSafely("handle tile entity place") {
+            tileEntityProxy?.tileEntity?.handlePlace(ctx)
+        }
         handlePlace(block, blockState, ctx)
     }
     
@@ -120,7 +122,9 @@ internal class NovaTileEntityBlock(
             .build()
         
         handleBreak(block, blockState, ctx)
-        tileEntity?.handleBreak(ctx)
+        runSafely("handle tile entity break") {
+            tileEntity?.handleBreak(ctx)
+        }
     }
     
     @Suppress("UNCHECKED_CAST")
@@ -156,7 +160,7 @@ internal class NovaTileEntityProxy(
         val ctx = ImplicitIntentions.BLOCK_PLACE.getOrNull()
         if (ctx != null) {
             val persistent = ctx[BlockPlace.TILE_ENTITY_DATA_NOVA]
-                data["persistent"] = persistent
+            data["persistent"] = persistent
             val owner = ctx[BlockPlace.RESPONSIBLE_PLAYER]
             if (owner != null)
                 data["ownerUuid"] = owner.uniqueId
@@ -188,11 +192,15 @@ internal class NovaTileEntityProxy(
             tileEntity.isTicking = false
             tileEntity.coroutineSupervisor?.cancel()
             tileEntity.coroutineSupervisor = null
-            tileEntity.handleDisableTicking()
+            runSafely("disable tile entity ticking") {
+                tileEntity.handleDisableTicking()
+            }
         }
         if (tileEntity.isEnabled) {
             tileEntity.isEnabled = false
-            tileEntity.handleDisable()
+            runSafely("disable tile entity") {
+                tileEntity.handleDisable()
+            }
         }
     }
     
@@ -225,8 +233,8 @@ internal class NovaTileEntityProxy(
     private inline fun <T> runSafely(name: String, fallback: () -> T, run: () -> T): T {
         try {
             return run()
-        } catch (e: Exception) {
-            NOVA_LOGGER.error("Failed to $name for ${block.key.asString()} at ${worldPosition.x}, ${worldPosition.y}, ${worldPosition.z} in ${level?.dimension()?.identifier()}", e)
+        } catch (t: Throwable) {
+            NOVA_LOGGER.error("Failed to $name for ${block.key.asString()} at ${worldPosition.x}, ${worldPosition.y}, ${worldPosition.z} in ${level?.dimension()?.identifier()}", t)
         }
         return fallback()
     }
@@ -236,8 +244,11 @@ internal class NovaTileEntityProxy(
         if (tickrate == 0)
             return
         
-        if ((level.gameTime * tickrate + tickOffset) % 20L < tickrate)
-            tileEntity?.handleTick()
+        if ((level.gameTime * tickrate + tickOffset) % 20L < tickrate) {
+            runSafely("tick tile entity") {
+                tileEntity?.handleTick()
+            }
+        }
     }
     
 }
