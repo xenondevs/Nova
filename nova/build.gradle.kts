@@ -61,6 +61,7 @@ origami {
             // DCEVM
             "-XX:+AllowEnhancedClassRedefinition",
             // other
+            "-ea",
             "-XX:+EnableDynamicAgentLoading",
             "--enable-native-access=ALL-UNNAMED",
             "-DNovaDev",
