@@ -189,7 +189,7 @@ internal object PacketItems : PacketListener {
     const val SERVER_SIDE_COMPONENTS_TAG = "NovaServerSideComponents"
     const val SERVER_SIDE_ITEM_TYPE_TAG = "NovaServerSideType"
     
-    private val TOOLTIP_HIDDEN_DATA_COMPONENTS = BuiltInRegistries.DATA_COMPONENT_TYPE.filterTo(LinkedHashSet()) { 
+    private val TOOLTIP_HIDDEN_DATA_COMPONENTS = BuiltInRegistries.DATA_COMPONENT_TYPE.filterTo(LinkedHashSet()) {
         it != DataComponents.BUNDLE_CONTENTS && it != DataComponents.LORE
     }
     
@@ -947,7 +947,7 @@ internal object PacketItems : PacketListener {
     }
     
     private fun isIrrelevantClientSideComponent(type: DataComponentType<*>): Boolean {
-        return type == DataComponents.CUSTOM_DATA
+        return type == DataComponents.CUSTOM_DATA || type == DataComponents.BLOCK_ENTITY_DATA
     }
     
     private fun fixNestedStacks(player: Player?, itemStack: MojangStack): Boolean {
