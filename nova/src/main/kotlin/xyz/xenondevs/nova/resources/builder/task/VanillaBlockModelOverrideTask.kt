@@ -63,12 +63,12 @@ class VanillaBlockModelOverrideTask(private val builder: ResourcePackBuilder) : 
         val backingBlocks: Set<BlockType> = BackingStateCategory.entries.asSequence()
             .flatMap { it.backingStateConfigTypes.asSequence() }
             .mapTo(HashSet()) { it.of(0).blockType.get() }
-        for ([_, request] in BlockModelTask.requests) {
-            val layout = request.first as? BlockModelLayout.EntityBacked
+        for ([layout, _, states] in BlockModelTask.requests.values) {
+            layout as? BlockModelLayout.EntityBacked
                 ?: continue
             if (!layout.eraseSelectedVanillaModels)
                 continue
-            for (protoState in request.second) {
+            for (protoState in states) {
                 val blockData = layout.stateSelector(BlockSelectorScope(protoState))
                 val blockType = blockData.blockType
                 if (blockType.key.namespace() != "minecraft") {

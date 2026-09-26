@@ -324,7 +324,12 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     }
     
     override fun prepareBuild() {
-        BlockModelTask.request(entry, layout, ProtoBlockState.createBlockStates(entry, effectiveStateProperties))
+        BlockModelTask.request(
+            entry,
+            layout,
+            ProtoBlockState.createDefaultBlockState(entry, effectiveStateProperties),
+            ProtoBlockState.createBlockStates(entry, effectiveStateProperties)
+        )
     }
     
 }
@@ -367,6 +372,19 @@ internal data class ProtoBlockState(
     fun toBlockData(): BlockData = toBlockState().bukkitBlockData
     
     companion object {
+        
+        fun createDefaultBlockState(
+            entry: RegistryEntry.Paper<BlockType>,
+            properties: List<BlockStateProperty<*>>
+        ): ProtoBlockState {
+            val values = LinkedHashMap<String, String>()
+            fun <T : Comparable<T>> add(property: BlockStateProperty<T>) {
+                values[property.name] = property.valueToString(property.defaultValue)
+            }
+            for (property in properties)
+                add(property)
+            return ProtoBlockState(entry, values)
+        }
         
         /**
          * Creates a proto block state from [blockData].

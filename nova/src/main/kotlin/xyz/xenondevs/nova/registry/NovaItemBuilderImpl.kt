@@ -107,10 +107,10 @@ internal class NovaItemBuilderImpl(
         // note that this does not use NovaBlock.name as that would require making the name a Provider
         name(Component.translatable("block.${block.key.namespace()}.${block.key.value()}"))
         modelDefinition {
-            val [layout, blockStates] = BlockModelTask.requests[block]!!
+            val [layout, defaultState] = BlockModelTask.requests[block]!!
             
             val modelContent = resourcePackBuilder.getBuildData<ModelContent>()
-            val scope = BlockModelSelectorScope(blockStates[0], resourcePackBuilder, modelContent)
+            val scope = BlockModelSelectorScope(defaultState, resourcePackBuilder, modelContent)
             
             model = when (layout) {
                 is BlockModelLayout.StateBacked -> buildModel { layout.modelSelector(scope) }

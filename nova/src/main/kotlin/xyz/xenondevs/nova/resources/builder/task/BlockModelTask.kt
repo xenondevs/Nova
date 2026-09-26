@@ -172,7 +172,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
     ) {
         requests.entries
             .mapNotNull { [block, pair] ->
-                val [layout, blockStates] = pair
+                val [layout, _, blockStates] = pair
                 if (layout is L) Triple(block, layout, blockStates) else null
             }
             .sortedWith(compareBy(comparator) { [block, layout, _] -> block to layout })
@@ -302,7 +302,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
     
     internal companion object {
         
-        val requests: Map<RegistryEntry.Paper<BlockType>, Pair<BlockModelLayout, List<ProtoBlockState>>>
+        val requests: Map<RegistryEntry.Paper<BlockType>, Triple<BlockModelLayout, ProtoBlockState, List<ProtoBlockState>>>
             field = HashMap()
         
         /**
@@ -312,9 +312,10 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
         fun request(
             entry: RegistryEntry.Paper<BlockType>,
             layout: BlockModelLayout,
+            defaultState: ProtoBlockState,
             states: List<ProtoBlockState>,
         ) {
-            requests[entry] = layout to states
+            requests[entry] = Triple(layout, defaultState, states)
         }
         
     }
