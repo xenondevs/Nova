@@ -38,7 +38,7 @@ class RegistryKeySetBinarySerializerTest {
         @JvmStatic
         @BeforeAll
         fun setup() {
-            serializer = RegistryKeySetBinarySerializer(RegistryKey.ITEM)
+            serializer = RegistryKeySetBinarySerializer(RegistryKey.ITEM, RegistryAccess.registryAccess())
         }
         
     }

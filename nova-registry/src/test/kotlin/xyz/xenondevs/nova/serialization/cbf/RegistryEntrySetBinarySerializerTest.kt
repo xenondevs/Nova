@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.serialization.cbf
 
+import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import net.kyori.adventure.key.Key.key
 import org.bukkit.inventory.ItemType
@@ -61,7 +62,7 @@ class RegistryEntrySetBinarySerializerTest {
             registry.freeze()
             
             novaSerializer = NovaRegistryEntrySetBinarySerializer(registry)
-            paperSerializer = PaperRegistryEntrySetBinarySerializer(RegistryKey.ITEM)
+            paperSerializer = PaperRegistryEntrySetBinarySerializer(RegistryKey.ITEM, RegistryAccess.registryAccess())
         }
         
         private fun registerElement(name: String): RegistryEntry.Nova<TestElement> {
