@@ -22,6 +22,7 @@
     "block.lifecycle.NewChunkHolderMixin",
     "block.lifecycle.ServerLevelMixin",
     "block.light.ChunkHolderMixin",
+    "block.pickitem.ServerGamePacketListenerImplMixin",
     "block.sound.EntityMixin",
     "block.sound.LivingEntityMixin",
     "block.sound.ServerLevelMixin",
