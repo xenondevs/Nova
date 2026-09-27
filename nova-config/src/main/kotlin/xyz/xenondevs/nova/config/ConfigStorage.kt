@@ -9,6 +9,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.overwriteWith
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Namespaced
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.UnstableProviderApi
@@ -34,6 +35,14 @@ class ConfigStorage(
     private var jsons = ConcurrentHashMap<String, Json>()
     private val configProviders = ConcurrentHashMap<Key, ConfigProviderImpl>()
     private val readTimes = ConcurrentHashMap<Key, Long>()
+    
+    /**
+     * Sets the additional [serializers] to use for configs in [namespace].
+     * These are merged on top of [rootSerializers], with the namespace-specific serializers taking precedence.
+     */
+    fun setSerializers(namespace: Namespaced, serializers: SerializersModule) {
+        setSerializers(namespace.namespace(), serializers)
+    }
     
     /**
      * Sets the additional [serializers] to use for configs in [namespace].
