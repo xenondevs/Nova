@@ -8,6 +8,7 @@ import org.joml.Vector2i
 import org.joml.Vector2ic
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
@@ -15,6 +16,7 @@ import xyz.xenondevs.nova.registry.bootstrapFlatMap
 import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
 import xyz.xenondevs.nova.serialization.kotlinx.GuiTextureSerializer
+import xyz.xenondevs.nova.ui.menu.locale
 import xyz.xenondevs.nova.ui.overlay.MovedFonts
 import xyz.xenondevs.nova.util.component.adventure.isEmpty
 import xyz.xenondevs.nova.util.component.adventure.move
@@ -46,6 +48,24 @@ fun Provider<GuiTexture>.getTitle(translate: String, locale: Provider<Locale>): 
 fun Provider<GuiTexture>.getTitle(lines: List<Component>, locale: Provider<Locale>): Provider<Component> =
     bootstrapFlatMap { it.getTitle(lines, locale) }
 
+/**
+ * Gets the title using the window viewer's locale.
+ */
+context(windowDsl: WindowDsl)
+fun Provider<GuiTexture>.getTitle(): Provider<Component> = getTitle(windowDsl.locale)
+
+/**
+ * Gets the title with [translate] using the window viewer's locale.
+ */
+context(windowDsl: WindowDsl)
+fun Provider<GuiTexture>.getTitle(translate: String): Provider<Component> = getTitle(translate, windowDsl.locale)
+
+/**
+ * Gets the title with [lines] using the window viewer's locale.
+ */
+context(windowDsl: WindowDsl)
+fun Provider<GuiTexture>.getTitle(vararg lines: Component): Provider<Component> = getTitle(lines.asList(), windowDsl.locale)
+
 @Serializable(with = GuiTextureSerializer::class)
 class GuiTexture internal constructor(
     override val entry: RegistryEntry.Nova<GuiTexture>,
@@ -68,10 +88,28 @@ class GuiTexture internal constructor(
     }
     
     /**
+     * Gets the title using the window viewer's locale.
+     */
+    context(windowDsl: WindowDsl)
+    fun getTitle(): Provider<Component> = getTitle(windowDsl.locale)
+    
+    /**
+     * Gets the title with [translate] using the window viewer's locale.
+     */
+    context(windowDsl: WindowDsl)
+    fun getTitle(translate: String): Provider<Component> = getTitle(translate, windowDsl.locale)
+    
+    /**
+     * Gets the title with [lines] using the window viewer's locale.
+     */
+    context(windowDsl: WindowDsl)
+    fun getTitle(vararg lines: Component): Provider<Component> = getTitle(lines.asList(), windowDsl.locale)
+    
+    /**
      * Gets a provider of the gui texture component with all static lines for [locale].
      */
     fun getTitle(locale: Provider<Locale>): Provider<Component> =
-        getTitle(emptyList(), locale)
+        getTitle([], locale)
     
     /**
      * Gets a provider of the gui texture component with [translate] in the first dynamic line
