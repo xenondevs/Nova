@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.util.component.adventure.isEmpty
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.toMinecraftLocaleCode
 import java.util.*
+import kotlin.math.roundToInt
 
 /**
  * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [GuiTexture.component].
@@ -84,10 +85,12 @@ class GuiTexture internal constructor(
      * dynamic lines in the order they are defined.
      */
     fun getTitle(lines: List<Component>, locale: Provider<Locale>): Provider<Component> = combinedProvider(data, locale) { data, locale ->
+        val textureWidth = CharSizes.getCharWidth(data.font, data.codePoint)
+        val textureXRange = CharSizes.getCharXRange(data.font, data.codePoint)
         val builder = Component.text()
             .move(data.offset)
             .append(Component.text(Character.toString(data.codePoint), NamedTextColor.WHITE).font(data.font))
-            .move(-data.width - 1)
+            .move(-textureWidth.roundToInt())
         
         var dynamicLineIndex = 0
         titleLines.asSequence()
@@ -104,40 +107,21 @@ class GuiTexture internal constructor(
             .forEach { [text, position] ->
                 val movedText = MovedFonts.moveVertically(text, position.offset.y())
                 val textSize = CharSizes.calculateComponentSize(movedText, locale.toMinecraftLocaleCode(), false)
-                when (position.alignment) {
-                    TitlePosition.Alignment.DEFAULT -> {
-                        val preMove = -data.offset + position.offset.x()
-                        builder
-                            .move(preMove)
-                            .append(movedText)
-                            .move(-textSize.width - preMove)
-                    }
-                    
-                    TitlePosition.Alignment.LEFT -> {
-                        val preMove = position.offset.x() - textSize.xRange.start
-                        builder
-                            .move(preMove)
-                            .append(movedText)
-                            .move(-textSize.width - preMove)
-                    }
-                    
+                val preMove = when (position.alignment) {
+                    TitlePosition.Alignment.DEFAULT -> (-data.offset + position.offset.x()).toFloat()
+                    TitlePosition.Alignment.LEFT -> textureXRange.start + position.offset.x() - textSize.xRange.start
                     TitlePosition.Alignment.CENTER -> {
                         val visualCenter = (textSize.xRange.start + textSize.xRange.endInclusive) / 2
-                        val preMove = data.width / 2f + position.offset.x() - visualCenter
-                        builder
-                            .move(preMove)
-                            .append(movedText)
-                            .move(-textSize.width - preMove)
+                        val textureCenter = (textureXRange.start + textureXRange.endInclusive) / 2
+                        textureCenter + position.offset.x() - visualCenter
                     }
                     
-                    TitlePosition.Alignment.RIGHT -> {
-                        val preMove = data.width + 1 + position.offset.x() - textSize.xRange.endInclusive
-                        builder
-                            .move(preMove)
-                            .append(movedText)
-                            .move(-textSize.width - preMove)
-                    }
-                }
+                    TitlePosition.Alignment.RIGHT -> textureXRange.endInclusive + position.offset.x() - textSize.xRange.endInclusive
+                }.roundToInt()
+                builder
+                    .move(preMove)
+                    .append(movedText)
+                    .move(-textSize.width.roundToInt() - preMove)
             }
         
         builder.build()

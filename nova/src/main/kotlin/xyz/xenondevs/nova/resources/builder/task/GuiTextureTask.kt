@@ -24,9 +24,7 @@ internal class GuiTextureData(
     @Serializable(with = KeySerializer::class)
     val font: Key,
     val codePoint: Int,
-    val offset: Int,
-    val width: Int,
-    val height: Int
+    val offset: Int
 )
 
 /**
@@ -117,10 +115,8 @@ class GuiTextureTask(
             val fontChar = addEntry(guiTexture.key.asString(), texture, dim.height, -offset.y())
             guiTextures[guiTexture] = GuiTextureData(
                 fontChar.font,
-                fontChar.codePoint, 
-                offset.x(), 
-                dim.width,
-                dim.height
+                fontChar.codePoint,
+                offset.x()
             )
             guiTexturesByFontChar[fontChar] = guiTexture
         }
