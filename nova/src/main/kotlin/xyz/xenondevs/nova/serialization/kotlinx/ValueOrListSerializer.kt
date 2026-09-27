@@ -7,9 +7,21 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonTransformingSerializer
 
-internal typealias ValueOrList<T> = @Serializable(with = ValueOrListSerializer::class) List<T>
+/**
+ * Serializable type alias for [List] of [T] with [ValueOrListSerializer].
+ */
+typealias ValueOrList<T> = @Serializable(with = ValueOrListSerializer::class) List<T>
 
-internal class ValueOrListSerializer<T>(dataSerializer: KSerializer<T>) : JsonTransformingSerializer<List<T>>(ListSerializer(dataSerializer)) {
+/**
+ * [JsonTransformingSerializer] that accepts both a single [T] or an array of [T]
+ * and returns a [List] during deserialization.
+ * 
+ * During serialization, it will write a single value if the list has only one element,
+ * or an array if it has multiple elements.
+ */
+class ValueOrListSerializer<T>(
+    dataSerializer: KSerializer<T>
+) : JsonTransformingSerializer<List<T>>(ListSerializer(dataSerializer)) {
     
     override fun transformDeserialize(element: JsonElement): JsonElement =
         element as? JsonArray ?: JsonArray(listOf(element))
