@@ -96,13 +96,17 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
      * Injects an incoming packet into the netty pipeline starting at this handler.
      * 
      * This may be useful for cases where an incoming packet was previously canceled, asynchronously handled,
-     * and now a modified version needs to be re-inserted into the pipeline without firing packet events.
+     * and now a modified version needs to be re-inserted into the pipeline with [optionally][callEventHandlers] firing packet events.
      */
-    fun injectIncoming(msg: Any) {
-        if (channel.eventLoop().inEventLoop()) {
-            super.channelRead(channel.pipeline().context(this), msg)
-        } else channel.eventLoop().execute {
-            super.channelRead(channel.pipeline().context(this), msg)
+    fun injectIncoming(msg: Any, callEventHandlers: Boolean = false) {
+        if (!channel.eventLoop().inEventLoop())
+            return channel.eventLoop().execute { injectIncoming(msg, callEventHandlers) }
+        
+        val ctx = channel.pipeline().context(this)
+        if (callEventHandlers) {
+            channelRead(ctx, msg)
+        } else {
+            super.channelRead(ctx, msg)
         }
     }
     

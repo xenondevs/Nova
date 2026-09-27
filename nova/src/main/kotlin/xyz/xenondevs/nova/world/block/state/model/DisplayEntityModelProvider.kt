@@ -248,7 +248,7 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         )
         
         val packet = ServerboundPlayerActionPacket(START_DESTROY_BLOCK, BlockPos(x, y, z), hitDirection, 0)
-        player.packetHandler?.injectIncoming(packet)
+        player.packetHandler?.injectIncoming(packet, callEventHandlers = true)
     }
     
     private fun handleColliderInteract(
@@ -280,13 +280,13 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
             false
         )
         val packet = ServerboundUseItemOnPacket(InteractionHand.MAIN_HAND, hitResult, 0, System.currentTimeMillis())
-        event.player.packetHandler?.injectIncoming(packet)
+        event.player.packetHandler?.injectIncoming(packet, callEventHandlers = true)
     }
     
     private fun handleColliderPick(event: ServerboundPickItemFromEntityPacketEvent, pos: BlockPosition) {
         event.isCancelled = true
         val packet = ServerboundPickItemFromBlockPacket(BlockPos(pos.blockX(), pos.blockY(), pos.blockZ()), event.includeData)
-        event.player.packetHandler?.injectIncoming(packet)
+        event.player.packetHandler?.injectIncoming(packet, callEventHandlers = true)
     }
     
     private fun determineHitboxFace(x: Double, y: Double, z: Double, hitbox: HitboxCuboid) =
