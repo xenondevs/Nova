@@ -49,20 +49,20 @@ internal object Matrix4fcAsArraySerializer : KSerializer<Matrix4fc> {
     override fun serialize(encoder: Encoder, value: Matrix4fc) {
         val data = FloatArray(16)
         data[0] = value.m00()
-        data[1] = value.m01()
-        data[2] = value.m02()
-        data[3] = value.m03()
-        data[4] = value.m10()
+        data[1] = value.m10()
+        data[2] = value.m20()
+        data[3] = value.m30()
+        data[4] = value.m01()
         data[5] = value.m11()
-        data[6] = value.m12()
-        data[7] = value.m13()
-        data[8] = value.m20()
-        data[9] = value.m21()
+        data[6] = value.m21()
+        data[7] = value.m31()
+        data[8] = value.m02()
+        data[9] = value.m12()
         data[10] = value.m22()
-        data[11] = value.m23()
-        data[12] = value.m30()
-        data[13] = value.m31()
-        data[14] = value.m32()
+        data[11] = value.m32()
+        data[12] = value.m03()
+        data[13] = value.m13()
+        data[14] = value.m23()
         data[15] = value.m33()
         delegateSerializer.serialize(encoder, data)
     }
@@ -70,10 +70,10 @@ internal object Matrix4fcAsArraySerializer : KSerializer<Matrix4fc> {
     override fun deserialize(decoder: Decoder): Matrix4fc {
         val m = decoder.decodeSerializableValue(delegateSerializer)
         return Matrix4f(
-            m[0], m[1], m[2], m[3],
-            m[4], m[5], m[6], m[7],
-            m[8], m[9], m[10], m[11],
-            m[12], m[13], m[14], m[15]
+            m[0], m[4], m[8], m[12],
+            m[1], m[5], m[9], m[13],
+            m[2], m[6], m[10], m[14],
+            m[3], m[7], m[11], m[15]
         )
     }
     
