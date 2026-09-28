@@ -66,7 +66,8 @@ class SoundOverridesContent(private val builder: ResourcePackBuilder) : PackBuil
                 // create and write Nova's sounds.json
                 val novaSoundIndex = JsonObject()
                 soundEvents.forEach { soundEvent ->
-                    val soundEventObj = index[soundEvent]!!
+                    val soundEventObj = index[soundEvent]
+                        ?: return@forEach
                     novaSoundIndex.add(soundEvent, soundEventObj)
                 }
                 novaSoundIndex.writeToFile(builder.resolve("assets/nova/sounds.json"))
