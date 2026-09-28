@@ -38,7 +38,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.24.0
+        <div class="library-version" id="library-version">0.25.0-alpha.1
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
@@ -93,11 +93,30 @@
   <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.world.block.tileentity.network.node</a><span class="delimiter">/</span><span class="current">NetworkNodeConnection</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Network</span><wbr><span>Node</span><wbr><span><span>Connection</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="index.html">NetworkNodeConnection</a></div><p class="paragraph">Represents a connection of a <a href="../-network-node/index.html">NetworkNode</a> to a <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-network/index.html">Network</a>.</p><h4 class="tableheader">Inheritors</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-mutable-network-node-connection/index.html">MutableNetworkNodeConnection</a></div></span></div><div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">NetworkNodeConnection</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>node<span class="token operator">: </span><a href="../-network-node/index.html">NetworkNode</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>faces<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.util/-cube-face-set/index.html">CubeFaceSet</a><span class="token operator"> = </span>CubeFaceSet.NONE</span></span><span class="token punctuation">)</span></div><p class="paragraph">Represents a connection of a <a href="../-network-node/index.html">NetworkNode</a> to a <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-network/index.html">Network</a>.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="-988073611%2FConstructors%2F-501115348" anchor-label="NetworkNodeConnection" id="-988073611%2FConstructors%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-network-node-connection.html"><span>Network</span><wbr><span>Node</span><wbr><span><span>Connection</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-988073611%2FConstructors%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../-network-node/index.html">NetworkNode</a><span class="token punctuation">, </span></span><span class="parameter ">faces<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.util/-cube-face-set/index.html">CubeFaceSet</a><span class="token operator"> = </span>CubeFaceSet.NONE</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div data-togglable="PROPERTY">
         <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="-1513821710%2FProperties%2F-501115348" anchor-label="faces" id="-1513821710%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
@@ -110,7 +129,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="faces.html">faces</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The <span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFaces</span> with which the <a href="node.html">node</a> is connected.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="faces.html">faces</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.util/-cube-face-set/index.html">CubeFaceSet</a></div><div class="brief "><p class="paragraph">The faces through which <a href="../../../nova/xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node-connection/--root--.html">node</a> connects to the network.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -125,41 +144,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="node.html">node</a><span class="token operator">: </span><a href="../-network-node/index.html">NetworkNode</a></div><div class="brief "><p class="paragraph">The <a href="../-network-node/index.html">NetworkNode</a> that is connected.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div data-togglable="FUNCTION">
-        <h2 class="tableheader">Functions</h2>
-        <div class="table"><a data-name="1336080158%2FFunctions%2F-501115348" anchor-label="component1" id="1336080158%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="component1.html"><span><span>component1</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1336080158%2FFunctions%2F-501115348"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="component1.html"><span class="token function">component1</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-network-node/index.html">NetworkNode</a></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="1367099965%2FFunctions%2F-501115348" anchor-label="component2" id="1367099965%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="component2.html"><span><span>component2</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1367099965%2FFunctions%2F-501115348"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="component2.html"><span class="token function">component2</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="node.html">node</a><span class="token operator">: </span><a href="../-network-node/index.html">NetworkNode</a></div><div class="brief "><p class="paragraph">The network node that is connected.</p></div></div></div>
                 </div>
               </div>
             </div>

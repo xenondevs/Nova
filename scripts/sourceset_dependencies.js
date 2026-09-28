@@ -1,1 +1,1 @@
-sourceset_dependencies = '{":nova-api/javaMain":[],":nova/main":[]}'
+sourceset_dependencies = '{":nova-network/main":[],":nova-packet-entity/main":[],":nova-config/main":[],":nova-api/javaMain":[],":nova-interaction/main":[],":nova-gradle-plugin/main":[],":nova-registry/main":[],":nova/main":[]}'

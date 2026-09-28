@@ -1,0 +1,415 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>ServerboundSetStructureBlockPacketEvent</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-network/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-network/main" data-filter=":nova-network/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova-network::xyz.xenondevs.nova.network.event.serverbound/ServerboundSetStructureBlockPacketEvent///PointingToDeclaration//213940877">
+  <div class="breadcrumbs"><a href="../../index.html">nova-network</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.network.event.serverbound</a><span class="delimiter">/</span><span class="current">ServerboundSetStructureBlockPacketEvent</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Serverbound</span><wbr><span>Set</span><wbr><span>Structure</span><wbr><span>Block</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">ServerboundSetStructureBlockPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetStructureBlockPacket///PointingToDeclaration/">ServerboundSetStructureBlockPacket</span></span></span><span class="token punctuation">)</span> : <a href="../../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetStructureBlockPacket///PointingToDeclaration/">ServerboundSetStructureBlockPacket</span><span class="token operator">&gt; </span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="2110159957%2FConstructors%2F213940877" anchor-label="ServerboundSetStructureBlockPacketEvent" id="2110159957%2FConstructors%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-set-structure-block-packet-event.html"><span>Serverbound</span><wbr><span>Set</span><wbr><span>Structure</span><wbr><span>Block</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2110159957%2FConstructors%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetStructureBlockPacket///PointingToDeclaration/">ServerboundSetStructureBlockPacket</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-475024592%2FProperties%2F213940877" anchor-label="data" id="-475024592%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="data.html"><span><span>data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-475024592%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="data.html">data</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-483956985%2FProperties%2F213940877" anchor-label="ignoreEntities" id="-483956985%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ignore-entities.html"><span>ignore</span><wbr><span><span>Entities</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-483956985%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="ignore-entities.html">ignoreEntities</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-698254509%2FProperties%2F213940877" anchor-label="integrity" id="-698254509%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="integrity.html"><span><span>integrity</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-698254509%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="integrity.html">integrity</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2097129029%2FProperties%2F213940877" anchor-label="isCancelled" id="2097129029%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../xyz.xenondevs.nova.network.event/-packet-event/is-cancelled.html"><span>is</span><wbr><span><span>Cancelled</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2097129029%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="../../xyz.xenondevs.nova.network.event/-packet-event/is-cancelled.html">isCancelled</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Whether the event is canceled. Packets that are canceled will not be sent or processed by the server.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-408091269%2FProperties%2F213940877" anchor-label="mirror" id="-408091269%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="mirror.html"><span><span>mirror</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-408091269%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="mirror.html">mirror</a><span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.block/Mirror///PointingToDeclaration/">Mirror</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-180264105%2FProperties%2F213940877" anchor-label="mode" id="-180264105%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="mode.html"><span><span>mode</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-180264105%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="mode.html">mode</a><span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.block.state.properties/StructureMode///PointingToDeclaration/">StructureMode</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-151226513%2FProperties%2F213940877" anchor-label="name" id="-151226513%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="name.html"><span><span>name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-151226513%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="name.html">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-686628057%2FProperties%2F213940877" anchor-label="offset" id="-686628057%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="offset.html"><span><span>offset</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-686628057%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="offset.html">offset</a><span class="token operator">: </span><span data-unresolved-link="net.minecraft.core/BlockPos///PointingToDeclaration/">BlockPos</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1050248934%2FProperties%2F213940877" anchor-label="packet" id="1050248934%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../xyz.xenondevs.nova.network.event/-packet-event/packet.html"><span><span>packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1050248934%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="../../xyz.xenondevs.nova.network.event/-packet-event/packet.html">packet</a><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetStructureBlockPacket///PointingToDeclaration/">ServerboundSetStructureBlockPacket</span></div><div class="brief "><p class="paragraph">The packet that is being sent or received.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="285849228%2FProperties%2F213940877" anchor-label="player" id="285849228%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../xyz.xenondevs.nova.network.event/-player-packet-event/player.html"><span><span>player</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="285849228%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../../xyz.xenondevs.nova.network.event/-player-packet-event/player.html">player</a><span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-202695572%2FProperties%2F213940877" anchor-label="pos" id="-202695572%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pos.html"><span><span>pos</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-202695572%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="pos.html">pos</a><span class="token operator">: </span><span data-unresolved-link="net.minecraft.core/BlockPos///PointingToDeclaration/">BlockPos</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1991503012%2FProperties%2F213940877" anchor-label="rotation" id="-1991503012%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="rotation.html"><span><span>rotation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1991503012%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="rotation.html">rotation</a><span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.block/Rotation///PointingToDeclaration/">Rotation</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1133628855%2FProperties%2F213940877" anchor-label="seed" id="-1133628855%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="seed.html"><span><span>seed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1133628855%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="seed.html">seed</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="147766867%2FProperties%2F213940877" anchor-label="showAir" id="147766867%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="show-air.html"><span>show</span><wbr><span><span>Air</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="147766867%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="show-air.html">showAir</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="438728886%2FProperties%2F213940877" anchor-label="showBoundingBox" id="438728886%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="show-bounding-box.html"><span>show</span><wbr><span>Bounding</span><wbr><span><span>Box</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="438728886%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="show-bounding-box.html">showBoundingBox</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="892469945%2FProperties%2F213940877" anchor-label="size" id="892469945%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="size.html"><span><span>size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="892469945%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="size.html">size</a><span class="token operator">: </span><span data-unresolved-link="net.minecraft.core/Vec3i///PointingToDeclaration/">Vec3i</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1226420657%2FProperties%2F213940877" anchor-label="strict" id="1226420657%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="strict.html"><span><span>strict</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1226420657%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="strict.html">strict</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-617770089%2FProperties%2F213940877" anchor-label="updateType" id="-617770089%2FProperties%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-type.html"><span>update</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-617770089%2FProperties%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="update-type.html">updateType</a><span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.block.entity/StructureBlockEntity.UpdateType///PointingToDeclaration/">StructureBlockEntity.UpdateType</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

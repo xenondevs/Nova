@@ -38,7 +38,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.24.0
+        <div class="library-version" id="library-version">0.25.0-alpha.1
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
@@ -93,24 +93,133 @@
   <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.ui.waila.info</a><span class="delimiter">/</span><span class="current">WailaInfoProvider</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Waila</span><wbr><span>Info</span><wbr><span><span>Provider</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="index.html">WailaInfoProvider</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span></div><h4 class="tableheader">Inheritors</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-nova-waila-info-provider/index.html">NovaWailaInfoProvider</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-vanilla-waila-info-provider/index.html">VanillaWailaInfoProvider</a></div></span></div><div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/Serializable///PointingToDeclaration/"><span class="token annotation builtin">Serializable</span></span><span class="token punctuation">(</span><span>with<span class="token operator"> = </span><a href="../../xyz.xenondevs.nova.serialization.kotlinx/-waila-info-provider-serializer/index.html">WailaInfoProviderSerializer::class</a></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">class </span><a href="index.html">WailaInfoProvider</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="index.html">S</a><span class="token operator"> : </span><span data-unresolved-link="org.bukkit.block.data/BlockData///PointingToDeclaration/">BlockData</span><span class="token operator">&gt;</span> : <a href="../../../nova-registry/xyz.xenondevs.nova.registry/-nova-registry-element/index.html">NovaRegistryElement</a><span class="token operator">&lt;</span><a href="index.html">WailaInfoProvider</a><span class="token operator">&lt;</span><a href="index.html">S</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div><p class="paragraph">Provides the <a href="../-waila-info/index.html">WailaInfo</a> (icon and text) for a player looking at a block.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
-      <div data-togglable="FUNCTION">
-        <h2 class="tableheader">Functions</h2>
-        <div class="table"><a data-name="-1959422533%2FFunctions%2F-501115348" anchor-label="getInfo" id="-1959422533%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-2038339023%2FProperties%2F-501115348" anchor-label="blocks" id="-2038339023%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
           <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="get-info.html"><span>get</span><wbr><span><span>Info</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1959422533%2FFunctions%2F-501115348"></span>
+                  <div><a href="blocks.html"><span><span>blocks</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2038339023%2FProperties%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="get-info.html"><span class="token function">getInfo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">pos<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a><span class="token punctuation">, </span></span><span class="parameter ">blockState<span class="token operator">: </span><a href="index.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-waila-info/index.html">WailaInfo</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="blocks.html">blocks</a><span class="token operator">: </span><a href="../../../nova-registry/xyz.xenondevs.nova.registry/-registry-entry-set/-paper/index.html">RegistryEntrySet.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.block/BlockType///PointingToDeclaration/">BlockType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The blocks this provider applies to.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-351527151%2FProperties%2F-501115348" anchor-label="entry" id="-351527151%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="entry.html"><span><span>entry</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-351527151%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="entry.html">entry</a><span class="token operator">: </span><a href="../../../nova-registry/xyz.xenondevs.nova.registry/-registry-entry/-nova/index.html">RegistryEntry.Nova</a><span class="token operator">&lt;</span><a href="index.html">WailaInfoProvider</a><span class="token operator">&lt;</span><a href="index.html">S</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1265334991%2FProperties%2F-501115348" anchor-label="id" id="-1265334991%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../xyz.xenondevs.nova.world.player.attachment/-attachment-type/index.html#-1265334991%2FProperties%2F-501115348"><span><span>id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1265334991%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../xyz.xenondevs.nova.world.player.attachment/-attachment-type/index.html#-1265334991%2FProperties%2F-501115348"><strike>id</strike></a><span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1633835503%2FProperties%2F-501115348" anchor-label="key" id="1633835503%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../xyz.xenondevs.nova.world.player.attachment/-attachment-type/index.html#1633835503%2FProperties%2F-501115348"><span><span>key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1633835503%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../xyz.xenondevs.nova.world.player.attachment/-attachment-type/index.html#1633835503%2FProperties%2F-501115348">key</a><span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="../../xyz.xenondevs.nova.world.player.attachment/-attachment-type/index.html#1633835503%2FProperties%2F-501115348">key</a><span class="token operator">: </span><span data-unresolved-link="org.bukkit/NamespacedKey///PointingToDeclaration/">NamespacedKey</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="842241363%2FProperties%2F-501115348" anchor-label="priority" id="842241363%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="priority.html"><span><span>priority</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="842241363%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="priority.html">priority</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">The priority of this provider. If multiple providers apply to the same block, the one with the highest priority will be chosen.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1884155899%2FFunctions%2F-501115348" anchor-label="getInfo" id="-1884155899%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-info.html"><span>get</span><wbr><span><span>Info</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1884155899%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-info.html"><span class="token function">getInfo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span><span class="token punctuation">, </span></span><span class="parameter ">blockState<span class="token operator">: </span><a href="index.html">S</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-waila-info/index.html">WailaInfo</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-123838621%2FFunctions%2F-501115348" anchor-label="getKey" id="-123838621%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../xyz.xenondevs.nova.world.player.attachment/-attachment-type/index.html#-123838621%2FFunctions%2F-501115348"><span>get</span><wbr><span><span>Key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-123838621%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../xyz.xenondevs.nova.world.player.attachment/-attachment-type/index.html#-123838621%2FFunctions%2F-501115348"><span class="token function">getKey</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit/NamespacedKey///PointingToDeclaration/">NamespacedKey</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1633835503%2FFunctions%2F-501115348" anchor-label="key" id="1633835503%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../xyz.xenondevs.nova.world.player.attachment/-attachment-type/index.html#1633835503%2FFunctions%2F-501115348"><span><span>key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1633835503%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../xyz.xenondevs.nova.world.player.attachment/-attachment-type/index.html#1633835503%2FFunctions%2F-501115348"><span class="token function">key</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span></div></div></div>
                 </div>
               </div>
             </div>

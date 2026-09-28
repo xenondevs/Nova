@@ -1,0 +1,696 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>AbstractChestedHorseMetadataDsl</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-packet-entity/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-packet-entity/main" data-filter=":nova-packet-entity/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova-packet-entity::xyz.xenondevs.nova.packetentity/AbstractChestedHorseMetadataDsl///PointingToDeclaration//737294119">
+  <div class="breadcrumbs"><a href="../../index.html">nova-packet-entity</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.packetentity</a><span class="delimiter">/</span><span class="current">AbstractChestedHorseMetadataDsl</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Abstract</span><wbr><span>Chested</span><wbr><span>Horse</span><wbr><span>Metadata</span><wbr><span><span>Dsl</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="index.html">AbstractChestedHorseMetadataDsl</a> : <a href="../-abstract-horse-metadata-dsl/index.html">AbstractHorseMetadataDsl</a></div><h4 class="tableheader">Inheritors</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-llama-metadata-dsl/index.html">LlamaMetadataDsl</a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-114463165%2FProperties%2F737294119" anchor-label="ageLocked" id="-114463165%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-ageable-mob-metadata-dsl/age-locked.html"><span>age</span><wbr><span><span>Locked</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-114463165%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-ageable-mob-metadata-dsl/age-locked.html">ageLocked</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1220363087%2FProperties%2F737294119" anchor-label="airSupply" id="1220363087%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-entity-metadata-dsl/air-supply.html"><span>air</span><wbr><span><span>Supply</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1220363087%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-entity-metadata-dsl/air-supply.html">airSupply</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-948268253%2FProperties%2F737294119" anchor-label="arrowCount" id="-948268253%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-living-entity-metadata-dsl/arrow-count.html"><span>arrow</span><wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-948268253%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-living-entity-metadata-dsl/arrow-count.html">arrowCount</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="870565624%2FProperties%2F737294119" anchor-label="baby" id="870565624%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-ageable-mob-metadata-dsl/baby.html"><span><span>baby</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="870565624%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-ageable-mob-metadata-dsl/baby.html">baby</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-361781213%2FProperties%2F737294119" anchor-label="chest" id="-361781213%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="chest.html"><span><span>chest</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-361781213%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="chest.html">chest</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-993836362%2FProperties%2F737294119" anchor-label="customName" id="-993836362%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-entity-metadata-dsl/custom-name.html"><span>custom</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-993836362%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-entity-metadata-dsl/custom-name.html">customName</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><span data-unresolved-link="net.kyori.adventure.text/Component///PointingToDeclaration/">Component</span><span class="token operator">?</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1606548846%2FProperties%2F737294119" anchor-label="customNameVisible" id="-1606548846%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-entity-metadata-dsl/custom-name-visible.html"><span>custom</span><wbr><span>Name</span><wbr><span><span>Visible</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1606548846%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-entity-metadata-dsl/custom-name-visible.html">customNameVisible</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-422611878%2FProperties%2F737294119" anchor-label="effectAmbience" id="-422611878%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-living-entity-metadata-dsl/effect-ambience.html"><span>effect</span><wbr><span><span>Ambience</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-422611878%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-living-entity-metadata-dsl/effect-ambience.html">effectAmbience</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="467379061%2FProperties%2F737294119" anchor-label="effectParticles" id="467379061%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-living-entity-metadata-dsl/effect-particles.html"><span>effect</span><wbr><span><span>Particles</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="467379061%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-living-entity-metadata-dsl/effect-particles.html">effectParticles</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.core.particles/ParticleOptions///PointingToDeclaration/">ParticleOptions</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="416716587%2FProperties%2F737294119" anchor-label="flags" id="416716587%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-abstract-horse-metadata-dsl/flags.html"><span><span>flags</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="416716587%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-abstract-horse-metadata-dsl/flags.html">flags</a><span class="token operator">: </span><a href="../-flags-dsl-property/index.html">FlagsDslProperty</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1762034122%2FProperties%2F737294119" anchor-label="hasNoAi" id="-1762034122%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../has-no-ai.html"><span>has</span><wbr><span>No</span><wbr><span><span>Ai</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1762034122%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-mob-metadata-dsl/index.html">MobMetadataDsl</a><span class="token punctuation">.</span><a href="../has-no-ai.html">hasNoAi</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-181178867%2FProperties%2F737294119" anchor-label="health" id="-181178867%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-living-entity-metadata-dsl/health.html"><span><span>health</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-181178867%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-living-entity-metadata-dsl/health.html">health</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-786659333%2FProperties%2F737294119" anchor-label="isAggressive" id="-786659333%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-aggressive.html"><span>is</span><wbr><span><span>Aggressive</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-786659333%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-mob-metadata-dsl/index.html">MobMetadataDsl</a><span class="token punctuation">.</span><a href="../is-aggressive.html">isAggressive</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1897188747%2FProperties%2F737294119" anchor-label="isBred" id="-1897188747%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-bred.html"><span>is</span><wbr><span><span>Bred</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1897188747%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-abstract-horse-metadata-dsl/index.html">AbstractHorseMetadataDsl</a><span class="token punctuation">.</span><a href="../is-bred.html">isBred</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1254919334%2FProperties%2F737294119" anchor-label="isCrouching" id="-1254919334%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-crouching.html"><span>is</span><wbr><span><span>Crouching</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1254919334%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-entity-metadata-dsl/index.html">EntityMetadataDsl</a><span class="token punctuation">.</span><a href="../is-crouching.html">isCrouching</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-545967174%2FProperties%2F737294119" anchor-label="isEating" id="-545967174%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-eating.html"><span>is</span><wbr><span><span>Eating</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-545967174%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-abstract-horse-metadata-dsl/index.html">AbstractHorseMetadataDsl</a><span class="token punctuation">.</span><a href="../is-eating.html">isEating</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1966976394%2FProperties%2F737294119" anchor-label="isFlyingElytra" id="-1966976394%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-flying-elytra.html"><span>is</span><wbr><span>Flying</span><wbr><span><span>Elytra</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1966976394%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-entity-metadata-dsl/index.html">EntityMetadataDsl</a><span class="token punctuation">.</span><a href="../is-flying-elytra.html">isFlyingElytra</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1125527015%2FProperties%2F737294119" anchor-label="isGlowing" id="1125527015%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-glowing.html"><span>is</span><wbr><span><span>Glowing</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1125527015%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-entity-metadata-dsl/index.html">EntityMetadataDsl</a><span class="token punctuation">.</span><a href="../is-glowing.html">isGlowing</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1033685215%2FProperties%2F737294119" anchor-label="isInvisible" id="1033685215%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-invisible.html"><span>is</span><wbr><span><span>Invisible</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1033685215%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-entity-metadata-dsl/index.html">EntityMetadataDsl</a><span class="token punctuation">.</span><a href="../is-invisible.html">isInvisible</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-409998678%2FProperties%2F737294119" anchor-label="isLeftHanded" id="-409998678%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-left-handed.html"><span>is</span><wbr><span>Left</span><wbr><span><span>Handed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-409998678%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-mob-metadata-dsl/index.html">MobMetadataDsl</a><span class="token punctuation">.</span><a href="../is-left-handed.html">isLeftHanded</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="911735895%2FProperties%2F737294119" anchor-label="isMouthOpen" id="911735895%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-mouth-open.html"><span>is</span><wbr><span>Mouth</span><wbr><span><span>Open</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="911735895%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-abstract-horse-metadata-dsl/index.html">AbstractHorseMetadataDsl</a><span class="token punctuation">.</span><a href="../is-mouth-open.html">isMouthOpen</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1061478867%2FProperties%2F737294119" anchor-label="isOffHandActive" id="-1061478867%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-off-hand-active.html"><span>is</span><wbr><span>Off</span><wbr><span>Hand</span><wbr><span><span>Active</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1061478867%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-living-entity-metadata-dsl/index.html">LivingEntityMetadataDsl</a><span class="token punctuation">.</span><a href="../is-off-hand-active.html">isOffHandActive</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1257242443%2FProperties%2F737294119" anchor-label="isOnFire" id="1257242443%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-on-fire.html"><span>is</span><wbr><span>On</span><wbr><span><span>Fire</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1257242443%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-entity-metadata-dsl/index.html">EntityMetadataDsl</a><span class="token punctuation">.</span><a href="../is-on-fire.html">isOnFire</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="807881834%2FProperties%2F737294119" anchor-label="isRearing" id="807881834%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-rearing.html"><span>is</span><wbr><span><span>Rearing</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="807881834%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-abstract-horse-metadata-dsl/index.html">AbstractHorseMetadataDsl</a><span class="token punctuation">.</span><a href="../is-rearing.html">isRearing</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2086315393%2FProperties%2F737294119" anchor-label="isSpinAttacking" id="2086315393%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-spin-attacking.html"><span>is</span><wbr><span>Spin</span><wbr><span><span>Attacking</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2086315393%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-living-entity-metadata-dsl/index.html">LivingEntityMetadataDsl</a><span class="token punctuation">.</span><a href="../is-spin-attacking.html">isSpinAttacking</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2073885958%2FProperties%2F737294119" anchor-label="isSprinting" id="-2073885958%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-sprinting.html"><span>is</span><wbr><span><span>Sprinting</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2073885958%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-entity-metadata-dsl/index.html">EntityMetadataDsl</a><span class="token punctuation">.</span><a href="../is-sprinting.html">isSprinting</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-921439501%2FProperties%2F737294119" anchor-label="isSwimming" id="-921439501%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-swimming.html"><span>is</span><wbr><span><span>Swimming</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-921439501%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-entity-metadata-dsl/index.html">EntityMetadataDsl</a><span class="token punctuation">.</span><a href="../is-swimming.html">isSwimming</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1207741065%2FProperties%2F737294119" anchor-label="isTamed" id="1207741065%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-tamed.html"><span>is</span><wbr><span><span>Tamed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1207741065%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-abstract-horse-metadata-dsl/index.html">AbstractHorseMetadataDsl</a><span class="token punctuation">.</span><a href="../is-tamed.html">isTamed</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1631308224%2FProperties%2F737294119" anchor-label="isUsingItem" id="1631308224%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../is-using-item.html"><span>is</span><wbr><span>Using</span><wbr><span><span>Item</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1631308224%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-living-entity-metadata-dsl/index.html">LivingEntityMetadataDsl</a><span class="token punctuation">.</span><a href="../is-using-item.html">isUsingItem</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="953909622%2FProperties%2F737294119" anchor-label="livingEntityFlags" id="953909622%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-living-entity-metadata-dsl/living-entity-flags.html"><span>living</span><wbr><span>Entity</span><wbr><span><span>Flags</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="953909622%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-living-entity-metadata-dsl/living-entity-flags.html">livingEntityFlags</a><span class="token operator">: </span><a href="../-flags-dsl-property/index.html">FlagsDslProperty</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-62389060%2FProperties%2F737294119" anchor-label="mobFlags" id="-62389060%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-mob-metadata-dsl/mob-flags.html"><span>mob</span><wbr><span><span>Flags</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-62389060%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-mob-metadata-dsl/mob-flags.html">mobFlags</a><span class="token operator">: </span><a href="../-flags-dsl-property/index.html">FlagsDslProperty</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="498166619%2FProperties%2F737294119" anchor-label="noGravity" id="498166619%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-entity-metadata-dsl/no-gravity.html"><span>no</span><wbr><span><span>Gravity</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="498166619%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-entity-metadata-dsl/no-gravity.html">noGravity</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1328610015%2FProperties%2F737294119" anchor-label="pose" id="-1328610015%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-entity-metadata-dsl/pose.html"><span><span>pose</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1328610015%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-entity-metadata-dsl/pose.html">pose</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/Pose///PointingToDeclaration/">Pose</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-808159642%2FProperties%2F737294119" anchor-label="sharedFlags" id="-808159642%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-entity-metadata-dsl/shared-flags.html"><span>shared</span><wbr><span><span>Flags</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-808159642%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-entity-metadata-dsl/shared-flags.html">sharedFlags</a><span class="token operator">: </span><a href="../-flags-dsl-property/index.html">FlagsDslProperty</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1632251037%2FProperties%2F737294119" anchor-label="silent" id="1632251037%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-entity-metadata-dsl/silent.html"><span><span>silent</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1632251037%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-entity-metadata-dsl/silent.html">silent</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="178438536%2FProperties%2F737294119" anchor-label="sleepingPos" id="178438536%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-living-entity-metadata-dsl/sleeping-pos.html"><span>sleeping</span><wbr><span><span>Pos</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="178438536%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-living-entity-metadata-dsl/sleeping-pos.html">sleepingPos</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><span data-unresolved-link="org.joml/Vector3ic///PointingToDeclaration/">Vector3ic</span><span class="token operator">?</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1097234344%2FProperties%2F737294119" anchor-label="stingerCount" id="1097234344%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-living-entity-metadata-dsl/stinger-count.html"><span>stinger</span><wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1097234344%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-living-entity-metadata-dsl/stinger-count.html">stingerCount</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1439169874%2FProperties%2F737294119" anchor-label="ticksFrozen" id="1439169874%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-entity-metadata-dsl/ticks-frozen.html"><span>ticks</span><wbr><span><span>Frozen</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1439169874%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-entity-metadata-dsl/ticks-frozen.html">ticksFrozen</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider.dsl/DslProperty///PointingToDeclaration/">DslProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

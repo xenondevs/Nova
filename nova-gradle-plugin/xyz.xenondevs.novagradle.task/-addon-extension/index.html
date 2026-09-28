@@ -1,0 +1,419 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>AddonExtension</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-gradle-plugin/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-gradle-plugin/main" data-filter=":nova-gradle-plugin/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova-gradle-plugin::xyz.xenondevs.novagradle.task/AddonExtension///PointingToDeclaration//310340056">
+  <div class="breadcrumbs"><a href="../../index.html">nova-gradle-plugin</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.novagradle.task</a><span class="delimiter">/</span><span class="current">AddonExtension</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Addon</span><wbr><span><span>Extension</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">AddonExtension</a>&nbsp;<span><span class="token annotation builtin">@</span><span data-unresolved-link="javax.inject/Inject///PointingToDeclaration/"><span class="token annotation builtin">Inject</span></span>&nbsp;</span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">project<span class="token operator">: </span><span data-unresolved-link="org.gradle.api/Project///PointingToDeclaration/">Project</span><span class="token punctuation">, </span></span><span class="parameter ">objects<span class="token operator">: </span><span data-unresolved-link="org.gradle.api.model/ObjectFactory///PointingToDeclaration/">ObjectFactory</span></span></span><span class="token punctuation">)</span></div><p class="paragraph">Contains configuration options for the <code class="lang-kotlin">addonJar</code> task.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="1249412464%2FConstructors%2F310340056" anchor-label="AddonExtension" id="1249412464%2FConstructors%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-addon-extension.html"><span>Addon</span><wbr><span><span>Extension</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1249412464%2FConstructors%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="javax.inject/Inject///PointingToDeclaration/"><span class="token annotation builtin">Inject</span></span></div></div><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">project<span class="token operator">: </span><span data-unresolved-link="org.gradle.api/Project///PointingToDeclaration/">Project</span><span class="token punctuation">, </span></span><span class="parameter ">objects<span class="token operator">: </span><span data-unresolved-link="org.gradle.api.model/ObjectFactory///PointingToDeclaration/">ObjectFactory</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1051114267%2FProperties%2F310340056" anchor-label="addAddonJarToServerPlugins" id="1051114267%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="add-addon-jar-to-server-plugins.html"><span>add</span><wbr><span>Addon</span><wbr><span>Jar</span><wbr><span>To</span><wbr><span>Server</span><wbr><span><span>Plugins</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1051114267%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="add-addon-jar-to-server-plugins.html">addAddonJarToServerPlugins</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Whether the <code class="lang-kotlin">addonJar</code> output should be added to Origami's run-server plugins. Defaults to true.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-249619119%2FProperties%2F310340056" anchor-label="authors" id="-249619119%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="authors.html"><span><span>authors</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-249619119%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="authors.html">authors</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/ListProperty///PointingToDeclaration/">ListProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">(optional) A <a href="https://docs.papermc.io/paper/dev/plugin-yml/#author--authors">list of authors</a> of the addon.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="96238418%2FProperties%2F310340056" anchor-label="bootstrapper" id="96238418%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bootstrapper.html"><span><span>bootstrapper</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="96238418%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="bootstrapper.html">bootstrapper</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">(optional) The path to the <a href="https://docs.papermc.io/paper/dev/getting-started/paper-plugins/#bootstrapper">PluginBootstrap</a> implementation. (e.g. <code class="lang-kotlin">com.example.MyBootstrapper</code>)</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1191726999%2FProperties%2F310340056" anchor-label="contributors" id="-1191726999%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="contributors.html"><span><span>contributors</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1191726999%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="contributors.html">contributors</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/ListProperty///PointingToDeclaration/">ListProperty</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">(optional) A <a href="https://docs.papermc.io/paper/dev/plugin-yml/#contributors">list of contributors</a> of the addon.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-933521576%2FProperties%2F310340056" anchor-label="dependencies" id="-933521576%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dependencies.html"><span><span>dependencies</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-933521576%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="dependencies.html">dependencies</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/ListProperty///PointingToDeclaration/">ListProperty</span><span class="token operator">&lt;</span><a href="../-plugin-dependency/index.html">PluginDependency</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">(optional) A list of <a href="https://docs.papermc.io/paper/dev/getting-started/paper-plugins/#dependency-declaration">plugin dependencies</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-510743011%2FProperties%2F310340056" anchor-label="description" id="-510743011%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="description.html"><span><span>description</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-510743011%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="description.html">description</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">(optional) A <a href="https://docs.papermc.io/paper/dev/plugin-yml/#description">description</a> of the addon.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-778189237%2FProperties%2F310340056" anchor-label="destination" id="-778189237%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="destination.html"><span><span>destination</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-778189237%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="destination.html">destination</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.file/DirectoryProperty///PointingToDeclaration/">DirectoryProperty</span></div><div class="brief "><p class="paragraph">The destination directory of the <code class="lang-kotlin">addonJar</code> task.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="919616026%2FProperties%2F310340056" anchor-label="fileName" id="919616026%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="file-name.html"><span>file</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="919616026%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="file-name.html">fileName</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The file name of the jar produced by the <code class="lang-kotlin">addonJar</code> task.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-13536497%2FProperties%2F310340056" anchor-label="input" id="-13536497%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="input.html"><span><span>input</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-13536497%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="input.html">input</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><span data-unresolved-link="org.gradle.api.file/CopySpec///PointingToDeclaration/">CopySpec</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The <span data-unresolved-link="org.gradle.api.file/CopySpec///PointingToDeclaration/">CopySpec</span> to merge into <code class="lang-kotlin">addonJar</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1131025746%2FProperties%2F310340056" anchor-label="loader" id="-1131025746%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="loader.html"><span><span>loader</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1131025746%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="loader.html">loader</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">(optional) The path to the <a href="https://docs.papermc.io/paper/dev/getting-started/paper-plugins/#loaders">PluginLoader</a> implementation.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1747700536%2FProperties%2F310340056" anchor-label="main" id="-1747700536%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="main.html"><span><span>main</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1747700536%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="main.html">main</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The path to the addons main class, e.g. <code class="lang-kotlin">com.example.MyAddon</code>. The main class needs to be a singleton object extending <code class="lang-kotlin">xyz.xenondevs.nova.addon.Addon</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1782288330%2FProperties%2F310340056" anchor-label="name" id="-1782288330%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="name.html"><span><span>name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1782288330%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="name.html">name</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The name of the addon. The lowercase version is used as the addon's id (namespace).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-409361296%2FProperties%2F310340056" anchor-label="novaDev" id="-409361296%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nova-dev.html"><span>nova</span><wbr><span><span>Dev</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-409361296%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="nova-dev.html">novaDev</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Whether Nova development mode should be enabled for Origami run-server tasks. Adds the <code class="lang-kotlin">-DNovaDev</code> JVM argument when enabled. Defaults to true.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1316766891%2FProperties%2F310340056" anchor-label="pluginMain" id="-1316766891%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="plugin-main.html"><span>plugin</span><wbr><span><span>Main</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1316766891%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="plugin-main.html">pluginMain</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">(optional) The path to the <a href="https://docs.papermc.io/paper/dev/project-setup/#the-main-class">JavaPlugin</a> implementation.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1988303601%2FProperties%2F310340056" anchor-label="prefix" id="-1988303601%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="prefix.html"><span><span>prefix</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1988303601%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="prefix.html">prefix</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">(optional) The <a href="https://docs.papermc.io/paper/dev/plugin-yml/#prefix">prefix</a> of the addon. Used for logging.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="965038785%2FProperties%2F310340056" anchor-label="version" id="965038785%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="version.html"><span><span>version</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="965038785%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="version.html">version</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The version of the addon. This is parsed using <a href="https://commons.dokka.xenondevs.xyz/commons-version/xyz.xenondevs.commons.version/-version/index.html">xenondevs' commons-version</a> and needs to be valid according to that.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-992198562%2FProperties%2F310340056" anchor-label="website" id="-992198562%2FProperties%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="website.html"><span><span>website</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-992198562%2FProperties%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="website.html">website</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/Property///PointingToDeclaration/">Property</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">(optional) The <a href="https://docs.papermc.io/paper/dev/plugin-yml/#website">website</a> of the addon.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="730218994%2FFunctions%2F310340056" anchor-label="dependency" id="730218994%2FFunctions%2F310340056" data-filterable-set=":nova-gradle-plugin/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-gradle-plugin/main" data-filterable-set=":nova-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dependency.html"><span><span>dependency</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="730218994%2FFunctions%2F310340056"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="dependency.html"><span class="token function">dependency</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">load<span class="token operator">: </span><a href="../-plugin-dependency/-load/index.html">PluginDependency.Load</a><span class="token operator"> = </span>Load.OMIT<span class="token punctuation">, </span></span><span class="parameter ">required<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">joinClasspath<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Creates a dependency on a plugin named <a href="dependency.html">name</a> in both the <a href="../-plugin-dependency/-stage/-b-o-o-t-s-t-r-a-p/index.html">Stage.BOOTSTRAP</a> and <a href="../-plugin-dependency/-stage/-s-e-r-v-e-r/index.html">Stage.SERVER</a> stages. The load order is defined by <a href="dependency.html">load</a>, the plugin will require the dependency if <a href="dependency.html">required</a> is true, and the plugin's classes will be accessible if <a href="dependency.html">joinClasspath</a> is true.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="dependency.html"><span class="token function">dependency</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">stage<span class="token operator">: </span><a href="../-plugin-dependency/-stage/index.html">PluginDependency.Stage</a><span class="token punctuation">, </span></span><span class="parameter ">load<span class="token operator">: </span><a href="../-plugin-dependency/-load/index.html">PluginDependency.Load</a><span class="token operator"> = </span>Load.OMIT<span class="token punctuation">, </span></span><span class="parameter ">required<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">joinClasspath<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Creates a dependency on a plugin named <a href="dependency.html">name</a> in the specified <a href="dependency.html">stage</a>. The load order is defined by <a href="dependency.html">load</a>, the plugin will require the dependency if <a href="dependency.html">required</a> is true, and the plugin's classes will be accessible if <a href="dependency.html">joinClasspath</a> is true.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

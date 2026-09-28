@@ -1,0 +1,906 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>EntityTypeTags</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-registry/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-registry/main" data-filter=":nova-registry/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova-registry::xyz.xenondevs.nova.registry.tags/EntityTypeTags///PointingToDeclaration//1933957036">
+  <div class="breadcrumbs"><a href="../../index.html">nova-registry</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.registry.tags</a><span class="delimiter">/</span><span class="current">EntityTypeTags</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Entity</span><wbr><span>Type</span><wbr><span><span>Tags</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">EntityTypeTags</a></div><p class="paragraph">Contains corresponding entry sets for tags in <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys///PointingToDeclaration/">EntityTypeTagKeys</span>.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="128257454%2FProperties%2F1933957036" anchor-label="ACCEPTS_IRON_GOLEM_GIFT" id="128257454%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-c-c-e-p-t-s_-i-r-o-n_-g-o-l-e-m_-g-i-f-t.html"><span>ACCEPTS_</span><wbr><span>IRON_</span><wbr><span>GOLEM_</span><wbr><span>GIFT</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="128257454%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-c-c-e-p-t-s_-i-r-o-n_-g-o-l-e-m_-g-i-f-t.html">ACCEPTS_IRON_GOLEM_GIFT</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/ACCEPTS_IRON_GOLEM_GIFT/#/PointingToDeclaration/">EntityTypeTagKeys.ACCEPTS_IRON_GOLEM_GIFT</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1571251151%2FProperties%2F1933957036" anchor-label="ALL_TAGS" id="1571251151%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-l-l_-t-a-g-s.html"><span>ALL_</span><wbr><span>TAGS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1571251151%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-l-l_-t-a-g-s.html">ALL_TAGS</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A provider containing all tags in this registry.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1499330974%2FProperties%2F1933957036" anchor-label="AQUATIC" id="-1499330974%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-q-u-a-t-i-c.html"><span><span>AQUATIC</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1499330974%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-q-u-a-t-i-c.html">AQUATIC</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/AQUATIC/#/PointingToDeclaration/">EntityTypeTagKeys.AQUATIC</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1250658300%2FProperties%2F1933957036" anchor-label="ARROWS" id="1250658300%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-r-r-o-w-s.html"><span><span>ARROWS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1250658300%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-r-r-o-w-s.html">ARROWS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/ARROWS/#/PointingToDeclaration/">EntityTypeTagKeys.ARROWS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2072343951%2FProperties%2F1933957036" anchor-label="ARTHROPOD" id="-2072343951%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-r-t-h-r-o-p-o-d.html"><span><span>ARTHROPOD</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2072343951%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-r-t-h-r-o-p-o-d.html">ARTHROPOD</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/ARTHROPOD/#/PointingToDeclaration/">EntityTypeTagKeys.ARTHROPOD</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-516790761%2FProperties%2F1933957036" anchor-label="AXOLOTL_ALWAYS_HOSTILES" id="-516790761%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-x-o-l-o-t-l_-a-l-w-a-y-s_-h-o-s-t-i-l-e-s.html"><span>AXOLOTL_</span><wbr><span>ALWAYS_</span><wbr><span>HOSTILES</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-516790761%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-x-o-l-o-t-l_-a-l-w-a-y-s_-h-o-s-t-i-l-e-s.html">AXOLOTL_ALWAYS_HOSTILES</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/AXOLOTL_ALWAYS_HOSTILES/#/PointingToDeclaration/">EntityTypeTagKeys.AXOLOTL_ALWAYS_HOSTILES</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-669733372%2FProperties%2F1933957036" anchor-label="AXOLOTL_HUNT_TARGETS" id="-669733372%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-x-o-l-o-t-l_-h-u-n-t_-t-a-r-g-e-t-s.html"><span>AXOLOTL_</span><wbr><span>HUNT_</span><wbr><span>TARGETS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-669733372%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-x-o-l-o-t-l_-h-u-n-t_-t-a-r-g-e-t-s.html">AXOLOTL_HUNT_TARGETS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/AXOLOTL_HUNT_TARGETS/#/PointingToDeclaration/">EntityTypeTagKeys.AXOLOTL_HUNT_TARGETS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="615120856%2FProperties%2F1933957036" anchor-label="BEEHIVE_INHABITORS" id="615120856%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-e-e-h-i-v-e_-i-n-h-a-b-i-t-o-r-s.html"><span>BEEHIVE_</span><wbr><span>INHABITORS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="615120856%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-e-e-h-i-v-e_-i-n-h-a-b-i-t-o-r-s.html">BEEHIVE_INHABITORS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/BEEHIVE_INHABITORS/#/PointingToDeclaration/">EntityTypeTagKeys.BEEHIVE_INHABITORS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="657678150%2FProperties%2F1933957036" anchor-label="BOAT" id="657678150%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-o-a-t.html"><span><span>BOAT</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="657678150%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-o-a-t.html">BOAT</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/BOAT/#/PointingToDeclaration/">EntityTypeTagKeys.BOAT</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1474007774%2FProperties%2F1933957036" anchor-label="BURN_IN_DAYLIGHT" id="-1474007774%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-u-r-n_-i-n_-d-a-y-l-i-g-h-t.html"><span>BURN_</span><wbr><span>IN_</span><wbr><span>DAYLIGHT</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1474007774%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-u-r-n_-i-n_-d-a-y-l-i-g-h-t.html">BURN_IN_DAYLIGHT</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/BURN_IN_DAYLIGHT/#/PointingToDeclaration/">EntityTypeTagKeys.BURN_IN_DAYLIGHT</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="31364589%2FProperties%2F1933957036" anchor-label="CAN_BREATHE_UNDER_WATER" id="31364589%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-n_-b-r-e-a-t-h-e_-u-n-d-e-r_-w-a-t-e-r.html"><span>CAN_</span><wbr><span>BREATHE_</span><wbr><span>UNDER_</span><wbr><span>WATER</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="31364589%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n_-b-r-e-a-t-h-e_-u-n-d-e-r_-w-a-t-e-r.html">CAN_BREATHE_UNDER_WATER</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/CAN_BREATHE_UNDER_WATER/#/PointingToDeclaration/">EntityTypeTagKeys.CAN_BREATHE_UNDER_WATER</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1595326722%2FProperties%2F1933957036" anchor-label="CAN_EQUIP_HARNESS" id="1595326722%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-n_-e-q-u-i-p_-h-a-r-n-e-s-s.html"><span>CAN_</span><wbr><span>EQUIP_</span><wbr><span>HARNESS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1595326722%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n_-e-q-u-i-p_-h-a-r-n-e-s-s.html">CAN_EQUIP_HARNESS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/CAN_EQUIP_HARNESS/#/PointingToDeclaration/">EntityTypeTagKeys.CAN_EQUIP_HARNESS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1785794081%2FProperties%2F1933957036" anchor-label="CAN_EQUIP_SADDLE" id="1785794081%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-n_-e-q-u-i-p_-s-a-d-d-l-e.html"><span>CAN_</span><wbr><span>EQUIP_</span><wbr><span>SADDLE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1785794081%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n_-e-q-u-i-p_-s-a-d-d-l-e.html">CAN_EQUIP_SADDLE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/CAN_EQUIP_SADDLE/#/PointingToDeclaration/">EntityTypeTagKeys.CAN_EQUIP_SADDLE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1425281382%2FProperties%2F1933957036" anchor-label="CAN_FLOAT_WHILE_RIDDEN" id="1425281382%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-n_-f-l-o-a-t_-w-h-i-l-e_-r-i-d-d-e-n.html"><span>CAN_</span><wbr><span>FLOAT_</span><wbr><span>WHILE_</span><wbr><span>RIDDEN</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1425281382%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n_-f-l-o-a-t_-w-h-i-l-e_-r-i-d-d-e-n.html">CAN_FLOAT_WHILE_RIDDEN</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/CAN_FLOAT_WHILE_RIDDEN/#/PointingToDeclaration/">EntityTypeTagKeys.CAN_FLOAT_WHILE_RIDDEN</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="72924264%2FProperties%2F1933957036" anchor-label="CAN_TURN_IN_BOATS" id="72924264%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-n_-t-u-r-n_-i-n_-b-o-a-t-s.html"><span>CAN_</span><wbr><span>TURN_</span><wbr><span>IN_</span><wbr><span>BOATS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="72924264%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n_-t-u-r-n_-i-n_-b-o-a-t-s.html">CAN_TURN_IN_BOATS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/CAN_TURN_IN_BOATS/#/PointingToDeclaration/">EntityTypeTagKeys.CAN_TURN_IN_BOATS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1681730042%2FProperties%2F1933957036" anchor-label="CAN_WEAR_HORSE_ARMOR" id="1681730042%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-n_-w-e-a-r_-h-o-r-s-e_-a-r-m-o-r.html"><span>CAN_</span><wbr><span>WEAR_</span><wbr><span>HORSE_</span><wbr><span>ARMOR</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1681730042%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n_-w-e-a-r_-h-o-r-s-e_-a-r-m-o-r.html">CAN_WEAR_HORSE_ARMOR</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/CAN_WEAR_HORSE_ARMOR/#/PointingToDeclaration/">EntityTypeTagKeys.CAN_WEAR_HORSE_ARMOR</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-309388368%2FProperties%2F1933957036" anchor-label="CAN_WEAR_NAUTILUS_ARMOR" id="-309388368%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-n_-w-e-a-r_-n-a-u-t-i-l-u-s_-a-r-m-o-r.html"><span>CAN_</span><wbr><span>WEAR_</span><wbr><span>NAUTILUS_</span><wbr><span>ARMOR</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-309388368%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n_-w-e-a-r_-n-a-u-t-i-l-u-s_-a-r-m-o-r.html">CAN_WEAR_NAUTILUS_ARMOR</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/CAN_WEAR_NAUTILUS_ARMOR/#/PointingToDeclaration/">EntityTypeTagKeys.CAN_WEAR_NAUTILUS_ARMOR</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-967223508%2FProperties%2F1933957036" anchor-label="CANDIDATE_FOR_IRON_GOLEM_GIFT" id="-967223508%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-n-d-i-d-a-t-e_-f-o-r_-i-r-o-n_-g-o-l-e-m_-g-i-f-t.html"><span>CANDIDATE_</span><wbr><span>FOR_</span><wbr><span>IRON_</span><wbr><span>GOLEM_</span><wbr><span>GIFT</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-967223508%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n-d-i-d-a-t-e_-f-o-r_-i-r-o-n_-g-o-l-e-m_-g-i-f-t.html">CANDIDATE_FOR_IRON_GOLEM_GIFT</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/CANDIDATE_FOR_IRON_GOLEM_GIFT/#/PointingToDeclaration/">EntityTypeTagKeys.CANDIDATE_FOR_IRON_GOLEM_GIFT</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="310990876%2FProperties%2F1933957036" anchor-label="CANNOT_BE_AGE_LOCKED" id="310990876%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-n-n-o-t_-b-e_-a-g-e_-l-o-c-k-e-d.html"><span>CANNOT_</span><wbr><span>BE_</span><wbr><span>AGE_</span><wbr><span>LOCKED</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="310990876%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n-n-o-t_-b-e_-a-g-e_-l-o-c-k-e-d.html">CANNOT_BE_AGE_LOCKED</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/CANNOT_BE_AGE_LOCKED/#/PointingToDeclaration/">EntityTypeTagKeys.CANNOT_BE_AGE_LOCKED</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1346971550%2FProperties%2F1933957036" anchor-label="CANNOT_BE_DISMOUNTED_BY_ITEM_USAGE" id="1346971550%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-n-n-o-t_-b-e_-d-i-s-m-o-u-n-t-e-d_-b-y_-i-t-e-m_-u-s-a-g-e.html"><span>CANNOT_</span><wbr><span>BE_</span><wbr><span>DISMOUNTED_</span><wbr><span>BY_</span><wbr><span>ITEM_</span><wbr><span>USAGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1346971550%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n-n-o-t_-b-e_-d-i-s-m-o-u-n-t-e-d_-b-y_-i-t-e-m_-u-s-a-g-e.html">CANNOT_BE_DISMOUNTED_BY_ITEM_USAGE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/CANNOT_BE_DISMOUNTED_BY_ITEM_USAGE/#/PointingToDeclaration/">EntityTypeTagKeys.CANNOT_BE_DISMOUNTED_BY_ITEM_USAGE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2090660704%2FProperties%2F1933957036" anchor-label="CANNOT_BE_PUSHED_ONTO_BOATS" id="-2090660704%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-n-n-o-t_-b-e_-p-u-s-h-e-d_-o-n-t-o_-b-o-a-t-s.html"><span>CANNOT_</span><wbr><span>BE_</span><wbr><span>PUSHED_</span><wbr><span>ONTO_</span><wbr><span>BOATS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2090660704%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n-n-o-t_-b-e_-p-u-s-h-e-d_-o-n-t-o_-b-o-a-t-s.html">CANNOT_BE_PUSHED_ONTO_BOATS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/CANNOT_BE_PUSHED_ONTO_BOATS/#/PointingToDeclaration/">EntityTypeTagKeys.CANNOT_BE_PUSHED_ONTO_BOATS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-455097225%2FProperties%2F1933957036" anchor-label="DEFLECTS_PROJECTILES" id="-455097225%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-e-f-l-e-c-t-s_-p-r-o-j-e-c-t-i-l-e-s.html"><span>DEFLECTS_</span><wbr><span><span>PROJECTILES</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-455097225%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-d-e-f-l-e-c-t-s_-p-r-o-j-e-c-t-i-l-e-s.html">DEFLECTS_PROJECTILES</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/DEFLECTS_PROJECTILES/#/PointingToDeclaration/">EntityTypeTagKeys.DEFLECTS_PROJECTILES</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1140762320%2FProperties%2F1933957036" anchor-label="DISMOUNTS_UNDERWATER" id="1140762320%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-i-s-m-o-u-n-t-s_-u-n-d-e-r-w-a-t-e-r.html"><span>DISMOUNTS_</span><wbr><span>UNDERWATER</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1140762320%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-d-i-s-m-o-u-n-t-s_-u-n-d-e-r-w-a-t-e-r.html">DISMOUNTS_UNDERWATER</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/DISMOUNTS_UNDERWATER/#/PointingToDeclaration/">EntityTypeTagKeys.DISMOUNTS_UNDERWATER</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2001011223%2FProperties%2F1933957036" anchor-label="FALL_DAMAGE_IMMUNE" id="2001011223%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-a-l-l_-d-a-m-a-g-e_-i-m-m-u-n-e.html"><span>FALL_</span><wbr><span>DAMAGE_</span><wbr><span>IMMUNE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2001011223%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-a-l-l_-d-a-m-a-g-e_-i-m-m-u-n-e.html">FALL_DAMAGE_IMMUNE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/FALL_DAMAGE_IMMUNE/#/PointingToDeclaration/">EntityTypeTagKeys.FALL_DAMAGE_IMMUNE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1848674707%2FProperties%2F1933957036" anchor-label="FOLLOWABLE_FRIENDLY_MOBS" id="1848674707%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-o-l-l-o-w-a-b-l-e_-f-r-i-e-n-d-l-y_-m-o-b-s.html"><span>FOLLOWABLE_</span><wbr><span>FRIENDLY_</span><wbr><span>MOBS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1848674707%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-o-l-l-o-w-a-b-l-e_-f-r-i-e-n-d-l-y_-m-o-b-s.html">FOLLOWABLE_FRIENDLY_MOBS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/FOLLOWABLE_FRIENDLY_MOBS/#/PointingToDeclaration/">EntityTypeTagKeys.FOLLOWABLE_FRIENDLY_MOBS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1019658785%2FProperties%2F1933957036" anchor-label="FREEZE_HURTS_EXTRA_TYPES" id="-1019658785%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-r-e-e-z-e_-h-u-r-t-s_-e-x-t-r-a_-t-y-p-e-s.html"><span>FREEZE_</span><wbr><span>HURTS_</span><wbr><span>EXTRA_</span><wbr><span>TYPES</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1019658785%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-r-e-e-z-e_-h-u-r-t-s_-e-x-t-r-a_-t-y-p-e-s.html">FREEZE_HURTS_EXTRA_TYPES</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/FREEZE_HURTS_EXTRA_TYPES/#/PointingToDeclaration/">EntityTypeTagKeys.FREEZE_HURTS_EXTRA_TYPES</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1931791189%2FProperties%2F1933957036" anchor-label="FREEZE_IMMUNE_ENTITY_TYPES" id="1931791189%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-r-e-e-z-e_-i-m-m-u-n-e_-e-n-t-i-t-y_-t-y-p-e-s.html"><span>FREEZE_</span><wbr><span>IMMUNE_</span><wbr><span>ENTITY_</span><wbr><span>TYPES</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1931791189%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-r-e-e-z-e_-i-m-m-u-n-e_-e-n-t-i-t-y_-t-y-p-e-s.html">FREEZE_IMMUNE_ENTITY_TYPES</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/FREEZE_IMMUNE_ENTITY_TYPES/#/PointingToDeclaration/">EntityTypeTagKeys.FREEZE_IMMUNE_ENTITY_TYPES</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1671168357%2FProperties%2F1933957036" anchor-label="FROG_FOOD" id="-1671168357%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-r-o-g_-f-o-o-d.html"><span>FROG_</span><wbr><span>FOOD</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1671168357%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-r-o-g_-f-o-o-d.html">FROG_FOOD</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/FROG_FOOD/#/PointingToDeclaration/">EntityTypeTagKeys.FROG_FOOD</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1541627562%2FProperties%2F1933957036" anchor-label="IGNORES_POISON_AND_REGEN" id="1541627562%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-g-n-o-r-e-s_-p-o-i-s-o-n_-a-n-d_-r-e-g-e-n.html"><span>IGNORES_</span><wbr><span>POISON_</span><wbr><span>AND_</span><wbr><span>REGEN</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1541627562%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-i-g-n-o-r-e-s_-p-o-i-s-o-n_-a-n-d_-r-e-g-e-n.html">IGNORES_POISON_AND_REGEN</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/IGNORES_POISON_AND_REGEN/#/PointingToDeclaration/">EntityTypeTagKeys.IGNORES_POISON_AND_REGEN</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1969246072%2FProperties%2F1933957036" anchor-label="ILLAGER" id="1969246072%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-l-l-a-g-e-r.html"><span><span>ILLAGER</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1969246072%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-i-l-l-a-g-e-r.html">ILLAGER</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/ILLAGER/#/PointingToDeclaration/">EntityTypeTagKeys.ILLAGER</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1698238206%2FProperties%2F1933957036" anchor-label="ILLAGER_FRIENDS" id="-1698238206%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-l-l-a-g-e-r_-f-r-i-e-n-d-s.html"><span>ILLAGER_</span><wbr><span>FRIENDS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1698238206%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-i-l-l-a-g-e-r_-f-r-i-e-n-d-s.html">ILLAGER_FRIENDS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/ILLAGER_FRIENDS/#/PointingToDeclaration/">EntityTypeTagKeys.ILLAGER_FRIENDS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1537722022%2FProperties%2F1933957036" anchor-label="IMMUNE_TO_INFESTED" id="-1537722022%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-m-m-u-n-e_-t-o_-i-n-f-e-s-t-e-d.html"><span>IMMUNE_</span><wbr><span>TO_</span><wbr><span>INFESTED</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1537722022%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-i-m-m-u-n-e_-t-o_-i-n-f-e-s-t-e-d.html">IMMUNE_TO_INFESTED</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/IMMUNE_TO_INFESTED/#/PointingToDeclaration/">EntityTypeTagKeys.IMMUNE_TO_INFESTED</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="123801718%2FProperties%2F1933957036" anchor-label="IMMUNE_TO_OOZING" id="123801718%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-m-m-u-n-e_-t-o_-o-o-z-i-n-g.html"><span>IMMUNE_</span><wbr><span>TO_</span><wbr><span>OOZING</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="123801718%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-i-m-m-u-n-e_-t-o_-o-o-z-i-n-g.html">IMMUNE_TO_OOZING</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/IMMUNE_TO_OOZING/#/PointingToDeclaration/">EntityTypeTagKeys.IMMUNE_TO_OOZING</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1780646955%2FProperties%2F1933957036" anchor-label="IMPACT_PROJECTILES" id="-1780646955%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-m-p-a-c-t_-p-r-o-j-e-c-t-i-l-e-s.html"><span>IMPACT_</span><wbr><span><span>PROJECTILES</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1780646955%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-i-m-p-a-c-t_-p-r-o-j-e-c-t-i-l-e-s.html">IMPACT_PROJECTILES</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/IMPACT_PROJECTILES/#/PointingToDeclaration/">EntityTypeTagKeys.IMPACT_PROJECTILES</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1448039255%2FProperties%2F1933957036" anchor-label="INVERTED_HEALING_AND_HARM" id="-1448039255%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-n-v-e-r-t-e-d_-h-e-a-l-i-n-g_-a-n-d_-h-a-r-m.html"><span>INVERTED_</span><wbr><span>HEALING_</span><wbr><span>AND_</span><wbr><span>HARM</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1448039255%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-i-n-v-e-r-t-e-d_-h-e-a-l-i-n-g_-a-n-d_-h-a-r-m.html">INVERTED_HEALING_AND_HARM</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/INVERTED_HEALING_AND_HARM/#/PointingToDeclaration/">EntityTypeTagKeys.INVERTED_HEALING_AND_HARM</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1259444913%2FProperties%2F1933957036" anchor-label="NAUTILUS_HOSTILES" id="-1259444913%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-n-a-u-t-i-l-u-s_-h-o-s-t-i-l-e-s.html"><span>NAUTILUS_</span><wbr><span>HOSTILES</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1259444913%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-a-u-t-i-l-u-s_-h-o-s-t-i-l-e-s.html">NAUTILUS_HOSTILES</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/NAUTILUS_HOSTILES/#/PointingToDeclaration/">EntityTypeTagKeys.NAUTILUS_HOSTILES</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1290299592%2FProperties%2F1933957036" anchor-label="NO_ANGER_FROM_WIND_CHARGE" id="1290299592%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-n-o_-a-n-g-e-r_-f-r-o-m_-w-i-n-d_-c-h-a-r-g-e.html"><span>NO_</span><wbr><span>ANGER_</span><wbr><span>FROM_</span><wbr><span>WIND_</span><wbr><span>CHARGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1290299592%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-o_-a-n-g-e-r_-f-r-o-m_-w-i-n-d_-c-h-a-r-g-e.html">NO_ANGER_FROM_WIND_CHARGE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/NO_ANGER_FROM_WIND_CHARGE/#/PointingToDeclaration/">EntityTypeTagKeys.NO_ANGER_FROM_WIND_CHARGE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1021398232%2FProperties%2F1933957036" anchor-label="NON_CONTROLLING_RIDER" id="1021398232%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-n-o-n_-c-o-n-t-r-o-l-l-i-n-g_-r-i-d-e-r.html"><span>NON_</span><wbr><span>CONTROLLING_</span><wbr><span>RIDER</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1021398232%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-o-n_-c-o-n-t-r-o-l-l-i-n-g_-r-i-d-e-r.html">NON_CONTROLLING_RIDER</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/NON_CONTROLLING_RIDER/#/PointingToDeclaration/">EntityTypeTagKeys.NON_CONTROLLING_RIDER</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-853673233%2FProperties%2F1933957036" anchor-label="NOT_AFFECTED_BY_GEYSERS" id="-853673233%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-n-o-t_-a-f-f-e-c-t-e-d_-b-y_-g-e-y-s-e-r-s.html"><span>NOT_</span><wbr><span>AFFECTED_</span><wbr><span>BY_</span><wbr><span>GEYSERS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-853673233%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-o-t_-a-f-f-e-c-t-e-d_-b-y_-g-e-y-s-e-r-s.html">NOT_AFFECTED_BY_GEYSERS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/NOT_AFFECTED_BY_GEYSERS/#/PointingToDeclaration/">EntityTypeTagKeys.NOT_AFFECTED_BY_GEYSERS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1890934419%2FProperties%2F1933957036" anchor-label="NOT_SCARY_FOR_PUFFERFISH" id="1890934419%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-n-o-t_-s-c-a-r-y_-f-o-r_-p-u-f-f-e-r-f-i-s-h.html"><span>NOT_</span><wbr><span>SCARY_</span><wbr><span>FOR_</span><wbr><span>PUFFERFISH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1890934419%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-o-t_-s-c-a-r-y_-f-o-r_-p-u-f-f-e-r-f-i-s-h.html">NOT_SCARY_FOR_PUFFERFISH</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/NOT_SCARY_FOR_PUFFERFISH/#/PointingToDeclaration/">EntityTypeTagKeys.NOT_SCARY_FOR_PUFFERFISH</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1183723109%2FProperties%2F1933957036" anchor-label="POWDER_SNOW_WALKABLE_MOBS" id="-1183723109%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-p-o-w-d-e-r_-s-n-o-w_-w-a-l-k-a-b-l-e_-m-o-b-s.html"><span>POWDER_</span><wbr><span>SNOW_</span><wbr><span>WALKABLE_</span><wbr><span>MOBS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1183723109%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-p-o-w-d-e-r_-s-n-o-w_-w-a-l-k-a-b-l-e_-m-o-b-s.html">POWDER_SNOW_WALKABLE_MOBS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/POWDER_SNOW_WALKABLE_MOBS/#/PointingToDeclaration/">EntityTypeTagKeys.POWDER_SNOW_WALKABLE_MOBS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-598688680%2FProperties%2F1933957036" anchor-label="RAIDERS" id="-598688680%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-r-a-i-d-e-r-s.html"><span><span>RAIDERS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-598688680%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-r-a-i-d-e-r-s.html">RAIDERS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/RAIDERS/#/PointingToDeclaration/">EntityTypeTagKeys.RAIDERS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2004890114%2FProperties%2F1933957036" anchor-label="REDIRECTABLE_PROJECTILE" id="2004890114%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-r-e-d-i-r-e-c-t-a-b-l-e_-p-r-o-j-e-c-t-i-l-e.html"><span>REDIRECTABLE_</span><wbr><span>PROJECTILE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2004890114%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-r-e-d-i-r-e-c-t-a-b-l-e_-p-r-o-j-e-c-t-i-l-e.html">REDIRECTABLE_PROJECTILE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/REDIRECTABLE_PROJECTILE/#/PointingToDeclaration/">EntityTypeTagKeys.REDIRECTABLE_PROJECTILE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1402768630%2FProperties%2F1933957036" anchor-label="SENSITIVE_TO_BANE_OF_ARTHROPODS" id="-1402768630%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-e-n-s-i-t-i-v-e_-t-o_-b-a-n-e_-o-f_-a-r-t-h-r-o-p-o-d-s.html"><span>SENSITIVE_</span><wbr><span>TO_</span><wbr><span>BANE_</span><wbr><span>OF_</span><wbr><span>ARTHROPODS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1402768630%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-e-n-s-i-t-i-v-e_-t-o_-b-a-n-e_-o-f_-a-r-t-h-r-o-p-o-d-s.html">SENSITIVE_TO_BANE_OF_ARTHROPODS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/SENSITIVE_TO_BANE_OF_ARTHROPODS/#/PointingToDeclaration/">EntityTypeTagKeys.SENSITIVE_TO_BANE_OF_ARTHROPODS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-743686066%2FProperties%2F1933957036" anchor-label="SENSITIVE_TO_IMPALING" id="-743686066%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-e-n-s-i-t-i-v-e_-t-o_-i-m-p-a-l-i-n-g.html"><span>SENSITIVE_</span><wbr><span>TO_</span><wbr><span>IMPALING</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-743686066%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-e-n-s-i-t-i-v-e_-t-o_-i-m-p-a-l-i-n-g.html">SENSITIVE_TO_IMPALING</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/SENSITIVE_TO_IMPALING/#/PointingToDeclaration/">EntityTypeTagKeys.SENSITIVE_TO_IMPALING</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1206858657%2FProperties%2F1933957036" anchor-label="SENSITIVE_TO_SMITE" id="1206858657%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-e-n-s-i-t-i-v-e_-t-o_-s-m-i-t-e.html"><span>SENSITIVE_</span><wbr><span>TO_</span><wbr><span>SMITE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1206858657%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-e-n-s-i-t-i-v-e_-t-o_-s-m-i-t-e.html">SENSITIVE_TO_SMITE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/SENSITIVE_TO_SMITE/#/PointingToDeclaration/">EntityTypeTagKeys.SENSITIVE_TO_SMITE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1879316910%2FProperties%2F1933957036" anchor-label="SKELETONS" id="1879316910%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-k-e-l-e-t-o-n-s.html"><span><span>SKELETONS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1879316910%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-k-e-l-e-t-o-n-s.html">SKELETONS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/SKELETONS/#/PointingToDeclaration/">EntityTypeTagKeys.SKELETONS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1740038726%2FProperties%2F1933957036" anchor-label="TAGS_BY_ELEMENT" id="-1740038726%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-t-a-g-s_-b-y_-e-l-e-m-e-n-t.html"><span>TAGS_</span><wbr><span>BY_</span><wbr><span>ELEMENT</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1740038726%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-t-a-g-s_-b-y_-e-l-e-m-e-n-t.html">TAGS_BY_ELEMENT</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A provider mapping all registry elements to the tags that contain them.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-258069692%2FProperties%2F1933957036" anchor-label="TAGS_BY_ENTRY" id="-258069692%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-t-a-g-s_-b-y_-e-n-t-r-y.html"><span>TAGS_</span><wbr><span>BY_</span><wbr><span>ENTRY</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-258069692%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-t-a-g-s_-b-y_-e-n-t-r-y.html">TAGS_BY_ENTRY</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A provider mapping all registry entries to the tags that contain them.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="919365225%2FProperties%2F1933957036" anchor-label="UNDEAD" id="919365225%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-u-n-d-e-a-d.html"><span><span>UNDEAD</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="919365225%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-u-n-d-e-a-d.html">UNDEAD</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/UNDEAD/#/PointingToDeclaration/">EntityTypeTagKeys.UNDEAD</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-605487043%2FProperties%2F1933957036" anchor-label="WITHER_FRIENDS" id="-605487043%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-w-i-t-h-e-r_-f-r-i-e-n-d-s.html"><span>WITHER_</span><wbr><span>FRIENDS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-605487043%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-w-i-t-h-e-r_-f-r-i-e-n-d-s.html">WITHER_FRIENDS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/WITHER_FRIENDS/#/PointingToDeclaration/">EntityTypeTagKeys.WITHER_FRIENDS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-859383801%2FProperties%2F1933957036" anchor-label="ZOMBIES" id="-859383801%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-z-o-m-b-i-e-s.html"><span><span>ZOMBIES</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-859383801%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-z-o-m-b-i-e-s.html">ZOMBIES</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/EntityType///PointingToDeclaration/">EntityType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing the tag <span data-unresolved-link="io.papermc.paper.registry.keys.tags/EntityTypeTagKeys/ZOMBIES/#/PointingToDeclaration/">EntityTypeTagKeys.ZOMBIES</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

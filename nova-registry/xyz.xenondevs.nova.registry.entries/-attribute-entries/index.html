@@ -1,0 +1,741 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>AttributeEntries</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-registry/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-registry/main" data-filter=":nova-registry/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova-registry::xyz.xenondevs.nova.registry.entries/AttributeEntries///PointingToDeclaration//1933957036">
+  <div class="breadcrumbs"><a href="../../index.html">nova-registry</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.registry.entries</a><span class="delimiter">/</span><span class="current">AttributeEntries</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Attribute</span><wbr><span><span>Entries</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">AttributeEntries</a></div><p class="paragraph">Contains corresponding entries for keys in <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys///PointingToDeclaration/">AttributeKeys</span>.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="179307256%2FProperties%2F1933957036" anchor-label="AIR_DRAG_MODIFIER" id="179307256%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-i-r_-d-r-a-g_-m-o-d-i-f-i-e-r.html"><span>AIR_</span><wbr><span>DRAG_</span><wbr><span>MODIFIER</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="179307256%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-i-r_-d-r-a-g_-m-o-d-i-f-i-e-r.html">AIR_DRAG_MODIFIER</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/AIR_DRAG_MODIFIER/#/PointingToDeclaration/">AttributeKeys.AIR_DRAG_MODIFIER</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-775939053%2FProperties%2F1933957036" anchor-label="ALL_ENTRIES" id="-775939053%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-l-l_-e-n-t-r-i-e-s.html"><span>ALL_</span><wbr><span>ENTRIES</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-775939053%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-l-l_-e-n-t-r-i-e-s.html">ALL_ENTRIES</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry set containing all entries in this registry.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-67841722%2FProperties%2F1933957036" anchor-label="ARMOR" id="-67841722%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-r-m-o-r.html"><span><span>ARMOR</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-67841722%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-r-m-o-r.html">ARMOR</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/ARMOR/#/PointingToDeclaration/">AttributeKeys.ARMOR</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1903902093%2FProperties%2F1933957036" anchor-label="ARMOR_TOUGHNESS" id="-1903902093%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-r-m-o-r_-t-o-u-g-h-n-e-s-s.html"><span>ARMOR_</span><wbr><span>TOUGHNESS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1903902093%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-r-m-o-r_-t-o-u-g-h-n-e-s-s.html">ARMOR_TOUGHNESS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/ARMOR_TOUGHNESS/#/PointingToDeclaration/">AttributeKeys.ARMOR_TOUGHNESS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="677159679%2FProperties%2F1933957036" anchor-label="ATTACK_DAMAGE" id="677159679%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-t-t-a-c-k_-d-a-m-a-g-e.html"><span>ATTACK_</span><wbr><span>DAMAGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="677159679%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-t-t-a-c-k_-d-a-m-a-g-e.html">ATTACK_DAMAGE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/ATTACK_DAMAGE/#/PointingToDeclaration/">AttributeKeys.ATTACK_DAMAGE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-778446063%2FProperties%2F1933957036" anchor-label="ATTACK_KNOCKBACK" id="-778446063%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-t-t-a-c-k_-k-n-o-c-k-b-a-c-k.html"><span>ATTACK_</span><wbr><span>KNOCKBACK</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-778446063%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-t-t-a-c-k_-k-n-o-c-k-b-a-c-k.html">ATTACK_KNOCKBACK</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/ATTACK_KNOCKBACK/#/PointingToDeclaration/">AttributeKeys.ATTACK_KNOCKBACK</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1827435397%2FProperties%2F1933957036" anchor-label="ATTACK_SPEED" id="1827435397%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-t-t-a-c-k_-s-p-e-e-d.html"><span>ATTACK_</span><wbr><span>SPEED</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1827435397%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-t-t-a-c-k_-s-p-e-e-d.html">ATTACK_SPEED</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/ATTACK_SPEED/#/PointingToDeclaration/">AttributeKeys.ATTACK_SPEED</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="845889642%2FProperties%2F1933957036" anchor-label="BELOW_NAME_DISTANCE" id="845889642%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-e-l-o-w_-n-a-m-e_-d-i-s-t-a-n-c-e.html"><span>BELOW_</span><wbr><span>NAME_</span><wbr><span>DISTANCE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="845889642%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-e-l-o-w_-n-a-m-e_-d-i-s-t-a-n-c-e.html">BELOW_NAME_DISTANCE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/BELOW_NAME_DISTANCE/#/PointingToDeclaration/">AttributeKeys.BELOW_NAME_DISTANCE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-33246416%2FProperties%2F1933957036" anchor-label="BLOCK_BREAK_SPEED" id="-33246416%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-l-o-c-k_-b-r-e-a-k_-s-p-e-e-d.html"><span>BLOCK_</span><wbr><span>BREAK_</span><wbr><span>SPEED</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-33246416%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-l-o-c-k_-b-r-e-a-k_-s-p-e-e-d.html">BLOCK_BREAK_SPEED</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/BLOCK_BREAK_SPEED/#/PointingToDeclaration/">AttributeKeys.BLOCK_BREAK_SPEED</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="146951175%2FProperties%2F1933957036" anchor-label="BLOCK_INTERACTION_RANGE" id="146951175%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-l-o-c-k_-i-n-t-e-r-a-c-t-i-o-n_-r-a-n-g-e.html"><span>BLOCK_</span><wbr><span>INTERACTION_</span><wbr><span>RANGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="146951175%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-l-o-c-k_-i-n-t-e-r-a-c-t-i-o-n_-r-a-n-g-e.html">BLOCK_INTERACTION_RANGE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/BLOCK_INTERACTION_RANGE/#/PointingToDeclaration/">AttributeKeys.BLOCK_INTERACTION_RANGE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="12831090%2FProperties%2F1933957036" anchor-label="BOUNCINESS" id="12831090%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-o-u-n-c-i-n-e-s-s.html"><span><span>BOUNCINESS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="12831090%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-o-u-n-c-i-n-e-s-s.html">BOUNCINESS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/BOUNCINESS/#/PointingToDeclaration/">AttributeKeys.BOUNCINESS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="344517404%2FProperties%2F1933957036" anchor-label="BURNING_TIME" id="344517404%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-u-r-n-i-n-g_-t-i-m-e.html"><span>BURNING_</span><wbr><span>TIME</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="344517404%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-u-r-n-i-n-g_-t-i-m-e.html">BURNING_TIME</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/BURNING_TIME/#/PointingToDeclaration/">AttributeKeys.BURNING_TIME</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1712761194%2FProperties%2F1933957036" anchor-label="CAMERA_DISTANCE" id="-1712761194%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-m-e-r-a_-d-i-s-t-a-n-c-e.html"><span>CAMERA_</span><wbr><span>DISTANCE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1712761194%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-m-e-r-a_-d-i-s-t-a-n-c-e.html">CAMERA_DISTANCE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/CAMERA_DISTANCE/#/PointingToDeclaration/">AttributeKeys.CAMERA_DISTANCE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1169187905%2FProperties%2F1933957036" anchor-label="ENTITY_INTERACTION_RANGE" id="1169187905%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-e-n-t-i-t-y_-i-n-t-e-r-a-c-t-i-o-n_-r-a-n-g-e.html"><span>ENTITY_</span><wbr><span>INTERACTION_</span><wbr><span>RANGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1169187905%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-e-n-t-i-t-y_-i-n-t-e-r-a-c-t-i-o-n_-r-a-n-g-e.html">ENTITY_INTERACTION_RANGE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/ENTITY_INTERACTION_RANGE/#/PointingToDeclaration/">AttributeKeys.ENTITY_INTERACTION_RANGE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1079771538%2FProperties%2F1933957036" anchor-label="EXPLOSION_KNOCKBACK_RESISTANCE" id="-1079771538%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-e-x-p-l-o-s-i-o-n_-k-n-o-c-k-b-a-c-k_-r-e-s-i-s-t-a-n-c-e.html"><span>EXPLOSION_</span><wbr><span>KNOCKBACK_</span><wbr><span>RESISTANCE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1079771538%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-e-x-p-l-o-s-i-o-n_-k-n-o-c-k-b-a-c-k_-r-e-s-i-s-t-a-n-c-e.html">EXPLOSION_KNOCKBACK_RESISTANCE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/EXPLOSION_KNOCKBACK_RESISTANCE/#/PointingToDeclaration/">AttributeKeys.EXPLOSION_KNOCKBACK_RESISTANCE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-88993080%2FProperties%2F1933957036" anchor-label="FALL_DAMAGE_MULTIPLIER" id="-88993080%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-a-l-l_-d-a-m-a-g-e_-m-u-l-t-i-p-l-i-e-r.html"><span>FALL_</span><wbr><span>DAMAGE_</span><wbr><span>MULTIPLIER</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-88993080%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-a-l-l_-d-a-m-a-g-e_-m-u-l-t-i-p-l-i-e-r.html">FALL_DAMAGE_MULTIPLIER</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/FALL_DAMAGE_MULTIPLIER/#/PointingToDeclaration/">AttributeKeys.FALL_DAMAGE_MULTIPLIER</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1610073694%2FProperties%2F1933957036" anchor-label="FLYING_SPEED" id="1610073694%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-l-y-i-n-g_-s-p-e-e-d.html"><span>FLYING_</span><wbr><span>SPEED</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1610073694%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-l-y-i-n-g_-s-p-e-e-d.html">FLYING_SPEED</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/FLYING_SPEED/#/PointingToDeclaration/">AttributeKeys.FLYING_SPEED</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1150787386%2FProperties%2F1933957036" anchor-label="FOLLOW_RANGE" id="-1150787386%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-o-l-l-o-w_-r-a-n-g-e.html"><span>FOLLOW_</span><wbr><span>RANGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1150787386%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-o-l-l-o-w_-r-a-n-g-e.html">FOLLOW_RANGE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/FOLLOW_RANGE/#/PointingToDeclaration/">AttributeKeys.FOLLOW_RANGE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1530348919%2FProperties%2F1933957036" anchor-label="FRICTION_MODIFIER" id="-1530348919%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-r-i-c-t-i-o-n_-m-o-d-i-f-i-e-r.html"><span>FRICTION_</span><wbr><span>MODIFIER</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1530348919%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-r-i-c-t-i-o-n_-m-o-d-i-f-i-e-r.html">FRICTION_MODIFIER</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/FRICTION_MODIFIER/#/PointingToDeclaration/">AttributeKeys.FRICTION_MODIFIER</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="795240727%2FProperties%2F1933957036" anchor-label="GRAVITY" id="795240727%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-g-r-a-v-i-t-y.html"><span><span>GRAVITY</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="795240727%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-g-r-a-v-i-t-y.html">GRAVITY</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/GRAVITY/#/PointingToDeclaration/">AttributeKeys.GRAVITY</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="693552275%2FProperties%2F1933957036" anchor-label="JUMP_STRENGTH" id="693552275%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-j-u-m-p_-s-t-r-e-n-g-t-h.html"><span>JUMP_</span><wbr><span>STRENGTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="693552275%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-j-u-m-p_-s-t-r-e-n-g-t-h.html">JUMP_STRENGTH</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/JUMP_STRENGTH/#/PointingToDeclaration/">AttributeKeys.JUMP_STRENGTH</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-453953480%2FProperties%2F1933957036" anchor-label="KNOCKBACK_RESISTANCE" id="-453953480%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-k-n-o-c-k-b-a-c-k_-r-e-s-i-s-t-a-n-c-e.html"><span>KNOCKBACK_</span><wbr><span>RESISTANCE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-453953480%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-k-n-o-c-k-b-a-c-k_-r-e-s-i-s-t-a-n-c-e.html">KNOCKBACK_RESISTANCE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/KNOCKBACK_RESISTANCE/#/PointingToDeclaration/">AttributeKeys.KNOCKBACK_RESISTANCE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1256417892%2FProperties%2F1933957036" anchor-label="LUCK" id="1256417892%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-l-u-c-k.html"><span><span>LUCK</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1256417892%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-l-u-c-k.html">LUCK</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/LUCK/#/PointingToDeclaration/">AttributeKeys.LUCK</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1300740725%2FProperties%2F1933957036" anchor-label="MAX_ABSORPTION" id="-1300740725%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-m-a-x_-a-b-s-o-r-p-t-i-o-n.html"><span>MAX_</span><wbr><span>ABSORPTION</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1300740725%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-a-x_-a-b-s-o-r-p-t-i-o-n.html">MAX_ABSORPTION</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/MAX_ABSORPTION/#/PointingToDeclaration/">AttributeKeys.MAX_ABSORPTION</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1601236706%2FProperties%2F1933957036" anchor-label="MAX_HEALTH" id="-1601236706%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-m-a-x_-h-e-a-l-t-h.html"><span>MAX_</span><wbr><span>HEALTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1601236706%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-a-x_-h-e-a-l-t-h.html">MAX_HEALTH</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/MAX_HEALTH/#/PointingToDeclaration/">AttributeKeys.MAX_HEALTH</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-39423283%2FProperties%2F1933957036" anchor-label="MINING_EFFICIENCY" id="-39423283%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-m-i-n-i-n-g_-e-f-f-i-c-i-e-n-c-y.html"><span>MINING_</span><wbr><span>EFFICIENCY</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-39423283%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-i-n-i-n-g_-e-f-f-i-c-i-e-n-c-y.html">MINING_EFFICIENCY</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/MINING_EFFICIENCY/#/PointingToDeclaration/">AttributeKeys.MINING_EFFICIENCY</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1689378388%2FProperties%2F1933957036" anchor-label="MOVEMENT_EFFICIENCY" id="-1689378388%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-m-o-v-e-m-e-n-t_-e-f-f-i-c-i-e-n-c-y.html"><span>MOVEMENT_</span><wbr><span>EFFICIENCY</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1689378388%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-o-v-e-m-e-n-t_-e-f-f-i-c-i-e-n-c-y.html">MOVEMENT_EFFICIENCY</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/MOVEMENT_EFFICIENCY/#/PointingToDeclaration/">AttributeKeys.MOVEMENT_EFFICIENCY</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="640739902%2FProperties%2F1933957036" anchor-label="MOVEMENT_SPEED" id="640739902%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-m-o-v-e-m-e-n-t_-s-p-e-e-d.html"><span>MOVEMENT_</span><wbr><span>SPEED</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="640739902%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-o-v-e-m-e-n-t_-s-p-e-e-d.html">MOVEMENT_SPEED</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/MOVEMENT_SPEED/#/PointingToDeclaration/">AttributeKeys.MOVEMENT_SPEED</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1364987127%2FProperties%2F1933957036" anchor-label="NAME_TAG_DISTANCE" id="1364987127%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-n-a-m-e_-t-a-g_-d-i-s-t-a-n-c-e.html"><span>NAME_</span><wbr><span>TAG_</span><wbr><span>DISTANCE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1364987127%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-a-m-e_-t-a-g_-d-i-s-t-a-n-c-e.html">NAME_TAG_DISTANCE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/NAME_TAG_DISTANCE/#/PointingToDeclaration/">AttributeKeys.NAME_TAG_DISTANCE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1236293717%2FProperties%2F1933957036" anchor-label="OXYGEN_BONUS" id="1236293717%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-o-x-y-g-e-n_-b-o-n-u-s.html"><span>OXYGEN_</span><wbr><span>BONUS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1236293717%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-o-x-y-g-e-n_-b-o-n-u-s.html">OXYGEN_BONUS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/OXYGEN_BONUS/#/PointingToDeclaration/">AttributeKeys.OXYGEN_BONUS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1164845518%2FProperties%2F1933957036" anchor-label="SAFE_FALL_DISTANCE" id="1164845518%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-a-f-e_-f-a-l-l_-d-i-s-t-a-n-c-e.html"><span>SAFE_</span><wbr><span>FALL_</span><wbr><span>DISTANCE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1164845518%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-a-f-e_-f-a-l-l_-d-i-s-t-a-n-c-e.html">SAFE_FALL_DISTANCE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/SAFE_FALL_DISTANCE/#/PointingToDeclaration/">AttributeKeys.SAFE_FALL_DISTANCE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1902003301%2FProperties%2F1933957036" anchor-label="SCALE" id="-1902003301%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-c-a-l-e.html"><span><span>SCALE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1902003301%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-c-a-l-e.html">SCALE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/SCALE/#/PointingToDeclaration/">AttributeKeys.SCALE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1742963009%2FProperties%2F1933957036" anchor-label="SNEAKING_SPEED" id="-1742963009%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-n-e-a-k-i-n-g_-s-p-e-e-d.html"><span>SNEAKING_</span><wbr><span>SPEED</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1742963009%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-n-e-a-k-i-n-g_-s-p-e-e-d.html">SNEAKING_SPEED</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/SNEAKING_SPEED/#/PointingToDeclaration/">AttributeKeys.SNEAKING_SPEED</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1355302639%2FProperties%2F1933957036" anchor-label="SPAWN_REINFORCEMENTS" id="1355302639%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-p-a-w-n_-r-e-i-n-f-o-r-c-e-m-e-n-t-s.html"><span>SPAWN_</span><wbr><span><span>REINFORCEMENTS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1355302639%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-p-a-w-n_-r-e-i-n-f-o-r-c-e-m-e-n-t-s.html">SPAWN_REINFORCEMENTS</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/SPAWN_REINFORCEMENTS/#/PointingToDeclaration/">AttributeKeys.SPAWN_REINFORCEMENTS</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-819668277%2FProperties%2F1933957036" anchor-label="STEP_HEIGHT" id="-819668277%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-t-e-p_-h-e-i-g-h-t.html"><span>STEP_</span><wbr><span>HEIGHT</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-819668277%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-t-e-p_-h-e-i-g-h-t.html">STEP_HEIGHT</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/STEP_HEIGHT/#/PointingToDeclaration/">AttributeKeys.STEP_HEIGHT</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="618678730%2FProperties%2F1933957036" anchor-label="SUBMERGED_MINING_SPEED" id="618678730%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-u-b-m-e-r-g-e-d_-m-i-n-i-n-g_-s-p-e-e-d.html"><span>SUBMERGED_</span><wbr><span>MINING_</span><wbr><span>SPEED</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="618678730%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-u-b-m-e-r-g-e-d_-m-i-n-i-n-g_-s-p-e-e-d.html">SUBMERGED_MINING_SPEED</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/SUBMERGED_MINING_SPEED/#/PointingToDeclaration/">AttributeKeys.SUBMERGED_MINING_SPEED</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-773575999%2FProperties%2F1933957036" anchor-label="SWEEPING_DAMAGE_RATIO" id="-773575999%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-w-e-e-p-i-n-g_-d-a-m-a-g-e_-r-a-t-i-o.html"><span>SWEEPING_</span><wbr><span>DAMAGE_</span><wbr><span>RATIO</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-773575999%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-w-e-e-p-i-n-g_-d-a-m-a-g-e_-r-a-t-i-o.html">SWEEPING_DAMAGE_RATIO</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/SWEEPING_DAMAGE_RATIO/#/PointingToDeclaration/">AttributeKeys.SWEEPING_DAMAGE_RATIO</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="729157159%2FProperties%2F1933957036" anchor-label="TEMPT_RANGE" id="729157159%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-t-e-m-p-t_-r-a-n-g-e.html"><span>TEMPT_</span><wbr><span>RANGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="729157159%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-t-e-m-p-t_-r-a-n-g-e.html">TEMPT_RANGE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/TEMPT_RANGE/#/PointingToDeclaration/">AttributeKeys.TEMPT_RANGE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2043130356%2FProperties%2F1933957036" anchor-label="WATER_MOVEMENT_EFFICIENCY" id="2043130356%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-w-a-t-e-r_-m-o-v-e-m-e-n-t_-e-f-f-i-c-i-e-n-c-y.html"><span>WATER_</span><wbr><span>MOVEMENT_</span><wbr><span>EFFICIENCY</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2043130356%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-w-a-t-e-r_-m-o-v-e-m-e-n-t_-e-f-f-i-c-i-e-n-c-y.html">WATER_MOVEMENT_EFFICIENCY</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/WATER_MOVEMENT_EFFICIENCY/#/PointingToDeclaration/">AttributeKeys.WATER_MOVEMENT_EFFICIENCY</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-80690318%2FProperties%2F1933957036" anchor-label="WAYPOINT_RECEIVE_RANGE" id="-80690318%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-w-a-y-p-o-i-n-t_-r-e-c-e-i-v-e_-r-a-n-g-e.html"><span>WAYPOINT_</span><wbr><span>RECEIVE_</span><wbr><span>RANGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-80690318%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-w-a-y-p-o-i-n-t_-r-e-c-e-i-v-e_-r-a-n-g-e.html">WAYPOINT_RECEIVE_RANGE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/WAYPOINT_RECEIVE_RANGE/#/PointingToDeclaration/">AttributeKeys.WAYPOINT_RECEIVE_RANGE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-343069127%2FProperties%2F1933957036" anchor-label="WAYPOINT_TRANSMIT_RANGE" id="-343069127%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-w-a-y-p-o-i-n-t_-t-r-a-n-s-m-i-t_-r-a-n-g-e.html"><span>WAYPOINT_</span><wbr><span>TRANSMIT_</span><wbr><span>RANGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-343069127%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-w-a-y-p-o-i-n-t_-t-r-a-n-s-m-i-t_-r-a-n-g-e.html">WAYPOINT_TRANSMIT_RANGE</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.attribute/Attribute///PointingToDeclaration/">Attribute</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">An entry for <span data-unresolved-link="io.papermc.paper.registry.keys/AttributeKeys/WAYPOINT_TRANSMIT_RANGE/#/PointingToDeclaration/">AttributeKeys.WAYPOINT_TRANSMIT_RANGE</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

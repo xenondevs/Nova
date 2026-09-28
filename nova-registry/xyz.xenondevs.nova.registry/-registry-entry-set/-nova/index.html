@@ -1,0 +1,644 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Nova</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-registry/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-registry/main" data-filter=":nova-registry/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova-registry::xyz.xenondevs.nova.registry/RegistryEntrySet.Nova///PointingToDeclaration//1933957036">
+  <div class="breadcrumbs"><a href="../../../index.html">nova-registry</a><span class="delimiter">/</span><a href="../../index.html">xyz.xenondevs.nova.registry</a><span class="delimiter">/</span><a href="../index.html">RegistryEntrySet</a><span class="delimiter">/</span><span class="current">Nova</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Nova</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="index.html">Nova</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">T</a><span class="token operator"> : </span><a href="../../-nova-registry-element/index.html">NovaRegistryElement</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span> : <a href="../index.html">RegistryEntrySet</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt; </span></div><p class="paragraph">A <a href="../index.html">RegistryEntrySet</a> backed by a Nova registry.</p><h4 class="tableheader">Inheritors</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-direct/index.html">Direct</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-tag/index.html">Tag</a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-1922693166%2FClasslikes%2F1933957036" anchor-label="Direct" id="-1922693166%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-direct/index.html"><span><span>Direct</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1922693166%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="-direct/index.html">Direct</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="-direct/index.html">T</a><span class="token operator"> : </span><a href="../../-nova-registry-element/index.html">NovaRegistryElement</a><span class="token operator">&lt;</span><a href="-direct/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span> : <a href="index.html">RegistryEntrySet.Nova</a><span class="token operator">&lt;</span><a href="-direct/index.html">T</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A <a href="index.html">RegistryEntrySet.Nova</a> backed by a constant set of entries.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2053061293%2FClasslikes%2F1933957036" anchor-label="Tag" id="2053061293%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html"><span><span>Tag</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2053061293%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="-tag/index.html">Tag</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="-tag/index.html">T</a><span class="token operator"> : </span><a href="../../-nova-registry-element/index.html">NovaRegistryElement</a><span class="token operator">&lt;</span><a href="-tag/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span> : <a href="index.html">RegistryEntrySet.Nova</a><span class="token operator">&lt;</span><a href="-tag/index.html">T</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A <a href="index.html">RegistryEntrySet.Nova</a> backed by a tag.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-1721574605%2FProperties%2F1933957036" anchor-label="children" id="-1721574605%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-1721574605%2FProperties%2F1933957036"><span><span>children</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1721574605%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="-tag/index.html#-1721574605%2FProperties%2F1933957036">children</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2116698515%2FProperties%2F1933957036" anchor-label="delegate" id="-2116698515%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-2116698515%2FProperties%2F1933957036"><span><span>delegate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2116698515%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="-tag/index.html#-2116698515%2FProperties%2F1933957036">delegate</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1753510163%2FProperties%2F1933957036" anchor-label="isStable" id="-1753510163%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-1753510163%2FProperties%2F1933957036"><span>is</span><wbr><span><span>Stable</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1753510163%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="-tag/index.html#-1753510163%2FProperties%2F1933957036">isStable</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-237825121%2FProperties%2F1933957036" anchor-label="parents" id="-237825121%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-237825121%2FProperties%2F1933957036"><span><span>parents</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-237825121%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="-tag/index.html#-237825121%2FProperties%2F1933957036">parents</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1647175351%2FProperties%2F1933957036" anchor-label="registry" id="-1647175351%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="registry.html"><span><span>registry</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1647175351%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="registry.html">registry</a><span class="token operator">: </span><a href="../../-nova-registry/index.html">NovaRegistry</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The registry this <a href="index.html">RegistryEntrySet.Nova</a> belongs to.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1900972791%2FProperties%2F1933957036" anchor-label="value" id="1900972791%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#1900972791%2FProperties%2F1933957036"><span><span>value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1900972791%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="-tag/index.html#1900972791%2FProperties%2F1933957036">value</a><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/DeferredValue///PointingToDeclaration/">DeferredValue</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1897011261%2FFunctions%2F1933957036" anchor-label="addStrongChild" id="-1897011261%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-1897011261%2FFunctions%2F1933957036"><span>add</span><wbr><span>Strong</span><wbr><span><span>Child</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1897011261%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="-tag/index.html#-1897011261%2FFunctions%2F1933957036"><span class="token function">addStrongChild</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">child<span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1693680932%2FFunctions%2F1933957036" anchor-label="addWeakChild" id="1693680932%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#1693680932%2FFunctions%2F1933957036"><span>add</span><wbr><span>Weak</span><wbr><span><span>Child</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1693680932%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="-tag/index.html#1693680932%2FFunctions%2F1933957036"><span class="token function">addWeakChild</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">child<span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1671338038%2FFunctions%2F1933957036" anchor-label="bootstrapFlatMap" id="-1671338038%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../bootstrap-flat-map.html"><span>bootstrap</span><wbr><span>Flat</span><wbr><span><span>Map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1671338038%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../bootstrap-flat-map.html">T</a><span class="token punctuation">, </span><a href="../../bootstrap-flat-map.html">R</a><span class="token operator">&gt; </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><a href="../../bootstrap-flat-map.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../bootstrap-flat-map.html"><span class="token function">bootstrapFlatMap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token punctuation">(</span><a href="../../bootstrap-flat-map.html">T</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><a href="../../bootstrap-flat-map.html">R</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><a href="../../bootstrap-flat-map.html">R</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Flat-maps the value of this provider via <a href="../../bootstrap-flat-map.html">transform</a>. During <a href="../../-registry-context/is-in-bootstrap-phase.html">bootstrap phase</a>, uses <a href="-tag/index.html#-65992976%2FFunctions%2F1933957036">Provider.flatMap</a>, otherwise <a href="-tag/index.html#1021948363%2FFunctions%2F1933957036">Provider.immediateFlatMap</a>. This allows creating flat-mapped providers based off of <a href="../../-registry-entry/index.html">RegistryEntries</a> lazily during bootstrap phase, where resolving their value is not possible, without paying for the extra overhead post-bootstrap, where immediateFlatMap can be used.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="885776707%2FFunctions%2F1933957036" anchor-label="bootstrapFlatten" id="885776707%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../bootstrap-flatten.html"><span>bootstrap</span><wbr><span><span>Flatten</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="885776707%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../bootstrap-flatten.html">T</a><span class="token operator">&gt; </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><a href="../../bootstrap-flatten.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../bootstrap-flatten.html"><span class="token function">bootstrapFlatten</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><a href="../../bootstrap-flatten.html">T</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Flattens the value of this provider. During <a href="../../-registry-context/is-in-bootstrap-phase.html">bootstrap phase</a>, uses <a href="-tag/index.html#-65992976%2FFunctions%2F1933957036">Provider.flatMap</a>, otherwise <a href="-tag/index.html#1021948363%2FFunctions%2F1933957036">Provider.immediateFlatMap</a>. This allows creating flat-mapped providers based off of <a href="../../-registry-entry/index.html">RegistryEntries</a> lazily during bootstrap phase, where resolving their value is not possible, without paying for the extra overhead post-bootstrap, where immediateFlatMap can be used.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1833456415%2FFunctions%2F1933957036" anchor-label="contains" id="-1833456415%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../contains.html"><span><span>contains</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1833456415%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="../contains.html"><span class="token function">contains</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="index.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether <a href="../contains.html">value</a> is part of this set. Requires resolving this set and as such this function may not be called before registry freeze.</p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="contains.html"><span class="token function">contains</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entry<span class="token operator">: </span><a href="../../-registry-entry/-nova/index.html">RegistryEntry.Nova</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether <a href="contains.html">entry</a> is part of this set. Depending on whether this is a <a href="-direct/index.html">Direct</a> or <a href="-tag/index.html">Tag</a> set, this may involve resolving this set and as such this function may not be called before registry freeze.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-65992976%2FFunctions%2F1933957036" anchor-label="flatMap" id="-65992976%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-65992976%2FFunctions%2F1933957036"><span>flat</span><wbr><span><span>Map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-65992976%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#-65992976%2FFunctions%2F1933957036">R</a><span class="token operator">&gt; </span><a href="-tag/index.html#-65992976%2FFunctions%2F1933957036"><span class="token function">flatMap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/flatMap/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.Provider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/flatMap/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.Provider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="730984306%2FFunctions%2F1933957036" anchor-label="get" id="730984306%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#730984306%2FFunctions%2F1933957036"><span><span>get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="730984306%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="-tag/index.html#730984306%2FFunctions%2F1933957036"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2128179088%2FFunctions%2F1933957036" anchor-label="getValue" id="-2128179088%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-2128179088%2FFunctions%2F1933957036"><span>get</span><wbr><span><span>Value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2128179088%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#-2128179088%2FFunctions%2F1933957036">X</a><span class="token operator">&gt; </span><a href="-tag/index.html#-2128179088%2FFunctions%2F1933957036"><span class="token function">getValue</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">thisRef<span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/getValue/#TypeParam(bounds=[kotlin.Any?])?#kotlin.reflect.KProperty[*]?/PointingToGenericParameters(0)/">X</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">property<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-property/index.html">KProperty</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1843878804%2FFunctions%2F1933957036" anchor-label="handleParentUpdated" id="1843878804%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#1843878804%2FFunctions%2F1933957036"><span>handle</span><wbr><span>Parent</span><wbr><span><span>Updated</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1843878804%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="-tag/index.html#1843878804%2FFunctions%2F1933957036"><span class="token function">handleParentUpdated</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">updatedParent<span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1021948363%2FFunctions%2F1933957036" anchor-label="immediateFlatMap" id="1021948363%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#1021948363%2FFunctions%2F1933957036"><span>immediate</span><wbr><span>Flat</span><wbr><span><span>Map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1021948363%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#1021948363%2FFunctions%2F1933957036">R</a><span class="token operator">&gt; </span><a href="-tag/index.html#1021948363%2FFunctions%2F1933957036"><span class="token function">immediateFlatMap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/immediateFlatMap/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.Provider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/immediateFlatMap/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.Provider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2113674249%2FFunctions%2F1933957036" anchor-label="immediateFlatMapMutable" id="2113674249%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#2113674249%2FFunctions%2F1933957036"><span>immediate</span><wbr><span>Flat</span><wbr><span>Map</span><wbr><span><span>Mutable</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2113674249%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#2113674249%2FFunctions%2F1933957036">R</a><span class="token operator">&gt; </span><a href="-tag/index.html#2113674249%2FFunctions%2F1933957036"><span class="token function">immediateFlatMapMutable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="xyz.xenondevs.commons.provider/MutableProvider///PointingToDeclaration/">MutableProvider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/immediateFlatMapMutable/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.MutableProvider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/MutableProvider///PointingToDeclaration/">MutableProvider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/immediateFlatMapMutable/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.MutableProvider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1361978886%2FFunctions%2F1933957036" anchor-label="map" id="1361978886%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#1361978886%2FFunctions%2F1933957036"><span><span>map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1361978886%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#1361978886%2FFunctions%2F1933957036">R</a><span class="token operator">&gt; </span><a href="-tag/index.html#1361978886%2FFunctions%2F1933957036"><span class="token function">map</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/map/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],TypeParam(bounds=[kotlin.Any?])]/PointingToGenericParameters(0)/">R</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/map/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],TypeParam(bounds=[kotlin.Any?])]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2099296346%2FFunctions%2F1933957036" anchor-label="observe" id="2099296346%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#2099296346%2FFunctions%2F1933957036"><span><span>observe</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2099296346%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="-tag/index.html#2099296346%2FFunctions%2F1933957036"><span class="token function">observe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-815440728%2FFunctions%2F1933957036" anchor-label="observeWeak" id="-815440728%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-815440728%2FFunctions%2F1933957036"><span>observe</span><wbr><span><span>Weak</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-815440728%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#-815440728%2FFunctions%2F1933957036">R</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="-tag/index.html#-815440728%2FFunctions%2F1933957036"><span class="token function">observeWeak</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">owner<span class="token operator">: </span><a href="-tag/index.html#-815440728%2FFunctions%2F1933957036">R</a><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span>owner<span class="token operator">: </span><a href="-tag/index.html#-815440728%2FFunctions%2F1933957036">R</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1397599516%2FFunctions%2F1933957036" anchor-label="removeStrongChild" id="1397599516%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#1397599516%2FFunctions%2F1933957036"><span>remove</span><wbr><span>Strong</span><wbr><span><span>Child</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1397599516%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="-tag/index.html#1397599516%2FFunctions%2F1933957036"><span class="token function">removeStrongChild</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">child<span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-519648067%2FFunctions%2F1933957036" anchor-label="removeWeakChild" id="-519648067%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-519648067%2FFunctions%2F1933957036"><span>remove</span><wbr><span>Weak</span><wbr><span><span>Child</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-519648067%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="-tag/index.html#-519648067%2FFunctions%2F1933957036"><span class="token function">removeWeakChild</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">child<span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="923260583%2FFunctions%2F1933957036" anchor-label="strongFlatMap" id="923260583%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#923260583%2FFunctions%2F1933957036"><span>strong</span><wbr><span>Flat</span><wbr><span><span>Map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="923260583%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#923260583%2FFunctions%2F1933957036">R</a><span class="token operator">&gt; </span><a href="-tag/index.html#923260583%2FFunctions%2F1933957036"><span class="token function">strongFlatMap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/strongFlatMap/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.Provider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/strongFlatMap/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.Provider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-106192908%2FFunctions%2F1933957036" anchor-label="strongImmediateFlatMap" id="-106192908%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-106192908%2FFunctions%2F1933957036"><span>strong</span><wbr><span>Immediate</span><wbr><span>Flat</span><wbr><span><span>Map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-106192908%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#-106192908%2FFunctions%2F1933957036">R</a><span class="token operator">&gt; </span><a href="-tag/index.html#-106192908%2FFunctions%2F1933957036"><span class="token function">strongImmediateFlatMap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/strongImmediateFlatMap/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.Provider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/strongImmediateFlatMap/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.Provider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1242984846%2FFunctions%2F1933957036" anchor-label="strongImmediateFlatMapMutable" id="-1242984846%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-1242984846%2FFunctions%2F1933957036"><span>strong</span><wbr><span>Immediate</span><wbr><span>Flat</span><wbr><span>Map</span><wbr><span><span>Mutable</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1242984846%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#-1242984846%2FFunctions%2F1933957036">R</a><span class="token operator">&gt; </span><a href="-tag/index.html#-1242984846%2FFunctions%2F1933957036"><span class="token function">strongImmediateFlatMapMutable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="xyz.xenondevs.commons.provider/MutableProvider///PointingToDeclaration/">MutableProvider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/strongImmediateFlatMapMutable/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.MutableProvider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/MutableProvider///PointingToDeclaration/">MutableProvider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/strongImmediateFlatMapMutable/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],xyz.xenondevs.commons.provider.MutableProvider[TypeParam(bounds=[kotlin.Any?])]]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1441463535%2FFunctions%2F1933957036" anchor-label="strongMap" id="1441463535%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#1441463535%2FFunctions%2F1933957036"><span>strong</span><wbr><span><span>Map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1441463535%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#1441463535%2FFunctions%2F1933957036">R</a><span class="token operator">&gt; </span><a href="-tag/index.html#1441463535%2FFunctions%2F1933957036"><span class="token function">strongMap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/strongMap/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],TypeParam(bounds=[kotlin.Any?])]/PointingToGenericParameters(0)/">R</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.commons.provider/Provider///PointingToDeclaration/">Provider</span><span class="token operator">&lt;</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/strongMap/#kotlin.Function1[kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],TypeParam(bounds=[kotlin.Any?])]/PointingToGenericParameters(0)/">R</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1540988513%2FFunctions%2F1933957036" anchor-label="subscribe" id="1540988513%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#1540988513%2FFunctions%2F1933957036"><span><span>subscribe</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1540988513%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="-tag/index.html#1540988513%2FFunctions%2F1933957036"><span class="token function">subscribe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span>value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="329967629%2FFunctions%2F1933957036" anchor-label="subscribeWeak" id="329967629%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#329967629%2FFunctions%2F1933957036"><span>subscribe</span><wbr><span><span>Weak</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="329967629%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#329967629%2FFunctions%2F1933957036">R</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="-tag/index.html#329967629%2FFunctions%2F1933957036"><span class="token function">subscribeWeak</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">owner<span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/subscribeWeak/#TypeParam(bounds=[kotlin.Any])#kotlin.Function2[TypeParam(bounds=[kotlin.Any]),kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],kotlin.Unit]/PointingToGenericParameters(0)/">R</span><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span>owner<span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/subscribeWeak/#TypeParam(bounds=[kotlin.Any])#kotlin.Function2[TypeParam(bounds=[kotlin.Any]),kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],kotlin.Unit]/PointingToGenericParameters(0)/">R</span><span class="token punctuation">, </span>value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1709092641%2FFunctions%2F1933957036" anchor-label="unobserve" id="1709092641%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#1709092641%2FFunctions%2F1933957036"><span><span>unobserve</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1709092641%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="-tag/index.html#1709092641%2FFunctions%2F1933957036"><span class="token function">unobserve</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="643155517%2FFunctions%2F1933957036" anchor-label="unobserveWeak" id="643155517%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#549800794%2FFunctions%2F1933957036"><span>unobserve</span><wbr><span><span>Weak</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="643155517%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#549800794%2FFunctions%2F1933957036">R</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="-tag/index.html#549800794%2FFunctions%2F1933957036"><span class="token function">unobserveWeak</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">owner<span class="token operator">: </span><a href="-tag/index.html#549800794%2FFunctions%2F1933957036">R</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#-717945425%2FFunctions%2F1933957036">R</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="-tag/index.html#-717945425%2FFunctions%2F1933957036"><span class="token function">unobserveWeak</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">owner<span class="token operator">: </span><a href="-tag/index.html#-717945425%2FFunctions%2F1933957036">R</a><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><a href="-tag/index.html#-717945425%2FFunctions%2F1933957036">R</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="269951848%2FFunctions%2F1933957036" anchor-label="unsubscribe" id="269951848%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#269951848%2FFunctions%2F1933957036"><span><span>unsubscribe</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="269951848%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="-tag/index.html#269951848%2FFunctions%2F1933957036"><span class="token function">unsubscribe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1674353868%2FFunctions%2F1933957036" anchor-label="unsubscribeWeak" id="-1674353868%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag/index.html#-1172115092%2FFunctions%2F1933957036"><span>unsubscribe</span><wbr><span><span>Weak</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1674353868%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#-1172115092%2FFunctions%2F1933957036">R</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="-tag/index.html#-1172115092%2FFunctions%2F1933957036"><span class="token function">unsubscribeWeak</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">owner<span class="token operator">: </span><a href="-tag/index.html#-1172115092%2FFunctions%2F1933957036">R</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="-tag/index.html#-868380844%2FFunctions%2F1933957036">R</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="-tag/index.html#-868380844%2FFunctions%2F1933957036"><span class="token function">unsubscribeWeak</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">owner<span class="token operator">: </span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/unsubscribeWeak/#TypeParam(bounds=[kotlin.Any])#kotlin.Function2[TypeParam(bounds=[kotlin.Any]),kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],kotlin.Unit]/PointingToGenericParameters(0)/">R</span><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="xyz.xenondevs.nova.registry/RegistryEntrySet.Nova/unsubscribeWeak/#TypeParam(bounds=[kotlin.Any])#kotlin.Function2[TypeParam(bounds=[kotlin.Any]),kotlin.collections.Set[TypeParam(bounds=[xyz.xenondevs.nova.registry.NovaRegistryElement[^]])],kotlin.Unit]/PointingToGenericParameters(0)/">R</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

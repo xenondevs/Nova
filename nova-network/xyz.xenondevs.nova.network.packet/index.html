@@ -1,0 +1,489 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>xyz.xenondevs.nova.network.packet</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-network/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-network/main" data-filter=":nova-network/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="nova-network::xyz.xenondevs.nova.network.packet////PointingToDeclaration//213940877">
+  <div class="breadcrumbs"><a href="../index.html">nova-network</a><span class="delimiter">/</span><span class="current">xyz.xenondevs.nova.network.packet</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-796671221%2FClasslikes%2F213940877" anchor-label="PacketIds" id="-796671221%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-packet-ids/index.html"><span>Packet</span><wbr><span><span>Ids</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-796671221%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="-packet-ids/index.html">PacketIds</a></div><div class="brief "><p class="paragraph">Contains the packet IDs of all packets in the protocol.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="332622685%2FFunctions%2F213940877" anchor-label="ClientboundAnimatePacket" id="332622685%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-animate-packet.html"><span>Clientbound</span><wbr><span>Animate</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="332622685%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-animate-packet.html"><span class="token function">ClientboundAnimatePacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entityId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundAnimatePacket///PointingToDeclaration/">ClientboundAnimatePacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-526082333%2FFunctions%2F213940877" anchor-label="ClientboundCommandsPacket" id="-526082333%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-commands-packet.html"><span>Clientbound</span><wbr><span>Commands</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-526082333%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-commands-packet.html"><span class="token function">ClientboundCommandsPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entries<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundCommandsPacket.Entry///PointingToDeclaration/">ClientboundCommandsPacket.Entry</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">rootIndex<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundCommandsPacket///PointingToDeclaration/">ClientboundCommandsPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="364020344%2FFunctions%2F213940877" anchor-label="ClientboundEntityEventPacket" id="364020344%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-entity-event-packet.html"><span>Clientbound</span><wbr><span>Entity</span><wbr><span>Event</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="364020344%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-entity-event-packet.html"><span class="token function">ClientboundEntityEventPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entityId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">eventId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte/index.html">Byte</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundEntityEventPacket///PointingToDeclaration/">ClientboundEntityEventPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1309114373%2FFunctions%2F213940877" anchor-label="ClientboundInitializeBorderPacket" id="-1309114373%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-initialize-border-packet.html"><span>Clientbound</span><wbr><span>Initialize</span><wbr><span>Border</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1309114373%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-initialize-border-packet.html"><span class="token function">ClientboundInitializeBorderPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">newCenterX<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token punctuation">, </span></span><span class="parameter ">newCenterZ<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token punctuation">, </span></span><span class="parameter ">oldSize<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token punctuation">, </span></span><span class="parameter ">newSize<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token punctuation">, </span></span><span class="parameter ">lerpTime<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">newAbsoluteMaxSize<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">warningBlocks<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">warningTime<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundInitializeBorderPacket///PointingToDeclaration/">ClientboundInitializeBorderPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="80564739%2FFunctions%2F213940877" anchor-label="ClientboundPlayerAbilitiesPacket" id="80564739%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-player-abilities-packet.html"><span>Clientbound</span><wbr><span>Player</span><wbr><span>Abilities</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="80564739%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-player-abilities-packet.html"><span class="token function">ClientboundPlayerAbilitiesPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">invulnerable<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">flying<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">canFly<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">instabuild<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">flyingSpeed<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">walkingSpeed<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundPlayerAbilitiesPacket///PointingToDeclaration/">ClientboundPlayerAbilitiesPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1133268531%2FFunctions%2F213940877" anchor-label="ClientboundPlayerLookAtPacket" id="-1133268531%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-player-look-at-packet.html"><span>Clientbound</span><wbr><span>Player</span><wbr><span>Look</span><wbr><span>At</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1133268531%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-player-look-at-packet.html"><span class="token function">ClientboundPlayerLookAtPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fromAnchor<span class="token operator">: </span><span data-unresolved-link="net.minecraft.commands.arguments/EntityAnchorArgument.Anchor///PointingToDeclaration/">EntityAnchorArgument.Anchor</span><span class="token punctuation">, </span></span><span class="parameter ">x<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token punctuation">, </span></span><span class="parameter ">y<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token punctuation">, </span></span><span class="parameter ">z<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token punctuation">, </span></span><span class="parameter ">entityId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">toAnchor<span class="token operator">: </span><span data-unresolved-link="net.minecraft.commands.arguments/EntityAnchorArgument.Anchor///PointingToDeclaration/">EntityAnchorArgument.Anchor</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundPlayerLookAtPacket///PointingToDeclaration/">ClientboundPlayerLookAtPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2006877896%2FFunctions%2F213940877" anchor-label="ClientboundRotateHeadPacket" id="-2006877896%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-rotate-head-packet.html"><span>Clientbound</span><wbr><span>Rotate</span><wbr><span>Head</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2006877896%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-rotate-head-packet.html"><span class="token function">ClientboundRotateHeadPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entityId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">packedYHeadRot<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte/index.html">Byte</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundRotateHeadPacket///PointingToDeclaration/">ClientboundRotateHeadPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1400523017%2FFunctions%2F213940877" anchor-label="ClientboundSetBorderCenterPacket" id="1400523017%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-set-border-center-packet.html"><span>Clientbound</span><wbr><span>Set</span><wbr><span>Border</span><wbr><span>Center</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1400523017%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-set-border-center-packet.html"><span class="token function">ClientboundSetBorderCenterPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">newCenterX<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token punctuation">, </span></span><span class="parameter ">newCenterZ<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSetBorderCenterPacket///PointingToDeclaration/">ClientboundSetBorderCenterPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1828643430%2FFunctions%2F213940877" anchor-label="ClientboundSetBorderLerpSizePacket" id="1828643430%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-set-border-lerp-size-packet.html"><span>Clientbound</span><wbr><span>Set</span><wbr><span>Border</span><wbr><span>Lerp</span><wbr><span>Size</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1828643430%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-set-border-lerp-size-packet.html"><span class="token function">ClientboundSetBorderLerpSizePacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">oldSize<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token punctuation">, </span></span><span class="parameter ">newSize<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token punctuation">, </span></span><span class="parameter ">lerpTime<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSetBorderLerpSizePacket///PointingToDeclaration/">ClientboundSetBorderLerpSizePacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1734741136%2FFunctions%2F213940877" anchor-label="ClientboundSetBorderSizePacket" id="1734741136%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-set-border-size-packet.html"><span>Clientbound</span><wbr><span>Set</span><wbr><span>Border</span><wbr><span>Size</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1734741136%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-set-border-size-packet.html"><span class="token function">ClientboundSetBorderSizePacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">size<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSetBorderSizePacket///PointingToDeclaration/">ClientboundSetBorderSizePacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1004001612%2FFunctions%2F213940877" anchor-label="ClientboundSetBorderWarningDelayPacket" id="1004001612%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-set-border-warning-delay-packet.html"><span>Clientbound</span><wbr><span>Set</span><wbr><span>Border</span><wbr><span>Warning</span><wbr><span>Delay</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1004001612%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-set-border-warning-delay-packet.html"><span class="token function">ClientboundSetBorderWarningDelayPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">warningDelay<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSetBorderWarningDelayPacket///PointingToDeclaration/">ClientboundSetBorderWarningDelayPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2099065438%2FFunctions%2F213940877" anchor-label="ClientboundSetBorderWarningDistancePacket" id="-2099065438%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-set-border-warning-distance-packet.html"><span>Clientbound</span><wbr><span>Set</span><wbr><span>Border</span><wbr><span>Warning</span><wbr><span>Distance</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2099065438%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-set-border-warning-distance-packet.html"><span class="token function">ClientboundSetBorderWarningDistancePacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">warningBlocks<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSetBorderWarningDistancePacket///PointingToDeclaration/">ClientboundSetBorderWarningDistancePacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1042573830%2FFunctions%2F213940877" anchor-label="ClientboundSetCameraPacket" id="-1042573830%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-set-camera-packet.html"><span>Clientbound</span><wbr><span>Set</span><wbr><span>Camera</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1042573830%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-set-camera-packet.html"><span class="token function">ClientboundSetCameraPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cameraId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSetCameraPacket///PointingToDeclaration/">ClientboundSetCameraPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1674632981%2FFunctions%2F213940877" anchor-label="ClientboundSetDisplayObjectivePacket" id="1674632981%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-set-display-objective-packet.html"><span>Clientbound</span><wbr><span>Set</span><wbr><span>Display</span><wbr><span>Objective</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1674632981%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-set-display-objective-packet.html"><span class="token function">ClientboundSetDisplayObjectivePacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">slot<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.scores/DisplaySlot///PointingToDeclaration/">DisplaySlot</span><span class="token punctuation">, </span></span><span class="parameter ">objectiveName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSetDisplayObjectivePacket///PointingToDeclaration/">ClientboundSetDisplayObjectivePacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="45821051%2FFunctions%2F213940877" anchor-label="ClientboundSetEntityLinkPacket" id="45821051%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-set-entity-link-packet.html"><span>Clientbound</span><wbr><span>Set</span><wbr><span>Entity</span><wbr><span>Link</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="45821051%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-set-entity-link-packet.html"><span class="token function">ClientboundSetEntityLinkPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sourceId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">destinationId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSetEntityLinkPacket///PointingToDeclaration/">ClientboundSetEntityLinkPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="557199167%2FFunctions%2F213940877" anchor-label="ClientboundSetEquipmentPacket" id="557199167%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-set-equipment-packet.html"><span>Clientbound</span><wbr><span>Set</span><wbr><span>Equipment</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="557199167%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-set-equipment-packet.html"><span class="token function">ClientboundSetEquipmentPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entityId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">equipment<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.world.entity/EquipmentSlot///PointingToDeclaration/">EquipmentSlot</span><span class="token punctuation">, </span><span data-unresolved-link="net.minecraft.world.item/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSetEquipmentPacket///PointingToDeclaration/">ClientboundSetEquipmentPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="712913107%2FFunctions%2F213940877" anchor-label="ClientboundSetObjectivePacket" id="712913107%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-set-objective-packet.html"><span>Clientbound</span><wbr><span>Set</span><wbr><span>Objective</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="712913107%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-set-objective-packet.html"><span class="token function">ClientboundSetObjectivePacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">objectiveName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">displayName<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.chat/Component///PointingToDeclaration/">Component</span><span class="token punctuation">, </span></span><span class="parameter ">renderType<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.scores.criteria/ObjectiveCriteria.RenderType///PointingToDeclaration/">ObjectiveCriteria.RenderType</span><span class="token punctuation">, </span></span><span class="parameter ">numberFormat<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Optional.html">Optional</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.chat.numbers/NumberFormat///PointingToDeclaration/">NumberFormat</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">method<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSetObjectivePacket///PointingToDeclaration/">ClientboundSetObjectivePacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="857487986%2FFunctions%2F213940877" anchor-label="ClientboundSetPassengersPacket" id="857487986%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-set-passengers-packet.html"><span>Clientbound</span><wbr><span>Set</span><wbr><span>Passengers</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="857487986%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-set-passengers-packet.html"><span class="token function">ClientboundSetPassengersPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">vehicle<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">passengers<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int-array/index.html">IntArray</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSetPassengersPacket///PointingToDeclaration/">ClientboundSetPassengersPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1496606545%2FFunctions%2F213940877" anchor-label="ClientboundSoundEntityPacket" id="-1496606545%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-sound-entity-packet.html"><span>Clientbound</span><wbr><span>Sound</span><wbr><span>Entity</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1496606545%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-clientbound-sound-entity-packet.html"><span class="token function">ClientboundSoundEntityPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sound<span class="token operator">: </span><span data-unresolved-link="net.minecraft.core/Holder///PointingToDeclaration/">Holder</span><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.sounds/SoundEvent///PointingToDeclaration/">SoundEvent</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">source<span class="token operator">: </span><span data-unresolved-link="net.minecraft.sounds/SoundSource///PointingToDeclaration/">SoundSource</span><span class="token punctuation">, </span></span><span class="parameter ">entityId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">volume<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">pitch<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">seed<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ClientboundSoundEntityPacket///PointingToDeclaration/">ClientboundSoundEntityPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-567323309%2FFunctions%2F213940877" anchor-label="ServerboundKeyPacket" id="-567323309%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-key-packet.html"><span>Serverbound</span><wbr><span>Key</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-567323309%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-serverbound-key-packet.html"><span class="token function">ServerboundKeyPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">keyBytes<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token punctuation">, </span></span><span class="parameter ">encryptedChallenge<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.login/ServerboundKeyPacket///PointingToDeclaration/">ServerboundKeyPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1030493%2FFunctions%2F213940877" anchor-label="ServerboundPlaceRecipePacket" id="1030493%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-place-recipe-packet.html"><span>Serverbound</span><wbr><span>Place</span><wbr><span>Recipe</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1030493%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-serverbound-place-recipe-packet.html"><span class="token function">ServerboundPlaceRecipePacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">containerId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">recipe<span class="token operator">: </span><span data-unresolved-link="net.minecraft.resources/Identifier///PointingToDeclaration/">Identifier</span><span class="token punctuation">, </span></span><span class="parameter ">shiftDown<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlaceRecipePacket///PointingToDeclaration/">ServerboundPlaceRecipePacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1076944023%2FFunctions%2F213940877" anchor-label="ServerboundPlayerAbilitiesPacket" id="-1076944023%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-player-abilities-packet.html"><span>Serverbound</span><wbr><span>Player</span><wbr><span>Abilities</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1076944023%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-serverbound-player-abilities-packet.html"><span class="token function">ServerboundPlayerAbilitiesPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">flying<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerAbilitiesPacket///PointingToDeclaration/">ServerboundPlayerAbilitiesPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1082882352%2FFunctions%2F213940877" anchor-label="ServerboundPlayerCommandPacket" id="1082882352%2FFunctions%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-player-command-packet.html"><span>Serverbound</span><wbr><span>Player</span><wbr><span>Command</span><wbr><span><span>Packet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1082882352%2FFunctions%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-serverbound-player-command-packet.html"><span class="token function">ServerboundPlayerCommandPacket</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entityId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerCommandPacket.Action///PointingToDeclaration/">ServerboundPlayerCommandPacket.Action</span><span class="token punctuation">, </span></span><span class="parameter ">data<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerCommandPacket///PointingToDeclaration/">ServerboundPlayerCommandPacket</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

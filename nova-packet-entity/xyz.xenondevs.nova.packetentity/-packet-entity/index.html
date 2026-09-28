@@ -1,0 +1,415 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>PacketEntity</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-packet-entity/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-packet-entity/main" data-filter=":nova-packet-entity/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova-packet-entity::xyz.xenondevs.nova.packetentity/PacketEntity///PointingToDeclaration//737294119">
+  <div class="breadcrumbs"><a href="../../index.html">nova-packet-entity</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.packetentity</a><span class="delimiter">/</span><span class="current">PacketEntity</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Packet</span><wbr><span><span>Entity</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="index.html">PacketEntity</a><span class="token operator">&lt;</span><a href="index.html">M</a><span class="token operator"> : </span><a href="../-entity-metadata/index.html">EntityMetadata</a><span class="token operator">&gt;</span> : <a href="../-packet-entity-node/index.html">PacketEntityNode</a><span class="token operator">&lt;</span><a href="index.html">M</a><span class="token operator">&gt; </span></div><p class="paragraph">A packet-only entity that is spawned, updated, and removed by sending packets to players.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val display = packetItemDisplay {<br>    location by player.location<br>    metadata {<br>        itemStack by item<br>    }<br>}<br><br>display.spawn()</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><h4 class="tableheader">Type Parameters</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>M</span></span></u></div></span></div><div><div class="title"><p class="paragraph">the metadata API type for this entity.</p></div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-1026431939%2FProperties%2F737294119" anchor-label="attackAsyncHandlers" id="-1026431939%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="attack-async-handlers.html"><span>attack</span><wbr><span>Async</span><wbr><span><span>Handlers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1026431939%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="attack-async-handlers.html">attackAsyncHandlers</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token punctuation">(</span><a href="../../../nova-network/xyz.xenondevs.nova.network.event.serverbound/-serverbound-attack-packet-event/index.html">ServerboundAttackPacketEvent</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Handlers that are called on the player's Netty event-loop thread when they attack this entity (left click).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-551825297%2FProperties%2F737294119" anchor-label="attackHandlers" id="-551825297%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="attack-handlers.html"><span>attack</span><wbr><span><span>Handlers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-551825297%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="attack-handlers.html">attackHandlers</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><a href="../-attack-dsl/index.html">AttackDsl</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Handlers that are called on the main thread when a player attacks this entity (left click).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1504193289%2FProperties%2F737294119" anchor-label="despawnHandlers" id="-1504193289%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="despawn-handlers.html"><span>despawn</span><wbr><span><span>Handlers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1504193289%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="despawn-handlers.html">despawnHandlers</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token punctuation">(</span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Handlers that are called on the main thread whenever this entity stops being visible to a player.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2035801930%2FProperties%2F737294119" anchor-label="equipment" id="2035801930%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-packet-entity-node/equipment.html"><span><span>equipment</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2035801930%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-packet-entity-node/equipment.html">equipment</a><span class="token operator">: </span><a href="../-packet-entity-equipment/index.html">PacketEntityEquipment</a></div><div class="brief "><p class="paragraph">The mutable equipment of this node.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-316860921%2FProperties%2F737294119" anchor-label="id" id="-316860921%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-packet-entity-node/id.html"><span><span>id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-316860921%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-packet-entity-node/id.html">id</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">The entity id used in packets for this entity.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1743961707%2FProperties%2F737294119" anchor-label="interactAsyncHandlers" id="1743961707%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="interact-async-handlers.html"><span>interact</span><wbr><span>Async</span><wbr><span><span>Handlers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1743961707%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="interact-async-handlers.html">interactAsyncHandlers</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token punctuation">(</span><a href="../../../nova-network/xyz.xenondevs.nova.network.event.serverbound/-serverbound-interact-packet-event/index.html">ServerboundInteractPacketEvent</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Handlers that are called on the player's Netty event-loop thread when they interact with this entity (right click).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1762995839%2FProperties%2F737294119" anchor-label="interactHandlers" id="-1762995839%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="interact-handlers.html"><span>interact</span><wbr><span><span>Handlers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1762995839%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="interact-handlers.html">interactHandlers</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><a href="../-interact-dsl/index.html">InteractDsl</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../../nova-interaction/xyz.xenondevs.nova.world/-interaction-result/index.html">InteractionResult</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Handlers that are called on the main thread when a player interacts with this entity (right click).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1127242827%2FProperties%2F737294119" anchor-label="location" id="1127242827%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="location.html"><span><span>location</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1127242827%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">var </span><a href="location.html">location</a><span class="token operator">: </span><span data-unresolved-link="org.bukkit/Location///PointingToDeclaration/">Location</span></div><div class="brief "><p class="paragraph">The entity location.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1086271821%2FProperties%2F737294119" anchor-label="metadata" id="-1086271821%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-packet-entity-node/metadata.html"><span><span>metadata</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1086271821%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-packet-entity-node/metadata.html">metadata</a><span class="token operator">: </span><a href="index.html">M</a></div><div class="brief "><p class="paragraph">The mutable metadata of this entity.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2116638519%2FProperties%2F737294119" anchor-label="passengers" id="-2116638519%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-packet-entity-node/passengers.html"><span><span>passengers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2116638519%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-packet-entity-node/passengers.html">passengers</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-packet-entity-node/index.html">PacketEntityNode</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The direct passengers mounted on this entity.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="295077526%2FProperties%2F737294119" anchor-label="pickAsyncHandlers" id="295077526%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pick-async-handlers.html"><span>pick</span><wbr><span>Async</span><wbr><span><span>Handlers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="295077526%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="pick-async-handlers.html">pickAsyncHandlers</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token punctuation">(</span><a href="../../../nova-network/xyz.xenondevs.nova.network.event.serverbound/-serverbound-pick-item-from-entity-packet-event/index.html">ServerboundPickItemFromEntityPacketEvent</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Handlers that are called on the player's Netty event-loop thread when they pick this entity (middle click).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="615910518%2FProperties%2F737294119" anchor-label="spawnHandlers" id="615910518%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="spawn-handlers.html"><span>spawn</span><wbr><span><span>Handlers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="615910518%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="spawn-handlers.html">spawnHandlers</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token punctuation">(</span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Handlers that are called on the main thread whenever this entity becomes visible to a player.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1515075111%2FProperties%2F737294119" anchor-label="uuid" id="1515075111%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-packet-entity-node/uuid.html"><span><span>uuid</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1515075111%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-packet-entity-node/uuid.html">uuid</a><span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/UUID.html">UUID</a></div><div class="brief "><p class="paragraph">The UUID used in packets for this entity.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1045516015%2FProperties%2F737294119" anchor-label="viewerBlacklist" id="1045516015%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="viewer-blacklist.html"><span>viewer</span><wbr><span><span>Blacklist</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1045516015%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">var </span><a href="viewer-blacklist.html">viewerBlacklist</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/UUID.html">UUID</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The set of players that must not see this entity.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-344409339%2FProperties%2F737294119" anchor-label="viewerWhitelist" id="-344409339%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="viewer-whitelist.html"><span>viewer</span><wbr><span><span>Whitelist</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-344409339%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">var </span><a href="viewer-whitelist.html">viewerWhitelist</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/UUID.html">UUID</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The optional whitelist of players that may see this entity.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="883691214%2FProperties%2F737294119" anchor-label="visibility" id="883691214%2FProperties%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="visibility.html"><span><span>visibility</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="883691214%2FProperties%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="visibility.html">visibility</a><span class="token operator">: </span><a href="../-packet-entity-visibility/index.html">PacketEntityVisibility</a></div><div class="brief "><p class="paragraph">The visibility of this entity.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1234100832%2FFunctions%2F737294119" anchor-label="despawn" id="1234100832%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="despawn.html"><span><span>despawn</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1234100832%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="despawn.html"><span class="token function">despawn</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Despawns the entity, making it invisible to players.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1837102881%2FFunctions%2F737294119" anchor-label="spawn" id="-1837102881%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="spawn.html"><span><span>spawn</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1837102881%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="spawn.html"><span class="token function">spawn</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Spawns the entity, making it visible for players.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1070527615%2FFunctions%2F737294119" anchor-label="teleport" id="-1070527615%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="teleport.html"><span><span>teleport</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1070527615%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="teleport.html"><span class="token function">teleport</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">modifyLocation<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Location///PointingToDeclaration/">Location</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Updates <a href="location.html">location</a> by applying <a href="teleport.html">modifyLocation</a> to a clone of the current location.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

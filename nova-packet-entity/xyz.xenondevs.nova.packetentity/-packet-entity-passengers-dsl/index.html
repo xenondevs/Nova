@@ -1,0 +1,1416 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>PacketEntityPassengersDsl</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-packet-entity/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-packet-entity/main" data-filter=":nova-packet-entity/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova-packet-entity::xyz.xenondevs.nova.packetentity/PacketEntityPassengersDsl///PointingToDeclaration//737294119">
+  <div class="breadcrumbs"><a href="../../index.html">nova-packet-entity</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.packetentity</a><span class="delimiter">/</span><span class="current">PacketEntityPassengersDsl</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Packet</span><wbr><span>Entity</span><wbr><span>Passengers</span><wbr><span><span>Dsl</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="index.html">PacketEntityPassengersDsl</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1753351811%2FFunctions%2F737294119" anchor-label="allay" id="-1753351811%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="allay.html"><span><span>allay</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1753351811%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="allay.html"><span class="token function">allay</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">allay<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-allay-metadata-dsl/index.html">AllayMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="933406589%2FFunctions%2F737294119" anchor-label="areaEffectCloud" id="933406589%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="area-effect-cloud.html"><span>area</span><wbr><span>Effect</span><wbr><span><span>Cloud</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="933406589%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="area-effect-cloud.html"><span class="token function">areaEffectCloud</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">areaEffectCloud<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-area-effect-cloud-metadata-dsl/index.html">AreaEffectCloudMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1017859197%2FFunctions%2F737294119" anchor-label="armadillo" id="1017859197%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="armadillo.html"><span><span>armadillo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1017859197%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="armadillo.html"><span class="token function">armadillo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">armadillo<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-armadillo-metadata-dsl/index.html">ArmadilloMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-699404261%2FFunctions%2F737294119" anchor-label="armorStand" id="-699404261%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="armor-stand.html"><span>armor</span><wbr><span><span>Stand</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-699404261%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="armor-stand.html"><span class="token function">armorStand</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">armorStand<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-armor-stand-metadata-dsl/index.html">ArmorStandMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1715181699%2FFunctions%2F737294119" anchor-label="arrow" id="-1715181699%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="arrow.html"><span><span>arrow</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1715181699%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="arrow.html"><span class="token function">arrow</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">arrow<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-arrow-metadata-dsl/index.html">ArrowMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="389433597%2FFunctions%2F737294119" anchor-label="axolotl" id="389433597%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="axolotl.html"><span><span>axolotl</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="389433597%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="axolotl.html"><span class="token function">axolotl</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">axolotl<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-axolotl-metadata-dsl/index.html">AxolotlMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-455418819%2FFunctions%2F737294119" anchor-label="bat" id="-455418819%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bat.html"><span><span>bat</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-455418819%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="bat.html"><span class="token function">bat</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bat<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-bat-metadata-dsl/index.html">BatMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1188400995%2FFunctions%2F737294119" anchor-label="bee" id="-1188400995%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bee.html"><span><span>bee</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1188400995%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="bee.html"><span class="token function">bee</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bee<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-bee-metadata-dsl/index.html">BeeMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1151581341%2FFunctions%2F737294119" anchor-label="blaze" id="1151581341%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="blaze.html"><span><span>blaze</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1151581341%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="blaze.html"><span class="token function">blaze</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">blaze<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-blaze-metadata-dsl/index.html">BlazeMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-589793513%2FFunctions%2F737294119" anchor-label="blockDisplay" id="-589793513%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="block-display.html"><span>block</span><wbr><span><span>Display</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-589793513%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="block-display.html"><span class="token function">blockDisplay</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">blockDisplay<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-block-display-metadata-dsl/index.html">BlockDisplayMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1586588603%2FFunctions%2F737294119" anchor-label="bogged" id="-1586588603%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bogged.html"><span><span>bogged</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1586588603%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="bogged.html"><span class="token function">bogged</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bogged<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-bogged-metadata-dsl/index.html">BoggedMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1983720675%2FFunctions%2F737294119" anchor-label="camel" id="-1983720675%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="camel.html"><span><span>camel</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1983720675%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="camel.html"><span class="token function">camel</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">camel<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-camel-metadata-dsl/index.html">CamelMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="962907677%2FFunctions%2F737294119" anchor-label="cat" id="962907677%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cat.html"><span><span>cat</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="962907677%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="cat.html"><span class="token function">cat</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cat<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-cat-metadata-dsl/index.html">CatMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-858418755%2FFunctions%2F737294119" anchor-label="chicken" id="-858418755%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="chicken.html"><span><span>chicken</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-858418755%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="chicken.html"><span class="token function">chicken</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">chicken<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-chicken-metadata-dsl/index.html">ChickenMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-356398723%2FFunctions%2F737294119" anchor-label="copperGolem" id="-356398723%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="copper-golem.html"><span>copper</span><wbr><span><span>Golem</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-356398723%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="copper-golem.html"><span class="token function">copperGolem</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">copperGolem<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-copper-golem-metadata-dsl/index.html">CopperGolemMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1925187965%2FFunctions%2F737294119" anchor-label="cow" id="1925187965%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cow.html"><span><span>cow</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1925187965%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="cow.html"><span class="token function">cow</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cow<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-cow-metadata-dsl/index.html">CowMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-809434639%2FFunctions%2F737294119" anchor-label="creaking" id="-809434639%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="creaking.html"><span><span>creaking</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-809434639%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="creaking.html"><span class="token function">creaking</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">creaking<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-creaking-metadata-dsl/index.html">CreakingMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-537835235%2FFunctions%2F737294119" anchor-label="creeper" id="-537835235%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="creeper.html"><span><span>creeper</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-537835235%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="creeper.html"><span class="token function">creeper</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">creeper<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-creeper-metadata-dsl/index.html">CreeperMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="458582589%2FFunctions%2F737294119" anchor-label="cushion" id="458582589%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cushion.html"><span><span>cushion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="458582589%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="cushion.html"><span class="token function">cushion</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cushion<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-cushion-metadata-dsl/index.html">CushionMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1731636451%2FFunctions%2F737294119" anchor-label="dolphin" id="-1731636451%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dolphin.html"><span><span>dolphin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1731636451%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="dolphin.html"><span class="token function">dolphin</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">dolphin<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-dolphin-metadata-dsl/index.html">DolphinMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1136911069%2FFunctions%2F737294119" anchor-label="endCrystal" id="-1136911069%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="end-crystal.html"><span>end</span><wbr><span><span>Crystal</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1136911069%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="end-crystal.html"><span class="token function">endCrystal</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endCrystal<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-end-crystal-metadata-dsl/index.html">EndCrystalMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-771279747%2FFunctions%2F737294119" anchor-label="enderDragon" id="-771279747%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ender-dragon.html"><span>ender</span><wbr><span><span>Dragon</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-771279747%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="ender-dragon.html"><span class="token function">enderDragon</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enderDragon<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-ender-dragon-metadata-dsl/index.html">EnderDragonMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1484777041%2FFunctions%2F737294119" anchor-label="enderman" id="1484777041%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enderman.html"><span><span>enderman</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1484777041%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="enderman.html"><span class="token function">enderman</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enderman<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-enderman-metadata-dsl/index.html">EndermanMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-512957443%2FFunctions%2F737294119" anchor-label="experienceOrb" id="-512957443%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="experience-orb.html"><span>experience</span><wbr><span><span>Orb</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-512957443%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="experience-orb.html"><span class="token function">experienceOrb</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">experienceOrb<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-experience-orb-metadata-dsl/index.html">ExperienceOrbMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="354062125%2FFunctions%2F737294119" anchor-label="eyeOfEnder" id="354062125%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="eye-of-ender.html"><span>eye</span><wbr><span>Of</span><wbr><span><span>Ender</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="354062125%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="eye-of-ender.html"><span class="token function">eyeOfEnder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">eyeOfEnder<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-eye-of-ender-metadata-dsl/index.html">EyeOfEnderMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-870255745%2FFunctions%2F737294119" anchor-label="fallingBlockEntity" id="-870255745%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="falling-block-entity.html"><span>falling</span><wbr><span>Block</span><wbr><span><span>Entity</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-870255745%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="falling-block-entity.html"><span class="token function">fallingBlockEntity</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fallingBlockEntity<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-falling-block-entity-metadata-dsl/index.html">FallingBlockEntityMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1104676009%2FFunctions%2F737294119" anchor-label="fireworkRocketEntity" id="1104676009%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="firework-rocket-entity.html"><span>firework</span><wbr><span>Rocket</span><wbr><span><span>Entity</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1104676009%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="firework-rocket-entity.html"><span class="token function">fireworkRocketEntity</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fireworkRocketEntity<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-firework-rocket-entity-metadata-dsl/index.html">FireworkRocketEntityMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1330667581%2FFunctions%2F737294119" anchor-label="fishingHook" id="1330667581%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fishing-hook.html"><span>fishing</span><wbr><span><span>Hook</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1330667581%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="fishing-hook.html"><span class="token function">fishingHook</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fishingHook<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-fishing-hook-metadata-dsl/index.html">FishingHookMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1484441853%2FFunctions%2F737294119" anchor-label="fox" id="1484441853%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fox.html"><span><span>fox</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1484441853%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="fox.html"><span class="token function">fox</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fox<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-fox-metadata-dsl/index.html">FoxMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="513646709%2FFunctions%2F737294119" anchor-label="frog" id="513646709%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="frog.html"><span><span>frog</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="513646709%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="frog.html"><span class="token function">frog</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">frog<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-frog-metadata-dsl/index.html">FrogMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1960130173%2FFunctions%2F737294119" anchor-label="ghast" id="1960130173%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ghast.html"><span><span>ghast</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1960130173%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="ghast.html"><span class="token function">ghast</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ghast<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-ghast-metadata-dsl/index.html">GhastMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-677157763%2FFunctions%2F737294119" anchor-label="glowSquid" id="-677157763%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="glow-squid.html"><span>glow</span><wbr><span><span>Squid</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-677157763%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="glow-squid.html"><span class="token function">glowSquid</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">glowSquid<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-glow-squid-metadata-dsl/index.html">GlowSquidMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="378075491%2FFunctions%2F737294119" anchor-label="goat" id="378075491%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="goat.html"><span><span>goat</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="378075491%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="goat.html"><span class="token function">goat</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">goat<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-goat-metadata-dsl/index.html">GoatMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1887826127%2FFunctions%2F737294119" anchor-label="guardian" id="1887826127%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="guardian.html"><span><span>guardian</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1887826127%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="guardian.html"><span class="token function">guardian</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">guardian<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-guardian-metadata-dsl/index.html">GuardianMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1236145903%2FFunctions%2F737294119" anchor-label="happyGhast" id="1236145903%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="happy-ghast.html"><span>happy</span><wbr><span><span>Ghast</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1236145903%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="happy-ghast.html"><span class="token function">happyGhast</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">happyGhast<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-happy-ghast-metadata-dsl/index.html">HappyGhastMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2128581391%2FFunctions%2F737294119" anchor-label="hoglin" id="2128581391%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="hoglin.html"><span><span>hoglin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2128581391%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="hoglin.html"><span class="token function">hoglin</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">hoglin<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-hoglin-metadata-dsl/index.html">HoglinMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-613778947%2FFunctions%2F737294119" anchor-label="horse" id="-613778947%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="horse.html"><span><span>horse</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-613778947%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="horse.html"><span class="token function">horse</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">horse<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-horse-metadata-dsl/index.html">HorseMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="44973725%2FFunctions%2F737294119" anchor-label="interaction" id="44973725%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="interaction.html"><span><span>interaction</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="44973725%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="interaction.html"><span class="token function">interaction</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">interaction<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-interaction-metadata-dsl/index.html">InteractionMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="373637597%2FFunctions%2F737294119" anchor-label="ironGolem" id="373637597%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="iron-golem.html"><span>iron</span><wbr><span><span>Golem</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="373637597%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="iron-golem.html"><span class="token function">ironGolem</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ironGolem<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-iron-golem-metadata-dsl/index.html">IronGolemMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-791000579%2FFunctions%2F737294119" anchor-label="itemDisplay" id="-791000579%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="item-display.html"><span>item</span><wbr><span><span>Display</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-791000579%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="item-display.html"><span class="token function">itemDisplay</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">itemDisplay<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-item-display-metadata-dsl/index.html">ItemDisplayMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1307528409%2FFunctions%2F737294119" anchor-label="itemEntity" id="1307528409%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="item-entity.html"><span>item</span><wbr><span><span>Entity</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1307528409%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="item-entity.html"><span class="token function">itemEntity</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">itemEntity<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-item-entity-metadata-dsl/index.html">ItemEntityMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-106927203%2FFunctions%2F737294119" anchor-label="itemFrame" id="-106927203%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="item-frame.html"><span>item</span><wbr><span><span>Frame</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-106927203%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="item-frame.html"><span class="token function">itemFrame</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">itemFrame<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-item-frame-metadata-dsl/index.html">ItemFrameMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="396907773%2FFunctions%2F737294119" anchor-label="llama" id="396907773%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="llama.html"><span><span>llama</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="396907773%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="llama.html"><span class="token function">llama</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">llama<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-llama-metadata-dsl/index.html">LlamaMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1414753379%2FFunctions%2F737294119" anchor-label="mannequin" id="-1414753379%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="mannequin.html"><span><span>mannequin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1414753379%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="mannequin.html"><span class="token function">mannequin</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">mannequin<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-mannequin-metadata-dsl/index.html">MannequinMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1049975895%2FFunctions%2F737294119" anchor-label="minecartCommandBlock" id="1049975895%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="minecart-command-block.html"><span>minecart</span><wbr><span>Command</span><wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1049975895%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="minecart-command-block.html"><span class="token function">minecartCommandBlock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">minecartCommandBlock<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-minecart-command-block-metadata-dsl/index.html">MinecartCommandBlockMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1449883971%2FFunctions%2F737294119" anchor-label="minecartFurnace" id="-1449883971%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="minecart-furnace.html"><span>minecart</span><wbr><span><span>Furnace</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1449883971%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="minecart-furnace.html"><span class="token function">minecartFurnace</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">minecartFurnace<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-minecart-furnace-metadata-dsl/index.html">MinecartFurnaceMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-367863427%2FFunctions%2F737294119" anchor-label="mushroomCow" id="-367863427%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="mushroom-cow.html"><span>mushroom</span><wbr><span><span>Cow</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-367863427%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="mushroom-cow.html"><span class="token function">mushroomCow</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">mushroomCow<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-mushroom-cow-metadata-dsl/index.html">MushroomCowMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1348119021%2FFunctions%2F737294119" anchor-label="ocelot" id="1348119021%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ocelot.html"><span><span>ocelot</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1348119021%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="ocelot.html"><span class="token function">ocelot</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ocelot<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-ocelot-metadata-dsl/index.html">OcelotMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1912999811%2FFunctions%2F737294119" anchor-label="ominousItemSpawner" id="1912999811%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ominous-item-spawner.html"><span>ominous</span><wbr><span>Item</span><wbr><span><span>Spawner</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1912999811%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="ominous-item-spawner.html"><span class="token function">ominousItemSpawner</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ominousItemSpawner<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-ominous-item-spawner-metadata-dsl/index.html">OminousItemSpawnerMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1378528331%2FFunctions%2F737294119" anchor-label="painting" id="-1378528331%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="painting.html"><span><span>painting</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1378528331%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="painting.html"><span class="token function">painting</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">painting<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-painting-metadata-dsl/index.html">PaintingMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-727781475%2FFunctions%2F737294119" anchor-label="panda" id="-727781475%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="panda.html"><span><span>panda</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-727781475%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="panda.html"><span class="token function">panda</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">panda<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-panda-metadata-dsl/index.html">PandaMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-439166375%2FFunctions%2F737294119" anchor-label="parrot" id="-439166375%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="parrot.html"><span><span>parrot</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-439166375%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="parrot.html"><span class="token function">parrot</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">parrot<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-parrot-metadata-dsl/index.html">ParrotMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1424278205%2FFunctions%2F737294119" anchor-label="phantom" id="1424278205%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="phantom.html"><span><span>phantom</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1424278205%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="phantom.html"><span class="token function">phantom</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">phantom<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-phantom-metadata-dsl/index.html">PhantomMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1762605283%2FFunctions%2F737294119" anchor-label="pig" id="-1762605283%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pig.html"><span><span>pig</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1762605283%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="pig.html"><span class="token function">pig</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pig<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-pig-metadata-dsl/index.html">PigMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1469839987%2FFunctions%2F737294119" anchor-label="piglin" id="1469839987%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="piglin.html"><span><span>piglin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1469839987%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="piglin.html"><span class="token function">piglin</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">piglin<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-piglin-metadata-dsl/index.html">PiglinMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1534053819%2FFunctions%2F737294119" anchor-label="pillager" id="-1534053819%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pillager.html"><span><span>pillager</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1534053819%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="pillager.html"><span class="token function">pillager</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pillager<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-pillager-metadata-dsl/index.html">PillagerMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-656934865%2FFunctions%2F737294119" anchor-label="player" id="-656934865%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="player.html"><span><span>player</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-656934865%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="player.html"><span class="token function">player</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-player-metadata-dsl/index.html">PlayerMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2038036125%2FFunctions%2F737294119" anchor-label="polarBear" id="2038036125%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="polar-bear.html"><span>polar</span><wbr><span><span>Bear</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2038036125%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="polar-bear.html"><span class="token function">polarBear</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">polarBear<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-polar-bear-metadata-dsl/index.html">PolarBearMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2065907325%2FFunctions%2F737294119" anchor-label="primedTnt" id="2065907325%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="primed-tnt.html"><span>primed</span><wbr><span><span>Tnt</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2065907325%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="primed-tnt.html"><span class="token function">primedTnt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">primedTnt<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-primed-tnt-metadata-dsl/index.html">PrimedTntMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1208782655%2FFunctions%2F737294119" anchor-label="pufferfish" id="-1208782655%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pufferfish.html"><span><span>pufferfish</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1208782655%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="pufferfish.html"><span class="token function">pufferfish</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pufferfish<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-pufferfish-metadata-dsl/index.html">PufferfishMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="126991969%2FFunctions%2F737294119" anchor-label="rabbit" id="126991969%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="rabbit.html"><span><span>rabbit</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="126991969%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="rabbit.html"><span class="token function">rabbit</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">rabbit<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-rabbit-metadata-dsl/index.html">RabbitMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-18248183%2FFunctions%2F737294119" anchor-label="salmon" id="-18248183%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="salmon.html"><span><span>salmon</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-18248183%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="salmon.html"><span class="token function">salmon</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">salmon<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-salmon-metadata-dsl/index.html">SalmonMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1062023747%2FFunctions%2F737294119" anchor-label="sheep" id="-1062023747%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sheep.html"><span><span>sheep</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1062023747%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="sheep.html"><span class="token function">sheep</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sheep<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-sheep-metadata-dsl/index.html">SheepMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1862030243%2FFunctions%2F737294119" anchor-label="shulker" id="-1862030243%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="shulker.html"><span><span>shulker</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1862030243%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="shulker.html"><span class="token function">shulker</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">shulker<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-shulker-metadata-dsl/index.html">ShulkerMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-886171577%2FFunctions%2F737294119" anchor-label="skeleton" id="-886171577%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="skeleton.html"><span><span>skeleton</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-886171577%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="skeleton.html"><span class="token function">skeleton</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">skeleton<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-skeleton-metadata-dsl/index.html">SkeletonMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-522982403%2FFunctions%2F737294119" anchor-label="sniffer" id="-522982403%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sniffer.html"><span><span>sniffer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-522982403%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="sniffer.html"><span class="token function">sniffer</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sniffer<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-sniffer-metadata-dsl/index.html">SnifferMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1807120125%2FFunctions%2F737294119" anchor-label="snowGolem" id="1807120125%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="snow-golem.html"><span>snow</span><wbr><span><span>Golem</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1807120125%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="snow-golem.html"><span class="token function">snowGolem</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">snowGolem<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-snow-golem-metadata-dsl/index.html">SnowGolemMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2014669001%2FFunctions%2F737294119" anchor-label="spider" id="-2014669001%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="spider.html"><span><span>spider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2014669001%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="spider.html"><span class="token function">spider</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">spider<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-spider-metadata-dsl/index.html">SpiderMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="836811581%2FFunctions%2F737294119" anchor-label="strider" id="836811581%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="strider.html"><span><span>strider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="836811581%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="strider.html"><span class="token function">strider</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">strider<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-strider-metadata-dsl/index.html">StriderMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="323186377%2FFunctions%2F737294119" anchor-label="sulfurCube" id="323186377%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sulfur-cube.html"><span>sulfur</span><wbr><span><span>Cube</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="323186377%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="sulfur-cube.html"><span class="token function">sulfurCube</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sulfurCube<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-sulfur-cube-metadata-dsl/index.html">SulfurCubeMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1201196925%2FFunctions%2F737294119" anchor-label="tadpole" id="1201196925%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="tadpole.html"><span><span>tadpole</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1201196925%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="tadpole.html"><span class="token function">tadpole</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tadpole<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-tadpole-metadata-dsl/index.html">TadpoleMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="620115773%2FFunctions%2F737294119" anchor-label="textDisplay" id="620115773%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="text-display.html"><span>text</span><wbr><span><span>Display</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="620115773%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="text-display.html"><span class="token function">textDisplay</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">textDisplay<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-text-display-metadata-dsl/index.html">TextDisplayMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="618612125%2FFunctions%2F737294119" anchor-label="thrownTrident" id="618612125%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="thrown-trident.html"><span>thrown</span><wbr><span><span>Trident</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="618612125%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="thrown-trident.html"><span class="token function">thrownTrident</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">thrownTrident<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-thrown-trident-metadata-dsl/index.html">ThrownTridentMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-590838683%2FFunctions%2F737294119" anchor-label="tropicalFish" id="-590838683%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="tropical-fish.html"><span>tropical</span><wbr><span><span>Fish</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-590838683%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="tropical-fish.html"><span class="token function">tropicalFish</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tropicalFish<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-tropical-fish-metadata-dsl/index.html">TropicalFishMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1086231515%2FFunctions%2F737294119" anchor-label="turtle" id="-1086231515%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="turtle.html"><span><span>turtle</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1086231515%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="turtle.html"><span class="token function">turtle</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">turtle<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-turtle-metadata-dsl/index.html">TurtleMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1911115331%2FFunctions%2F737294119" anchor-label="vex" id="-1911115331%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="vex.html"><span><span>vex</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1911115331%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="vex.html"><span class="token function">vex</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">vex<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-vex-metadata-dsl/index.html">VexMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1222444103%2FFunctions%2F737294119" anchor-label="villager" id="-1222444103%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="villager.html"><span><span>villager</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1222444103%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="villager.html"><span class="token function">villager</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">villager<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-villager-metadata-dsl/index.html">VillagerMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1200031305%2FFunctions%2F737294119" anchor-label="warden" id="-1200031305%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="warden.html"><span><span>warden</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1200031305%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="warden.html"><span class="token function">warden</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">warden<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-warden-metadata-dsl/index.html">WardenMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1817279683%2FFunctions%2F737294119" anchor-label="witch" id="-1817279683%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="witch.html"><span><span>witch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1817279683%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="witch.html"><span class="token function">witch</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">witch<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-witch-metadata-dsl/index.html">WitchMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="475603885%2FFunctions%2F737294119" anchor-label="witherBoss" id="475603885%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="wither-boss.html"><span>wither</span><wbr><span><span>Boss</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="475603885%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="wither-boss.html"><span class="token function">witherBoss</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">witherBoss<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-wither-boss-metadata-dsl/index.html">WitherBossMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-895409251%2FFunctions%2F737294119" anchor-label="witherSkull" id="-895409251%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="wither-skull.html"><span>wither</span><wbr><span><span>Skull</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-895409251%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="wither-skull.html"><span class="token function">witherSkull</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">witherSkull<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-wither-skull-metadata-dsl/index.html">WitherSkullMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1750036015%2FFunctions%2F737294119" anchor-label="wolf" id="-1750036015%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="wolf.html"><span><span>wolf</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1750036015%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="wolf.html"><span class="token function">wolf</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">wolf<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-wolf-metadata-dsl/index.html">WolfMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-490698261%2FFunctions%2F737294119" anchor-label="zoglin" id="-490698261%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="zoglin.html"><span><span>zoglin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-490698261%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="zoglin.html"><span class="token function">zoglin</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">zoglin<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-zoglin-metadata-dsl/index.html">ZoglinMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1761333113%2FFunctions%2F737294119" anchor-label="zombie" id="1761333113%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="zombie.html"><span><span>zombie</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1761333113%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="zombie.html"><span class="token function">zombie</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">zombie<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-zombie-metadata-dsl/index.html">ZombieMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-524806881%2FFunctions%2F737294119" anchor-label="zombieNautilus" id="-524806881%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="zombie-nautilus.html"><span>zombie</span><wbr><span><span>Nautilus</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-524806881%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="zombie-nautilus.html"><span class="token function">zombieNautilus</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">zombieNautilus<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-zombie-nautilus-metadata-dsl/index.html">ZombieNautilusMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2007933637%2FFunctions%2F737294119" anchor-label="zombieVillager" id="2007933637%2FFunctions%2F737294119" data-filterable-set=":nova-packet-entity/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-packet-entity/main" data-filterable-set=":nova-packet-entity/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="zombie-villager.html"><span>zombie</span><wbr><span><span>Villager</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2007933637%2FFunctions%2F737294119"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-packet-entity/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="zombie-villager.html"><span class="token function">zombieVillager</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">zombieVillager<span class="token operator">: </span><a href="../-passenger-packet-entity-dsl/index.html">PassengerPacketEntityDsl</a><span class="token operator">&lt;</span><a href="../-zombie-villager-metadata-dsl/index.html">ZombieVillagerMetadataDsl</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

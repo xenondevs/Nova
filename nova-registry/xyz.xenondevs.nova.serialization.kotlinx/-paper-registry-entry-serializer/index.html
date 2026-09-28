@@ -1,0 +1,224 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>PaperRegistryEntrySerializer</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-registry/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-registry/main" data-filter=":nova-registry/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova-registry::xyz.xenondevs.nova.serialization.kotlinx/PaperRegistryEntrySerializer///PointingToDeclaration//1933957036">
+  <div class="breadcrumbs"><a href="../../index.html">nova-registry</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.serialization.kotlinx</a><span class="delimiter">/</span><span class="current">PaperRegistryEntrySerializer</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Paper</span><wbr><span>Registry</span><wbr><span>Entry</span><wbr><span><span>Serializer</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">PaperRegistryEntrySerializer</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator"> : </span><span data-unresolved-link="org.bukkit/Keyed///PointingToDeclaration/">Keyed</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>registryKey<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>registryAccess<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryAccess///PointingToDeclaration/">RegistryAccess</span><span class="token operator"> = </span>RegistryAccess.registryAccess()</span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div><p class="paragraph">Open base class for specialized <a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a> serializers.</p><h4 class="tableheader">Inheritors</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-game-event-entry-serializer/index.html">GameEventEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-structure-type-entry-serializer/index.html">StructureTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-potion-effect-type-entry-serializer/index.html">PotionEffectTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-block-type-entry-serializer/index.html">BlockTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-item-type-entry-serializer/index.html">ItemTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-villager-profession-entry-serializer/index.html">VillagerProfessionEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-poi-type-entry-serializer/index.html">PoiTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-villager-type-entry-serializer/index.html">VillagerTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-map-cursor-type-entry-serializer/index.html">MapCursorTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-menu-type-entry-serializer/index.html">MenuTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-attribute-entry-serializer/index.html">AttributeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-fluid-entry-serializer/index.html">FluidEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-sound-entry-serializer/index.html">SoundEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-data-component-type-entry-serializer/index.html">DataComponentTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-game-rule-entry-serializer/index.html">GameRuleEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-biome-entry-serializer/index.html">BiomeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-structure-entry-serializer/index.html">StructureEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-trim-material-entry-serializer/index.html">TrimMaterialEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-trim-pattern-entry-serializer/index.html">TrimPatternEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-damage-type-entry-serializer/index.html">DamageTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-wolf-variant-entry-serializer/index.html">WolfVariantEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-wolf-sound-variant-entry-serializer/index.html">WolfSoundVariantEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-enchantment-entry-serializer/index.html">EnchantmentEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-jukebox-song-entry-serializer/index.html">JukeboxSongEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-pattern-type-entry-serializer/index.html">PatternTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-pot-pattern-type-entry-serializer/index.html">PotPatternTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-art-entry-serializer/index.html">ArtEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-music-instrument-entry-serializer/index.html">MusicInstrumentEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-cat-type-entry-serializer/index.html">CatTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-cat-sound-variant-entry-serializer/index.html">CatSoundVariantEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-frog-variant-entry-serializer/index.html">FrogVariantEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-chicken-variant-entry-serializer/index.html">ChickenVariantEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-chicken-sound-variant-entry-serializer/index.html">ChickenSoundVariantEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-cow-variant-entry-serializer/index.html">CowVariantEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-cow-sound-variant-entry-serializer/index.html">CowSoundVariantEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-pig-variant-entry-serializer/index.html">PigVariantEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-pig-sound-variant-entry-serializer/index.html">PigSoundVariantEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-zombie-nautilus-variant-entry-serializer/index.html">ZombieNautilusVariantEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-sulfur-cube-archetype-entry-serializer/index.html">SulfurCubeArchetypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-dialog-entry-serializer/index.html">DialogEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-entity-type-entry-serializer/index.html">EntityTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-particle-entry-serializer/index.html">ParticleEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-potion-type-entry-serializer/index.html">PotionTypeEntrySerializer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-memory-key-entry-serializer/index.html">MemoryKeyEntrySerializer</a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="-877728513%2FConstructors%2F1933957036" anchor-label="PaperRegistryEntrySerializer" id="-877728513%2FConstructors%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-paper-registry-entry-serializer.html"><span>Paper</span><wbr><span>Registry</span><wbr><span>Entry</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-877728513%2FConstructors%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registryKey<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">registryAccess<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryAccess///PointingToDeclaration/">RegistryAccess</span><span class="token operator"> = </span>RegistryAccess.registryAccess()</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1356080813%2FProperties%2F1933957036" anchor-label="descriptor" id="1356080813%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="descriptor.html"><span><span>descriptor</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1356080813%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">override </span><span class="token keyword">val </span><a href="descriptor.html">descriptor</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization.descriptors/SerialDescriptor///PointingToDeclaration/">SerialDescriptor</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-470738213%2FProperties%2F1933957036" anchor-label="registryAccess" id="-470738213%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="registry-access.html"><span>registry</span><wbr><span><span>Access</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-470738213%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="registry-access.html">registryAccess</a><span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryAccess///PointingToDeclaration/">RegistryAccess</span></div><div class="brief "><p class="paragraph">The registry access to retrieve the registry from.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="448846204%2FProperties%2F1933957036" anchor-label="registryKey" id="448846204%2FProperties%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="registry-key.html"><span>registry</span><wbr><span><span>Key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="448846204%2FProperties%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="registry-key.html">registryKey</a><span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The registry this serializer is for.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1461973825%2FFunctions%2F1933957036" anchor-label="deserialize" id="1461973825%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="deserialize.html"><span><span>deserialize</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1461973825%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">override </span><span class="token keyword">fun </span><a href="deserialize.html"><span class="token function">deserialize</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">decoder<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization.encoding/Decoder///PointingToDeclaration/">Decoder</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1887204182%2FFunctions%2F1933957036" anchor-label="serialize" id="1887204182%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="serialize.html"><span><span>serialize</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1887204182%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">override </span><span class="token keyword">fun </span><a href="serialize.html"><span class="token function">serialize</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">encoder<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization.encoding/Encoder///PointingToDeclaration/">Encoder</span><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

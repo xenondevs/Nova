@@ -38,7 +38,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.24.0
+        <div class="library-version" id="library-version">0.25.0-alpha.1
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
@@ -93,24 +93,43 @@
   <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.world.generation</a><span class="delimiter">/</span><span class="current">FeatureType</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Feature</span><wbr><span><span>Type</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">FeatureType</a><span class="token operator">&lt;</span><a href="index.html">FC</a><span class="token operator"> : </span><span data-unresolved-link="net.minecraft.world.level.levelgen.feature.configurations/FeatureConfiguration///PointingToDeclaration/">FeatureConfiguration</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">codec<span class="token operator">: </span><span data-unresolved-link="com.mojang.serialization/Codec///PointingToDeclaration/">Codec</span><span class="token operator">&lt;</span><a href="index.html">FC</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="net.minecraft.world.level.levelgen.feature/Feature///PointingToDeclaration/">Feature</span><span class="token operator">&lt;</span><a href="index.html">FC</a><span class="token operator">&gt; </span></div><p class="paragraph">An extension class of Minecraft's <span data-unresolved-link="net.minecraft.world.level.levelgen.feature/Feature///PointingToDeclaration/">Feature</span> that allows to use Bukkit's <span data-unresolved-link="org.bukkit/Material///PointingToDeclaration/">Material</span> and <a href="../../xyz.xenondevs.nova.world.block/-nova-block/index.html">NovaBlock</a>s via protected <code class="lang-kotlin">setBlock</code> functions.</p></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">FeatureType</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">featureCodec<span class="token operator">: </span><span data-unresolved-link="com.mojang.serialization/MapCodec///PointingToDeclaration/">MapCodec</span><span class="token operator">&lt;</span><span class="token keyword">out </span><span data-unresolved-link="net.minecraft.world.level.levelgen.feature/Feature///PointingToDeclaration/">Feature</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="net.minecraft.world.level.levelgen.feature/Feature///PointingToDeclaration/">Feature</span></div><p class="paragraph">An extension of Minecraft's <span data-unresolved-link="net.minecraft.world.level.levelgen.feature/Feature///PointingToDeclaration/">Feature</span> with protected helpers for placing Paper <span data-unresolved-link="org.bukkit.block/BlockType///PointingToDeclaration/">BlockType</span>s.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
         <h2 class="tableheader">Constructors</h2>
-        <div class="table"><a data-name="-1961418078%2FConstructors%2F-501115348" anchor-label="FeatureType" id="-1961418078%2FConstructors%2F-501115348" data-filterable-set=":nova/main"></a>
+        <div class="table"><a data-name="-1665524605%2FConstructors%2F-501115348" anchor-label="FeatureType" id="-1665524605%2FConstructors%2F-501115348" data-filterable-set=":nova/main"></a>
           <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-feature-type.html"><span>Feature</span><wbr><span><span>Type</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1961418078%2FConstructors%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1665524605%2FConstructors%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">codec<span class="token operator">: </span><span data-unresolved-link="com.mojang.serialization/Codec///PointingToDeclaration/">Codec</span><span class="token operator">&lt;</span><a href="index.html">FC</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">featureCodec<span class="token operator">: </span><span data-unresolved-link="com.mojang.serialization/MapCodec///PointingToDeclaration/">MapCodec</span><span class="token operator">&lt;</span><span class="token keyword">out </span><span data-unresolved-link="net.minecraft.world.level.levelgen.feature/Feature///PointingToDeclaration/">Feature</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1522118428%2FProperties%2F-501115348" anchor-label="subFeatures" id="1522118428%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1522118428%2FProperties%2F-501115348"><span>sub</span><wbr><span><span>Features</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1522118428%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="index.html#1522118428%2FProperties%2F-501115348">subFeatures</a><span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/stream/Stream.html">Stream</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.core/Holder///PointingToDeclaration/">Holder</span><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.world.level.levelgen.feature/Feature///PointingToDeclaration/">Feature</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -119,32 +138,77 @@
       </div>
       <div data-togglable="FUNCTION">
         <h2 class="tableheader">Functions</h2>
-        <div class="table"><a data-name="-1003796575%2FFunctions%2F-501115348" anchor-label="configuredCodec" id="-1003796575%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+        <div class="table"><a data-name="-1414795260%2FFunctions%2F-501115348" anchor-label="codec" id="-1414795260%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
           <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="index.html#-1003796575%2FFunctions%2F-501115348"><span>configured</span><wbr><span><span>Codec</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1003796575%2FFunctions%2F-501115348"></span>
+                  <div><a href="codec.html"><span><span>codec</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1414795260%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-1003796575%2FFunctions%2F-501115348"><span class="token function">configuredCodec</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.mojang.serialization/MapCodec///PointingToDeclaration/">MapCodec</span><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.world.level.levelgen.feature/ConfiguredFeature///PointingToDeclaration/">ConfiguredFeature</span><span class="token operator">&lt;</span><a href="index.html">FC</a><span class="token operator">?</span><span class="token punctuation">, </span><span data-unresolved-link="net.minecraft.world.level.levelgen.feature/Feature///PointingToDeclaration/">Feature</span><span class="token operator">&lt;</span><a href="index.html">FC</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="codec.html"><span class="token function">codec</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.mojang.serialization/MapCodec///PointingToDeclaration/">MapCodec</span><span class="token operator">&lt;</span><span class="token keyword">out </span><span data-unresolved-link="net.minecraft.world.level.levelgen.feature/Feature///PointingToDeclaration/">Feature</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="420945425%2FFunctions%2F-501115348" anchor-label="place" id="420945425%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+<a data-name="1558762910%2FFunctions%2F-501115348" anchor-label="markAboveForPostProcessing" id="1558762910%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
           <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="place.html"><span><span>place</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="420945425%2FFunctions%2F-501115348"></span>
+                  <div><a href="index.html#1558762910%2FFunctions%2F-501115348"><span>mark</span><wbr><span>Above</span><wbr><span>For</span><wbr><span>Post</span><wbr><span><span>Processing</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1558762910%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="place.html"><span class="token function">place</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.levelgen.feature/FeaturePlaceContext///PointingToDeclaration/">FeaturePlaceContext</span><span class="token operator">&lt;</span><a href="index.html">FC</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="place.html"><span class="token function">place</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">config<span class="token operator">: </span><a href="index.html">FC</a><span class="token punctuation">, </span></span><span class="parameter ">level<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level/WorldGenLevel///PointingToDeclaration/">WorldGenLevel</span><span class="token punctuation">, </span></span><span class="parameter ">generator<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.chunk/ChunkGenerator///PointingToDeclaration/">ChunkGenerator</span><span class="token punctuation">, </span></span><span class="parameter ">random<span class="token operator">: </span><span data-unresolved-link="net.minecraft.util/RandomSource///PointingToDeclaration/">RandomSource</span><span class="token punctuation">, </span></span><span class="parameter ">pos<span class="token operator">: </span><span data-unresolved-link="net.minecraft.core/BlockPos///PointingToDeclaration/">BlockPos</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#1558762910%2FFunctions%2F-501115348"><span class="token function">markAboveForPostProcessing</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">level<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level/WorldGenLevel///PointingToDeclaration/">WorldGenLevel</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">placePos<span class="token operator">: </span><span data-unresolved-link="net.minecraft.core/BlockPos///PointingToDeclaration/">BlockPos</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="859475561%2FFunctions%2F-501115348" anchor-label="place" id="859475561%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="place.html"><span><span>place</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="859475561%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="place.html"><span class="token function">place</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">level<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level/WorldGenLevel///PointingToDeclaration/">WorldGenLevel</span><span class="token punctuation">, </span></span><span class="parameter ">generator<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.chunk/ChunkGenerator///PointingToDeclaration/">ChunkGenerator</span><span class="token punctuation">, </span></span><span class="parameter ">random<span class="token operator">: </span><span data-unresolved-link="net.minecraft.util/RandomSource///PointingToDeclaration/">RandomSource</span><span class="token punctuation">, </span></span><span class="parameter ">pos<span class="token operator">: </span><span data-unresolved-link="net.minecraft.core/BlockPos///PointingToDeclaration/">BlockPos</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="19982203%2FFunctions%2F-501115348" anchor-label="safeSetBlock" id="19982203%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#19982203%2FFunctions%2F-501115348"><span>safe</span><wbr><span>Set</span><wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="19982203%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#19982203%2FFunctions%2F-501115348"><span class="token function">safeSetBlock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">level<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level/WorldGenLevel///PointingToDeclaration/">WorldGenLevel</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">pos<span class="token operator">: </span><span data-unresolved-link="net.minecraft.core/BlockPos///PointingToDeclaration/">BlockPos</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">state<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.block.state/BlockState///PointingToDeclaration/">BlockState</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">canReplace<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.world.level.block.state/BlockState///PointingToDeclaration/">BlockState</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="951512985%2FFunctions%2F-501115348" anchor-label="setBlock" id="951512985%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#951512985%2FFunctions%2F-501115348"><span>set</span><wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="951512985%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#951512985%2FFunctions%2F-501115348"><span class="token function">setBlock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">level<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level/LevelWriter///PointingToDeclaration/">LevelWriter</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">pos<span class="token operator">: </span><span data-unresolved-link="net.minecraft.core/BlockPos///PointingToDeclaration/">BlockPos</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">blockState<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.block.state/BlockState///PointingToDeclaration/">BlockState</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>

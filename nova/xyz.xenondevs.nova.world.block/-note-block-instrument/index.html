@@ -1,0 +1,599 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>NoteBlockInstrument</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova/main" data-filter=":nova/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.world.block/NoteBlockInstrument///PointingToDeclaration//-501115348">
+  <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.world.block</a><span class="delimiter">/</span><span class="current">NoteBlockInstrument</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Note</span><wbr><span>Block</span><wbr><span><span>Instrument</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">enum </span><a href="index.html">NoteBlockInstrument</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="index.html">NoteBlockInstrument</a><span class="token operator">&gt; </span></div><p class="paragraph">The instrument a note block gets when placed on top of a block.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="ENTRY">Entries</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="ENTRY">
+        <h2 class="tableheader">Entries</h2>
+        <div class="table"><a data-name="-570137550%2FClasslikes%2F-501115348" anchor-label="HARP" id="-570137550%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-h-a-r-p/index.html">HARP</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-570137550%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-h-a-r-p/index.html">HARP</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-713372525%2FClasslikes%2F-501115348" anchor-label="BASS_DRUM" id="-713372525%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-a-s-s_-d-r-u-m/index.html">BASS_DRUM</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-713372525%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-b-a-s-s_-d-r-u-m/index.html">BASS_DRUM</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1295254169%2FClasslikes%2F-501115348" anchor-label="SNARE_DRUM" id="-1295254169%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-n-a-r-e_-d-r-u-m/index.html">SNARE_DRUM</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1295254169%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-s-n-a-r-e_-d-r-u-m/index.html">SNARE_DRUM</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1667639540%2FClasslikes%2F-501115348" anchor-label="CLICKS_AND_STICKS" id="-1667639540%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-l-i-c-k-s_-a-n-d_-s-t-i-c-k-s/index.html">CLICKS_AND_STICKS</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1667639540%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-c-l-i-c-k-s_-a-n-d_-s-t-i-c-k-s/index.html">CLICKS_AND_STICKS</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1128861751%2FClasslikes%2F-501115348" anchor-label="BASS_GUITAR" id="1128861751%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-a-s-s_-g-u-i-t-a-r/index.html">BASS_GUITAR</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1128861751%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-b-a-s-s_-g-u-i-t-a-r/index.html">BASS_GUITAR</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1569753715%2FClasslikes%2F-501115348" anchor-label="FLUTE" id="-1569753715%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-l-u-t-e/index.html">FLUTE</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1569753715%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-f-l-u-t-e/index.html">FLUTE</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1868395714%2FClasslikes%2F-501115348" anchor-label="BELL" id="-1868395714%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-e-l-l/index.html">BELL</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1868395714%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-b-e-l-l/index.html">BELL</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="711965381%2FClasslikes%2F-501115348" anchor-label="GUITAR" id="711965381%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-g-u-i-t-a-r/index.html">GUITAR</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="711965381%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-g-u-i-t-a-r/index.html">GUITAR</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1337280169%2FClasslikes%2F-501115348" anchor-label="CHIME" id="1337280169%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-h-i-m-e/index.html">CHIME</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1337280169%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-c-h-i-m-e/index.html">CHIME</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-235241449%2FClasslikes%2F-501115348" anchor-label="XYLOPHONE" id="-235241449%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-x-y-l-o-p-h-o-n-e/index.html">XYLOPHONE</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-235241449%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-x-y-l-o-p-h-o-n-e/index.html">XYLOPHONE</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-445595058%2FClasslikes%2F-501115348" anchor-label="IRON_XYLOPHONE" id="-445595058%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-r-o-n_-x-y-l-o-p-h-o-n-e/index.html">IRON_XYLOPHONE</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-445595058%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-i-r-o-n_-x-y-l-o-p-h-o-n-e/index.html">IRON_XYLOPHONE</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-738532590%2FClasslikes%2F-501115348" anchor-label="COW_BELL" id="-738532590%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-o-w_-b-e-l-l/index.html">COW_BELL</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-738532590%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-c-o-w_-b-e-l-l/index.html">COW_BELL</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="833715307%2FClasslikes%2F-501115348" anchor-label="DIDGERIDOO" id="833715307%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-i-d-g-e-r-i-d-o-o/index.html">DIDGERIDOO</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="833715307%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-d-i-d-g-e-r-i-d-o-o/index.html">DIDGERIDOO</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1167760134%2FClasslikes%2F-501115348" anchor-label="BIT" id="-1167760134%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-i-t/index.html">BIT</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1167760134%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-b-i-t/index.html">BIT</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2023606529%2FClasslikes%2F-501115348" anchor-label="BANJO" id="2023606529%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-a-n-j-o/index.html">BANJO</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2023606529%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-b-a-n-j-o/index.html">BANJO</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1580962733%2FClasslikes%2F-501115348" anchor-label="PLING" id="-1580962733%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-p-l-i-n-g/index.html">PLING</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1580962733%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-p-l-i-n-g/index.html">PLING</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1679641034%2FClasslikes%2F-501115348" anchor-label="TRUMPET" id="-1679641034%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-t-r-u-m-p-e-t/index.html">TRUMPET</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1679641034%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-t-r-u-m-p-e-t/index.html">TRUMPET</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1487302967%2FClasslikes%2F-501115348" anchor-label="EXPOSED_TRUMPET" id="1487302967%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-e-x-p-o-s-e-d_-t-r-u-m-p-e-t/index.html">EXPOSED_TRUMPET</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1487302967%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-e-x-p-o-s-e-d_-t-r-u-m-p-e-t/index.html">EXPOSED_TRUMPET</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="688425770%2FClasslikes%2F-501115348" anchor-label="WEATHERED_TRUMPET" id="688425770%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-w-e-a-t-h-e-r-e-d_-t-r-u-m-p-e-t/index.html">WEATHERED_TRUMPET</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="688425770%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-w-e-a-t-h-e-r-e-d_-t-r-u-m-p-e-t/index.html">WEATHERED_TRUMPET</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1924664633%2FClasslikes%2F-501115348" anchor-label="OXIDIZED_TRUMPET" id="1924664633%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-o-x-i-d-i-z-e-d_-t-r-u-m-p-e-t/index.html">OXIDIZED_TRUMPET</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1924664633%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-o-x-i-d-i-z-e-d_-t-r-u-m-p-e-t/index.html">OXIDIZED_TRUMPET</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="425969505%2FClasslikes%2F-501115348" anchor-label="ZOMBIE" id="425969505%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-z-o-m-b-i-e/index.html">ZOMBIE</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="425969505%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-z-o-m-b-i-e/index.html">ZOMBIE</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="89965960%2FClasslikes%2F-501115348" anchor-label="SKELETON" id="89965960%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-k-e-l-e-t-o-n/index.html">SKELETON</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="89965960%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-s-k-e-l-e-t-o-n/index.html">SKELETON</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1618706715%2FClasslikes%2F-501115348" anchor-label="CREEPER" id="1618706715%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-r-e-e-p-e-r/index.html">CREEPER</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1618706715%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-c-r-e-e-p-e-r/index.html">CREEPER</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1333352078%2FClasslikes%2F-501115348" anchor-label="DRAGON" id="1333352078%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-r-a-g-o-n/index.html">DRAGON</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1333352078%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-d-r-a-g-o-n/index.html">DRAGON</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1324878682%2FClasslikes%2F-501115348" anchor-label="WITHER_SKELETON" id="-1324878682%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-w-i-t-h-e-r_-s-k-e-l-e-t-o-n/index.html">WITHER_SKELETON</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1324878682%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-w-i-t-h-e-r_-s-k-e-l-e-t-o-n/index.html">WITHER_SKELETON</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1662074178%2FClasslikes%2F-501115348" anchor-label="PIGLIN" id="-1662074178%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="ENTRY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-p-i-g-l-i-n/index.html">PIGLIN</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1662074178%2FClasslikes%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><a href="-p-i-g-l-i-n/index.html">PIGLIN</a></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-1067349803%2FProperties%2F-501115348" anchor-label="entries" id="-1067349803%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="entries.html"><span><span>entries</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1067349803%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="entries.html">entries</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.enums/-enum-entries/index.html">EnumEntries</a><span class="token operator">&lt;</span><a href="index.html">NoteBlockInstrument</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns a representation of an immutable list of all enum entries, in the order they're declared.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-372974862%2FProperties%2F-501115348" anchor-label="name" id="-372974862%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type.fluid/-fluid-type/-l-a-v-a/index.html#-372974862%2FProperties%2F-501115348"><span><span>name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-372974862%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type.fluid/-fluid-type/-l-a-v-a/index.html#-372974862%2FProperties%2F-501115348">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-739389684%2FProperties%2F-501115348" anchor-label="ordinal" id="-739389684%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type.fluid/-fluid-type/-l-a-v-a/index.html#-739389684%2FProperties%2F-501115348"><span><span>ordinal</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-739389684%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type.fluid/-fluid-type/-l-a-v-a/index.html#-739389684%2FProperties%2F-501115348">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1672484583%2FFunctions%2F-501115348" anchor-label="valueOf" id="1672484583%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="value-of.html"><span>value</span><wbr><span><span>Of</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1672484583%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="value-of.html"><span class="token function">valueOf</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">NoteBlockInstrument</a></div><div class="brief "><p class="paragraph">Returns the enum constant of this type with the specified name. The string must match exactly an identifier used to declare an enum constant in this type. (Extraneous whitespace characters are not permitted.)</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1275130931%2FFunctions%2F-501115348" anchor-label="values" id="1275130931%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="values.html"><span><span>values</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1275130931%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="values.html"><span class="token function">values</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="index.html">NoteBlockInstrument</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns an array containing the constants of this enum type, in the order they're declared.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

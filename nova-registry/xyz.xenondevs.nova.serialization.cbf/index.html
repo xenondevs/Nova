@@ -1,0 +1,324 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>xyz.xenondevs.nova.serialization.cbf</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-registry/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-registry/main" data-filter=":nova-registry/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="nova-registry::xyz.xenondevs.nova.serialization.cbf////PointingToDeclaration//1933957036">
+  <div class="breadcrumbs"><a href="../index.html">nova-registry</a><span class="delimiter">/</span><span class="current">xyz.xenondevs.nova.serialization.cbf</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="1081175362%2FClasslikes%2F1933957036" anchor-label="KeyBinarySerializer" id="1081175362%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-key-binary-serializer/index.html"><span>Key</span><wbr><span>Binary</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1081175362%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="-key-binary-serializer/index.html">KeyBinarySerializer</a> : <span data-unresolved-link="xyz.xenondevs.cbf.serializer/UnversionedBinarySerializer///PointingToDeclaration/">UnversionedBinarySerializer</span><span class="token operator">&lt;</span><span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A binary serializer for <span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span> that serializes to a string of <code class="lang-kotlin">namespace:value</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1063634571%2FClasslikes%2F1933957036" anchor-label="NamespacedKeyBinarySerializer" id="1063634571%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-namespaced-key-binary-serializer/index.html"><span>Namespaced</span><wbr><span>Key</span><wbr><span>Binary</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1063634571%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="-namespaced-key-binary-serializer/index.html">NamespacedKeyBinarySerializer</a> : <span data-unresolved-link="xyz.xenondevs.cbf.serializer/UnversionedBinarySerializer///PointingToDeclaration/">UnversionedBinarySerializer</span><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit/NamespacedKey///PointingToDeclaration/">NamespacedKey</span><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A binary serializer for <span data-unresolved-link="org.bukkit/NamespacedKey///PointingToDeclaration/">NamespacedKey</span> that serializes to a string of <code class="lang-kotlin">namespace:value</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1838931474%2FClasslikes%2F1933957036" anchor-label="NovaRegistryElementBinarySerializer" id="-1838931474%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-nova-registry-element-binary-serializer/index.html"><span>Nova</span><wbr><span>Registry</span><wbr><span>Element</span><wbr><span>Binary</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1838931474%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-nova-registry-element-binary-serializer/index.html">NovaRegistryElementBinarySerializer</a><span class="token operator">&lt;</span><a href="-nova-registry-element-binary-serializer/index.html">T</a><span class="token operator"> : </span><a href="../xyz.xenondevs.nova.registry/-nova-registry-element/index.html">NovaRegistryElement</a><span class="token operator">&lt;</span><a href="-nova-registry-element-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registry<span class="token operator">: </span><a href="../xyz.xenondevs.nova.registry/-nova-registry/index.html">NovaRegistry</a><span class="token operator">&lt;</span><a href="-nova-registry-element-binary-serializer/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="xyz.xenondevs.cbf.serializer/UnversionedBinarySerializer///PointingToDeclaration/">UnversionedBinarySerializer</span><span class="token operator">&lt;</span><a href="-nova-registry-element-binary-serializer/index.html">T</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A binary serializer for <a href="../xyz.xenondevs.nova.registry/-nova-registry-element/index.html">NovaRegistryElement</a> that serializes the element by its key.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1537212360%2FClasslikes%2F1933957036" anchor-label="NovaRegistryEntryBinarySerializer" id="-1537212360%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-nova-registry-entry-binary-serializer/index.html"><span>Nova</span><wbr><span>Registry</span><wbr><span>Entry</span><wbr><span>Binary</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1537212360%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-nova-registry-entry-binary-serializer/index.html">NovaRegistryEntryBinarySerializer</a><span class="token operator">&lt;</span><a href="-nova-registry-entry-binary-serializer/index.html">T</a><span class="token operator"> : </span><a href="../xyz.xenondevs.nova.registry/-nova-registry-element/index.html">NovaRegistryElement</a><span class="token operator">&lt;</span><a href="-nova-registry-entry-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registry<span class="token operator">: </span><a href="../xyz.xenondevs.nova.registry/-nova-registry/index.html">NovaRegistry</a><span class="token operator">&lt;</span><a href="-nova-registry-entry-binary-serializer/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="xyz.xenondevs.cbf.serializer/UnversionedBinarySerializer///PointingToDeclaration/">UnversionedBinarySerializer</span><span class="token operator">&lt;</span><a href="../xyz.xenondevs.nova.registry/-registry-entry/-nova/index.html">RegistryEntry.Nova</a><span class="token operator">&lt;</span><a href="-nova-registry-entry-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A binary serializer for <a href="../xyz.xenondevs.nova.registry/-registry-entry/-nova/index.html">RegistryEntry.Nova</a> that serializes the entry by its key.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="359589250%2FClasslikes%2F1933957036" anchor-label="NovaRegistryEntrySetBinarySerializer" id="359589250%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-nova-registry-entry-set-binary-serializer/index.html"><span>Nova</span><wbr><span>Registry</span><wbr><span>Entry</span><wbr><span>Set</span><wbr><span>Binary</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="359589250%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-nova-registry-entry-set-binary-serializer/index.html">NovaRegistryEntrySetBinarySerializer</a><span class="token operator">&lt;</span><a href="-nova-registry-entry-set-binary-serializer/index.html">T</a><span class="token operator"> : </span><a href="../xyz.xenondevs.nova.registry/-nova-registry-element/index.html">NovaRegistryElement</a><span class="token operator">&lt;</span><a href="-nova-registry-entry-set-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registry<span class="token operator">: </span><a href="../xyz.xenondevs.nova.registry/-nova-registry/index.html">NovaRegistry</a><span class="token operator">&lt;</span><a href="-nova-registry-entry-set-binary-serializer/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="xyz.xenondevs.cbf.serializer/BinarySerializer///PointingToDeclaration/">BinarySerializer</span><span class="token operator">&lt;</span><a href="../xyz.xenondevs.nova.registry/-registry-entry-set/-nova/index.html">RegistryEntrySet.Nova</a><span class="token operator">&lt;</span><a href="-nova-registry-entry-set-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A binary serializer for <a href="../xyz.xenondevs.nova.registry/-registry-entry-set/-nova/index.html">RegistryEntrySet.Nova</a> that serializes the set by its entries' keys.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1736325160%2FClasslikes%2F1933957036" anchor-label="PaperRegistryElementBinarySerializer" id="1736325160%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-paper-registry-element-binary-serializer/index.html"><span>Paper</span><wbr><span>Registry</span><wbr><span>Element</span><wbr><span>Binary</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1736325160%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-paper-registry-element-binary-serializer/index.html">PaperRegistryElementBinarySerializer</a><span class="token operator">&lt;</span><a href="-paper-registry-element-binary-serializer/index.html">T</a><span class="token operator"> : </span><span data-unresolved-link="org.bukkit/Keyed///PointingToDeclaration/">Keyed</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registryKey<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="-paper-registry-element-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">registryAccess<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryAccess///PointingToDeclaration/">RegistryAccess</span><span class="token punctuation">, </span></span><span class="parameter ">enumEntries<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="-paper-registry-element-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptyMap()</span></span><span class="token punctuation">)</span> : <span data-unresolved-link="xyz.xenondevs.cbf.serializer/UnversionedBinarySerializer///PointingToDeclaration/">UnversionedBinarySerializer</span><span class="token operator">&lt;</span><a href="-paper-registry-element-binary-serializer/index.html">T</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A binary serializer for Paper registry elements that serializes the element by its key. For registry elements that are also an enum, <a href="../../nova-registry/xyz.xenondevs.nova.serialization.cbf/-paper-registry-element-binary-serializer/--root--.html">enumEntries</a> can be used to provide the enum name mapping as a secondary input format.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1335778546%2FClasslikes%2F1933957036" anchor-label="PaperRegistryEntryBinarySerializer" id="1335778546%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-paper-registry-entry-binary-serializer/index.html"><span>Paper</span><wbr><span>Registry</span><wbr><span>Entry</span><wbr><span>Binary</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1335778546%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-paper-registry-entry-binary-serializer/index.html">PaperRegistryEntryBinarySerializer</a><span class="token operator">&lt;</span><a href="-paper-registry-entry-binary-serializer/index.html">T</a><span class="token operator"> : </span><span data-unresolved-link="org.bukkit/Keyed///PointingToDeclaration/">Keyed</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registryKey<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="-paper-registry-entry-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">registryAccess<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryAccess///PointingToDeclaration/">RegistryAccess</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="xyz.xenondevs.cbf.serializer/UnversionedBinarySerializer///PointingToDeclaration/">UnversionedBinarySerializer</span><span class="token operator">&lt;</span><a href="../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><a href="-paper-registry-entry-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A binary serializer for <a href="../xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a> that serializes the entry by its key.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-476604792%2FClasslikes%2F1933957036" anchor-label="PaperRegistryEntrySetBinarySerializer" id="-476604792%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-paper-registry-entry-set-binary-serializer/index.html"><span>Paper</span><wbr><span>Registry</span><wbr><span>Entry</span><wbr><span>Set</span><wbr><span>Binary</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-476604792%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-paper-registry-entry-set-binary-serializer/index.html">PaperRegistryEntrySetBinarySerializer</a><span class="token operator">&lt;</span><a href="-paper-registry-entry-set-binary-serializer/index.html">T</a><span class="token operator"> : </span><span data-unresolved-link="org.bukkit/Keyed///PointingToDeclaration/">Keyed</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registryKey<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="-paper-registry-entry-set-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">registryAccess<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryAccess///PointingToDeclaration/">RegistryAccess</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="xyz.xenondevs.cbf.serializer/BinarySerializer///PointingToDeclaration/">BinarySerializer</span><span class="token operator">&lt;</span><a href="../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/index.html">RegistryEntrySet.Paper</a><span class="token operator">&lt;</span><a href="-paper-registry-entry-set-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A binary serializer for <a href="../xyz.xenondevs.nova.registry/-registry-entry-set/-paper/index.html">RegistryEntrySet.Paper</a> that serializes the set by its entries' keys.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="519033147%2FClasslikes%2F1933957036" anchor-label="RegistryKeySetBinarySerializer" id="519033147%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-registry-key-set-binary-serializer/index.html"><span>Registry</span><wbr><span>Key</span><wbr><span>Set</span><wbr><span>Binary</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="519033147%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-registry-key-set-binary-serializer/index.html">RegistryKeySetBinarySerializer</a><span class="token operator">&lt;</span><a href="-registry-key-set-binary-serializer/index.html">T</a><span class="token operator"> : </span><span data-unresolved-link="org.bukkit/Keyed///PointingToDeclaration/">Keyed</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registryKey<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="-registry-key-set-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">registryAccess<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryAccess///PointingToDeclaration/">RegistryAccess</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="xyz.xenondevs.cbf.serializer/BinarySerializer///PointingToDeclaration/">BinarySerializer</span><span class="token operator">&lt;</span><span data-unresolved-link="io.papermc.paper.registry.set/RegistryKeySet///PointingToDeclaration/">RegistryKeySet</span><span class="token operator">&lt;</span><a href="-registry-key-set-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A binary serializer for <span data-unresolved-link="io.papermc.paper.registry.set/RegistryKeySet///PointingToDeclaration/">RegistryKeySet</span> that serializes the set by its entries' keys.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1325733782%2FClasslikes%2F1933957036" anchor-label="TagKeyBinarySerializer" id="1325733782%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tag-key-binary-serializer/index.html"><span>Tag</span><wbr><span>Key</span><wbr><span>Binary</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1325733782%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-tag-key-binary-serializer/index.html">TagKeyBinarySerializer</a><span class="token operator">&lt;</span><a href="-tag-key-binary-serializer/index.html">T</a><span class="token operator"> : </span><span data-unresolved-link="org.bukkit/Keyed///PointingToDeclaration/">Keyed</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registryKey<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="-tag-key-binary-serializer/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="xyz.xenondevs.cbf.serializer/UnversionedBinarySerializer///PointingToDeclaration/">UnversionedBinarySerializer</span><span class="token operator">&lt;</span><span data-unresolved-link="io.papermc.paper.registry.tag/TagKey///PointingToDeclaration/">TagKey</span><span class="token operator">&lt;</span><a href="-tag-key-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A binary serializer for <span data-unresolved-link="io.papermc.paper.registry.tag/TagKey///PointingToDeclaration/">TagKey</span> that serializes to a string of <code class="lang-kotlin">namespace:value</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="129160486%2FClasslikes%2F1933957036" anchor-label="TypedKeyBinarySerializer" id="129160486%2FClasslikes%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-typed-key-binary-serializer/index.html"><span>Typed</span><wbr><span>Key</span><wbr><span>Binary</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="129160486%2FClasslikes%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-typed-key-binary-serializer/index.html">TypedKeyBinarySerializer</a><span class="token operator">&lt;</span><a href="-typed-key-binary-serializer/index.html">T</a><span class="token operator"> : </span><span data-unresolved-link="org.bukkit/Keyed///PointingToDeclaration/">Keyed</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registryKey<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="-typed-key-binary-serializer/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="xyz.xenondevs.cbf.serializer/UnversionedBinarySerializer///PointingToDeclaration/">UnversionedBinarySerializer</span><span class="token operator">&lt;</span><span data-unresolved-link="io.papermc.paper.registry/TypedKey///PointingToDeclaration/">TypedKey</span><span class="token operator">&lt;</span><a href="-typed-key-binary-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A binary serializer for <span data-unresolved-link="io.papermc.paper.registry/TypedKey///PointingToDeclaration/">TypedKey</span> that serializes to a string of <code class="lang-kotlin">namespace:value</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="EXTENSION_FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1972221599%2FFunctions%2F1933957036" anchor-label="registerRegistrySerializers" id="1972221599%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="register-registry-serializers.html"><span>register</span><wbr><span>Registry</span><wbr><span><span>Serializers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1972221599%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="register-registry-serializers.html">T</a><span class="token operator"> : </span><a href="../xyz.xenondevs.nova.registry/-nova-registry-element/index.html">NovaRegistryElement</a><span class="token operator">&lt;</span><a href="register-registry-serializers.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><span data-unresolved-link="xyz.xenondevs.cbf/Cbf///PointingToDeclaration/">Cbf</span><span class="token punctuation">.</span><a href="register-registry-serializers.html"><span class="token function">registerRegistrySerializers</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registry<span class="token operator">: </span><a href="../xyz.xenondevs.nova.registry/-nova-registry/index.html">NovaRegistry</a><span class="token operator">&lt;</span><a href="register-registry-serializers.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Registers <a href="-nova-registry-element-binary-serializer/index.html">NovaRegistryElementBinarySerializer</a>, <a href="-nova-registry-entry-binary-serializer/index.html">NovaRegistryEntryBinarySerializer</a> and <a href="-nova-registry-entry-set-binary-serializer/index.html">NovaRegistryEntrySetBinarySerializer</a> for the given <a href="register-registry-serializers.html">registry</a> to <span data-unresolved-link="xyz.xenondevs.cbf/Cbf///PointingToDeclaration/">Cbf</span>.</p></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="register-registry-serializers.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="register-registry-serializers.html">T</a><span class="token operator">&gt;</span>, <span data-unresolved-link="org.bukkit/Keyed///PointingToDeclaration/">Keyed</span><span class="token operator">&gt; </span><span data-unresolved-link="xyz.xenondevs.cbf/Cbf///PointingToDeclaration/">Cbf</span><span class="token punctuation">.</span><a href="register-registry-serializers.html"><span class="token function">registerRegistrySerializers</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registry<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="register-registry-serializers.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">registryAccess<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryAccess///PointingToDeclaration/">RegistryAccess</span><span class="token operator"> = </span>RegistryAccess.registryAccess()</span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="register-registry-serializers.html">T</a><span class="token operator"> : </span><span data-unresolved-link="org.bukkit/Keyed///PointingToDeclaration/">Keyed</span><span class="token operator">&gt; </span><span data-unresolved-link="xyz.xenondevs.cbf/Cbf///PointingToDeclaration/">Cbf</span><span class="token punctuation">.</span><a href="register-registry-serializers.html"><span class="token function">registerRegistrySerializers</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registry<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="register-registry-serializers.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">registryAccess<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryAccess///PointingToDeclaration/">RegistryAccess</span><span class="token operator"> = </span>RegistryAccess.registryAccess()</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Registers <a href="-paper-registry-element-binary-serializer/index.html">PaperRegistryElementBinarySerializer</a>, <a href="-paper-registry-entry-binary-serializer/index.html">PaperRegistryEntryBinarySerializer</a>, <a href="-paper-registry-entry-set-binary-serializer/index.html">PaperRegistryEntrySetBinarySerializer</a>, <a href="-typed-key-binary-serializer/index.html">TypedKeyBinarySerializer</a>, <a href="-tag-key-binary-serializer/index.html">TagKeyBinarySerializer</a> and <a href="-registry-key-set-binary-serializer/index.html">RegistryKeySetBinarySerializer</a> for the given <a href="register-registry-serializers.html">registry</a> and <a href="register-registry-serializers.html">registryAccess</a> to <span data-unresolved-link="xyz.xenondevs.cbf/Cbf///PointingToDeclaration/">Cbf</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="172105816%2FFunctions%2F1933957036" anchor-label="registerRegistrySerializersCommon" id="172105816%2FFunctions%2F1933957036" data-filterable-set=":nova-registry/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-registry/main" data-filterable-set=":nova-registry/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="register-registry-serializers-common.html"><span>register</span><wbr><span>Registry</span><wbr><span>Serializers</span><wbr><span><span>Common</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="172105816%2FFunctions%2F1933957036"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-registry/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="register-registry-serializers-common.html">T</a><span class="token operator"> : </span><span data-unresolved-link="org.bukkit/Keyed///PointingToDeclaration/">Keyed</span><span class="token operator">&gt; </span><span data-unresolved-link="xyz.xenondevs.cbf/Cbf///PointingToDeclaration/">Cbf</span><span class="token punctuation">.</span><a href="register-registry-serializers-common.html"><span class="token function">registerRegistrySerializersCommon</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">registry<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryKey///PointingToDeclaration/">RegistryKey</span><span class="token operator">&lt;</span><a href="register-registry-serializers-common.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">registryAccess<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.registry/RegistryAccess///PointingToDeclaration/">RegistryAccess</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

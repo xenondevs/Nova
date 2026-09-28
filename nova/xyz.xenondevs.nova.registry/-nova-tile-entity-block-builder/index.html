@@ -1,0 +1,490 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>NovaTileEntityBlockBuilder</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova/main" data-filter=":nova/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.registry/NovaTileEntityBlockBuilder///PointingToDeclaration//-501115348">
+  <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.registry</a><span class="delimiter">/</span><span class="current">NovaTileEntityBlockBuilder</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Nova</span><wbr><span>Tile</span><wbr><span>Entity</span><wbr><span>Block</span><wbr><span><span>Builder</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="index.html">NovaTileEntityBlockBuilder</a> : <a href="../-nova-block-builder/index.html">NovaBlockBuilder</a></div><p class="paragraph">A builder for <a href="../../../nova/xyz.xenondevs.nova.world.block/-nova-tile-entity-block/index.html">NovaTileEntityBlock</a>.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-2100679265%2FProperties%2F-501115348" anchor-label="entry" id="-2100679265%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-registry-entry-builder/entry.html"><span><span>entry</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2100679265%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-registry-entry-builder/entry.html">entry</a><span class="token operator">: </span><a href="../../../nova-registry/xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.block/BlockType///PointingToDeclaration/">BlockType</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The entry of the element being built.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="7458797%2FFunctions%2F-501115348" anchor-label="behaviors" id="7458797%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/behaviors.html"><span><span>behaviors</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="7458797%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/behaviors.html"><span class="token function">behaviors</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>behaviors<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.behavior/-block-behavior-holder/index.html">BlockBehaviorHolder</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds to the behaviors of this block to <a href="../-nova-block-builder/behaviors.html">behaviors</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-562076506%2FFunctions%2F-501115348" anchor-label="breakable" id="-562076506%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/breakable.html"><span><span>breakable</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-562076506%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/breakable.html"><span class="token function">breakable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">hardness<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token operator"> = </span><span class="token constant">1.0</span><span class="token punctuation">, </span></span><span class="parameter ">toolCategories<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span><span class="token operator">&gt;</span><span class="token operator"> = </span>emptySet()<span class="token punctuation">, </span></span><span class="parameter ">toolTier<span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">requiresToolForDrops<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">hitParticles<span class="token operator">: </span><a href="../../../nova-registry/xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemType///PointingToDeclaration/">ItemType</span><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">breakParticles<span class="token operator">: </span><a href="../../../nova-registry/xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.block/BlockType///PointingToDeclaration/">BlockType</span><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">showBreakAnimation<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Makes this block breakable. Higher <a href="../-nova-block-builder/breakable.html">hardness</a> values increase the time required to break it, while <a href="../-nova-block-builder/breakable.html">requiresToolForDrops</a> determines whether an appropriate tool is needed for drops.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-181350325%2FFunctions%2F-501115348" anchor-label="config" id="-181350325%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-configurable-builder/config.html"><span><span>config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-181350325%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-configurable-builder/config.html"><span class="token function">config</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures the name of the config file in this addon's namespace.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="822329947%2FFunctions%2F-501115348" anchor-label="entityBacked" id="822329947%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/entity-backed.html"><span>entity</span><wbr><span><span>Backed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="822329947%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/entity-backed.html"><span class="token function">entityBacked</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">stateSelector<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-selector-scope/index.html">BlockSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="org.bukkit.block.data/BlockData///PointingToDeclaration/">BlockData</span><span class="token operator"> = </span>DEFAULT_BLOCK_STATE_SELECTOR<span class="token punctuation">, </span></span><span class="parameter ">eraseSelectedVanillaModels<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">extraColliderSelector<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-selector-scope/index.html">BlockSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.world.block/-collider-cube/index.html">ColliderCube</a><span class="token operator">&gt;</span><span class="token operator"> = </span>DEFAULT_EXTRA_COLLIDER_SELECTOR<span class="token punctuation">, </span></span><span class="parameter ">extraHitboxSelector<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-selector-scope/index.html">BlockSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.world.block/-hitbox-cuboid/index.html">HitboxCuboid</a><span class="token operator">&gt;</span><span class="token operator"> = </span>{ extraColliderSelector().map(HitboxCuboid::fromCollider) }<span class="token punctuation">, </span></span><span class="parameter ">modelSelector<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-model-selector-scope/index.html">BlockModelSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../xyz.xenondevs.nova.resources.builder.model/-model-builder/index.html">ModelBuilder</a><span class="token operator"> = </span>DEFAULT_BLOCK_MODEL_SELECTOR</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures the model, hitboxes and colliders of this entity-based block model via <a href="../-nova-block-builder/entity-backed.html">modelSelector</a>, <a href="../-nova-block-builder/entity-backed.html">stateSelector</a>, <a href="../-nova-block-builder/entity-backed.html">extraColliderSelector</a> and <a href="../-nova-block-builder/entity-backed.html">extraHitboxSelector</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1043378937%2FFunctions%2F-501115348" anchor-label="entityItemBacked" id="1043378937%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/entity-item-backed.html"><span>entity</span><wbr><span>Item</span><wbr><span><span>Backed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1043378937%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/entity-item-backed.html"><span class="token function">entityItemBacked</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">stateSelector<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-selector-scope/index.html">BlockSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="org.bukkit.block.data/BlockData///PointingToDeclaration/">BlockData</span><span class="token operator"> = </span>DEFAULT_BLOCK_STATE_SELECTOR<span class="token punctuation">, </span></span><span class="parameter ">eraseSelectedVanillaModels<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">extraColliderSelector<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-selector-scope/index.html">BlockSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.world.block/-collider-cube/index.html">ColliderCube</a><span class="token operator">&gt;</span><span class="token operator"> = </span>DEFAULT_EXTRA_COLLIDER_SELECTOR<span class="token punctuation">, </span></span><span class="parameter ">extraHitboxSelector<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-selector-scope/index.html">BlockSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.world.block/-hitbox-cuboid/index.html">HitboxCuboid</a><span class="token operator">&gt;</span><span class="token operator"> = </span>{ extraColliderSelector().map(HitboxCuboid::fromCollider) }<span class="token punctuation">, </span></span><span class="parameter ">itemSelector<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.item/-item-model-definition-builder/index.html">ItemModelDefinitionBuilder</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-model-selector-scope/index.html">BlockModelSelectorScope</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>DEFAULT_CONFIGURE_BLOCK_MODEL_SELECTOR</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures the model and hitboxes and colliders of this entity-based block model via <a href="../-nova-block-builder/entity-item-backed.html">itemSelector</a>, <a href="../-nova-block-builder/entity-item-backed.html">stateSelector</a>, <a href="../-nova-block-builder/entity-item-backed.html">extraColliderSelector</a> and <a href="../-nova-block-builder/entity-item-backed.html">extraHitboxSelector</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1322792320%2FFunctions%2F-501115348" anchor-label="explosionResistance" id="1322792320%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/explosion-resistance.html"><span>explosion</span><wbr><span><span>Resistance</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1322792320%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/explosion-resistance.html"><span class="token function">explosionResistance</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">explosionResistance<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures this block's resistance to explosions. Higher values make the block harder to destroy.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="510238477%2FFunctions%2F-501115348" anchor-label="flammable" id="510238477%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/flammable.html"><span><span>flammable</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="510238477%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/flammable.html"><span class="token function">flammable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">igniteOdds<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">burnOdds<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">ignitedByLava<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures how this block interacts with vanilla fire.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1878600032%2FFunctions%2F-501115348" anchor-label="fluidFlowMode" id="1878600032%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/fluid-flow-mode.html"><span>fluid</span><wbr><span>Flow</span><wbr><span><span>Mode</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1878600032%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/fluid-flow-mode.html"><span class="token function">fluidFlowMode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">selectFluidFlowMode<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-selector-scope/index.html">BlockSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../xyz.xenondevs.nova.world.block/-fluid-flow-mode/index.html">FluidFlowMode</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures how fluids flow into and out of each block state.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-nova-block-builder/fluid-flow-mode.html"><span class="token function">fluidFlowMode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">mode<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block/-fluid-flow-mode/index.html">FluidFlowMode</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures how fluids flow into and out of all states of this block.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="574838646%2FFunctions%2F-501115348" anchor-label="item" id="574838646%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/item.html"><span><span>item</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="574838646%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/item.html"><span class="token function">item</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">item<span class="token operator">: </span><a href="../../../nova-registry/xyz.xenondevs.nova.registry/-registry-entry/-paper/index.html">RegistryEntry.Paper</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemType///PointingToDeclaration/">ItemType</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the item type of this block. Used in, for example, block drops via <a href="../../xyz.xenondevs.nova.world.block.behavior/-block-drops/index.html">BlockDrops</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-974195110%2FFunctions%2F-501115348" anchor-label="lightEmission" id="-974195110%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/light-emission.html"><span>light</span><wbr><span><span>Emission</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-974195110%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/light-emission.html"><span class="token function">lightEmission</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">selectLightEmission<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-selector-scope/index.html">BlockSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures the emitted light level for each block state. Selected values must be between <code class="lang-kotlin">0</code> and <code class="lang-kotlin">15</code>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-nova-block-builder/light-emission.html"><span class="token function">lightEmission</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">level<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures the light level emitted by all states of this block. Must be between <code class="lang-kotlin">0</code> and <code class="lang-kotlin">15</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-325476609%2FFunctions%2F-501115348" anchor-label="localizedName" id="-325476609%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nameable-builder/localized-name.html"><span>localized</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-325476609%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-nameable-builder/localized-name.html"><span class="token function">localizedName</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">localizedName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the localization key.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-549969415%2FFunctions%2F-501115348" anchor-label="mapColor" id="-549969415%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/map-color.html"><span>map</span><wbr><span><span>Color</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-549969415%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/map-color.html"><span class="token function">mapColor</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">mapColor<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Color///PointingToDeclaration/">Color</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures this block's color on maps. The closest color available in Minecraft's map palette is used.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1277766127%2FFunctions%2F-501115348" anchor-label="modelLess" id="1277766127%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/model-less.html"><span>model</span><wbr><span><span>Less</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1277766127%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/model-less.html"><span class="token function">modelLess</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">stateSelector<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-selector-scope/index.html">BlockSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="org.bukkit.block.data/BlockData///PointingToDeclaration/">BlockData</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures this block to not use any custom models, but instead use the given <a href="../-nova-block-builder/model-less.html">stateSelector</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1303332669%2FFunctions%2F-501115348" anchor-label="name" id="-1303332669%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nameable-builder/name.html"><span><span>name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1303332669%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nameable-builder/name.html"><span class="token function">name</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text/Component///PointingToDeclaration/">Component</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the name.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1859223149%2FFunctions%2F-501115348" anchor-label="noteBlockInstrument" id="-1859223149%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/note-block-instrument.html"><span>note</span><wbr><span>Block</span><wbr><span><span>Instrument</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1859223149%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/note-block-instrument.html"><span class="token function">noteBlockInstrument</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">instrument<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block/-note-block-instrument/index.html">NoteBlockInstrument</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures the instrument used by nearby note blocks. Normal instruments require this block to be below the note block, while mob-head instruments require this block to be above the note block. Defaults to <a href="../../xyz.xenondevs.nova.world.block/-note-block-instrument/-h-a-r-p/index.html">NoteBlockInstrument.HARP</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="511072173%2FFunctions%2F-501115348" anchor-label="pistonReaction" id="511072173%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/piston-reaction.html"><span>piston</span><wbr><span><span>Reaction</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="511072173%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/piston-reaction.html"><span class="token function">pistonReaction</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pistonReaction<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/PistonMoveReaction///PointingToDeclaration/">PistonMoveReaction</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures how pistons interact with this block. Defaults to <span data-unresolved-link="org.bukkit.block/PistonMoveReaction.MOVE///PointingToDeclaration/{&quot;org.jetbrains.dokka.links.EnumEntryDRIExtra&quot;:{&quot;key&quot;:&quot;org.jetbrains.dokka.links.EnumEntryDRIExtra&quot;}}">PistonMoveReaction.MOVE</span>. Tile Entities can never be moved.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1431828223%2FFunctions%2F-501115348" anchor-label="rawConfig" id="1431828223%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-configurable-builder/raw-config.html"><span>raw</span><wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1431828223%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-configurable-builder/raw-config.html"><span class="token function">rawConfig</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-configurable-builder/raw-config.html"><span class="token function">rawConfig</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures the id of this config file in the format <code class="lang-kotlin">namespace:name</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1117767808%2FFunctions%2F-501115348" anchor-label="sounds" id="1117767808%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/sounds.html"><span><span>sounds</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1117767808%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/sounds.html"><span class="token function">sounds</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">soundGroup<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.sound/-sound-group/index.html">SoundGroup</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures the sounds made by this block. Defaults to <a href="../../xyz.xenondevs.nova.world.block.sound/-sound-group/-companion/-e-m-p-t-y.html">SoundGroup.EMPTY</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1629700255%2FFunctions%2F-501115348" anchor-label="stateBacked" id="-1629700255%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/state-backed.html"><span>state</span><wbr><span><span>Backed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1629700255%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-nova-block-builder/state-backed.html"><span class="token function">stateBacked</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">category<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-backing-state-category/index.html">BackingStateCategory</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>categories<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-backing-state-category/index.html">BackingStateCategory</a><span class="token punctuation">, </span></span><span class="parameter ">modelSelector<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-model-selector-scope/index.html">BlockModelSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../xyz.xenondevs.nova.resources.builder.model/-model-builder/index.html">ModelBuilder</a><span class="token operator"> = </span>DEFAULT_BLOCK_MODEL_SELECTOR</span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/state-backed.html"><span class="token function">stateBacked</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">priority<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">category<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-backing-state-category/index.html">BackingStateCategory</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>categories<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-backing-state-category/index.html">BackingStateCategory</a><span class="token punctuation">, </span></span><span class="parameter ">modelSelector<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.resources.builder.layout.block/-block-model-selector-scope/index.html">BlockModelSelectorScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../xyz.xenondevs.nova.resources.builder.model/-model-builder/index.html">ModelBuilder</a><span class="token operator"> = </span>DEFAULT_BLOCK_MODEL_SELECTOR</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures the backing state types of this block model via the given (<a href="../-nova-block-builder/state-backed.html">category</a>, <a href="../-nova-block-builder/state-backed.html">categories</a>), then selects the corresponding block models via the given <a href="../-nova-block-builder/state-backed.html">modelSelector</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1651296294%2FFunctions%2F-501115348" anchor-label="stateProperties" id="-1651296294%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nova-block-builder/state-properties.html"><span>state</span><wbr><span><span>Properties</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1651296294%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nova-block-builder/state-properties.html"><span class="token function">stateProperties</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>stateProperties<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.state.property/-block-state-property/index.html">BlockStateProperty</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds the <a href="../-nova-block-builder/state-properties.html">stateProperties</a> to the properties of this block.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1600051003%2FFunctions%2F-501115348" anchor-label="style" id="-1600051003%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-nameable-builder/style.html"><span><span>style</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1600051003%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-nameable-builder/style.html"><span class="token function">style</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text.format/Style///PointingToDeclaration/">Style</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-nameable-builder/style.html"><span class="token function">style</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">color<span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text.format/TextColor///PointingToDeclaration/">TextColor</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-nameable-builder/style.html"><span class="token function">style</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">decoration<span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text.format/TextDecoration///PointingToDeclaration/">TextDecoration</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-nameable-builder/style.html"><span class="token function">style</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>decorations<span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text.format/TextDecoration///PointingToDeclaration/">TextDecoration</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-nameable-builder/style.html"><span class="token function">style</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">color<span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text.format/TextColor///PointingToDeclaration/">TextColor</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>decorations<span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text.format/TextDecoration///PointingToDeclaration/">TextDecoration</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the style of the name.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="988123103%2FFunctions%2F-501115348" anchor-label="tags" id="988123103%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-registry-entry-builder/-paper/tags.html"><span><span>tags</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="988123103%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-registry-entry-builder/-paper/tags.html"><span class="token function">tags</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>tags<span class="token operator">: </span><a href="../../../nova-registry/xyz.xenondevs.nova.registry/-registry-entry-set/-paper/-tag/index.html">RegistryEntrySet.Paper.Tag</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.block/BlockType///PointingToDeclaration/">BlockType</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds the entry of the element being build to the given <a href="../-registry-entry-builder/-paper/tags.html">tags</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="998788079%2FFunctions%2F-501115348" anchor-label="tickrate" id="998788079%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="tickrate.html"><span><span>tickrate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="998788079%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="tickrate.html"><span class="token function">tickrate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tickrate<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures the amount of times <a href="../../xyz.xenondevs.nova.world.block.tileentity/-tile-entity/handle-tick.html">TileEntity.handleTick</a> is called per second. Accepts values from 0 to 20, with 0 disabling ticking.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

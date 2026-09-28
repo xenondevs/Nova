@@ -38,7 +38,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.24.0
+        <div class="library-version" id="library-version">0.25.0-alpha.1
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
@@ -94,7 +94,7 @@
   <div class="cover ">
     <h1 class="cover"><span>handle</span><wbr><span>Network</span><wbr><span><span>Update</span></span></h1>
   </div>
-  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="handle-network-update.html"><span class="token function">handleNetworkUpdate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">state<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format/-network-state/index.html">NetworkState</a></span></span><span class="token punctuation">)</span></div><p class="paragraph">Called when a <a href="index.html">NetworkNode</a> in one of the six cartesian directions is added, removed, or updated in a way that affects this node.</p><p class="paragraph">Also called after this node has been initialized.</p><p class="paragraph">Note that a node may never receive an update when it is unloaded at that time, so you shouldn't rely on this method for important updates, it is rather intended to update the visual state and similar non-critical things.</p></div></div>
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="handle-network-update.html"><span class="token function">handleNetworkUpdate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">state<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format/-network-state/index.html">NetworkState</a></span></span><span class="token punctuation">)</span></div><p class="paragraph">Called when a <a href="index.html">NetworkNode</a> in one of the six cartesian directions is added, removed, or updated in a way that affects this node.</p><p class="paragraph">Also called after this node has been initialized.</p><p class="paragraph">Note that a node may never receive an update when it is unloaded at that time, so you shouldn't rely on this method for important updates, it is rather intended to update the visual state and similar non-critical things.</p><p class="paragraph">Called on the network configurator thread (off-main).</p></div></div>
 </div>
     <div class="footer">
         <div class="footer--container">

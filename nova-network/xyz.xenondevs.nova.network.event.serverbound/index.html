@@ -1,0 +1,1310 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>xyz.xenondevs.nova.network.event.serverbound</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
+                    nova
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.25.0-alpha.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova-network/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova-network/main" data-filter=":nova-network/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    nova
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="nova-network::xyz.xenondevs.nova.network.event.serverbound////PointingToDeclaration//213940877">
+  <div class="breadcrumbs"><a href="../index.html">nova-network</a><span class="delimiter">/</span><span class="current">xyz.xenondevs.nova.network.event.serverbound</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-1045252570%2FClasslikes%2F213940877" anchor-label="ClientboundPongResponsePacketEvent" id="-1045252570%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clientbound-pong-response-packet-event/index.html"><span>Clientbound</span><wbr><span>Pong</span><wbr><span>Response</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1045252570%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-clientbound-pong-response-packet-event/index.html">ClientboundPongResponsePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.ping/ClientboundPongResponsePacket///PointingToDeclaration/">ClientboundPongResponsePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.ping/ClientboundPongResponsePacket///PointingToDeclaration/">ClientboundPongResponsePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1392349819%2FClasslikes%2F213940877" anchor-label="ClientIntentionPacketEvent" id="1392349819%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-client-intention-packet-event/index.html"><span>Client</span><wbr><span>Intention</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1392349819%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-client-intention-packet-event/index.html">ClientIntentionPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.handshake/ClientIntentionPacket///PointingToDeclaration/">ClientIntentionPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.handshake/ClientIntentionPacket///PointingToDeclaration/">ClientIntentionPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1333480319%2FClasslikes%2F213940877" anchor-label="ServerboundAcceptCodeOfConductPacketEvent" id="-1333480319%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-accept-code-of-conduct-packet-event/index.html"><span>Serverbound</span><wbr><span>Accept</span><wbr><span>Code</span><wbr><span>Of</span><wbr><span>Conduct</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1333480319%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-accept-code-of-conduct-packet-event/index.html">ServerboundAcceptCodeOfConductPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.configuration/ServerboundAcceptCodeOfConductPacket///PointingToDeclaration/">ServerboundAcceptCodeOfConductPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.configuration/ServerboundAcceptCodeOfConductPacket///PointingToDeclaration/">ServerboundAcceptCodeOfConductPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="322346539%2FClasslikes%2F213940877" anchor-label="ServerboundAcceptTeleportationPacketEvent" id="322346539%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-accept-teleportation-packet-event/index.html"><span>Serverbound</span><wbr><span>Accept</span><wbr><span>Teleportation</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="322346539%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-accept-teleportation-packet-event/index.html">ServerboundAcceptTeleportationPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundAcceptTeleportationPacket///PointingToDeclaration/">ServerboundAcceptTeleportationPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundAcceptTeleportationPacket///PointingToDeclaration/">ServerboundAcceptTeleportationPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1954193251%2FClasslikes%2F213940877" anchor-label="ServerboundAttackPacketEvent" id="-1954193251%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-attack-packet-event/index.html"><span>Serverbound</span><wbr><span>Attack</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1954193251%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-attack-packet-event/index.html">ServerboundAttackPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundAttackPacket///PointingToDeclaration/">ServerboundAttackPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundAttackPacket///PointingToDeclaration/">ServerboundAttackPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1000433127%2FClasslikes%2F213940877" anchor-label="ServerboundBlockEntityTagQueryPacketEvent" id="1000433127%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-block-entity-tag-query-packet-event/index.html"><span>Serverbound</span><wbr><span>Block</span><wbr><span>Entity</span><wbr><span>Tag</span><wbr><span>Query</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1000433127%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-block-entity-tag-query-packet-event/index.html">ServerboundBlockEntityTagQueryPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundBlockEntityTagQueryPacket///PointingToDeclaration/">ServerboundBlockEntityTagQueryPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundBlockEntityTagQueryPacket///PointingToDeclaration/">ServerboundBlockEntityTagQueryPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="720432352%2FClasslikes%2F213940877" anchor-label="ServerboundChangeDifficultyPacketEvent" id="720432352%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-change-difficulty-packet-event/index.html"><span>Serverbound</span><wbr><span>Change</span><wbr><span>Difficulty</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="720432352%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-change-difficulty-packet-event/index.html">ServerboundChangeDifficultyPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChangeDifficultyPacket///PointingToDeclaration/">ServerboundChangeDifficultyPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChangeDifficultyPacket///PointingToDeclaration/">ServerboundChangeDifficultyPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="206584410%2FClasslikes%2F213940877" anchor-label="ServerboundChangeGameModePacketEvent" id="206584410%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-change-game-mode-packet-event/index.html"><span>Serverbound</span><wbr><span>Change</span><wbr><span>Game</span><wbr><span>Mode</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="206584410%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-change-game-mode-packet-event/index.html">ServerboundChangeGameModePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChangeGameModePacket///PointingToDeclaration/">ServerboundChangeGameModePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChangeGameModePacket///PointingToDeclaration/">ServerboundChangeGameModePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-547839686%2FClasslikes%2F213940877" anchor-label="ServerboundChatAckPacketEvent" id="-547839686%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-chat-ack-packet-event/index.html"><span>Serverbound</span><wbr><span>Chat</span><wbr><span>Ack</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-547839686%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-chat-ack-packet-event/index.html">ServerboundChatAckPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChatAckPacket///PointingToDeclaration/">ServerboundChatAckPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChatAckPacket///PointingToDeclaration/">ServerboundChatAckPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-769706500%2FClasslikes%2F213940877" anchor-label="ServerboundChatCommandPacketEvent" id="-769706500%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-chat-command-packet-event/index.html"><span>Serverbound</span><wbr><span>Chat</span><wbr><span>Command</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-769706500%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-chat-command-packet-event/index.html">ServerboundChatCommandPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChatCommandPacket///PointingToDeclaration/">ServerboundChatCommandPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChatCommandPacket///PointingToDeclaration/">ServerboundChatCommandPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="544188792%2FClasslikes%2F213940877" anchor-label="ServerboundChatCommandSignedPacketEvent" id="544188792%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-chat-command-signed-packet-event/index.html"><span>Serverbound</span><wbr><span>Chat</span><wbr><span>Command</span><wbr><span>Signed</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="544188792%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-chat-command-signed-packet-event/index.html">ServerboundChatCommandSignedPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChatCommandSignedPacket///PointingToDeclaration/">ServerboundChatCommandSignedPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChatCommandSignedPacket///PointingToDeclaration/">ServerboundChatCommandSignedPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1643705133%2FClasslikes%2F213940877" anchor-label="ServerboundChatPacketEvent" id="1643705133%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-chat-packet-event/index.html"><span>Serverbound</span><wbr><span>Chat</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1643705133%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-chat-packet-event/index.html">ServerboundChatPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChatPacket///PointingToDeclaration/">ServerboundChatPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChatPacket///PointingToDeclaration/">ServerboundChatPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-242338256%2FClasslikes%2F213940877" anchor-label="ServerboundChatSessionUpdatePacketEvent" id="-242338256%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-chat-session-update-packet-event/index.html"><span>Serverbound</span><wbr><span>Chat</span><wbr><span>Session</span><wbr><span>Update</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-242338256%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-chat-session-update-packet-event/index.html">ServerboundChatSessionUpdatePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChatSessionUpdatePacket///PointingToDeclaration/">ServerboundChatSessionUpdatePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChatSessionUpdatePacket///PointingToDeclaration/">ServerboundChatSessionUpdatePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-136202205%2FClasslikes%2F213940877" anchor-label="ServerboundChunkBatchReceivedPacketEvent" id="-136202205%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-chunk-batch-received-packet-event/index.html"><span>Serverbound</span><wbr><span>Chunk</span><wbr><span>Batch</span><wbr><span>Received</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-136202205%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-chunk-batch-received-packet-event/index.html">ServerboundChunkBatchReceivedPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChunkBatchReceivedPacket///PointingToDeclaration/">ServerboundChunkBatchReceivedPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundChunkBatchReceivedPacket///PointingToDeclaration/">ServerboundChunkBatchReceivedPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-280587991%2FClasslikes%2F213940877" anchor-label="ServerboundClientCommandPacketEvent" id="-280587991%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-client-command-packet-event/index.html"><span>Serverbound</span><wbr><span>Client</span><wbr><span>Command</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-280587991%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-client-command-packet-event/index.html">ServerboundClientCommandPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundClientCommandPacket///PointingToDeclaration/">ServerboundClientCommandPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundClientCommandPacket///PointingToDeclaration/">ServerboundClientCommandPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-892759286%2FClasslikes%2F213940877" anchor-label="ServerboundClientInformationPacketEvent" id="-892759286%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-client-information-packet-event/index.html"><span>Serverbound</span><wbr><span>Client</span><wbr><span>Information</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-892759286%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-client-information-packet-event/index.html">ServerboundClientInformationPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundClientInformationPacket///PointingToDeclaration/">ServerboundClientInformationPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundClientInformationPacket///PointingToDeclaration/">ServerboundClientInformationPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-744025508%2FClasslikes%2F213940877" anchor-label="ServerboundClientTickEndPacketEvent" id="-744025508%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-client-tick-end-packet-event/index.html"><span>Serverbound</span><wbr><span>Client</span><wbr><span>Tick</span><wbr><span>End</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-744025508%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-client-tick-end-packet-event/index.html">ServerboundClientTickEndPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundClientTickEndPacket///PointingToDeclaration/">ServerboundClientTickEndPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundClientTickEndPacket///PointingToDeclaration/">ServerboundClientTickEndPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="900217688%2FClasslikes%2F213940877" anchor-label="ServerboundCommandSuggestionPacketEvent" id="900217688%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-command-suggestion-packet-event/index.html"><span>Serverbound</span><wbr><span>Command</span><wbr><span>Suggestion</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="900217688%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-command-suggestion-packet-event/index.html">ServerboundCommandSuggestionPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundCommandSuggestionPacket///PointingToDeclaration/">ServerboundCommandSuggestionPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundCommandSuggestionPacket///PointingToDeclaration/">ServerboundCommandSuggestionPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2064352377%2FClasslikes%2F213940877" anchor-label="ServerboundConfigurationAcknowledgedPacketEvent" id="-2064352377%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-configuration-acknowledged-packet-event/index.html"><span>Serverbound</span><wbr><span>Configuration</span><wbr><span>Acknowledged</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2064352377%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-configuration-acknowledged-packet-event/index.html">ServerboundConfigurationAcknowledgedPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundConfigurationAcknowledgedPacket///PointingToDeclaration/">ServerboundConfigurationAcknowledgedPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundConfigurationAcknowledgedPacket///PointingToDeclaration/">ServerboundConfigurationAcknowledgedPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1867798410%2FClasslikes%2F213940877" anchor-label="ServerboundContainerButtonClickPacketEvent" id="1867798410%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-container-button-click-packet-event/index.html"><span>Serverbound</span><wbr><span>Container</span><wbr><span>Button</span><wbr><span>Click</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1867798410%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-container-button-click-packet-event/index.html">ServerboundContainerButtonClickPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundContainerButtonClickPacket///PointingToDeclaration/">ServerboundContainerButtonClickPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundContainerButtonClickPacket///PointingToDeclaration/">ServerboundContainerButtonClickPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1961171548%2FClasslikes%2F213940877" anchor-label="ServerboundContainerClickPacketEvent" id="1961171548%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-container-click-packet-event/index.html"><span>Serverbound</span><wbr><span>Container</span><wbr><span>Click</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1961171548%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-container-click-packet-event/index.html">ServerboundContainerClickPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundContainerClickPacket///PointingToDeclaration/">ServerboundContainerClickPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundContainerClickPacket///PointingToDeclaration/">ServerboundContainerClickPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-903497012%2FClasslikes%2F213940877" anchor-label="ServerboundContainerClosePacketEvent" id="-903497012%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-container-close-packet-event/index.html"><span>Serverbound</span><wbr><span>Container</span><wbr><span>Close</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-903497012%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-container-close-packet-event/index.html">ServerboundContainerClosePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundContainerClosePacket///PointingToDeclaration/">ServerboundContainerClosePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundContainerClosePacket///PointingToDeclaration/">ServerboundContainerClosePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="31289547%2FClasslikes%2F213940877" anchor-label="ServerboundContainerSlotStateChangedPacketEvent" id="31289547%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-container-slot-state-changed-packet-event/index.html"><span>Serverbound</span><wbr><span>Container</span><wbr><span>Slot</span><wbr><span>State</span><wbr><span>Changed</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="31289547%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-container-slot-state-changed-packet-event/index.html">ServerboundContainerSlotStateChangedPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundContainerSlotStateChangedPacket///PointingToDeclaration/">ServerboundContainerSlotStateChangedPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundContainerSlotStateChangedPacket///PointingToDeclaration/">ServerboundContainerSlotStateChangedPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-303529830%2FClasslikes%2F213940877" anchor-label="ServerboundCookieResponsePacketEvent" id="-303529830%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-cookie-response-packet-event/index.html"><span>Serverbound</span><wbr><span>Cookie</span><wbr><span>Response</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-303529830%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-cookie-response-packet-event/index.html">ServerboundCookieResponsePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.cookie/ServerboundCookieResponsePacket///PointingToDeclaration/">ServerboundCookieResponsePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.cookie/ServerboundCookieResponsePacket///PointingToDeclaration/">ServerboundCookieResponsePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1495755178%2FClasslikes%2F213940877" anchor-label="ServerboundCustomClickActionPacketEvent" id="-1495755178%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-custom-click-action-packet-event/index.html"><span>Serverbound</span><wbr><span>Custom</span><wbr><span>Click</span><wbr><span>Action</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1495755178%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-custom-click-action-packet-event/index.html">ServerboundCustomClickActionPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundCustomClickActionPacket///PointingToDeclaration/">ServerboundCustomClickActionPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundCustomClickActionPacket///PointingToDeclaration/">ServerboundCustomClickActionPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1012943494%2FClasslikes%2F213940877" anchor-label="ServerboundCustomPayloadPacketEvent" id="1012943494%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-custom-payload-packet-event/index.html"><span>Serverbound</span><wbr><span>Custom</span><wbr><span>Payload</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1012943494%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-custom-payload-packet-event/index.html">ServerboundCustomPayloadPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundCustomPayloadPacket///PointingToDeclaration/">ServerboundCustomPayloadPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundCustomPayloadPacket///PointingToDeclaration/">ServerboundCustomPayloadPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1457288990%2FClasslikes%2F213940877" anchor-label="ServerboundCustomQueryAnswerPacketEvent" id="1457288990%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-custom-query-answer-packet-event/index.html"><span>Serverbound</span><wbr><span>Custom</span><wbr><span>Query</span><wbr><span>Answer</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1457288990%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-custom-query-answer-packet-event/index.html">ServerboundCustomQueryAnswerPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.login/ServerboundCustomQueryAnswerPacket///PointingToDeclaration/">ServerboundCustomQueryAnswerPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.login/ServerboundCustomQueryAnswerPacket///PointingToDeclaration/">ServerboundCustomQueryAnswerPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-593294668%2FClasslikes%2F213940877" anchor-label="ServerboundDebugSubscriptionRequestPacketEvent" id="-593294668%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-debug-subscription-request-packet-event/index.html"><span>Serverbound</span><wbr><span>Debug</span><wbr><span>Subscription</span><wbr><span>Request</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-593294668%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-debug-subscription-request-packet-event/index.html">ServerboundDebugSubscriptionRequestPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundDebugSubscriptionRequestPacket///PointingToDeclaration/">ServerboundDebugSubscriptionRequestPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundDebugSubscriptionRequestPacket///PointingToDeclaration/">ServerboundDebugSubscriptionRequestPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1107698840%2FClasslikes%2F213940877" anchor-label="ServerboundEditBookPacketEvent" id="-1107698840%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-edit-book-packet-event/index.html"><span>Serverbound</span><wbr><span>Edit</span><wbr><span>Book</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1107698840%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-edit-book-packet-event/index.html">ServerboundEditBookPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundEditBookPacket///PointingToDeclaration/">ServerboundEditBookPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundEditBookPacket///PointingToDeclaration/">ServerboundEditBookPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-964060634%2FClasslikes%2F213940877" anchor-label="ServerboundEntityTagQueryPacketEvent" id="-964060634%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-entity-tag-query-packet-event/index.html"><span>Serverbound</span><wbr><span>Entity</span><wbr><span>Tag</span><wbr><span>Query</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-964060634%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-entity-tag-query-packet-event/index.html">ServerboundEntityTagQueryPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundEntityTagQueryPacket///PointingToDeclaration/">ServerboundEntityTagQueryPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundEntityTagQueryPacket///PointingToDeclaration/">ServerboundEntityTagQueryPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-75820468%2FClasslikes%2F213940877" anchor-label="ServerboundFinishConfigurationPacketEvent" id="-75820468%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-finish-configuration-packet-event/index.html"><span>Serverbound</span><wbr><span>Finish</span><wbr><span>Configuration</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-75820468%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-finish-configuration-packet-event/index.html">ServerboundFinishConfigurationPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.configuration/ServerboundFinishConfigurationPacket///PointingToDeclaration/">ServerboundFinishConfigurationPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.configuration/ServerboundFinishConfigurationPacket///PointingToDeclaration/">ServerboundFinishConfigurationPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1144055301%2FClasslikes%2F213940877" anchor-label="ServerboundHelloPacketEvent" id="-1144055301%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-hello-packet-event/index.html"><span>Serverbound</span><wbr><span>Hello</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1144055301%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-hello-packet-event/index.html">ServerboundHelloPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.login/ServerboundHelloPacket///PointingToDeclaration/">ServerboundHelloPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.login/ServerboundHelloPacket///PointingToDeclaration/">ServerboundHelloPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1254577163%2FClasslikes%2F213940877" anchor-label="ServerboundInteractPacketEvent" id="1254577163%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-interact-packet-event/index.html"><span>Serverbound</span><wbr><span>Interact</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1254577163%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-interact-packet-event/index.html">ServerboundInteractPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundInteractPacket///PointingToDeclaration/">ServerboundInteractPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundInteractPacket///PointingToDeclaration/">ServerboundInteractPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="519784907%2FClasslikes%2F213940877" anchor-label="ServerboundJigsawGeneratePacketEvent" id="519784907%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-jigsaw-generate-packet-event/index.html"><span>Serverbound</span><wbr><span>Jigsaw</span><wbr><span>Generate</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="519784907%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-jigsaw-generate-packet-event/index.html">ServerboundJigsawGeneratePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundJigsawGeneratePacket///PointingToDeclaration/">ServerboundJigsawGeneratePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundJigsawGeneratePacket///PointingToDeclaration/">ServerboundJigsawGeneratePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1606652273%2FClasslikes%2F213940877" anchor-label="ServerboundKeepAlivePacketEvent" id="1606652273%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-keep-alive-packet-event/index.html"><span>Serverbound</span><wbr><span>Keep</span><wbr><span>Alive</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1606652273%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-keep-alive-packet-event/index.html">ServerboundKeepAlivePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundKeepAlivePacket///PointingToDeclaration/">ServerboundKeepAlivePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundKeepAlivePacket///PointingToDeclaration/">ServerboundKeepAlivePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1947814008%2FClasslikes%2F213940877" anchor-label="ServerboundKeyPacketEvent" id="-1947814008%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-key-packet-event/index.html"><span>Serverbound</span><wbr><span>Key</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1947814008%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-key-packet-event/index.html">ServerboundKeyPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.login/ServerboundKeyPacket///PointingToDeclaration/">ServerboundKeyPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.login/ServerboundKeyPacket///PointingToDeclaration/">ServerboundKeyPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1751094427%2FClasslikes%2F213940877" anchor-label="ServerboundLockDifficultyPacketEvent" id="1751094427%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-lock-difficulty-packet-event/index.html"><span>Serverbound</span><wbr><span>Lock</span><wbr><span>Difficulty</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1751094427%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-lock-difficulty-packet-event/index.html">ServerboundLockDifficultyPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundLockDifficultyPacket///PointingToDeclaration/">ServerboundLockDifficultyPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundLockDifficultyPacket///PointingToDeclaration/">ServerboundLockDifficultyPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1370075654%2FClasslikes%2F213940877" anchor-label="ServerboundLoginAcknowledgedPacketEvent" id="-1370075654%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-login-acknowledged-packet-event/index.html"><span>Serverbound</span><wbr><span>Login</span><wbr><span>Acknowledged</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1370075654%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-login-acknowledged-packet-event/index.html">ServerboundLoginAcknowledgedPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.login/ServerboundLoginAcknowledgedPacket///PointingToDeclaration/">ServerboundLoginAcknowledgedPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.login/ServerboundLoginAcknowledgedPacket///PointingToDeclaration/">ServerboundLoginAcknowledgedPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-28617205%2FClasslikes%2F213940877" anchor-label="ServerboundMovePlayerPosPacketEvent" id="-28617205%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-move-player-pos-packet-event/index.html"><span>Serverbound</span><wbr><span>Move</span><wbr><span>Player</span><wbr><span>Pos</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-28617205%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-move-player-pos-packet-event/index.html">ServerboundMovePlayerPosPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundMovePlayerPacket.Pos///PointingToDeclaration/">ServerboundMovePlayerPacket.Pos</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundMovePlayerPacket.Pos///PointingToDeclaration/">ServerboundMovePlayerPacket.Pos</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-795993110%2FClasslikes%2F213940877" anchor-label="ServerboundMovePlayerPosRotPacketEvent" id="-795993110%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-move-player-pos-rot-packet-event/index.html"><span>Serverbound</span><wbr><span>Move</span><wbr><span>Player</span><wbr><span>Pos</span><wbr><span>Rot</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-795993110%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-move-player-pos-rot-packet-event/index.html">ServerboundMovePlayerPosRotPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundMovePlayerPacket.PosRot///PointingToDeclaration/">ServerboundMovePlayerPacket.PosRot</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundMovePlayerPacket.PosRot///PointingToDeclaration/">ServerboundMovePlayerPacket.PosRot</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1544218610%2FClasslikes%2F213940877" anchor-label="ServerboundMovePlayerRotPacketEvent" id="-1544218610%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-move-player-rot-packet-event/index.html"><span>Serverbound</span><wbr><span>Move</span><wbr><span>Player</span><wbr><span>Rot</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1544218610%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-move-player-rot-packet-event/index.html">ServerboundMovePlayerRotPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundMovePlayerPacket.Rot///PointingToDeclaration/">ServerboundMovePlayerPacket.Rot</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundMovePlayerPacket.Rot///PointingToDeclaration/">ServerboundMovePlayerPacket.Rot</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="238711365%2FClasslikes%2F213940877" anchor-label="ServerboundMovePlayerStatusOnlyPacketEvent" id="238711365%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-move-player-status-only-packet-event/index.html"><span>Serverbound</span><wbr><span>Move</span><wbr><span>Player</span><wbr><span>Status</span><wbr><span>Only</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="238711365%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-move-player-status-only-packet-event/index.html">ServerboundMovePlayerStatusOnlyPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundMovePlayerPacket.StatusOnly///PointingToDeclaration/">ServerboundMovePlayerPacket.StatusOnly</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundMovePlayerPacket.StatusOnly///PointingToDeclaration/">ServerboundMovePlayerPacket.StatusOnly</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1070755652%2FClasslikes%2F213940877" anchor-label="ServerboundMoveVehiclePacketEvent" id="1070755652%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-move-vehicle-packet-event/index.html"><span>Serverbound</span><wbr><span>Move</span><wbr><span>Vehicle</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1070755652%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-move-vehicle-packet-event/index.html">ServerboundMoveVehiclePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundMoveVehiclePacket///PointingToDeclaration/">ServerboundMoveVehiclePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundMoveVehiclePacket///PointingToDeclaration/">ServerboundMoveVehiclePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1442160159%2FClasslikes%2F213940877" anchor-label="ServerboundPaddleBoatPacketEvent" id="1442160159%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-paddle-boat-packet-event/index.html"><span>Serverbound</span><wbr><span>Paddle</span><wbr><span>Boat</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1442160159%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-paddle-boat-packet-event/index.html">ServerboundPaddleBoatPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPaddleBoatPacket///PointingToDeclaration/">ServerboundPaddleBoatPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPaddleBoatPacket///PointingToDeclaration/">ServerboundPaddleBoatPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="582366776%2FClasslikes%2F213940877" anchor-label="ServerboundPickItemFromBlockPacketEvent" id="582366776%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-pick-item-from-block-packet-event/index.html"><span>Serverbound</span><wbr><span>Pick</span><wbr><span>Item</span><wbr><span>From</span><wbr><span>Block</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="582366776%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-pick-item-from-block-packet-event/index.html">ServerboundPickItemFromBlockPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPickItemFromBlockPacket///PointingToDeclaration/">ServerboundPickItemFromBlockPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPickItemFromBlockPacket///PointingToDeclaration/">ServerboundPickItemFromBlockPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1979796746%2FClasslikes%2F213940877" anchor-label="ServerboundPickItemFromEntityPacketEvent" id="-1979796746%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-pick-item-from-entity-packet-event/index.html"><span>Serverbound</span><wbr><span>Pick</span><wbr><span>Item</span><wbr><span>From</span><wbr><span>Entity</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1979796746%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-pick-item-from-entity-packet-event/index.html">ServerboundPickItemFromEntityPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPickItemFromEntityPacket///PointingToDeclaration/">ServerboundPickItemFromEntityPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPickItemFromEntityPacket///PointingToDeclaration/">ServerboundPickItemFromEntityPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-865927962%2FClasslikes%2F213940877" anchor-label="ServerboundPingRequestPacketEvent" id="-865927962%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-ping-request-packet-event/index.html"><span>Serverbound</span><wbr><span>Ping</span><wbr><span>Request</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-865927962%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-ping-request-packet-event/index.html">ServerboundPingRequestPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.ping/ServerboundPingRequestPacket///PointingToDeclaration/">ServerboundPingRequestPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.ping/ServerboundPingRequestPacket///PointingToDeclaration/">ServerboundPingRequestPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1411377762%2FClasslikes%2F213940877" anchor-label="ServerboundPlaceRecipePacketEvent" id="-1411377762%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-place-recipe-packet-event/index.html"><span>Serverbound</span><wbr><span>Place</span><wbr><span>Recipe</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1411377762%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-place-recipe-packet-event/index.html">ServerboundPlaceRecipePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlaceRecipePacket///PointingToDeclaration/">ServerboundPlaceRecipePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlaceRecipePacket///PointingToDeclaration/">ServerboundPlaceRecipePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1297288080%2FClasslikes%2F213940877" anchor-label="ServerboundPlayerAbilitiesPacketEvent" id="1297288080%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-player-abilities-packet-event/index.html"><span>Serverbound</span><wbr><span>Player</span><wbr><span>Abilities</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1297288080%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-player-abilities-packet-event/index.html">ServerboundPlayerAbilitiesPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerAbilitiesPacket///PointingToDeclaration/">ServerboundPlayerAbilitiesPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerAbilitiesPacket///PointingToDeclaration/">ServerboundPlayerAbilitiesPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1025998540%2FClasslikes%2F213940877" anchor-label="ServerboundPlayerActionPacketEvent" id="1025998540%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-player-action-packet-event/index.html"><span>Serverbound</span><wbr><span>Player</span><wbr><span>Action</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1025998540%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-player-action-packet-event/index.html">ServerboundPlayerActionPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerActionPacket///PointingToDeclaration/">ServerboundPlayerActionPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerActionPacket///PointingToDeclaration/">ServerboundPlayerActionPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-985032621%2FClasslikes%2F213940877" anchor-label="ServerboundPlayerCommandPacketEvent" id="-985032621%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-player-command-packet-event/index.html"><span>Serverbound</span><wbr><span>Player</span><wbr><span>Command</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-985032621%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-player-command-packet-event/index.html">ServerboundPlayerCommandPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerCommandPacket///PointingToDeclaration/">ServerboundPlayerCommandPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerCommandPacket///PointingToDeclaration/">ServerboundPlayerCommandPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1108714386%2FClasslikes%2F213940877" anchor-label="ServerboundPlayerInputPacketEvent" id="1108714386%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-player-input-packet-event/index.html"><span>Serverbound</span><wbr><span>Player</span><wbr><span>Input</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1108714386%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-player-input-packet-event/index.html">ServerboundPlayerInputPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerInputPacket///PointingToDeclaration/">ServerboundPlayerInputPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerInputPacket///PointingToDeclaration/">ServerboundPlayerInputPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="805090587%2FClasslikes%2F213940877" anchor-label="ServerboundPlayerLoadedPacketEvent" id="805090587%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-player-loaded-packet-event/index.html"><span>Serverbound</span><wbr><span>Player</span><wbr><span>Loaded</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="805090587%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-player-loaded-packet-event/index.html">ServerboundPlayerLoadedPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerLoadedPacket///PointingToDeclaration/">ServerboundPlayerLoadedPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPlayerLoadedPacket///PointingToDeclaration/">ServerboundPlayerLoadedPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1060186061%2FClasslikes%2F213940877" anchor-label="ServerboundPongPacketEvent" id="1060186061%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-pong-packet-event/index.html"><span>Serverbound</span><wbr><span>Pong</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1060186061%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-pong-packet-event/index.html">ServerboundPongPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundPongPacket///PointingToDeclaration/">ServerboundPongPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundPongPacket///PointingToDeclaration/">ServerboundPongPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="791880791%2FClasslikes%2F213940877" anchor-label="ServerboundPunchPacketEvent" id="791880791%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-punch-packet-event/index.html"><span>Serverbound</span><wbr><span>Punch</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="791880791%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-punch-packet-event/index.html">ServerboundPunchPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPunchPacket///PointingToDeclaration/">ServerboundPunchPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundPunchPacket///PointingToDeclaration/">ServerboundPunchPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="777376063%2FClasslikes%2F213940877" anchor-label="ServerboundRecipeBookChangeSettingsPacketEvent" id="777376063%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-recipe-book-change-settings-packet-event/index.html"><span>Serverbound</span><wbr><span>Recipe</span><wbr><span>Book</span><wbr><span>Change</span><wbr><span>Settings</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="777376063%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-recipe-book-change-settings-packet-event/index.html">ServerboundRecipeBookChangeSettingsPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundRecipeBookChangeSettingsPacket///PointingToDeclaration/">ServerboundRecipeBookChangeSettingsPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundRecipeBookChangeSettingsPacket///PointingToDeclaration/">ServerboundRecipeBookChangeSettingsPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="829534389%2FClasslikes%2F213940877" anchor-label="ServerboundRecipeBookSeenRecipePacketEvent" id="829534389%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-recipe-book-seen-recipe-packet-event/index.html"><span>Serverbound</span><wbr><span>Recipe</span><wbr><span>Book</span><wbr><span>Seen</span><wbr><span>Recipe</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="829534389%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-recipe-book-seen-recipe-packet-event/index.html">ServerboundRecipeBookSeenRecipePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundRecipeBookSeenRecipePacket///PointingToDeclaration/">ServerboundRecipeBookSeenRecipePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundRecipeBookSeenRecipePacket///PointingToDeclaration/">ServerboundRecipeBookSeenRecipePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1926159942%2FClasslikes%2F213940877" anchor-label="ServerboundRenameItemPacketEvent" id="1926159942%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-rename-item-packet-event/index.html"><span>Serverbound</span><wbr><span>Rename</span><wbr><span>Item</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1926159942%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-rename-item-packet-event/index.html">ServerboundRenameItemPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundRenameItemPacket///PointingToDeclaration/">ServerboundRenameItemPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundRenameItemPacket///PointingToDeclaration/">ServerboundRenameItemPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1793696156%2FClasslikes%2F213940877" anchor-label="ServerboundResourcePackPacketEvent" id="1793696156%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-resource-pack-packet-event/index.html"><span>Serverbound</span><wbr><span>Resource</span><wbr><span>Pack</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1793696156%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-resource-pack-packet-event/index.html">ServerboundResourcePackPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundResourcePackPacket///PointingToDeclaration/">ServerboundResourcePackPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.common/ServerboundResourcePackPacket///PointingToDeclaration/">ServerboundResourcePackPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-775619197%2FClasslikes%2F213940877" anchor-label="ServerboundSeenAdvancementsPacketEvent" id="-775619197%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-seen-advancements-packet-event/index.html"><span>Serverbound</span><wbr><span>Seen</span><wbr><span>Advancements</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-775619197%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-seen-advancements-packet-event/index.html">ServerboundSeenAdvancementsPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSeenAdvancementsPacket///PointingToDeclaration/">ServerboundSeenAdvancementsPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSeenAdvancementsPacket///PointingToDeclaration/">ServerboundSeenAdvancementsPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1755165914%2FClasslikes%2F213940877" anchor-label="ServerboundSelectBundleItemPacketEvent" id="-1755165914%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-select-bundle-item-packet-event/index.html"><span>Serverbound</span><wbr><span>Select</span><wbr><span>Bundle</span><wbr><span>Item</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1755165914%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-select-bundle-item-packet-event/index.html">ServerboundSelectBundleItemPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSelectBundleItemPacket///PointingToDeclaration/">ServerboundSelectBundleItemPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSelectBundleItemPacket///PointingToDeclaration/">ServerboundSelectBundleItemPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="924806016%2FClasslikes%2F213940877" anchor-label="ServerboundSelectKnownPacksEvent" id="924806016%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-select-known-packs-event/index.html"><span>Serverbound</span><wbr><span>Select</span><wbr><span>Known</span><wbr><span>Packs</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="924806016%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-select-known-packs-event/index.html">ServerboundSelectKnownPacksEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.configuration/ServerboundSelectKnownPacks///PointingToDeclaration/">ServerboundSelectKnownPacks</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.configuration/ServerboundSelectKnownPacks///PointingToDeclaration/">ServerboundSelectKnownPacks</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1106262129%2FClasslikes%2F213940877" anchor-label="ServerboundSelectTradePacketEvent" id="1106262129%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-select-trade-packet-event/index.html"><span>Serverbound</span><wbr><span>Select</span><wbr><span>Trade</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1106262129%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-select-trade-packet-event/index.html">ServerboundSelectTradePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSelectTradePacket///PointingToDeclaration/">ServerboundSelectTradePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSelectTradePacket///PointingToDeclaration/">ServerboundSelectTradePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1454725777%2FClasslikes%2F213940877" anchor-label="ServerboundSetBeaconPacketEvent" id="-1454725777%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-set-beacon-packet-event/index.html"><span>Serverbound</span><wbr><span>Set</span><wbr><span>Beacon</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1454725777%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-set-beacon-packet-event/index.html">ServerboundSetBeaconPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetBeaconPacket///PointingToDeclaration/">ServerboundSetBeaconPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetBeaconPacket///PointingToDeclaration/">ServerboundSetBeaconPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-414870992%2FClasslikes%2F213940877" anchor-label="ServerboundSetCarriedItemPacketEvent" id="-414870992%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-set-carried-item-packet-event/index.html"><span>Serverbound</span><wbr><span>Set</span><wbr><span>Carried</span><wbr><span>Item</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-414870992%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-set-carried-item-packet-event/index.html">ServerboundSetCarriedItemPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetCarriedItemPacket///PointingToDeclaration/">ServerboundSetCarriedItemPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetCarriedItemPacket///PointingToDeclaration/">ServerboundSetCarriedItemPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2060928301%2FClasslikes%2F213940877" anchor-label="ServerboundSetCommandBlockPacketEvent" id="2060928301%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-set-command-block-packet-event/index.html"><span>Serverbound</span><wbr><span>Set</span><wbr><span>Command</span><wbr><span>Block</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2060928301%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-set-command-block-packet-event/index.html">ServerboundSetCommandBlockPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetCommandBlockPacket///PointingToDeclaration/">ServerboundSetCommandBlockPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetCommandBlockPacket///PointingToDeclaration/">ServerboundSetCommandBlockPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1697474801%2FClasslikes%2F213940877" anchor-label="ServerboundSetCommandMinecartPacketEvent" id="1697474801%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-set-command-minecart-packet-event/index.html"><span>Serverbound</span><wbr><span>Set</span><wbr><span>Command</span><wbr><span>Minecart</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1697474801%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-set-command-minecart-packet-event/index.html">ServerboundSetCommandMinecartPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetCommandMinecartPacket///PointingToDeclaration/">ServerboundSetCommandMinecartPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetCommandMinecartPacket///PointingToDeclaration/">ServerboundSetCommandMinecartPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1060185915%2FClasslikes%2F213940877" anchor-label="ServerboundSetCreativeModeSlotPacketEvent" id="1060185915%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-set-creative-mode-slot-packet-event/index.html"><span>Serverbound</span><wbr><span>Set</span><wbr><span>Creative</span><wbr><span>Mode</span><wbr><span>Slot</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1060185915%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-set-creative-mode-slot-packet-event/index.html">ServerboundSetCreativeModeSlotPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetCreativeModeSlotPacket///PointingToDeclaration/">ServerboundSetCreativeModeSlotPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetCreativeModeSlotPacket///PointingToDeclaration/">ServerboundSetCreativeModeSlotPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1921488697%2FClasslikes%2F213940877" anchor-label="ServerboundSetGameRulePacketEvent" id="1921488697%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-set-game-rule-packet-event/index.html"><span>Serverbound</span><wbr><span>Set</span><wbr><span>Game</span><wbr><span>Rule</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1921488697%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-set-game-rule-packet-event/index.html">ServerboundSetGameRulePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetGameRulePacket///PointingToDeclaration/">ServerboundSetGameRulePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetGameRulePacket///PointingToDeclaration/">ServerboundSetGameRulePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-951590209%2FClasslikes%2F213940877" anchor-label="ServerboundSetJigsawBlockPacketEvent" id="-951590209%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-set-jigsaw-block-packet-event/index.html"><span>Serverbound</span><wbr><span>Set</span><wbr><span>Jigsaw</span><wbr><span>Block</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-951590209%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-set-jigsaw-block-packet-event/index.html">ServerboundSetJigsawBlockPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetJigsawBlockPacket///PointingToDeclaration/">ServerboundSetJigsawBlockPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetJigsawBlockPacket///PointingToDeclaration/">ServerboundSetJigsawBlockPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-15036155%2FClasslikes%2F213940877" anchor-label="ServerboundSetStructureBlockPacketEvent" id="-15036155%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-set-structure-block-packet-event/index.html"><span>Serverbound</span><wbr><span>Set</span><wbr><span>Structure</span><wbr><span>Block</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-15036155%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-set-structure-block-packet-event/index.html">ServerboundSetStructureBlockPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetStructureBlockPacket///PointingToDeclaration/">ServerboundSetStructureBlockPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetStructureBlockPacket///PointingToDeclaration/">ServerboundSetStructureBlockPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1898403282%2FClasslikes%2F213940877" anchor-label="ServerboundSetTestBlockPacketEvent" id="-1898403282%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-set-test-block-packet-event/index.html"><span>Serverbound</span><wbr><span>Set</span><wbr><span>Test</span><wbr><span>Block</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1898403282%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-set-test-block-packet-event/index.html">ServerboundSetTestBlockPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetTestBlockPacket///PointingToDeclaration/">ServerboundSetTestBlockPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSetTestBlockPacket///PointingToDeclaration/">ServerboundSetTestBlockPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1682394821%2FClasslikes%2F213940877" anchor-label="ServerboundSignUpdatePacketEvent" id="-1682394821%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-sign-update-packet-event/index.html"><span>Serverbound</span><wbr><span>Sign</span><wbr><span>Update</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1682394821%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-sign-update-packet-event/index.html">ServerboundSignUpdatePacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSignUpdatePacket///PointingToDeclaration/">ServerboundSignUpdatePacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSignUpdatePacket///PointingToDeclaration/">ServerboundSignUpdatePacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="454450990%2FClasslikes%2F213940877" anchor-label="ServerboundSpectatorActionPacketEvent" id="454450990%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-spectator-action-packet-event/index.html"><span>Serverbound</span><wbr><span>Spectator</span><wbr><span>Action</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="454450990%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-spectator-action-packet-event/index.html">ServerboundSpectatorActionPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSpectatorActionPacket///PointingToDeclaration/">ServerboundSpectatorActionPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundSpectatorActionPacket///PointingToDeclaration/">ServerboundSpectatorActionPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1253178394%2FClasslikes%2F213940877" anchor-label="ServerboundStatusRequestPacketEvent" id="-1253178394%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-status-request-packet-event/index.html"><span>Serverbound</span><wbr><span>Status</span><wbr><span>Request</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1253178394%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-status-request-packet-event/index.html">ServerboundStatusRequestPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.status/ServerboundStatusRequestPacket///PointingToDeclaration/">ServerboundStatusRequestPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-packet-event/index.html">PacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.status/ServerboundStatusRequestPacket///PointingToDeclaration/">ServerboundStatusRequestPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="312578270%2FClasslikes%2F213940877" anchor-label="ServerboundTeleportToEntityPacketEvent" id="312578270%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-teleport-to-entity-packet-event/index.html"><span>Serverbound</span><wbr><span>Teleport</span><wbr><span>To</span><wbr><span>Entity</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="312578270%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-teleport-to-entity-packet-event/index.html">ServerboundTeleportToEntityPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundTeleportToEntityPacket///PointingToDeclaration/">ServerboundTeleportToEntityPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundTeleportToEntityPacket///PointingToDeclaration/">ServerboundTeleportToEntityPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1798119685%2FClasslikes%2F213940877" anchor-label="ServerboundTestInstanceBlockActionPacketEvent" id="1798119685%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-test-instance-block-action-packet-event/index.html"><span>Serverbound</span><wbr><span>Test</span><wbr><span>Instance</span><wbr><span>Block</span><wbr><span>Action</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1798119685%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-test-instance-block-action-packet-event/index.html">ServerboundTestInstanceBlockActionPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundTestInstanceBlockActionPacket///PointingToDeclaration/">ServerboundTestInstanceBlockActionPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundTestInstanceBlockActionPacket///PointingToDeclaration/">ServerboundTestInstanceBlockActionPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1778826910%2FClasslikes%2F213940877" anchor-label="ServerboundUseItemOnPacketEvent" id="-1778826910%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-use-item-on-packet-event/index.html"><span>Serverbound</span><wbr><span>Use</span><wbr><span>Item</span><wbr><span>On</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1778826910%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-use-item-on-packet-event/index.html">ServerboundUseItemOnPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundUseItemOnPacket///PointingToDeclaration/">ServerboundUseItemOnPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundUseItemOnPacket///PointingToDeclaration/">ServerboundUseItemOnPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-722793501%2FClasslikes%2F213940877" anchor-label="ServerboundUseItemPacketEvent" id="-722793501%2FClasslikes%2F213940877" data-filterable-set=":nova-network/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova-network/main" data-filterable-set=":nova-network/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serverbound-use-item-packet-event/index.html"><span>Serverbound</span><wbr><span>Use</span><wbr><span>Item</span><wbr><span>Packet</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-722793501%2FClasslikes%2F213940877"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova-network/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-serverbound-use-item-packet-event/index.html">ServerboundUseItemPacketEvent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">packet<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundUseItemPacket///PointingToDeclaration/">ServerboundUseItemPacket</span></span></span><span class="token punctuation">)</span> : <a href="../xyz.xenondevs.nova.network.event/-player-packet-event/index.html">PlayerPacketEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol.game/ServerboundUseItemPacket///PointingToDeclaration/">ServerboundUseItemPacket</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
