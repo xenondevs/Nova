@@ -15,7 +15,7 @@ xenondevs-commons = "1.38"
 
 [libraries]
 adventure-key = { group = "net.kyori", name = "adventure-key", version = "4.26.1" }
-awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.49.6" }
+awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.55.5" }
 bstats = { group = "xyz.xenondevs.bstats", name = "bstats-bukkit", version = "3.0.1" }
 bytebase = { group = "xyz.xenondevs.bytebase", name = "ByteBase", version.ref = "bytebase" }
 bytebase-runtime = { group = "xyz.xenondevs.bytebase", name = "ByteBase-Runtime", version.ref = "bytebase" }
