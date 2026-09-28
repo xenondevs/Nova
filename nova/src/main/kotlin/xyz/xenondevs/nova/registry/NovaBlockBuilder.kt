@@ -173,10 +173,16 @@ sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, Regist
     )
     
     /**
-     * Configures the sounds made by this block.
+     * Configures the sounds made by all states of this block.
      * Defaults to [SoundGroup.EMPTY].
      */
-    fun sounds(soundGroup: SoundGroup)
+    fun sounds(soundGroup: SoundGroup) = sounds { soundGroup }
+    
+    /**
+     * Configures the sounds made by each block state.
+     * Defaults to [SoundGroup.EMPTY].
+     */
+    fun sounds(selectSoundGroup: BlockSelectorScope.() -> SoundGroup)
     
     /**
      * Configures the instrument used by nearby note blocks.

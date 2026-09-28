@@ -21,6 +21,7 @@ import net.minecraft.world.level.ScheduledTickAccess
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.FireBlock
+import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.material.FluidState
@@ -77,6 +78,7 @@ import xyz.xenondevs.nova.util.toPropertyStringMap
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
+import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
@@ -246,6 +248,7 @@ internal open class NovaBlock(
     properties: Provider<Properties>,
     flammable: Provider<FlammableSettings>,
     selectFluidFlowMode: Provider<BlockSelectorScope.() -> FluidFlowMode>,
+    selectSoundGroup: Provider<BlockSelectorScope.() -> SoundGroup>,
     hitParticles: Provider<ItemType?>,
     breakParticles: Provider<BlockType?>,
     showBreakAnimation: Provider<Boolean>
@@ -270,6 +273,14 @@ internal open class NovaBlock(
                 if (mode.requiresWaterloggedState && !state.hasProperty(BlockStateProperties.WATERLOGGED))
                     FluidFlowMode.BLOCK
                 else mode
+            }
+        }
+    
+    private val soundTypes: Map<NmsBlockState, SoundType>
+        by selectSoundGroup.map { selector ->
+            stateDefinition.possibleStates.associateWithTo(IdentityHashMap()) { state ->
+                val proto = ProtoBlockState(entry, state.toPropertyStringMap())
+                BlockSelectorScope(proto).selector().nmsSoundType
             }
         }
     
@@ -349,6 +360,9 @@ internal open class NovaBlock(
         else super.getFluidState(state)
     }
     
+    override fun getSoundType(state: NmsBlockState): SoundType {
+        return soundTypes[state] ?: super.getSoundType(state)
+    }
     
     //<editor-fold desc="event methods">
     /**

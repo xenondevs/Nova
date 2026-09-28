@@ -33,6 +33,7 @@ import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.getOrNull
 import xyz.xenondevs.nova.util.toBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
+import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import java.lang.invoke.MethodHandles
@@ -58,6 +59,7 @@ internal class NovaTileEntityBlock(
     properties: Provider<Properties>,
     flammable: Provider<FlammableSettings>,
     selectFluidFlowMode: Provider<BlockSelectorScope.() -> FluidFlowMode>,
+    selectSoundGroup: Provider<BlockSelectorScope.() -> SoundGroup>,
     hitParticles: Provider<ItemType?>,
     breakParticles: Provider<BlockType?>,
     showBreakAnimation: Provider<Boolean>,
@@ -74,6 +76,7 @@ internal class NovaTileEntityBlock(
     properties,
     flammable,
     selectFluidFlowMode,
+    selectSoundGroup,
     hitParticles,
     breakParticles,
     showBreakAnimation

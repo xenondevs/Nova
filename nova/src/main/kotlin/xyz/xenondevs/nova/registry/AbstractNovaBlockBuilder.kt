@@ -75,7 +75,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected val _hitParticles = uninitializedProvider<RegistryEntry.Paper<ItemType>?>()
     protected val _breakParticles = uninitializedProvider<RegistryEntry.Paper<BlockType>?>()
     protected val _showBreakAnimation = uninitializedProvider<Boolean>()
-    protected val _soundGroup = uninitializedProvider<SoundGroup>()
+    protected val _selectSoundGroup = uninitializedProvider<BlockSelectorScope.() -> SoundGroup>()
     protected val _noteBlockInstrument = uninitializedProvider<NoteBlockInstrument>()
     protected val _pistonReaction = uninitializedProvider<PistonMoveReaction>()
     protected val _selectLightEmission = uninitializedProvider<BlockSelectorScope.() -> Int>()
@@ -115,14 +115,14 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     }
     
     protected val _properties = combinedProvider(
-        _hardness, _requiresToolForDrops, _pistonReaction, _selectLightEmission, _explosionResistance, _flammable, _mapColor, _soundGroup, _noteBlockInstrument
-    ) { hardness, requiresToolForDrops, pistonReaction, selectLightEmission, explosionResistance, flammable, mapColor, soundGroup, noteBlockInstrument ->
+        _hardness, _requiresToolForDrops, _pistonReaction, _selectLightEmission, _explosionResistance, _flammable, _mapColor, _selectSoundGroup, _noteBlockInstrument, _effectiveStateProperties
+    ) { hardness, requiresToolForDrops, pistonReaction, selectLightEmission, explosionResistance, flammable, mapColor, selectSoundGroup, noteBlockInstrument, stateProperties ->
         Properties.of()
             .setId(TypedKey.create(entry.registry, entry.key).toResourceKey())
             .pushReaction(pistonReaction.nmsPushReaction)
             .explosionResistance(explosionResistance)
             .mapColor(mapColor.toNmsMapColor())
-            .sound(soundGroup.nmsSoundType)
+            .sound(BlockSelectorScope(ProtoBlockState.createDefaultBlockState(entry, stateProperties)).selectSoundGroup().nmsSoundType)
             .instrument(noteBlockInstrument.nmsNoteBlockInstrument)
             .lightLevel { state ->
                 val proto = ProtoBlockState(
@@ -152,7 +152,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected var hitParticles: RegistryEntry.Paper<ItemType>? by _hitParticles
     protected var breakParticles: RegistryEntry.Paper<BlockType>? by _breakParticles
     protected var showBreakAnimation: Boolean by _showBreakAnimation
-    protected var soundGroup: SoundGroup by _soundGroup
+    protected var selectSoundGroup: BlockSelectorScope.() -> SoundGroup by _selectSoundGroup
     protected var noteBlockInstrument: NoteBlockInstrument by _noteBlockInstrument
     protected var pistonReaction: PistonMoveReaction by _pistonReaction
     protected var selectLightEmission: BlockSelectorScope.() -> Int by _selectLightEmission
@@ -176,7 +176,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         hitParticles = null
         breakParticles = null
         showBreakAnimation = true
-        soundGroup = SoundGroup.EMPTY
+        selectSoundGroup = { SoundGroup.EMPTY }
         noteBlockInstrument = NoteBlockInstrument.HARP
         pistonReaction = PistonMoveReaction.MOVE
         selectLightEmission = { 0 }
@@ -248,8 +248,8 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
         }
     }
     
-    override fun sounds(soundGroup: SoundGroup) {
-        this.soundGroup = soundGroup
+    override fun sounds(selectSoundGroup: BlockSelectorScope.() -> SoundGroup) {
+        this.selectSoundGroup = selectSoundGroup
     }
     
     override fun noteBlockInstrument(instrument: NoteBlockInstrument) {
