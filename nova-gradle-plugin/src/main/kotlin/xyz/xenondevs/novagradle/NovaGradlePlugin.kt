@@ -92,8 +92,8 @@ internal class NovaGradlePlugin : KotlinCompilerPluginSupportPlugin {
                     "-Dorigami.agent.loaded=true" // bypass agent check in NovaBootstrapper
                 )
                 jvmArgs.addAll(ext.novaDev.map { enabled ->
-                    if (enabled) listOf("-DNovaDev")
-                    else emptyList()
+                    if (enabled) ["-ea", "-DNovaDev"]
+                    else []
                 })
             }
         }
