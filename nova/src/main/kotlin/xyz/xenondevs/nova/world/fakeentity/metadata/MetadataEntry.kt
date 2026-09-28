@@ -1,11 +1,15 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.world.fakeentity.metadata
 
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.network.syncher.EntityDataSerializers
+import xyz.xenondevs.nova.world.fakeentity.FAKE_ENTITY_DEPRECATION
 import java.util.*
 import kotlin.reflect.KProperty
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 internal interface MetadataEntry<T> {
     
     var dirty: Boolean
@@ -16,6 +20,7 @@ internal interface MetadataEntry<T> {
     
 }
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 internal open class NonNullMetadataEntry<T : Any>(
     private val index: Int,
     private val serializer: EntityDataSerializer<T>,
@@ -47,6 +52,7 @@ internal open class NonNullMetadataEntry<T : Any>(
     
 }
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 internal class MappedNonNullMetadataEntry<T, R : Any>(
     private val index: Int,
     private val serializer: EntityDataSerializer<R>,
@@ -82,6 +88,7 @@ internal class MappedNonNullMetadataEntry<T, R : Any>(
     
 }
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 internal class NullableMetadataEntry<T>(
     private val index: Int,
     private val serializer: EntityDataSerializer<Optional<T & Any>>,
@@ -112,6 +119,7 @@ internal class NullableMetadataEntry<T>(
     
 }
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 internal class MappedNullableMetadataEntry<T, R>(
     private val index: Int,
     private val serializer: EntityDataSerializer<Optional<R & Any>>,
@@ -146,6 +154,7 @@ internal class MappedNullableMetadataEntry<T, R>(
     
 }
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 internal class SharedFlagsMetadataEntry(
     index: Int
 ) : NonNullMetadataEntry<Byte>(index, EntityDataSerializers.BYTE, 0.toByte()) {

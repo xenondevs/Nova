@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.command
 
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
-import xyz.xenondevs.nova.LIFECYCLE_MANAGER
+import xyz.xenondevs.nova.BOOTSTRAP_LIFECYCLE
 import xyz.xenondevs.nova.command.impl.NovaCommand
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
@@ -15,7 +15,7 @@ internal object CommandManager {
     @Suppress("UnstableApiUsage")
     @InitFun
     private fun registerCommands() {
-        LIFECYCLE_MANAGER.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
+        BOOTSTRAP_LIFECYCLE.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
             val commands = event.registrar()
             commands.register(NovaCommand.node)
             commands.register(NovaRecipeCommand.node)

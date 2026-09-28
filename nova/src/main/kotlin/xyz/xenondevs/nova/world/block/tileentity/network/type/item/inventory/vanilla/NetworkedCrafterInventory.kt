@@ -8,17 +8,21 @@ import org.bukkit.inventory.ItemStack as BukkitStack
 internal class NetworkedCrafterInventory(
     private val entity: CrafterBlockEntity,
     container: ItemStackContainer
-) : NetworkedNMSInventory(container) {
+) : NetworkedNMSInventory(container, entity) {
     
-    override fun add(itemStack: BukkitStack, amount: Int): Int =
-        add(itemStack.unwrap(), amount)
+    override fun add(itemStack: BukkitStack, amount: Int): Int {
+        val remaining = add(itemStack.unwrap(), amount)
+        if (remaining < amount)
+            markChanged()
+        return remaining
+    }
     
     private fun add(itemStack: MojangStack, amount: Int): Int {
         val maxStackSize = itemStack.maxStackSize
         var remaining = amount
         outer@ while (remaining > 0) {
             var bestPartial: MojangStack? = null
-            for ((slot, slotStack) in container.withIndex()) {
+            for ([slot, slotStack] in container.withIndex()) {
                 if (entity.isSlotDisabled(slot))
                     continue
                 

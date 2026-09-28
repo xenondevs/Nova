@@ -25,6 +25,8 @@ import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBossEventPacketEvent
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.unregisterPacketListener
+import xyz.xenondevs.nova.network.send
+import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.ui.overlay.MovedFonts
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarOrigin
@@ -36,7 +38,6 @@ import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.unregisterEvents
 import java.util.*
 import kotlin.math.max
@@ -77,7 +78,7 @@ object BossBarOverlayManager : Listener, PacketListener {
             
             if (!ENABLED) {
                 // re-add tracked boss bars as real boss bars
-                trackedBars.forEach { (player, bars) ->
+                trackedBars.forEach { [player, bars] ->
                     bars.values.forEach { bar -> player.send(bar.addPacket) }
                 }
                 
@@ -118,7 +119,7 @@ object BossBarOverlayManager : Listener, PacketListener {
     }
     
     private fun handleTick() {
-        overlays.forEach { (uuid, overlays) ->
+        overlays.forEach { [uuid, overlays] ->
             if (uuid in changes || overlays.any { it.hasChanged }) {
                 if (remakeBars(uuid)) changes -= uuid
             }
@@ -160,19 +161,27 @@ object BossBarOverlayManager : Listener, PacketListener {
                 return@forEachIndexed
             
             val builder = Component.text()
-            barLevelOverlays.forEach { (overlay, offset) ->
+            barLevelOverlays.forEach { [overlay, offset] ->
+                val component = MovedFonts.moveVertically(overlay.component, offset, true)
                 
                 val centerX = overlay.centerX
+                val leftX = overlay.leftX
                 var width = overlay.getWidth(player.locale)
-                if (centerX != null) {
-                    val preMove = centerX - width / 2
+                if (centerX != null || leftX != null) {
+                    val xRange = CharSizes.calculateComponentSize(component, player.locale, true).xRange
+                    val preMove = if (centerX != null) {
+                        val visualCenter = (xRange.start + xRange.endInclusive) / 2
+                        centerX - visualCenter
+                    } else {
+                        leftX!! - xRange.start
+                    }
                     builder.move(preMove)
                     
                     width += preMove
                 }
                 
                 builder
-                    .append(MovedFonts.moveVertically(overlay.component, offset, true))
+                    .append(component)
                     .move(-width)
             }
             
@@ -266,7 +275,7 @@ object BossBarOverlayManager : Listener, PacketListener {
         val player = event.player
         
         // remove tracked bars and associated fake bar overlays
-        trackedBars.remove(player)?.forEach { (_, bar) ->
+        trackedBars.remove(player)?.forEach { [_, bar] ->
             val compound = vanillaBarOverlays.remove(bar)
             if (compound != null)
                 unregisterOverlay(player, compound)

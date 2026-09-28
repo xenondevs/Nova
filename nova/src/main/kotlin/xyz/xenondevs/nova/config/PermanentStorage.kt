@@ -4,64 +4,23 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import net.kyori.adventure.key.Key
-import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.commons.version.Version
-import xyz.xenondevs.nova.PREVIOUS_NOVA_VERSION
-import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.serialization.json.GSON
-import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.UUIDSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.VersionSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.NOVA_SERIALIZERS_MODULE
 import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.data.writeJson
-import xyz.xenondevs.nova.world.ChunkPos
 import java.nio.file.Path
-import java.util.*
 import kotlin.io.path.Path
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
-
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
-internal object PermanentStorageMigrations {
-    
-    @InitFun
-    private fun migrate() {
-        if (PREVIOUS_NOVA_VERSION == null || PREVIOUS_NOVA_VERSION >= Version("0.19-alpha.3"))
-            return
-        
-        // migrations for structured map keys from [[key, value], [key, value]] to [key, value, key, value]
-        
-        val blockChunkCounter = PermanentStorage.getPath("block_chunk_counter")
-        if (blockChunkCounter.exists()) {
-            val map = GSON.fromJson<HashMap<UUID, HashMap<ChunkPos, HashMap<Key, Int>>>>(blockChunkCounter)
-            blockChunkCounter.writeJson(map, PermanentStorage.JSON)
-        }
-        
-        val forceLoadedChunks = PermanentStorage.getPath("forceLoadedChunks")
-        if (forceLoadedChunks.exists()) {
-            val map = GSON.fromJson<HashMap<ChunkPos, HashSet<UUID>>>(forceLoadedChunks)
-            forceLoadedChunks.writeJson(map, PermanentStorage.JSON)
-        }
-    }
-    
-}
+import kotlin.reflect.KType
 
 internal object PermanentStorage {
     
     val JSON = Json {
         allowStructuredMapKeys = true
-        serializersModule = SerializersModule {
-            contextual(UUID::class, UUIDSerializer)
-            contextual(Key::class, KeySerializer)
-            contextual(Version::class, VersionSerializer)
-        }
+        serializersModule = NOVA_SERIALIZERS_MODULE
     }
     
     private val dir = Path("plugins/Nova/.internal_data/storage/")
@@ -77,6 +36,14 @@ internal object PermanentStorage {
     
     fun <T> retrieve(key: String, deserializer: DeserializationStrategy<T>): T? =
         getPath(key).takeIf { it.exists() }?.readJson(deserializer, JSON)
+    
+    @Suppress("UNCHECKED_CAST")
+    fun <T> store(key: String, type: KType, data: T): Unit =
+        store(key, JSON.serializersModule.contextualSerializer(type) as KSerializer<T>, data)
+    
+    @Suppress("UNCHECKED_CAST")
+    fun <T> retrieve(key: String, type: KType): T? =
+        retrieve(key, JSON.serializersModule.contextualSerializer(type) as KSerializer<T>)
     
     inline fun <reified T> store(key: String, data: T): Unit =
         getPath(key).also { it.createParentDirectories() }.writeJson(data, JSON)

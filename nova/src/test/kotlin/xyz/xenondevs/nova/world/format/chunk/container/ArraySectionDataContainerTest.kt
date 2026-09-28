@@ -23,7 +23,7 @@ class ArraySectionDataContainerTest : AbstractSectionDataContainerTest() {
         palette.putValue("b")
         palette.putValue("c")
         
-        val binIn = byteWriter { 
+        val binIn = byteWriter {
             Palette.write(palette, this)
             
             val arr = CompactIntArray.create(4096, 2)
@@ -76,7 +76,7 @@ class ArraySectionDataContainerTest : AbstractSectionDataContainerTest() {
         paletteOutExpected.putValue("b")
         paletteOutExpected.putValue("c")
         paletteOutExpected.putValue("d")
-        val binOutExpected = byteWriter { 
+        val binOutExpected = byteWriter {
             Palette.write(paletteOutExpected, this)
             
             val arr = CompactIntArray.create(4096, 4)
@@ -85,7 +85,7 @@ class ArraySectionDataContainerTest : AbstractSectionDataContainerTest() {
             arr[2] = paletteOutExpected.getId("c")
             arr[3] = paletteOutExpected.getId("d")
             arr.write(this)
-
+            
             writeVarInt(4) // non-empty block count
         }
         

@@ -1,134 +1,163 @@
 package xyz.xenondevs.nova.world.block.tileentity.vanilla
 
-import net.minecraft.core.Direction
+import net.minecraft.core.SectionPos
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.ChestBlock
 import net.minecraft.world.level.block.entity.ChestBlockEntity
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.ChestType
-import org.bukkit.block.BlockFace
-import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.concurrent.checkServerThread
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
-import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.DefaultItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.DynamicVanillaItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.DoubleChestItemStackContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.NetworkedNMSInventory
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.SimpleItemStackContainer
-import xyz.xenondevs.nova.world.format.WorldDataManager
-import java.util.*
+import xyz.xenondevs.nova.world.chunkPos
 
 internal class VanillaChestTileEntity internal constructor(
-    type: Type,
-    pos: BlockPos,
-    data: Compound
-) : ItemStorageVanillaTileEntity(type, pos, data) {
+    private val chestEntity: ChestBlockEntity
+) : ItemStorageVanillaTileEntity(chestEntity) {
     
-    private lateinit var inventories: EnumMap<BlockFace, NetworkedInventory>
-    private lateinit var allowedConnectionTypes: HashMap<NetworkedInventory, NetworkConnectionType>
-    override lateinit var itemHolder: ItemHolder
+    @Volatile
+    private var inventoryLayout = InventoryLayout(singleInventory())
     
-    private var chestType: ChestType = ChestType.SINGLE
+    @Volatile
     private var linkedChest: VanillaChestTileEntity? = null
     
-    override fun handleEnable() {
-        linkedChest = getLinkedChest()?.also(linkedNodes::add)
-        setInventory(createNetworkedInventory())
-        
-        itemHolder = DynamicVanillaItemHolder(
-            storedValue("itemHolder", ::Compound),
-            { inventories },
-            { allowedConnectionTypes }
-        )
-        
-        super.handleEnable()
+    private var chestType = ChestType.SINGLE
+    
+    @Volatile
+    private var linkedNodeSet: Set<NetworkNode> = emptySet()
+    
+    override val linkedNodes: Set<NetworkNode>
+        get() = linkedNodeSet
+    
+    override val itemHolder: ItemHolder = DynamicVanillaItemHolder(
+        chestEntity,
+        { inventoryLayout.inventories },
+        { inventoryLayout.allowedConnectionTypes }
+    )
+    
+    override fun handleCreated() {
+        refreshLink()
     }
     
-    override fun handlePlace() {
-        linkedChest?.handleChestLink(this, chestType.opposite)
-        super.handlePlace()
-    }
-    
-    override fun handleBreak() {
-        super.handleBreak()
-        linkedChest?.handleChestLink(null, ChestType.SINGLE)
-    }
-    
-    private fun handleChestLink(newLink: VanillaChestTileEntity?, newType: ChestType) {
-        linkedChest = newLink
-        chestType = newType
-        
-        linkedNodes.clear()
-        if (newLink != null)
-            linkedNodes += newLink
-        
-        val inventory = createNetworkedInventory()
-        
-        NetworkManager.queueWrite(pos.chunkPos) { state ->
-            setInventory(inventory)
-            state.forEachNetwork(this) { _, _, network -> network.markDirty() }
+    internal fun refreshLink() {
+        if (chestEntity.isRemoved) {
+            handleRemoved()
+            return
         }
+        
+        val chestType = chestEntity.blockState.getValue(BlockStateProperties.CHEST_TYPE)
+        val linkedEntity = findLinkedChestEntity(chestType)
+        val linked = linkedEntity?.let(VanillaTileEntity::of) as? VanillaChestTileEntity
+        val previous = linkedChest
+        
+        setLink(linked, chestType)
+        
+        if (previous !== linked && previous?.linkedChest === this) {
+            previous.setLink(null, ChestType.SINGLE)
+        }
+        
+        linked?.setLink(this, chestType.opposite)
     }
     
-    private fun getLinkedChest(): VanillaChestTileEntity? {
-        checkServerThread()
+    internal fun handleRemoved() {
+        val linked = linkedChest
+        setLink(null, ChestType.SINGLE)
         
-        val blockState = pos.nmsBlockState
-        val chestType = blockState.getValue(BlockStateProperties.CHEST_TYPE)
+        if (linked?.linkedChest === this)
+            linked.setLink(null, ChestType.SINGLE)
+    }
+    
+    private fun setLink(linked: VanillaChestTileEntity?, chestType: ChestType) {
+        if (linkedChest === linked && this.chestType == chestType)
+            return
+        
+        linkedChest = linked
         this.chestType = chestType
-        if (chestType == ChestType.SINGLE)
-            return null
+        linkedNodeSet = linked?.let(::setOf) ?: emptySet()
         
-        val facing = blockState.getValue(BlockStateProperties.HORIZONTAL_FACING)
-        val linkedPos = when {
-            chestType == ChestType.LEFT && facing == Direction.NORTH -> pos.add(1, 0, 0)
-            chestType == ChestType.LEFT && facing == Direction.EAST -> pos.add(0, 0, 1)
-            chestType == ChestType.LEFT && facing == Direction.SOUTH -> pos.add(-1, 0, 0)
-            chestType == ChestType.LEFT && facing == Direction.WEST -> pos.add(0, 0, -1)
-            chestType == ChestType.RIGHT && facing == Direction.NORTH -> pos.add(-1, 0, 0)
-            chestType == ChestType.RIGHT && facing == Direction.EAST -> pos.add(0, 0, -1)
-            chestType == ChestType.RIGHT && facing == Direction.SOUTH -> pos.add(1, 0, 0)
-            chestType == ChestType.RIGHT && facing == Direction.WEST -> pos.add(0, 0, 1)
-            else -> throw IllegalArgumentException("Invalid chest type $chestType and facing $facing")
+        val inventory = createNetworkedInventory(linked, chestType)
+        inventoryLayout = InventoryLayout(CubeFaceMap(inventory))
+        
+        NetworkManager.queue(block.chunkPos) { state ->
+            if (this !in state)
+                return@queue false
+            
+            state.forEachNetwork(this) { _, _, network ->
+                network.markDirty()
+                network.cluster?.invalidate()
+            }
+            true
         }
-        
-        return WorldDataManager.getVanillaTileEntityOrNullIfUnloaded(linkedPos) as? VanillaChestTileEntity
     }
     
-    private fun createNetworkedInventory(): NetworkedInventory {
-        checkServerThread()
-        
-        val chest = pos.nmsBlockEntity as ChestBlockEntity
-        val linkedChest = linkedChest
-        val chestType = chestType
-        if (chestType == ChestType.SINGLE || linkedChest == null)
-            return NetworkedNMSInventory(SimpleItemStackContainer(chest.contents))
+    private fun createNetworkedInventory(linked: VanillaChestTileEntity?, chestType: ChestType): NetworkedInventory {
+        if (linked == null || chestType == ChestType.SINGLE)
+            return NetworkedNMSInventory(SimpleItemStackContainer(chestEntity.contents), chestEntity)
         
         val left: MutableList<ItemStack>
         val right: MutableList<ItemStack>
-        when (chestType) {
-            ChestType.LEFT -> {
-                left = chest.contents
-                right = (linkedChest.pos.nmsBlockEntity as ChestBlockEntity).contents
-            }
-            
-            ChestType.RIGHT -> {
-                left = (linkedChest.pos.nmsBlockEntity as ChestBlockEntity).contents
-                right = chest.contents
-            }
+        if (chestType == ChestType.LEFT) {
+            left = chestEntity.contents
+            right = linked.chestEntity.contents
+        } else {
+            left = linked.chestEntity.contents
+            right = chestEntity.contents
         }
         
-        return NetworkedNMSInventory(DoubleChestItemStackContainer(left, right))
+        return NetworkedNMSInventory(DoubleChestItemStackContainer(left, right), chestEntity, linked.chestEntity)
     }
     
-    private fun setInventory(inventory: NetworkedInventory) {
-        inventories = CUBE_FACES.associateWithTo(enumMap()) { inventory }
-        allowedConnectionTypes = inventories.entries.associateTo(HashMap()) { (_, inv) -> inv to NetworkConnectionType.BUFFER }
+    private fun singleInventory(): CubeFaceMap<NetworkedInventory> =
+        CubeFaceMap(NetworkedNMSInventory(SimpleItemStackContainer(chestEntity.contents), chestEntity))
+    
+    private fun findLinkedChestEntity(chestType: ChestType): ChestBlockEntity? {
+        if (chestType == ChestType.SINGLE)
+            return null
+        
+        val level = chestEntity.level as? ServerLevel
+            ?: return null
+        val facing = chestEntity.blockState.getValue(BlockStateProperties.HORIZONTAL_FACING)
+        val linkedPos = chestEntity.blockPos.relative(ChestBlock.getConnectedDirection(chestEntity.blockState))
+        val linkedChunk = level.getChunkIfLoaded(
+            SectionPos.blockToSectionCoord(linkedPos.x),
+            SectionPos.blockToSectionCoord(linkedPos.z)
+        ) ?: return null
+        val linked = linkedChunk.getBlockEntity(linkedPos) as? ChestBlockEntity
+            ?: return null
+        if (linked.isRemoved || linked.type != chestEntity.type)
+            return null
+        
+        val linkedState = linked.blockState
+        if (
+            linkedState.block !is ChestBlock ||
+            linkedState.getValue(BlockStateProperties.CHEST_TYPE) != chestType.opposite ||
+            linkedState.getValue(BlockStateProperties.HORIZONTAL_FACING) != facing
+        ) return null
+        
+        return linked
+    }
+    
+    companion object {
+        
+        fun isLinkStateChanged(oldState: BlockState, newState: BlockState): Boolean {
+            return oldState.getValue(BlockStateProperties.CHEST_TYPE) != newState.getValue(BlockStateProperties.CHEST_TYPE) ||
+                oldState.getValue(BlockStateProperties.HORIZONTAL_FACING) != newState.getValue(BlockStateProperties.HORIZONTAL_FACING)
+        }
+        
+    }
+    
+    private class InventoryLayout(val inventories: CubeFaceMap<NetworkedInventory>) {
+        val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType> =
+            inventories.values.associateWith { NetworkConnectionType.BUFFER }
     }
     
 }

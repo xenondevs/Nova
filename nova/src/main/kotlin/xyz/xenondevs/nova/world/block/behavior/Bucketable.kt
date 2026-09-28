@@ -1,27 +1,28 @@
 package xyz.xenondevs.nova.world.block.behavior
 
 import org.bukkit.GameMode
-import org.bukkit.Material
 import org.bukkit.Sound
+import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.util.addToInventoryOrDrop
 import xyz.xenondevs.nova.util.addToInventoryPrioritizedOrDrop
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.util.playSound
 import xyz.xenondevs.nova.world.InteractionResult
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.NovaBlockState
+import xyz.xenondevs.nova.world.block.novaTileEntity
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
-import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.item.itemType
 
 /**
  * Allows filling and emptying fluid containers of [TileEntities][TileEntity]
@@ -29,20 +30,20 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
  */
 object Bucketable : BlockBehavior {
     
-    override fun useItemOn(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult {
+    override fun useItemOn(block: Block, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult {
         val player = ctx[BlockInteract.SOURCE_PLAYER]
             ?: return InteractionResult.Pass
         val hand = ctx[BlockInteract.HELD_HAND]
             ?: return InteractionResult.Pass
         val item = player.inventory.getItem(hand).takeUnlessEmpty()
             ?: return InteractionResult.Pass
-        val tileEntity = WorldDataManager.getTileEntity(pos) as? NetworkEndPoint
+        val tileEntity = block.novaTileEntity as? NetworkEndPoint
             ?: return InteractionResult.Pass
         val fluidHolder = tileEntity.holders.firstInstanceOfOrNull<FluidHolder>()
             ?: return InteractionResult.Pass
         val clickedFace = ctx[BlockInteract.CLICKED_BLOCK_FACE]
         
-        if (item.type == Material.BUCKET) {
+        if (item.itemType == ItemType.BUCKET) {
             // move fluid from tile-entity to bucket
             val container = selectContainerExtract(fluidHolder, clickedFace)
                 ?: return InteractionResult.Pass
@@ -50,13 +51,13 @@ object Bucketable : BlockBehavior {
             container.takeFluid(1000)
             if (player.gameMode != GameMode.CREATIVE)
                 fillBucketInHand(player, hand, fluidType)
-            val sound = when (container.type) {
+            val sound = when (fluidType) {
                 FluidType.LAVA -> Sound.ITEM_BUCKET_FILL_LAVA
                 else -> Sound.ITEM_BUCKET_FILL
             }
-            pos.playSound(sound, 1f, 1f)
+            block.playSound(sound, 1f, 1f)
         } else {
-            val fluidType = FluidType.entries.firstOrNull { it.bucket.type == item.type }
+            val fluidType = FluidType.entries.firstOrNull { it.bucket.itemType == item.itemType }
                 ?: return InteractionResult.Pass
             
             // move fluid from bucket to tile-entity
@@ -69,7 +70,7 @@ object Bucketable : BlockBehavior {
                 FluidType.LAVA -> Sound.ITEM_BUCKET_EMPTY_LAVA
                 else -> Sound.ITEM_BUCKET_EMPTY
             }
-            pos.playSound(sound, 1f, 1f)
+            block.playSound(sound, 1f, 1f)
         }
         
         return InteractionResult.Success(swing = true)
@@ -114,7 +115,7 @@ object Bucketable : BlockBehavior {
     }
     
     private fun selectContainerInsert(fluidHolder: FluidHolder, fluidType: FluidType): NetworkedFluidContainer? {
-        for ((container, conType) in fluidHolder.containers.entries) {
+        for ([container, conType] in fluidHolder.containers.entries) {
             if (!conType.insert)
                 continue
             if (!container.accepts(fluidType, 1000))
@@ -127,7 +128,7 @@ object Bucketable : BlockBehavior {
     }
     
     private fun selectContainerExtract(fluidHolder: FluidHolder): NetworkedFluidContainer? {
-        for ((container, conType) in fluidHolder.containers.entries) {
+        for ([container, conType] in fluidHolder.containers.entries) {
             if (!conType.extract)
                 continue
             if (container.type == null || container.amount < 1000)
@@ -141,7 +142,7 @@ object Bucketable : BlockBehavior {
     
     internal fun emptyBucketInHand(player: Player, hand: EquipmentSlot) {
         val itemStack = player.inventory.getItem(hand)
-        val bucket = ItemStack(Material.BUCKET)
+        val bucket = ItemType.BUCKET.createItemStack()
         if (itemStack.amount > 1) {
             itemStack.amount--
             player.addToInventoryOrDrop(bucket)

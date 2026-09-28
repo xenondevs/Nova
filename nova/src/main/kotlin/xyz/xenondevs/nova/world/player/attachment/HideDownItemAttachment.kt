@@ -16,20 +16,16 @@ class HideDownItemAttachment(
     scale: Vector3fc = Vector3f(1f, 1f, 1f),
 ) : ItemAttachment(player, itemStack, translation, scale) {
     
-    private var hidden = false
-    
     override fun handleTick() {
         super.handleTick()
         
         val pitch = player.location.pitch
-        if (pitch >= pitchThreshold && !hidden) {
+        if (pitch >= pitchThreshold && passenger.viewerBlacklist.isEmpty()) {
             // hide display entity for attachment carrier
-            passenger.despawn(player)
-            hidden = true
-        } else if (hidden && pitch < pitchThreshold) {
+            passenger.viewerBlacklist = setOf(player.uniqueId)
+        } else if (passenger.viewerBlacklist.isNotEmpty() && pitch < pitchThreshold) {
             // show display entity again
-            passenger.spawn(player)
-            hidden = false
+            passenger.viewerBlacklist = emptySet()
         }
     }
     

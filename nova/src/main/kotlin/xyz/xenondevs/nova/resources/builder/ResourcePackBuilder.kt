@@ -18,7 +18,6 @@ import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_JAR
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.entry
@@ -27,7 +26,6 @@ import xyz.xenondevs.nova.resources.ResourcePackManager
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourceFilter.Type
-import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder.Companion.configure
 import xyz.xenondevs.nova.resources.builder.task.AtlasTask
 import xyz.xenondevs.nova.resources.builder.task.BlockModelTask
 import xyz.xenondevs.nova.resources.builder.task.BlockStateContent
@@ -48,12 +46,15 @@ import xyz.xenondevs.nova.resources.builder.task.NoHandAnimationTask
 import xyz.xenondevs.nova.resources.builder.task.PackBuildData
 import xyz.xenondevs.nova.resources.builder.task.PackMcMetaTask
 import xyz.xenondevs.nova.resources.builder.task.PackTask
-import xyz.xenondevs.nova.resources.builder.task.SoundOverridesTask
+import xyz.xenondevs.nova.resources.builder.task.SoundOverridesContent
 import xyz.xenondevs.nova.resources.builder.task.TextureContent
 import xyz.xenondevs.nova.resources.builder.task.TextureIconContent
-import xyz.xenondevs.nova.resources.builder.task.TooltipStyleContent
+import xyz.xenondevs.nova.resources.builder.task.TooltipStyleTask
+import xyz.xenondevs.nova.resources.builder.task.VanillaBlockModelOverrideTask
+import xyz.xenondevs.nova.resources.builder.task.WailaOverlayTextureTask
 import xyz.xenondevs.nova.resources.builder.task.WailaTask
 import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.data.writeImage
@@ -66,6 +67,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 import kotlin.time.measureTime
 
 private val EXTRACTION_MODE by MAIN_CONFIG.entry<String>("resource_pack", "generation", "minecraft_assets_source").map {
@@ -77,6 +79,8 @@ private val EXTRACTION_MODE by MAIN_CONFIG.entry<String>("resource_pack", "gener
 }
 
 private val SKIP_PACK_TASKS: Set<String> by MAIN_CONFIG.entry<HashSet<String>>("debug", "skip_pack_tasks")
+private val ASSET_PACK_OVERRIDES: Map<String, Path> by MAIN_CONFIG.entry<Map<String, String>>("debug", "asset_pack_overrides")
+    .map { it.mapValues { [_, path] -> Path.of(path) } }
 
 /**
  * Builds a resource pack based on a [ResourcePackConfiguration].
@@ -114,13 +118,11 @@ class ResourcePackBuilder internal constructor(
         internal val MCASSETS_DIR: Path = DATA_FOLDER.resolve("resource_pack/.mcassets")
         private val MCASSETS_DOWNLOAD_MUTEX = Mutex()
         
-        private val _configurations = ConcurrentHashMap<Key, ResourcePackConfiguration>()
-        
         /**
          * The registered [ResourcePackConfigurations][ResourcePackConfiguration] by their [id][Key].
          */
         val configurations: Map<Key, ResourcePackConfiguration>
-            get() = _configurations
+            field: MutableMap<Key, ResourcePackConfiguration> = ConcurrentHashMap()
         
         init {
             register(CORE_PACK_ID) {
@@ -153,19 +155,23 @@ class ResourcePackBuilder internal constructor(
                 registerTask(LanguageContent::LoadAll)
                 registerTask(LanguageContent::Write)
                 
+                registerBuildData(::SoundOverridesContent)
+                registerTask(SoundOverridesContent::Write)
+                
                 registerTask(::AtlasTask)
                 registerTask(::BossBarOverlayTask)
                 registerTask(::GuiTextureTask)
                 registerTask(::MoveCharactersTask)
+                registerTask(::WailaOverlayTextureTask)
                 registerTask(::WailaTask)
                 registerTask(::BlockModelTask)
+                registerTask(::VanillaBlockModelOverrideTask)
                 registerTask(::EntityVariantTask)
                 registerTask(::EquipmentTask)
                 registerTask(::ExtractTask)
                 registerBuildData(::TextureContent)
-                registerTask(::TooltipStyleContent)
+                registerTask(::TooltipStyleTask)
                 registerTask(::CharSizeCalculator)
-                registerTask(::SoundOverridesTask)
                 registerTask(::PackMcMetaTask)
                 registerTask(::NoHandAnimationTask)
                 
@@ -188,6 +194,8 @@ class ResourcePackBuilder internal constructor(
                         )
                     } else emptyList()
                 })
+                
+                registerPostBuildHook { ResourceLookups.storeAll() }
             }
         }
         
@@ -196,8 +204,8 @@ class ResourcePackBuilder internal constructor(
          * @throws IllegalArgumentException If [id] is already in use.
          */
         fun register(id: Key, configure: ResourcePackConfiguration.() -> Unit) {
-            require(id !in configurations) { "Id $id is already in use" }
-            _configurations[id] = ResourcePackConfiguration(id).apply(configure)
+            require(id !in configurations) { "Id ${id.asString()} is already in use" }
+            configurations[id] = ResourcePackConfiguration(id).apply(configure)
         }
         
         /**
@@ -206,7 +214,7 @@ class ResourcePackBuilder internal constructor(
          */
         fun configure(id: Key, configure: ResourcePackConfiguration.() -> Unit) {
             val configuration = configurations[id]
-            requireNotNull(configuration) { "No ResourcePackBuilderFactory registered for id $id" }
+            requireNotNull(configuration) { "No ResourcePackBuilderFactory registered for id ${id.asString()}" }
             configuration.configure()
         }
         
@@ -216,7 +224,7 @@ class ResourcePackBuilder internal constructor(
          */
         internal fun createBuilder(id: Key, extraListener: Audience? = null): ResourcePackBuilder {
             val configuration = configurations[id]
-            requireNotNull(configuration) { "No ResourcePackBuilderFactory registered for id $id" }
+            requireNotNull(configuration) { "No ResourcePackBuilderFactory registered for id ${id.asString()}" }
             return configuration.create(extraListener)
         }
         
@@ -230,12 +238,15 @@ class ResourcePackBuilder internal constructor(
          * @throws IllegalArgumentException If there is no [ResourcePackConfiguration] registered for [id].
          */
         suspend fun build(id: Key, sendToPlayers: Boolean = true, extraListener: Audience? = null) {
-            val bin = createBuilder(id, extraListener).build()
+            val builder = createBuilder(id, extraListener)
+            val bin = builder.build()
             AutoUploadManager.uploadPack(id, bin)
             AutoCopier.copyToDestinations(id, bin)
             
             if (sendToPlayers)
                 ResourcePackManager.handlePackUpdated(id)
+            
+            builder.postBuildHooks.forEach { it() }
         }
         
         private suspend fun downloadMcAssets(): Unit = MCASSETS_DOWNLOAD_MUTEX.withLock {
@@ -273,9 +284,10 @@ class ResourcePackBuilder internal constructor(
     internal lateinit var zipper: PackZipper
     internal lateinit var postProcessors: List<PackPostProcessor>
     internal lateinit var resourceFilters: Map<ResourceFilter.Stage, List<ResourceFilter>>
+    internal lateinit var postBuildHooks: List<() -> Unit>
     
     private val taskTimes = HashMap<PackTask, Duration>()
-    private var totalTime: Duration = Duration.ZERO // fixme: total duration ends up being less than task sum durations, why?
+    private var totalTime: Duration = Duration.ZERO
     
     /**
      * The [AssetPacks][AssetPack] of all addons.
@@ -283,7 +295,7 @@ class ResourcePackBuilder internal constructor(
     lateinit var assetPacks: List<AssetPack> private set
     
     internal suspend fun build(): ByteArray {
-        logger.info("Building resource pack $id")
+        logger.info("Building resource pack ${id.asString()}")
         buildPackPreWorld()
         return buildPackPostWorld()
     }
@@ -306,37 +318,41 @@ class ResourcePackBuilder internal constructor(
     
     internal suspend fun buildPackPostWorld(): ByteArray {
         check(fs.isOpen) { "FileSystem is closed" }
-        try {
+        fs.use {
+            var bin: ByteArray
             totalTime += measureTime {
                 tasks[BuildStage.POST_WORLD]?.forEach { runTaskTimed(it) }
                 logger.info("Packing zip...")
-                var bin = zipper.createZip()
+                bin = zipper.createZip()
                 if (postProcessors.isNotEmpty()) {
                     logger.info("Running ${postProcessors.size} post-processor(s)...")
                     bin = postProcessors.fold(bin) { b, p -> p.process(b) }
                 }
-                logTaskTimes()
-                return bin
             }
-        } finally {
-            fs.close()
+            logTaskTimes()
+            return bin
         }
     }
     
     @Suppress("RemoveExplicitTypeArguments")
     private fun loadAssetPacks(): List<AssetPack> {
         return buildList<Triple<String, Path, String>> {
-            this += AddonBootstrapper.addons.map { addon -> Triple(addon.id, addon.file, "assets/") }
+            this += AddonBootstrapper.addons.map { addon -> Triple(addon.namespace(), addon.file, "assets/") }
             this += Triple("nova", NOVA_JAR, "assets/nova/")
-        }.map { (namespace, file, assetsPath) ->
-            val zip = FileSystems.newFileSystem(file)
-            AssetPack(namespace, zip.getPath(assetsPath))
+        }.map { [namespace, file, assetsPath] ->
+            val override = ASSET_PACK_OVERRIDES[namespace]
+            if (override != null) {
+                AssetPack(namespace, override)
+            } else {
+                val zip = FileSystems.newFileSystem(file)
+                AssetPack(namespace, zip.getPath(assetsPath))
+            }
         }
     }
     
     private fun logTaskOrder() {
         logger.info("Tasks (${tasks.values.sumOf(List<*>::size)}):")
-        for ((stage, tasks) in tasks) {
+        for ([stage, tasks] in tasks) {
             logger.info("  $stage (${tasks.size}):")
             for (task in tasks) {
                 val skipped = task.toString() in SKIP_PACK_TASKS
@@ -350,11 +366,11 @@ class ResourcePackBuilder internal constructor(
     }
     
     private fun logTaskTimes() {
-        logger.info("Resource pack built in ${totalTime}:")
+        logger.info("Resource pack built in ${totalTime.toString(SECONDS, 1)}:")
         taskTimes.entries.asSequence()
             .sortedByDescending { it.value }
             .take(5)
-            .forEach { (task, time) -> logger.info("  ${task::class.simpleNestedName}: $time") }
+            .forEach { [task, time] -> logger.info("  ${task::class.simpleNestedName}: ${time.toString(SECONDS, 1)}") }
     }
     
     /**

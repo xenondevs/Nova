@@ -1,10 +1,30 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.node
 
 import org.bukkit.OfflinePlayer
-import xyz.xenondevs.nova.world.BlockPos
+import org.bukkit.block.Block
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.format.NetworkState
+import java.util.concurrent.CancellationException
+
+internal suspend fun NetworkNode.safelyHandleNetworkLoaded(state: NetworkState) {
+    try {
+        handleNetworkLoaded(state)
+    } catch(t: Throwable) {
+        if (t is CancellationException) throw t
+        LOGGER.error("An exception occurred during handleNetworkLoaded for $this", t)
+    }
+}
+
+internal suspend fun NetworkNode.safelyHandleNetworkUpdate(state: NetworkState) {
+    try {
+        handleNetworkUpdate(state)
+    } catch(t: Throwable) {
+        if (t is CancellationException) throw t
+        LOGGER.error("An exception occurred during handleNetworkUpdate for $this", t)
+    }
+}
 
 /**
  * A node in a [Network].
@@ -15,9 +35,9 @@ import xyz.xenondevs.nova.world.format.NetworkState
 sealed interface NetworkNode {
     
     /**
-     * The [BlockPos] of this [NetworkNode]
+     * The [Block] of this [NetworkNode]
      */
-    val pos: BlockPos
+    val block: Block
     
     /**
      * The owner of this [NetworkNode] or null if it doesn't have one.
@@ -48,6 +68,8 @@ sealed interface NetworkNode {
      * Note that a node may never receive an update when it is unloaded at that time,
      * so you shouldn't rely on this method for important updates, it is rather
      * intended to update the visual state and similar non-critical things.
+     * 
+     * Called on the network configurator thread (off-main).
      */
     suspend fun handleNetworkUpdate(state: NetworkState) = Unit
     
@@ -57,6 +79,8 @@ sealed interface NetworkNode {
      * Note that this function is only called when a [NetworkNode] is loaded,
      * not when the node was added using [NetworkManager.queueAddEndPoint] or
      * [NetworkManager.queueAddBridge].
+     * 
+     * Called on the network configurator thread (off-main).
      */
     suspend fun handleNetworkLoaded(state: NetworkState) = Unit
     

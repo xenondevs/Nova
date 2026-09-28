@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import org.bukkit.Sound
+import org.bukkit.craftbukkit.CraftSound
 import org.bukkit.event.Listener
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -27,7 +28,7 @@ import kotlin.random.Random
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [WorldDataManager::class]
+    runAfter = [WorldDataManager::class]
 )
 internal object SoundEngine : Listener, PacketListener {
     
@@ -38,30 +39,28 @@ internal object SoundEngine : Listener, PacketListener {
     }
     
     fun overridesSound(sound: String): Boolean {
-        return sound.removePrefix("minecraft:") in ResourceLookups.SOUND_OVERRIDES
+        return sound.removePrefix("minecraft:") in ResourceLookups.soundOverrides
     }
     
     fun overridesSound(sound: Sound): Boolean {
-        return overridesSound(sound.key.toString())
+        return overridesSound(CraftSound.bukkitToMinecraft(sound))
+    }
+    
+    fun overridesSound(sound: SoundEvent): Boolean {
+        return overridesSound(sound.location.toString())
     }
     
     @JvmStatic
-    fun broadcast(entity: Entity, oldSound: String, newSound: String, volume: Float, pitch: Float) {
+    fun broadcast(entity: Entity, oldSound: SoundEvent, newSound: SoundEvent, volume: Float, pitch: Float) {
         val level = entity.level()
         val player = if (overridesSound(oldSound)) null else entity as? Player
-
-        MINECRAFT_SERVER.playerList.broadcast(
+        
+        level.playSound(
             player,
-            entity.x, entity.y, entity.z, 
-            16.0, 
-            level.dimension(),
-            ClientboundSoundPacket(
-                Holder.direct(SoundEvent.createVariableRangeEvent(Identifier.parse(newSound))),
-                entity.soundSource,
-                entity.x, entity.y, entity.z,
-                volume, pitch,
-                level.random.nextLong()
-            )
+            entity.x, entity.y, entity.z,
+            newSound,
+            entity.soundSource,
+            volume, pitch
         )
     }
     
@@ -91,7 +90,7 @@ internal object SoundEngine : Listener, PacketListener {
     @PacketHandler
     private fun handleSoundPacket(event: ClientboundSoundPacketEvent) {
         val location = event.sound.unwrap().mapBoth({ it.identifier() }, { it.location }).take()
-        if (location.namespace == "minecraft" && location.path in ResourceLookups.SOUND_OVERRIDES) {
+        if (location.namespace == "minecraft" && location.path in ResourceLookups.soundOverrides) {
             event.sound = getNovaSound(location.path)
         }
     }
@@ -99,7 +98,7 @@ internal object SoundEngine : Listener, PacketListener {
     @PacketHandler
     private fun handleSoundPacket(event: ClientboundSoundEntityPacketEvent) {
         val location = event.sound.unwrap().mapBoth({ it.identifier() }, { it.location }).take()
-        if (location.namespace == "minecraft" && location.path in ResourceLookups.SOUND_OVERRIDES) {
+        if (location.namespace == "minecraft" && location.path in ResourceLookups.soundOverrides) {
             event.sound = getNovaSound(location.path)
         }
     }

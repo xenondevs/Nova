@@ -6,6 +6,10 @@ internal object WildcardUtils {
     private val WILDCARD_REPLACEMENT_RULES = mapOf('*' to ".*", '?' to ".")
     
     fun toRegex(wildcard: String): Regex {
+        return Regex(toRegexString(wildcard))
+    }
+    
+    fun toRegexString(wildcard: String): String {
         val regexStr = StringBuilder()
         wildcard.toCharArray().forEach { char ->
             regexStr.append(
@@ -14,7 +18,7 @@ internal object WildcardUtils {
             )
         }
         
-        return Regex(regexStr.toString())
+        return regexStr.toString()
     }
     
 }

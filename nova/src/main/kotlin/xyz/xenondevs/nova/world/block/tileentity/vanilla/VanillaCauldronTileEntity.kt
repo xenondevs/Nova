@@ -1,86 +1,81 @@
 package xyz.xenondevs.nova.world.block.tileentity.vanilla
 
+import net.minecraft.core.BlockPos
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.Identifier
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.LayeredCauldronBlock
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
-import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.setBlockState
-import xyz.xenondevs.nova.util.withoutBlockMigration
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.registry.set
+import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.FluidContainer
-import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.DefaultFluidHolder
-import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
+import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.VanillaFluidHolder
 import java.util.*
 import kotlin.math.roundToInt
 
-private val ALLOWED_FLUID_TYPES = hashSetOf(FluidType.WATER, FluidType.LAVA)
+private val ALLOWED_FLUID_TYPES = setOf(FluidType.WATER, FluidType.LAVA)
 
 internal class VanillaCauldronTileEntity internal constructor(
-    type: Type,
-    pos: BlockPos,
-    data: Compound
-) : NetworkedVanillaTileEntity(type, pos, data) {
+    private val cauldronEntity: VanillaCauldronBlockEntity
+) : NetworkedVanillaTileEntity(cauldronEntity) {
     
-    private lateinit var container: FluidContainer
-    private lateinit var fluidHolder: FluidHolder
-    override lateinit var holders: Set<EndPointDataHolder>
+    private var currentBlockState = cauldronEntity.blockState
     
-    @Volatile
-    private lateinit var currentBlockState: BlockState
-    
-    @Volatile
     private var newBlockState: BlockState? = null
         set(value) {
-            if (value == currentBlockState)
-                return
-            field = value
+            field = if (value == currentBlockState) null else value
         }
     
-    override fun handleEnable() {
-        container = FluidContainer(
-            UUID(0L, 0L),
-            ALLOWED_FLUID_TYPES,
-            provider(1000L),
-            mutableProvider(::getFluidType, ::setFluidType),
-            mutableProvider(::getFluidAmount, ::setFluidAmount)
-        )
-        fluidHolder = DefaultFluidHolder(
-            storedValue("fluidHolder", ::Compound),
-            mapOf(container to NetworkConnectionType.BUFFER),
-            emptySet(),
-            { CUBE_FACES.associateWithTo(enumMap()) { container } },
-            { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.BUFFER } }
-        )
-        holders = setOf(fluidHolder)
-        currentBlockState = pos.nmsBlockState
-        
-        handleBlockStateChange(currentBlockState)
-        
-        super.handleEnable()
-    }
+    private var skipContainerUpdate = false
     
-    override fun handleBlockStateChange(blockState: BlockState) {
+    private val container = FluidContainer(
+        UUID(0L, 0L),
+        ALLOWED_FLUID_TYPES,
+        provider(1000L),
+        mutableProvider(::getFluidType, ::setFluidType),
+        mutableProvider(::getFluidAmount, ::setFluidAmount)
+    )
+    
+    private val fluidHolder = VanillaFluidHolder(
+        cauldronEntity,
+        mapOf(container to NetworkConnectionType.BUFFER),
+        CubeFaceMap(container)
+    )
+    
+    override val holders: Set<EndPointDataHolder> = setOf(fluidHolder)
+    
+    internal fun handleBlockStateChange(blockState: BlockState) {
         currentBlockState = blockState
+        if (skipContainerUpdate)
+            return
+        
         container.typeProvider.set(getFluidType())
         container.amountProvider.set(getFluidAmount())
+        newBlockState = null
     }
     
-    fun postNetworkTickSync() {
-        val newBlockState = newBlockState
-        if (newBlockState != null) {
-            withoutBlockMigration(pos) {
-                pos.setBlockState(newBlockState)
+    internal fun postNetworkTickSync() {
+        val newBlockState = newBlockState ?: return
+        val level = cauldronEntity.level ?: return
+        skipContainerUpdate = true
+        try {
+            if (level.setBlock(cauldronEntity.blockPos, newBlockState, Block.UPDATE_ALL)) {
+                currentBlockState = newBlockState
+                this.newBlockState = null
             }
-            
-            this.currentBlockState = newBlockState
-            this.newBlockState = null
+        } finally {
+            skipContainerUpdate = false
         }
     }
     
@@ -100,25 +95,45 @@ internal class VanillaCauldronTileEntity internal constructor(
         }.defaultBlockState()
     }
     
-    // This will allow players to cheat small amounts of fluids, but that shouldn't be a big issue.
     private fun getFluidAmount(): Long {
-        if (currentBlockState.block == Blocks.WATER_CAULDRON) {
-            return currentBlockState.getValue(LayeredCauldronBlock.LEVEL) * 333L + 1
-        } else if (currentBlockState.block == Blocks.LAVA_CAULDRON) {
-            return 1000L
+        return when (currentBlockState.block) {
+            Blocks.WATER_CAULDRON -> currentBlockState.getValue(LayeredCauldronBlock.LEVEL) * 333L + 1
+            Blocks.LAVA_CAULDRON -> 1000L
+            else -> 0L
         }
-        
-        return 0L
     }
     
     private fun setFluidAmount(amount: Long) {
-        // (lava cauldron do not have levels, so we just don't to anything for them)
-        if (currentBlockState.block == Blocks.WATER_CAULDRON) {
-            newBlockState = when (val level = (amount / 333.0).roundToInt()) {
-                0 -> Blocks.CAULDRON.defaultBlockState()
-                else -> Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, level)
-            }
+        if ((newBlockState ?: currentBlockState).block != Blocks.WATER_CAULDRON)
+            return
+        
+        newBlockState = when (val level = (amount / 333.0).roundToInt()) {
+            0 -> Blocks.CAULDRON.defaultBlockState()
+            else -> Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, level)
         }
     }
     
+    @InternalInit(stage = InternalInitStage.PRE_WORLD)
+    companion object {
+        
+        @JvmStatic
+        lateinit var type: BlockEntityType<VanillaCauldronBlockEntity>
+            private set
+        
+        @InitFun
+        private fun register() {
+            type = BlockEntityType(
+                ::VanillaCauldronBlockEntity,
+                setOf(Blocks.CAULDRON, Blocks.WATER_CAULDRON, Blocks.LAVA_CAULDRON)
+            )
+            Registries.BLOCK_ENTITY_TYPE[Identifier.fromNamespaceAndPath("nova", "cauldron")] = type
+        }
+        
+    }
+    
 }
+
+internal class VanillaCauldronBlockEntity(
+    pos: BlockPos,
+    state: BlockState
+) : BlockEntity(VanillaCauldronTileEntity.type, pos, state)

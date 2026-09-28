@@ -1,32 +1,41 @@
 package xyz.xenondevs.nova.ui.menu.sideconfig
 
-import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
-import xyz.xenondevs.invui.Click
-import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.gui.TabGui
-import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.invui.dsl.WindowDsl
+import xyz.xenondevs.invui.dsl.item
+import xyz.xenondevs.invui.dsl.tabGui
+import xyz.xenondevs.invui.dsl.window
+import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.nova.ui.menu.by
 import xyz.xenondevs.nova.ui.menu.item.BackItem
-import xyz.xenondevs.nova.ui.menu.item.ClickyTabItem
+import xyz.xenondevs.nova.ui.menu.item.tabItem
+import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.itemProvider
+
+private const val USE_DSL_SIDE_CONFIG_ITEM = "Use openSideConfigItem(...) with menu configuration directly."
 
 /**
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [inventories] with their localized names.
  */
+@Suppress("DEPRECATION")
+@Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuItem")
 fun SideConfigMenu(
     endPoint: NetworkEndPoint,
@@ -38,6 +47,8 @@ fun SideConfigMenu(
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [inventories] with their localized names.
  */
+@Suppress("DEPRECATION")
+@Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuItem")
 fun SideConfigMenu(
     endPoint: NetworkEndPoint,
@@ -49,6 +60,8 @@ fun SideConfigMenu(
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [containers] with their localized names.
  */
+@Suppress("DEPRECATION")
+@Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuFluid")
 fun SideConfigMenu(
     endPoint: NetworkEndPoint,
@@ -60,6 +73,8 @@ fun SideConfigMenu(
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [containers] with their localized names.
  */
+@Suppress("DEPRECATION")
+@Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuFluid")
 fun SideConfigMenu(
     endPoint: NetworkEndPoint,
@@ -71,17 +86,19 @@ fun SideConfigMenu(
  * The built-in implementation of a side-config menu that supports all built-in
  * network types (energy, item, fluid).
  */
-class SideConfigMenu(
+class SideConfigMenu @Deprecated(USE_DSL_SIDE_CONFIG_ITEM) constructor(
     private val endPoint: NetworkEndPoint,
     inventories: Map<NetworkedInventory, String>? = null,
     containers: Map<NetworkedFluidContainer, String>? = null,
-    openPrevious: (Player) -> Unit
+    private val openPrevious: (Player) -> Unit
 ) {
     
     /**
      * Creates a new [SideConfigMenu] for [endPoint] using the given
      * [inventories] and [containers] with their localized names.
      */
+    @Suppress("DEPRECATION")
+    @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
     constructor(
         endPoint: NetworkEndPoint,
         inventories: Map<NetworkedInventory, String>? = null,
@@ -92,6 +109,8 @@ class SideConfigMenu(
     /**
      * Creates a new [SideConfigMenu] for [endPoint].
      */
+    @Suppress("DEPRECATION")
+    @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
     constructor(
         endPoint: NetworkEndPoint,
         openPrevious: (Player) -> Unit
@@ -100,6 +119,8 @@ class SideConfigMenu(
     /**
      * Creates a new [SideConfigMenu] for [endPoint].
      */
+    @Suppress("DEPRECATION")
+    @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
     constructor(
         endPoint: NetworkEndPoint,
         openPrevious: () -> Unit
@@ -108,8 +129,6 @@ class SideConfigMenu(
     private val energyConfigMenu: EnergySideConfigMenu?
     private val itemConfigMenu: ItemSideConfigMenu?
     private val fluidConfigMenu: FluidSideConfigMenu?
-    
-    private val mainGui: Gui
     
     init {
         val energyHolder = endPoint.holders.firstInstanceOfOrNull<EnergyHolder>()
@@ -129,82 +148,120 @@ class SideConfigMenu(
         
         require(energyConfigMenu != null || itemConfigMenu != null || fluidConfigMenu != null)
         
-        mainGui = TabGui.builder()
-            .setStructure(
-                "< # # e i f # # #",
-                "- - - - - - - - -",
-                "x x x x x x x x x",
-                "x x x x x x x x x",
-                "x x x x x x x x x"
-            )
-            .addIngredient('<', BackItem(openPrevious = openPrevious))
-            .addIngredient('e', ClickyTabItem(0) {
-                (if (energyConfigMenu != null) {
-                    if (it.tab == 0)
-                        DefaultGuiItems.ENERGY_BTN_SELECTED
-                    else DefaultGuiItems.ENERGY_BTN_ON
-                } else DefaultGuiItems.ENERGY_BTN_OFF).clientsideProvider
-            })
-            .addIngredient('i', ClickyTabItem(1) {
-                (if (itemConfigMenu != null) {
-                    if (it.tab == 1)
-                        DefaultGuiItems.ITEM_BTN_SELECTED
-                    else DefaultGuiItems.ITEM_BTN_ON
-                } else DefaultGuiItems.ITEM_BTN_OFF).clientsideProvider
-            })
-            .addIngredient('f', ClickyTabItem(2) {
-                (if (fluidConfigMenu != null) {
-                    if (it.tab == 2)
-                        DefaultGuiItems.FLUID_BTN_SELECTED
-                    else DefaultGuiItems.FLUID_BTN_ON
-                } else DefaultGuiItems.FLUID_BTN_OFF).clientsideProvider
-            })
-            .setTabs(listOf(energyConfigMenu?.gui, itemConfigMenu?.gui, fluidConfigMenu?.gui))
-            .build()
-        
-        updateNetworkData()
+        initNetworkData()
     }
     
     /**
      * Opens a [Window] of this [SideConfigMenu] for the given [player].
      */
     fun openWindow(player: Player) {
-        val window = Window.builder()
-            .setViewer(player)
-            .setTitle(Component.translatable("menu.nova.side_config"))
-            .setUpperGui(mainGui)
-            .addOpenHandler(::updateNetworkData)
-            .build()
-        
-        if (endPoint is TileEntity) {
-            endPoint.menuContainer.registerWindow(window)
-        }
-        
-        window.open()
+        createWindow(player).open()
     }
     
-    private fun updateNetworkData() {
-        NetworkManager.queueRead(endPoint.pos.chunkPos) {
-            energyConfigMenu?.initAsync()
-            itemConfigMenu?.initAsync()
-            fluidConfigMenu?.initAsync()
+    /**
+     * Creates a [Window] for this [SideConfigMenu] for the given [player].
+     * If the [endPoint] is a [TileEntity], the window is also registered to the [TileEntity's menu][TileEntity.menu].
+     */
+    fun createWindow(player: Player): Window {
+        val window = window(player) {
+            title by DefaultGuiTextures.SIDE_CONFIG
+            upperGui by tabGui(
+                "< x x x x x x x x",
+                "e x x x x x x x x",
+                "i x x x x x x x x",
+                "f x x x x x x x x"
+            ) {
+                tabs by listOf(energyConfigMenu?.gui, itemConfigMenu?.gui, fluidConfigMenu?.gui)
+                
+                '<' by BackItem(DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.itemProvider, openPrevious)
+                'e' by tabItem(
+                    0, tab, tabs,
+                    DefaultGuiItems.TP_ENERGY_BTN_SELECTED.itemProvider,
+                    DefaultGuiItems.TP_ENERGY_BTN_ON.itemProvider,
+                    DefaultGuiItems.TP_ENERGY_BTN_OFF.itemProvider
+                )
+                'i' by tabItem(
+                    1, tab, tabs,
+                    DefaultGuiItems.TP_ITEM_BTN_SELECTED.itemProvider,
+                    DefaultGuiItems.TP_ITEM_BTN_ON.itemProvider,
+                    DefaultGuiItems.TP_ITEM_BTN_OFF.itemProvider
+                )
+                'f' by tabItem(
+                    2, tab, tabs,
+                    DefaultGuiItems.TP_FLUID_BTN_SELECTED.itemProvider,
+                    DefaultGuiItems.TP_FLUID_BTN_ON.itemProvider,
+                    DefaultGuiItems.TP_FLUID_BTN_OFF.itemProvider
+                )
+            }
+            onOpen { updateNetworkData() }
+        }
+        
+        if (endPoint is TileEntity)
+            endPoint.menu.register(window)
+        
+        return window
+    }
+    
+    private fun initNetworkData() {
+        NetworkManager.queueRead(endPoint.block.chunkPos) { state ->
+            energyConfigMenu?.init(state)
+            itemConfigMenu?.init(state)
+            fluidConfigMenu?.init(state)
+        }        
+    }
+    
+    internal fun updateNetworkData() {
+        NetworkManager.queueRead(endPoint.block.chunkPos) { state ->
+            energyConfigMenu?.refresh(state)
+            itemConfigMenu?.refresh(state)
+            fluidConfigMenu?.refresh(state)
         }
     }
     
 }
 
 /**
- * An ui item that opens the [sideConfigMenu] when clicked.
+ * A UI item that creates, memorizes, and opens a [SideConfigMenu] for the given [endPoint] and [containers] when clicked.
+ * 
+ * Uses the [window from the context][windowDsl] as the previous window.
  */
-class OpenSideConfigItem(private val sideConfigMenu: SideConfigMenu) : AbstractItem() {
-    
-    override fun getItemProvider(player: Player): ItemProvider {
-        return DefaultGuiItems.SIDE_CONFIG_BTN.clientsideProvider
+context(windowDsl: WindowDsl, endPoint: NetworkEndPoint)
+fun openSideConfigItem(
+    containers: Map<NetworkedFluidContainer, String>? = null
+): Item = openSideConfigItem(null, containers)
+
+/**
+ * A UI item that creates, memorizes, and opens a [SideConfigMenu] for the given [endPoint], [inventories], and [containers] when clicked.
+ * 
+ * Uses the [window from the context][windowDsl] as the previous window.
+ * 
+ * Uses the [end point from the context][endPoint] to retrieve the [EndPointDataHolders][EndPointDataHolder].
+ */
+@Suppress("DEPRECATION")
+context(windowDsl: WindowDsl, endPoint: NetworkEndPoint)
+fun openSideConfigItem(
+    inventories: Map<NetworkedInventory, String>? = null,
+    containers: Map<NetworkedFluidContainer, String>? = null,
+    itemProvider: Provider<ItemProvider> = DefaultGuiItems.TP_SIDE_CONFIG_BTN.itemProvider
+): Item = item {
+    val outerWindow = windowDsl.window
+    // eagerly create the menu as loading network state is async
+    val menu = SideConfigMenu(endPoint, inventories, containers) { _ -> outerWindow.get().open() }
+    val window = menu.createWindow(windowDsl.viewer)
+    this.itemProvider by itemProvider
+    onClick {
+        player.playClickSound()
+        window.open()
     }
-    
-    override fun handleClick(clickType: ClickType, player: Player, click: Click) {
+    windowDsl.onOpen { menu.updateNetworkData() }
+}
+
+@Suppress("FunctionName")
+@Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
+fun OpenSideConfigItem(sideConfigMenu: SideConfigMenu): Item = item {
+    itemProvider by DefaultGuiItems.SIDE_CONFIG_BTN.itemProvider
+    onClick {
         player.playClickSound()
         sideConfigMenu.openWindow(player)
     }
-    
 }

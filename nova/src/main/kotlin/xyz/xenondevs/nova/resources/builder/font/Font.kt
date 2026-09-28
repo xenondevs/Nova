@@ -22,56 +22,56 @@ class Font(
     providers: List<FontProvider> = emptyList()
 ) {
     
-    private val _providers = providers.toMutableList()
-    val providers: List<FontProvider> get() = _providers
+    val providers: List<FontProvider>
+        field = providers.toMutableList()
     
     /**
      * Adds the given [provider] to the start of the list.
      */
     fun addFirst(provider: FontProvider) {
-        _providers.add(0, provider)
+        providers.add(0, provider)
     }
     
     /**
      * Adds the given [provider] to the end of the list.
      */
     fun add(provider: FontProvider) {
-        _providers += provider
+        providers += provider
     }
     
     /**
      * Adds all [providers] of the given font to the end of the list.
      */
     fun addAll(other: Font) {
-        _providers += other.providers
+        providers += other.providers
     }
     
     /**
      * Adds the given [provider] to the end of the list.
      */
     operator fun plusAssign(provider: FontProvider) {
-        _providers += provider
+        providers += provider
     }
     
     /**
      * Adds the given [providers] to the end of the list.
      */
     operator fun plusAssign(providers: Iterable<FontProvider>) {
-        _providers += providers
+        this.providers += providers
     }
     
     /**
      * Adds all [providers] of the given font to the end of the list.
      */
     operator fun plusAssign(font: Font) {
-        _providers += font.providers
+        providers += font.providers
     }
     
     /**
      * Removes the given [provider] from the list.
      */
     fun remove(provider: FontProvider) {
-        _providers -= provider
+        providers -= provider
     }
     
     /**
@@ -82,7 +82,7 @@ class Font(
     fun mapReferences(fonts: Iterable<Font>): Set<Font> {
         return providers.asSequence()
             .filterIsInstance<ReferenceProvider>()
-            .mapTo(HashSet()) { ref -> fonts.firstOrNull { ref.id == it.id } ?: throw IllegalArgumentException("Referenced font ${ref.id} not found") }
+            .mapTo(HashSet()) { ref -> fonts.firstOrNull { ref.id == it.id } ?: throw IllegalArgumentException("Referenced font ${ref.id.asString()} not found") }
     }
     
     /**
@@ -93,7 +93,7 @@ class Font(
         for (provider in providers) {
             if (provider is ReferenceProvider) {
                 val font = fonts.firstOrNull { it.id == provider.id }
-                    ?: throw IllegalArgumentException("Referenced font ${provider.id} not found")
+                    ?: throw IllegalArgumentException("Referenced font ${provider.id.asString()} not found")
                 codePoints.addAll(font.getCodePoints(fonts))
             } else {
                 codePoints.addAll(provider.codePoints)
@@ -104,9 +104,9 @@ class Font(
     }
     
     /**
-     * Writes this [Font] to its corresponding file in the given [assetsDir].
+     * Writes this [Font] to its corresponding file in the given resource pack.
      *
-     * Depending on the providers, additional files (such as bitmaps or unihex zips) might be written to the [assetsDir].
+     * Depending on the providers, additional files (such as bitmaps or unihex zips) might be written to the resource pack.
      */
     fun write(builder: ResourcePackBuilder) {
         val file = builder.resolve(id)
@@ -119,7 +119,7 @@ class Font(
         obj.writeToFile(file)
     }
     
-    override fun toString() = id.toString()
+    override fun toString() = id.asString()
     
     companion object {
         

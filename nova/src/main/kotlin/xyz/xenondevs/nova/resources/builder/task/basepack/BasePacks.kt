@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.resources.builder.task.basepack
 
 import net.minecraft.world.level.block.state.BlockState
-import org.bukkit.Material
 import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
@@ -49,7 +48,6 @@ class BasePacks internal constructor(internal val builder: ResourcePackBuilder) 
         .mapTo(HashSet()) { it.absoluteFile } // deduplicate
     
     val packAmount = packs.size
-    val occupiedModelData = HashMap<Material, HashSet<Int>>()
     internal val occupiedSolidIds = HashMap<BackingStateConfigType<*>, HashSet<Int>>()
     
     inner class Include : PackTask {
@@ -63,7 +61,7 @@ class BasePacks internal constructor(internal val builder: ResourcePackBuilder) 
                 }
             }
             
-            val occupiedBlockStates: Set<BlockState> = occupiedSolidIds.entries.map { (type, ids) ->
+            val occupiedBlockStates: Set<BlockState> = occupiedSolidIds.entries.map { [type, ids] ->
                 buildSet {
                     for (id in ids) {
                         add(type.of(id, false).vanillaBlockState)
@@ -77,7 +75,7 @@ class BasePacks internal constructor(internal val builder: ResourcePackBuilder) 
             if (occupiedBlockStates.isNotEmpty())
                 builder.logger.warn("Base packs occupy ${occupiedBlockStates.size} block states that cannot be used by Nova")
             
-            ResourceLookups.OCCUPIED_BLOCK_STATES = occupiedBlockStates
+            ResourceLookups.occupiedBlockStates = occupiedBlockStates
         }
         
         

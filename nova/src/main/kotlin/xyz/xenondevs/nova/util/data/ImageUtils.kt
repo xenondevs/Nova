@@ -1,120 +1,284 @@
 package xyz.xenondevs.nova.util.data
 
-import org.joml.Vector2i
-import org.joml.Vector2ic
 import java.awt.Color
 import java.awt.Point
 import java.awt.image.BufferedImage
 import java.awt.image.ColorModel
+import java.awt.image.ComponentSampleModel
 import java.awt.image.DataBuffer
+import java.awt.image.DataBufferByte
 import java.awt.image.DataBufferInt
 import java.awt.image.Raster
 import java.awt.image.SinglePixelPackedSampleModel
+
+internal data class ImageBorders(
+    val left: Int,
+    val right: Int,
+    val top: Int,
+    val bottom: Int
+)
 
 internal object ImageUtils {
     
     private val ARGB_BIT_MASKS = intArrayOf(0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000.toInt())
     
     /**
-     * Finds the left and right borders of the given [image].
-     * The values in the returned Pair<Left, Right> correspond with the
-     * x-coordinate of the first non-empty column from the left and right side of the image.
-     *
-     * @return An integer pair containing the left and right borders, or null if the image is completely empty.
+     * Finds all non-transparent borders of [image] in one pass.
      */
-    fun findVerticalBorders(image: BufferedImage): Pair<Int, Int>? {
+    fun findBorders(image: BufferedImage): ImageBorders? {
+        val width = image.width
+        val height = image.height
+        if (width == 0 || height == 0)
+            return null
+        if (!image.colorModel.hasAlpha())
+            return ImageBorders(0, width - 1, 0, height - 1)
+        
+        val alphaRaster = image.alphaRaster
+        if (alphaRaster != null) {
+            val sampleModel = alphaRaster.sampleModel
+            val sampleX = alphaRaster.minX - alphaRaster.sampleModelTranslateX
+            val sampleY = alphaRaster.minY - alphaRaster.sampleModelTranslateY
+            
+            if (sampleModel is ComponentSampleModel && alphaRaster.dataBuffer is DataBufferByte) {
+                val dataBuffer = alphaRaster.dataBuffer as DataBufferByte
+                val bank = sampleModel.bankIndices[0]
+                val data = dataBuffer.bankData[bank]
+                val offset = dataBuffer.offsets[bank] + sampleModel.getOffset(sampleX, sampleY)
+                return findByteBorders(data, offset, sampleModel.pixelStride, sampleModel.scanlineStride, width, height)
+            }
+            
+            if (sampleModel is SinglePixelPackedSampleModel && alphaRaster.dataBuffer is DataBufferInt) {
+                val dataBuffer = alphaRaster.dataBuffer as DataBufferInt
+                val data = dataBuffer.bankData[0]
+                val offset = dataBuffer.offsets[0] + sampleModel.getOffset(sampleX, sampleY)
+                return findIntBorders(data, offset, sampleModel.scanlineStride, sampleModel.bitMasks[0], width, height)
+            }
+            
+            return findRasterBorders(alphaRaster, width, height)
+        }
+        
+        return findColorModelBorders(image)
+    }
+    
+    /**
+     * Finds all non-transparent borders of the row-major ARGB [image] with the given [width] and [height] in one pass.
+     */
+    fun findBorders(image: IntArray, width: Int, height: Int): ImageBorders? {
+        requireDimensions(image, width, height)
+        return findIntBorders(image, 0, width, 0xFF000000.toInt(), width, height)
+    }
+    
+    private fun requireDimensions(image: IntArray, width: Int, height: Int) {
+        require(width >= 0 && height >= 0) { "Image dimensions must be non-negative" }
+        require(image.size == width * height) {
+            "ARGB array size ${image.size} does not match image dimensions $width x $height"
+        }
+    }
+    
+    private fun findByteBorders(
+        image: ByteArray,
+        offset: Int,
+        pixelStride: Int,
+        scanlineStride: Int,
+        width: Int,
+        height: Int
+    ): ImageBorders? {
         var left = 0
-        while (left < image.width && isColumnEmpty(image, left)) left++
-        if (left == image.width) return null
+        left@ while (left < width) {
+            var index = offset + left * pixelStride
+            repeat(height) {
+                if (image[index].toInt() and 0xFF != 0)
+                    break@left
+                index += scanlineStride
+            }
+            left++
+        }
+        if (left == width)
+            return null
+        
+        var right = width - 1
+        right@ while (right > left) {
+            var index = offset + right * pixelStride
+            repeat(height) {
+                if (image[index].toInt() and 0xFF != 0)
+                    break@right
+                index += scanlineStride
+            }
+            right--
+        }
+        
+        var top = 0
+        top@ while (top < height) {
+            var index = offset + top * scanlineStride + left * pixelStride
+            repeat(right - left + 1) {
+                if (image[index].toInt() and 0xFF != 0)
+                    break@top
+                index += pixelStride
+            }
+            top++
+        }
+        
+        var bottom = height - 1
+        bottom@ while (bottom > top) {
+            var index = offset + bottom * scanlineStride + left * pixelStride
+            repeat(right - left + 1) {
+                if (image[index].toInt() and 0xFF != 0)
+                    break@bottom
+                index += pixelStride
+            }
+            bottom--
+        }
+        
+        return ImageBorders(left, right, top, bottom)
+    }
+    
+    private fun findIntBorders(
+        image: IntArray,
+        offset: Int,
+        scanlineStride: Int,
+        alphaMask: Int,
+        width: Int,
+        height: Int
+    ): ImageBorders? {
+        var left = 0
+        left@ while (left < width) {
+            var index = offset + left
+            repeat(height) {
+                if (image[index] and alphaMask != 0)
+                    break@left
+                index += scanlineStride
+            }
+            left++
+        }
+        if (left == width)
+            return null
+        
+        var right = width - 1
+        right@ while (right > left) {
+            var index = offset + right
+            repeat(height) {
+                if (image[index] and alphaMask != 0)
+                    break@right
+                index += scanlineStride
+            }
+            right--
+        }
+        
+        var top = 0
+        top@ while (top < height) {
+            var index = offset + top * scanlineStride + left
+            repeat(right - left + 1) {
+                if (image[index] and alphaMask != 0)
+                    break@top
+                index++
+            }
+            top++
+        }
+        
+        var bottom = height - 1
+        bottom@ while (bottom > top) {
+            var index = offset + bottom * scanlineStride + left
+            repeat(right - left + 1) {
+                if (image[index] and alphaMask != 0)
+                    break@bottom
+                index++
+            }
+            bottom--
+        }
+        
+        return ImageBorders(left, right, top, bottom)
+    }
+    
+    private fun findRasterBorders(alphaRaster: Raster, width: Int, height: Int): ImageBorders? {
+        var left = 0
+        left@ while (left < width) {
+            for (y in 0..<height) {
+                if (alphaRaster.getSample(alphaRaster.minX + left, alphaRaster.minY + y, 0) != 0)
+                    break@left
+            }
+            left++
+        }
+        if (left == width)
+            return null
+        
+        var right = width - 1
+        right@ while (right > left) {
+            for (y in 0..<height) {
+                if (alphaRaster.getSample(alphaRaster.minX + right, alphaRaster.minY + y, 0) != 0)
+                    break@right
+            }
+            right--
+        }
+        
+        var top = 0
+        top@ while (top < height) {
+            for (x in left..right) {
+                if (alphaRaster.getSample(alphaRaster.minX + x, alphaRaster.minY + top, 0) != 0)
+                    break@top
+            }
+            top++
+        }
+        
+        var bottom = height - 1
+        bottom@ while (bottom > top) {
+            for (x in left..right) {
+                if (alphaRaster.getSample(alphaRaster.minX + x, alphaRaster.minY + bottom, 0) != 0)
+                    break@bottom
+            }
+            bottom--
+        }
+        
+        return ImageBorders(left, right, top, bottom)
+    }
+    
+    private fun findColorModelBorders(image: BufferedImage): ImageBorders? {
+        val raster = image.raster
+        val colorModel = image.colorModel
+        var pixel: Any? = null
+        
+        var left = 0
+        left@ while (left < image.width) {
+            for (y in 0..<image.height) {
+                pixel = raster.getDataElements(raster.minX + left, raster.minY + y, pixel)
+                if (colorModel.getAlpha(pixel) != 0)
+                    break@left
+            }
+            left++
+        }
+        if (left == image.width)
+            return null
         
         var right = image.width - 1
-        while (right > left && isColumnEmpty(image, right)) right--
-        
-        return left to right
-    }
-    
-    /**
-     * Finds the left border of the given [image].
-     * The returned value corresponds with the x-coordinate of the first non-empty column from the left side of the image
-     * or null if the image is completely empty.
-     */
-    fun findLeftBorder(image: BufferedImage): Int? {
-        var x = 0
-        while (x < image.width && isColumnEmpty(image, x)) x++
-        return if (x != image.width) x else null
-    }
-    
-    /**
-     * Finds the right border of the given [image].
-     * The returned value corresponds with the x-coordinate of the first non-empty column from the right side of the image
-     * or null if the image is completely empty.
-     */
-    fun findRightBorder(image: BufferedImage): Int? {
-        var x = image.width - 1
-        while (x >= 0 && isColumnEmpty(image, x)) x--
-        return if (x != -1) x else null
-    }
-    
-    /**
-     * Checks whether the column at the given [x] coordinate is transparent.
-     */
-    fun isColumnEmpty(image: BufferedImage, x: Int): Boolean {
-        for (y in 0..<image.height) {
-            if (image.getRGB(x, y) ushr 24 != 0)
-                return false
+        right@ while (right > left) {
+            for (y in 0..<image.height) {
+                pixel = raster.getDataElements(raster.minX + right, raster.minY + y, pixel)
+                if (colorModel.getAlpha(pixel) != 0)
+                    break@right
+            }
+            right--
         }
-        return true
-    }
-    
-    /**
-     * Finds the top and bottom borders of the given [image].
-     * The values in the returned Pair<Top, Bottom> correspond with the
-     * y-coordinate of the first non-empty row from the top and bottom side of the image.
-     *
-     * @return A vector containing the top and bottom borders, or null if the image is completely empty.
-     */
-    fun findTopBottomBorders(image: BufferedImage): Vector2ic? {
+        
         var top = 0
-        while (top < image.height && isRowEmpty(image, top)) top++
-        if (top == image.height) return null
+        top@ while (top < image.height) {
+            for (x in left..right) {
+                pixel = raster.getDataElements(raster.minX + x, raster.minY + top, pixel)
+                if (colorModel.getAlpha(pixel) != 0)
+                    break@top
+            }
+            top++
+        }
         
         var bottom = image.height - 1
-        while (bottom > top && isRowEmpty(image, bottom)) bottom--
-        
-        return Vector2i(top, bottom)
-    }
-    
-    /**
-     * Finds the bottom border of the given [image].
-     * The returned value corresponds with the y-coordinate of the first non-empty row from the bottom side of the image
-     * or null if the image is completely empty.
-     */
-    fun findTopBorder(image: BufferedImage): Int? {
-        var y = 0
-        while (y < image.height && isRowEmpty(image, y)) y++
-        return if (y != image.height) y else null
-    }
-    
-    /**
-     * Finds the bottom border of the given [image].
-     * The returned value corresponds with the y-coordinate of the first non-empty row from the bottom side of the image
-     * or null if the image is completely empty.
-     */
-    fun findBottomBorder(image: BufferedImage): Int? {
-        var y = image.height - 1
-        while (y >= 0 && isRowEmpty(image, y)) y--
-        return if (y != -1) y else null
-    }
-    
-    /**
-     * Checks whether the row at the given [y] coordinate is transparent.
-     */
-    fun isRowEmpty(image: BufferedImage, y: Int): Boolean {
-        for (x in 0..<image.width) {
-            if (image.getRGB(x, y) ushr 24 != 0)
-                return false
+        bottom@ while (bottom > top) {
+            for (x in left..right) {
+                pixel = raster.getDataElements(raster.minX + x, raster.minY + bottom, pixel)
+                if (colorModel.getAlpha(pixel) != 0)
+                    break@bottom
+            }
+            bottom--
         }
-        return true
+        
+        return ImageBorders(left, right, top, bottom)
     }
     
     @JvmStatic

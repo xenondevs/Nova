@@ -29,7 +29,7 @@ private val COLOR_LOOKUP: Map<BossBarColor, TextColor> = mapOf(
     BossBarColor.YELLOW to Color(252, 255, 0),
     BossBarColor.PURPLE to Color(133, 0, 255),
     BossBarColor.WHITE to Color(255, 255, 255)
-).mapValuesTo(enumMap()) { (_, color) -> TextColor.color(color.rgb) }
+).mapValuesTo(enumMap()) { [_, color] -> TextColor.color(color.rgb) }
 
 private const val BOSS_BAR_FONT = "nova:bossbar"
 private const val BOSS_BAR_LENGTH = 182
@@ -71,7 +71,7 @@ internal class VanillaBossBarOverlay(
             
             val progress = getProgressComponent(bar.progress, color)
             if (progress != null) {
-                val (progressComponent, progressWidth) = progress
+                val [progressComponent, progressWidth] = progress
                 builder
                     .append(progressComponent.color(color))
                     .move(-progressWidth - 1)

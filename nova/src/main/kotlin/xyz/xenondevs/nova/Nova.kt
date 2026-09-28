@@ -19,8 +19,12 @@ import xyz.xenondevs.nova.api.ApiItemRegistry
 import xyz.xenondevs.nova.api.ApiTileEntityManager
 import xyz.xenondevs.nova.api.NovaMaterialRegistry
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
+import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.network.installPacketHandler
+import xyz.xenondevs.nova.packetentity.initPacketEntityManager
+import xyz.xenondevs.nova.registry.NovaRegistryContext
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.registerEvents
@@ -44,11 +48,7 @@ internal val HTTP_CLIENT = HttpClient(CIO) {
 internal var PLUGIN_READY = false
     private set
 
-private val INCOMPATIBLE_PLUGINS = setOf(
-    // FAWE replaces LevelChunkSections, preventing Nova from doing block migrations & world gen
-    // https://github.com/xenondevs/Nova/issues/560
-    "FastAsyncWorldEdit"
-)
+private val INCOMPATIBLE_PLUGINS: Set<String> = emptySet()
 
 internal object Nova : JavaPlugin(), INova {
     
@@ -64,13 +64,18 @@ internal object Nova : JavaPlugin(), INova {
                 throw Exception("Nova is not compatible with the following plugin(s): ${incompatibilities.joinToString()}")
             
             PLUGIN_READY = true
-            LIFECYCLE_MANAGER = lifecycleManager
             
+            NovaRegistryContext.exitBootstrapPhase()
             InvUI.getInstance().setPlugin(this)
             Languages.getInstance().enableServerSideTranslations(false)
-            Initializer.registerEvents()
+            installPacketHandler(this)
+            initPacketEntityManager(this)
+            context(Initializer) { registerEvents() }
         } catch (t: Throwable) {
-            LOGGER.error("", t)
+            if (t is InitializationException)
+                LOGGER.error(t.message)
+            else LOGGER.error("", t)
+            
             (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
             Runtime.getRuntime().halt(-1) // force-quit
         }

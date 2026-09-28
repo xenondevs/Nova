@@ -15,9 +15,9 @@ class BossBarOverlayTask(private val builder: ResourcePackBuilder) : PackTask {
     override suspend fun run() {
         if (BossBarOverlayManager.ENABLED) {
             val movedFontContent = builder.getBuildData<MovedFontContent>()
-            movedFontContent.requestMovedFonts(ResourcePath(ResourceType.Font, "minecraft", "default"), 1..19)
-            movedFontContent.requestMovedFonts(ResourcePath(ResourceType.Font, "minecraft", "uniform"), 1..19)
-            movedFontContent.requestMovedFonts(ResourcePath(ResourceType.Font, "nova", "bossbar"), 1..19)
+            movedFontContent.requestMovedFonts(ResourcePath(ResourceType.Font, "minecraft", "default"), 0..18)
+            movedFontContent.requestMovedFonts(ResourcePath(ResourceType.Font, "minecraft", "uniform"), 0..18)
+            movedFontContent.requestMovedFonts(ResourcePath(ResourceType.Font, "nova", "bossbar"), 1..18)
         }
     }
     

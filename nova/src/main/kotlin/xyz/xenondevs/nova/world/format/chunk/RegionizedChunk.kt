@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.world.format.chunk
 
+import xyz.xenondevs.nova.world.*
+
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
-import xyz.xenondevs.nova.world.BlockPos
+import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.RegionizedFile
 
@@ -27,7 +29,7 @@ internal sealed interface RegionizedChunk {
          *
          * @see RegionizedChunkReader.unpackBlockPos
          */
-        fun packBlockPos(pos: BlockPos): Int =
+        fun packBlockPos(pos: Block): Int =
             (pos.y shl 8) or (pos.x and 0xF shl 4) or (pos.z and 0xF)
         
     }
@@ -52,15 +54,15 @@ internal abstract class RegionizedChunkReader<C : RegionizedChunk> {
     companion object {
         
         /**
-         * Unpacks a 32-bit integer [value] into a [BlockPos] using the given [chunkPos].
+         * Unpacks a 32-bit integer [value] into a [Block] using the given [chunkPos].
          *
          * @see RegionizedChunk.packBlockPos
          */
-        fun unpackBlockPos(chunkPos: ChunkPos, value: Int): BlockPos {
+        fun unpackBlockPos(chunkPos: ChunkPos, value: Int): Block {
             val y = value shr 8
             val x = (value shr 4) and 0xF
             val z = value and 0xF
-            return BlockPos(chunkPos.world!!, (chunkPos.x shl 4) + x, y, (chunkPos.z shl 4) + z)
+            return chunkPos.world!!.getBlockAt((chunkPos.x shl 4) + x, y, (chunkPos.z shl 4) + z)
         }
         
     }

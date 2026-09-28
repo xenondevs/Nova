@@ -7,8 +7,6 @@ import jdk.jfr.Name
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -19,25 +17,25 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.bukkit.World
-import xyz.xenondevs.commons.collections.mapToBooleanArray
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.task.LoadChunkTask
 import xyz.xenondevs.nova.world.block.tileentity.network.task.NetworkTask
 import xyz.xenondevs.nova.world.block.tileentity.network.task.ProtectedNodeNetworkTask
-import xyz.xenondevs.nova.world.block.tileentity.network.task.ProtectionResult
 import xyz.xenondevs.nova.world.block.tileentity.network.task.UnloadChunkTask
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 internal class NetworkConfigurator(private val world: World, private val ticker: NetworkTicker) {
     
@@ -55,7 +53,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     /**
      * Lock for [loadedChunks] and [taskBacklog].
      */
-    private val queueLock = Mutex()
+    private val queueLock = ReentrantLock()
     
     /**
      * Contains all positions of chunks that will be loaded for a network task queued now.
@@ -72,7 +70,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     /**
      * Stores protection query results for [ProtectedNodeNetworkTasks][ProtectedNodeNetworkTask].
      */
-    private val protectionResults = ConcurrentHashMap<ProtectedNodeNetworkTask, Deferred<ProtectionResult>>()
+    private val protectionResults = ConcurrentHashMap<ProtectedNodeNetworkTask, CompletableFuture<CubeFaceSet>>()
     
     /**
      * The current network state, i.e. which nodes are connected to which networks.
@@ -99,9 +97,14 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
                     // Work off all tasks first, then build dirty networks
                     taskChannel.onReceive { task ->
                         try {
-                            task.event.begin()
+                            val event = task.event
+                            event.begin()
                             processTask(task)
-                            task.event.commit()
+                            event.end()
+                            if (event.shouldCommit()) {
+                                task.populateEvent(event)
+                                event.commit()
+                            }
                         } catch (e: Exception) {
                             LOGGER.error("An exception occurred trying to process NetworkTask: $task", e)
                         }
@@ -131,33 +134,31 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
      * Enqueues the [task] to be processed by the appropriate coroutine.
      * Also queries protection in case of [ProtectedNodeNetworkTask].
      */
-    fun queueTask(task: NetworkTask): Unit = runBlocking {
-        queueLock.withLock {
-            if (task is ProtectedNodeNetworkTask)
-                protectionResults[task] = CoroutineScope(protectionSupervisor).async(Dispatchers.Default) { queryProtection(task.node) }
+    fun queueTask(task: NetworkTask): Unit = queueLock.withLock {
+        if (task is ProtectedNodeNetworkTask)
+            protectionResults[task] = queryProtectionAsync(task.node)
+        
+        // ensure load chunk task is queued before any other task that might need its data
+        val chunkPos = task.chunkPos
+        if (task is LoadChunkTask) {
+            // ignore duplicate chunk load requests
+            if (chunkPos in loadedChunks)
+                return@withLock
             
-            // ensure load chunk task is queued before any other task that might need its data
-            val chunkPos = task.chunkPos
-            if (task is LoadChunkTask) {
-                // ignore duplicate chunk load requests
-                if (chunkPos in loadedChunks)
-                    return@runBlocking
-                
-                taskChannel.send(task)
-                loadedChunks += chunkPos
-                taskBacklog.remove(chunkPos)?.forEach { taskChannel.send(it) }
-            } else if (task is UnloadChunkTask) {
-                // ignore duplicate chunk unload requests
-                if (chunkPos !in loadedChunks)
-                    return@runBlocking
-                
-                taskChannel.send(task)
-                loadedChunks -= chunkPos
-            } else if (chunkPos !in loadedChunks) {
-                taskBacklog.getOrPut(chunkPos, ::ArrayList) += task
-            } else {
-                taskChannel.send(task)
-            }
+            taskChannel.trySend(task).getOrThrow()
+            loadedChunks += chunkPos
+            taskBacklog.remove(chunkPos)?.forEach { taskChannel.trySend(it).getOrThrow() }
+        } else if (task is UnloadChunkTask) {
+            // ignore duplicate chunk unload requests
+            if (chunkPos !in loadedChunks)
+                return@withLock
+            
+            taskChannel.trySend(task).getOrThrow()
+            loadedChunks -= chunkPos
+        } else if (chunkPos !in loadedChunks) {
+            taskBacklog.getOrPut(chunkPos, ::ArrayList) += task
+        } else {
+            taskChannel.trySend(task).getOrThrow()
         }
     }
     
@@ -174,16 +175,16 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     
     /**
      * Queries the block use protection in all 6 cartesian directions around [node] asynchronously
-     * and returns the [ProtectionResult].
+     * and returns the result.
      */
-    private suspend fun queryProtection(node: NetworkNode): ProtectionResult = coroutineScope {
+    private fun queryProtectionAsync(node: NetworkNode): CompletableFuture<CubeFaceSet> {
         val owner = node.owner
-        if (owner != null) {
-            CUBE_FACES
-                .map { face -> ProtectionManager.canUseBlockAsync(owner, null, node.pos.advance(face, 1)) }
-                .mapToBooleanArray { it.await() }
-                .let(::ProtectionResult)
-        } else ProtectionResult.ALL_ALLOWED
+        return if (owner != null) {
+            // TODO: Await ProtectionManager startup
+            val results = CubeFaceMap { ProtectionManager.canUseBlockAsync(owner, null, node.block.getRelative(it)) }
+            CompletableFuture.allOf(*results.values.toTypedArray())
+                .thenApply { results.mapToCubeFaceSet { it.get() } }
+        } else CompletableFuture.completedFuture(CubeFaceSet.ALL)
     }
     
     /**
@@ -194,7 +195,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
         state.mutex.withLock {
             // await protection results, run task
             if (task is ProtectedNodeNetworkTask) {
-                task.result = protectionResults.remove(task)?.await()
+                task.protectionResult = protectionResults.remove(task)?.await()
                     ?: throw IllegalStateException("Protection was not queried")
             }
             
@@ -205,17 +206,9 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     
     private suspend fun buildClusters(): List<NetworkCluster> = coroutineScope {
         state.mutex.withLock {
-            // init clusters TODO: clusters are only uninitialized here if an exception was thrown in the task, but it may make sense to always init here
-            for (network in state.networks) {
-                if (network.cluster == null) {
-                    LOGGER.error("Cluster of $network is uninitialized")
-                    network.initCluster()
-                }
-            }
+            // initialize and collect (deduplicate) all clusters
+            val protoClusters = state.networks.mapTo(HashSet()) { it.initCluster() }
             
-            // collect proto clusters
-            val protoClusters = state.networks
-                .mapTo(HashSet()) { it.cluster ?: throw IllegalStateException("Cluster for $it is uninitialized") }
             // debug: verify proto clusters
             if (IS_DEV_SERVER)
                 verifyClusters(protoClusters)

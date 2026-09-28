@@ -46,7 +46,7 @@ internal class ItemNetworkGroup(data: NetworkGroupData<ItemNetwork>) : NetworkGr
                     val providersInLevel = distributor.providerLevels[level]
                     val levelSnapshots = Array<Array<ItemStack>?>(providersInLevel.size) { null }
                     snapshots[level] = levelSnapshots
-                    for ((idx, provider) in providersInLevel.withIndex()) {
+                    for ([idx, provider] in providersInLevel.withIndex()) {
                         levelSnapshots[idx] = filteredProviderSnapshots[provider]!!
                     }
                 }
@@ -78,14 +78,18 @@ internal class ItemNetworkGroup(data: NetworkGroupData<ItemNetwork>) : NetworkGr
         }
     }
     
+    override fun postTickSync() {
+        networks.forEach(ItemNetwork::postTickSync)
+    }
+    
     private fun takeSnapshot() {
-        for ((provider, snapshot) in providerSnapshots) {
+        for ([provider, snapshot] in providerSnapshots) {
             provider.copyContents(snapshot)
         }
         
-        for ((provider, snapshot) in filteredProviderSnapshots) {
+        for ([provider, snapshot] in filteredProviderSnapshots) {
             val unfilteredSnapshot = providerSnapshots[provider.inventory]!!
-            for ((slot, itemStack) in unfilteredSnapshot.withIndex()) {
+            for ([slot, itemStack] in unfilteredSnapshot.withIndex()) {
                 snapshot[slot] = if (provider.denies(itemStack)) ItemStack.empty() else itemStack
             }
         }

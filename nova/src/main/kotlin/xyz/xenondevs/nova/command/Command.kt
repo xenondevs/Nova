@@ -3,7 +3,6 @@
 package xyz.xenondevs.nova.command
 
 import com.mojang.brigadier.builder.ArgumentBuilder
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -19,13 +18,13 @@ internal inline operator fun <reified V> CommandContext<*>.get(name: String): V 
 internal fun <C, T : ArgumentBuilder<C, T>> ArgumentBuilder<C, T>.executes0(run: (CommandContext<C>) -> Unit): T =
     executes { run(it); 0 }
 
-internal fun LiteralArgumentBuilder<CommandSourceStack>.requiresConsole(): LiteralArgumentBuilder<CommandSourceStack> =
+internal fun <T : ArgumentBuilder<CommandSourceStack, T>> T.requiresConsole(): T =
     this.requires { it.sender is ConsoleCommandSender }
 
-internal fun LiteralArgumentBuilder<CommandSourceStack>.requiresPlayer(): LiteralArgumentBuilder<CommandSourceStack> =
+internal fun <T : ArgumentBuilder<CommandSourceStack, T>> T.requiresPlayer(): T =
     this.requires { it.sender is Player }
 
-internal fun LiteralArgumentBuilder<CommandSourceStack>.requiresPermission(permission: String): LiteralArgumentBuilder<CommandSourceStack> =
+internal fun <T : ArgumentBuilder<CommandSourceStack, T>> T.requiresPermission(permission: String): T =
     this.requires { it.sender.hasPermission(permission) }
 
 internal abstract class Command {

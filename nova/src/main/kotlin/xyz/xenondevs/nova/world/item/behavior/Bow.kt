@@ -7,19 +7,23 @@ import net.minecraft.world.item.BowItem
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.ProjectileWeaponItem
 import org.bukkit.GameMode
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
-import org.bukkit.Tag
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
-import xyz.xenondevs.nova.Nova
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.ItemUse
+import xyz.xenondevs.nova.registry.tags.ItemTypeTags
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
+import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.InteractionResult
+import xyz.xenondevs.nova.world.item.ItemAction
+import xyz.xenondevs.nova.world.item.itemType
 
 /**
  * Defines how [Bow] behaves.
@@ -51,14 +55,14 @@ interface BowLogic {
                 return true
             
             return entity is InventoryHolder
-                && entity.inventory.any { it != null && Tag.ITEMS_ARROWS.isTagged(it.type) }
+                && entity.inventory.any { it != null && it.itemType in ItemTypeTags.ARROWS }
         }
         
         override fun handleDrawTick(entity: LivingEntity, bow: ItemStack, tick: Int) = Unit
         
         override fun shoot(entity: LivingEntity, hand: EquipmentSlot, bow: ItemStack, chargeTime: Int): ItemStack {
             val nmsEntity = entity.nmsEntity
-            val projectile = nmsEntity.getProjectile(ItemStack.of(Material.BOW).unwrap())
+            val projectile = nmsEntity.getProjectile(ItemType.BOW.createItemStack().unwrap())
             if (projectile.isEmpty)
                 return bow
             
@@ -74,9 +78,9 @@ interface BowLogic {
             
             (Items.BOW as BowItem).shoot(
                 level,
-                nmsEntity, 
-                hand.nmsInteractionHand, 
-                bow.unwrap(), 
+                nmsEntity,
+                hand.nmsInteractionHand,
+                bow.unwrap(),
                 projectileItems,
                 powerForTime * 3f,
                 1f,
@@ -100,7 +104,7 @@ interface BowLogic {
     
 }
 
-private val CAN_USE_KEY = NamespacedKey(Nova, "can_use_bow")
+private val CAN_USE_KEY = novaKey("can_use_bow")
 private const val USE_DURATION: Int = 72000
 
 /**
@@ -123,20 +127,28 @@ private const val USE_DURATION: Int = 72000
  */
 class Bow(private val logic: BowLogic = BowLogic.Vanilla) : ItemBehavior {
     
+    override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {
+        val entity = ctx[ItemUse.SOURCE_LIVING_ENTITY] ?: return InteractionResult.Pass
+        val hand = ctx[ItemUse.HELD_HAND] ?: return InteractionResult.Pass
+        entity.startUsingItem(hand)
+        return InteractionResult.Success(swing = false, action = ItemAction.None)
+    }
+    
     override fun modifyUseDuration(entity: LivingEntity, itemStack: ItemStack, duration: Int): Int {
         if (logic.canDraw(entity, itemStack.clone()))
             return USE_DURATION
         return 0
     }
     
-    override fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) {
+    override fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int): ItemAction? {
         val tick = USE_DURATION - remainingUseTicks
         logic.handleDrawTick(entity, itemStack.clone(), tick)
+        return null
     }
     
-    override fun handleUseStopped(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) {
+    override fun handleUseStopped(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int): ItemAction {
         val result = logic.shoot(entity, hand, itemStack.clone(), USE_DURATION - remainingUseTicks)
-        entity.equipment?.setItem(hand, result)
+        return ItemAction.ConvertStack(result)
     }
     
     //<editor-fold desc="disabling client-side prediction if necessary">
@@ -157,9 +169,9 @@ class Bow(private val logic: BowLogic = BowLogic.Vanilla) : ItemBehavior {
         }
     }
     
-    override fun modifyClientSideItemType(player: Player?, server: ItemStack, client: Material): Material {
+    override fun modifyClientSideItemType(player: Player?, server: ItemStack, client: ItemType): ItemType {
         if (logic == BowLogic.Vanilla || server.persistentDataContainer.has(CAN_USE_KEY))
-            return Material.BOW
+            return ItemType.BOW
         return client
     }
     //</editor-fold>

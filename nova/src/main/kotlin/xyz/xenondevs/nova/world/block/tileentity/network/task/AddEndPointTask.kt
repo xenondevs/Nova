@@ -5,9 +5,7 @@ import jdk.jfr.Event
 import jdk.jfr.Label
 import jdk.jfr.Name
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
@@ -26,38 +24,40 @@ internal class AddEndPointTask(
     @Name("xyz.xenondevs.AddEndPoint")
     @Label("Add EndPoint")
     @Category("Nova", "TileEntity Network")
-    private inner class AddEndPointTaskEvent : Event() {
+    private class AddEndPointTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = node.pos.toString()
+        var pos: String = ""
         
     }
     
-    override val event: Event = AddEndPointTaskEvent()
+    override val event: Event
+        get() = AddEndPointTaskEvent()
+    
+    override fun populateEvent(event: Event) {
+        (event as AddEndPointTaskEvent).pos = node.block.toString()
+    }
     //</editor-fold>
     
     override suspend fun add() {
         state.setEndPointData(
-            node.pos,
+            node.block,
             NetworkEndPointData(node.owner)
         )
         
-        val clustersToEnlarge = HashSet<ProtoNetwork<*>>()
-        
-        for (networkType in NovaRegistries.NETWORK_TYPE) {
-            var allowedFaces = state.getAllowedFaces(node, networkType)
+        for (networkType in NovaRegistries.NETWORK_TYPE.entrySet.get()) {
+            val allowedFaces = state.getAllowedFaces(node, networkType) and protectionResult
             if (allowedFaces.isEmpty())
                 continue
-            allowedFaces = allowedFaces.toEnumSet().also { result.removeProtected(it) }
             
-            for ((face, neighborNode) in state.getNearbyNodes(node.pos, allowedFaces)) {
+            state.forEachNearbyNode(node.block, allowedFaces) { face, neighborNode ->
                 // do not allow networks between two vanilla tile entities
                 if (node is VanillaTileEntity && neighborNode is VanillaTileEntity)
-                    continue
+                    return@forEachNearbyNode
                 
                 val success = when (neighborNode) {
-                    is NetworkBridge -> tryConnectToBridge(neighborNode, networkType, face, clustersToEnlarge)
-                    is NetworkEndPoint -> tryConnectToEndPoint(neighborNode, networkType, face, clustersToEnlarge)
+                    is NetworkBridge -> tryConnectToBridge(neighborNode, networkType, face)
+                    is NetworkEndPoint -> tryConnectToEndPoint(neighborNode, networkType, face)
                 }
                 
                 if (success) {
@@ -65,19 +65,14 @@ internal class AddEndPointTask(
                 }
             }
         }
-        
-        for (network in clustersToEnlarge) {
-            network.enlargeCluster(node)
-        }
     }
     
     private suspend fun tryConnectToBridge(
         bridge: NetworkBridge,
-        networkType: NetworkType<*>, face: BlockFace,
-        clustersToEnlarge: MutableSet<ProtoNetwork<*>>
+        networkType: NetworkType<*>, face: BlockFace
     ): Boolean {
         if (face.oppositeFace in state.getAllowedFaces(bridge, networkType)) {
-            state.connectEndPointToBridge(node, bridge, networkType, face, clustersToEnlarge)
+            state.connectEndPointToBridge(node, bridge, networkType, face)
             return true
         }
         
@@ -86,11 +81,10 @@ internal class AddEndPointTask(
     
     private suspend fun tryConnectToEndPoint(
         endPoint: NetworkEndPoint,
-        networkType: NetworkType<*>, face: BlockFace,
-        clustersToEnlarge: MutableSet<ProtoNetwork<*>>
+        networkType: NetworkType<*>, face: BlockFace
     ): Boolean {
         if (face.oppositeFace in state.getAllowedFaces(endPoint, networkType)) {
-            state.connectEndPointToEndPoint(node, endPoint, networkType, face, clustersToEnlarge)
+            state.connectEndPointToEndPoint(node, endPoint, networkType, face)
             return true
         }
         

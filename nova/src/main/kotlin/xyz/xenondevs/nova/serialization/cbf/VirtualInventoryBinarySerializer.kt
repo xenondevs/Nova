@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.serialization.cbf
 
+import xyz.xenondevs.nova.util.asBukkitMirror
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.nbt.NbtOps
@@ -17,6 +18,7 @@ import java.util.*
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
+// TODO: stop serializing maxstacksizes
 internal object VirtualInventoryBinarySerializer : VersionedBinarySerializer<VirtualInventory>(2U) {
     
     override fun readVersioned(version: UByte, reader: ByteReader): VirtualInventory {
@@ -52,7 +54,7 @@ internal object VirtualInventoryBinarySerializer : VersionedBinarySerializer<Vir
         if (reader.readBoolean()) {
             maxStackSizes = IntArray(size) { reader.readVarInt() }
         } else {
-            maxStackSizes = IntArray(size) { 64 }
+            maxStackSizes = IntArray(size) { 99 }
         }
         
         return VirtualInventory(uuid, size, items, maxStackSizes)
@@ -77,7 +79,7 @@ internal object VirtualInventoryBinarySerializer : VersionedBinarySerializer<Vir
         writer.writeVarInt(size)
         
         val itemsMask = BitSet(size)
-        for ((slot, itemStack) in items.withIndex()) {
+        for ([slot, itemStack] in items.withIndex()) {
             if (!itemStack.isNullOrEmpty())
                 itemsMask.set(slot)
         }
@@ -96,7 +98,7 @@ internal object VirtualInventoryBinarySerializer : VersionedBinarySerializer<Vir
         }
         
         // write stack sizes if custom
-        if (maxStackSizes.any { it != 64 }) {
+        if (maxStackSizes.any { it != 99 }) {
             writer.writeBoolean(true)
             for (stackSize in obj.maxStackSizes) {
                 writer.writeVarInt(stackSize)

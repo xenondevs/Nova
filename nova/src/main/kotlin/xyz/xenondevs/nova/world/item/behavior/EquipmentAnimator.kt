@@ -19,8 +19,8 @@ import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.network.ClientboundSetEquipmentPacket
-import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.network.packet.ClientboundSetEquipmentPacket
+import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -40,8 +40,8 @@ internal object EquipmentAnimator {
         BukkitEquipmentSlot.BODY
     )
     
-    private val _tick = mutableProvider(0)
-    val tick: Provider<Int> get() = _tick
+    val tick: Provider<Int>
+        field = mutableProvider(0)
     
     val animatedBehaviors: MutableSet<ItemBehavior> = concurrentHashSet()
     
@@ -54,7 +54,7 @@ internal object EquipmentAnimator {
         if (animatedBehaviors.isEmpty())
             return
         
-        _tick.set(_tick.get() + 1)
+        tick.set(tick.get() + 1)
         
         Bukkit.getWorlds().asSequence()
             .flatMap { it.livingEntities }
@@ -71,7 +71,7 @@ internal object EquipmentAnimator {
     private fun updatePlayerArmor(player: Player) {
         val serverPlayer = player.serverPlayer
         val updatedEquipment = HashMap<EquipmentSlot, ItemStack>()
-        for ((armorSlot, armorStack) in player.equipment.armorContents.withIndex()) {
+        for ([armorSlot, armorStack] in player.equipment.armorContents.withIndex()) {
             if (armorStack?.novaItem?.behaviors?.any { it in animatedBehaviors } == true) {
                 serverPlayer.inventoryMenu.setRemoteSlot(8 - armorSlot, ItemStack.EMPTY) // mark as dirty, force update
                 updatedEquipment[EquipmentSlot.entries[armorSlot + 2]] = armorStack.unwrap()

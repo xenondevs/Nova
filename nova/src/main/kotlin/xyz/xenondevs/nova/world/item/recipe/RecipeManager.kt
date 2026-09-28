@@ -5,7 +5,6 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.crafting.RecipeHolder
 import net.minecraft.world.item.crafting.RecipeInput
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -27,7 +26,7 @@ import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.ReflectionUtils
 import xyz.xenondevs.nova.util.data.key
 import xyz.xenondevs.nova.util.identifier
-import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.registerEvents
 import net.minecraft.world.item.crafting.Recipe as MojangRecipe
@@ -51,17 +50,16 @@ private val PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD = ReflectionUtils.getField(Pre
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [HooksLoader::class, VanillaRecipeTypes::class]
+    runAfter = [HooksLoader::class, VanillaRecipeTypes::class]
 )
 object RecipeManager : Listener, PacketListener {
     
     private val registeredVanillaRecipes = HashMap<ResourceKey<MojangRecipe<*>>, RecipeHolder<*>>()
     private val customVanillaRecipes = HashMap<ResourceKey<MojangRecipe<*>>, MojangRecipe<*>>()
-    private val _novaRecipes = HashMap<RecipeType<*>, HashMap<Key, NovaRecipe>>()
     private val hardcodedRecipes = ArrayList<Any>()
     
     val novaRecipes: Map<RecipeType<*>, Map<Key, NovaRecipe>>
-        get() = _novaRecipes
+        field = HashMap<RecipeType<*>, HashMap<Key, NovaRecipe>>()
     
     @InitFun
     private fun init() {
@@ -96,12 +94,12 @@ object RecipeManager : Listener, PacketListener {
     
     @Suppress("UNCHECKED_CAST")
     fun <T : ConversionNovaRecipe> getConversionRecipeFor(type: RecipeType<T>, input: ItemStack): T? {
-        return _novaRecipes[type]?.values?.firstOrNull { (it as ConversionNovaRecipe).input.test(input) } as T?
+        return novaRecipes[type]?.values?.firstOrNull { (it as ConversionNovaRecipe).input.test(input) } as T?
     }
     
     @Suppress("UNCHECKED_CAST")
     fun <T : NovaRecipe> getRecipe(type: RecipeType<T>, id: Key): T? {
-        return _novaRecipes[type]?.get(id) as T?
+        return novaRecipes[type]?.get(id) as T?
     }
     
     private fun loadRecipes() {
@@ -133,7 +131,7 @@ object RecipeManager : Listener, PacketListener {
                 customVanillaRecipes[key] = nmsRecipe
             }
             
-            is NovaRecipe -> _novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.id] = recipe
+            is NovaRecipe -> novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.id] = recipe
             
             else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
         }
@@ -147,11 +145,11 @@ object RecipeManager : Listener, PacketListener {
         }
         
         customVanillaRecipes.clear()
-        _novaRecipes.clear()
+        novaRecipes.clear()
         
         loadRecipes()
         RecipeRegistry.indexRecipes()
-        RECIPE_TYPE.forEach { it.group.invalidateCache() }
+        RECIPE_TYPE.entrySet.get().forEach { it.group.invalidateCache() }
     }
     
     @EventHandler
@@ -170,7 +168,7 @@ object RecipeManager : Listener, PacketListener {
         var requiresContainer = ResourceKey.create(Registries.RECIPE, recipe.key.identifier) in registeredVanillaRecipes.keys
         if (!requiresContainer && event.inventory.contents.any { it?.novaItem != null }) {
             // prevent non-Nova recipes from using Nova items
-            event.inventory.result = ItemStack(Material.AIR)
+            event.inventory.result = ItemStack.empty()
             requiresContainer = true
         }
         

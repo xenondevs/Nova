@@ -1,4 +1,4 @@
-@file:Suppress("UNCHECKED_CAST")
+@file:Suppress("UNCHECKED_CAST", "DEPRECATION")
 
 package xyz.xenondevs.nova.world.fakeentity.metadata.impl
 
@@ -13,7 +13,9 @@ import org.joml.Quaternionf
 import org.joml.Quaternionfc
 import org.joml.Vector3f
 import org.joml.Vector3fc
+import xyz.xenondevs.nova.world.fakeentity.FAKE_ENTITY_DEPRECATION
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 abstract class DisplayMetadata : EntityMetadata() {
     
     var transformationInterpolationDelay: Int by entry(8, EntityDataSerializers.INT, 0)

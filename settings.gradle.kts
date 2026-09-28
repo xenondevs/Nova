@@ -1,10 +1,13 @@
 rootProject.name = "nova"
 
-// core project
+// core
 include("nova")
 include("nova-api")
-include("nova-gradle-plugin")
-include("nova-dokka-plugin")
+include("nova-config")
+include("nova-interaction")
+include("nova-network")
+include("nova-packet-entity")
+include("nova-registry")
 
 // hooks
 include("nova-hooks:nova-hook-griefprevention")
@@ -21,6 +24,16 @@ include("nova-hooks:nova-hook-vault")
 include("nova-hooks:nova-hook-worldedit")
 include("nova-hooks:nova-hook-worldguard")
 
+// ksp
+include("nova-ksp:processor:registry")
+include("nova-ksp:processor:network")
+include("nova-ksp:processor:packet-entity")
+
+// tooling
+include("nova-compiler-plugin")
+include("nova-dokka-plugin")
+include("nova-gradle-plugin")
+
 // misc
 include("catalog")
 
@@ -34,12 +47,13 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs")
         create("origamiLibs") {
-            from("xyz.xenondevs.origami:origami-catalog:0.5.0")
+            from("xyz.xenondevs.origami:origami-catalog:0.5.2") // !!! also change in build-logic !!!
         }
     }
 }
 
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
         mavenCentral()

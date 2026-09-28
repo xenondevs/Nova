@@ -11,10 +11,11 @@ import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
+import xyz.xenondevs.nova.network.sendTo
 import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.nmsEntity
+import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.particle.particle
-import xyz.xenondevs.nova.util.sendTo
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.ItemAction
@@ -28,9 +29,9 @@ private const val EXTINGUISH_CAMPFIRE_LEVEL_EVENT = 1009
 object Extinguishing : ItemBehavior {
     
     override fun useOnBlock(itemStack: ItemStack, block: Block, ctx: Context<BlockInteract>): InteractionResult {
-        val pos = ctx[BlockInteract.BLOCK_POS]
+        val pos = ctx[BlockInteract.BLOCK]
         val entity = ctx[BlockInteract.SOURCE_LIVING_ENTITY] ?: return InteractionResult.Pass
-        val state = ctx[BlockInteract.BLOCK_STATE_VANILLA]?.nmsBlockState ?: return InteractionResult.Pass
+        val state = ctx[BlockInteract.BLOCK_STATE]?.nmsBlockState ?: return InteractionResult.Pass
         
         if (state.block != Blocks.CAMPFIRE || !state.getValue(CampfireBlock.LIT))
             return InteractionResult.Pass
@@ -39,7 +40,7 @@ object Extinguishing : ItemBehavior {
         val level = pos.world.serverLevel
         val nmsPos = pos.nmsPos
         
-        CampfireBlock.dowse(nmsEntity, level, nmsPos, state)
+        CampfireBlock.douse(nmsEntity, level, nmsPos, state)
         displayCampfireExtinguishParticles(
             pos.location,
             if (state.getValue(CampfireBlock.SIGNAL_FIRE)) ParticleTypes.CAMPFIRE_SIGNAL_SMOKE else ParticleTypes.CAMPFIRE_COSY_SMOKE

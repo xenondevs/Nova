@@ -4,35 +4,227 @@ import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureLayout
-import xyz.xenondevs.nova.resources.lookup.ResourceLookups
+import org.joml.Vector2i
+import org.joml.Vector2ic
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.invui.dsl.WindowDsl
+import xyz.xenondevs.nova.i18n.LocaleManager
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.bootstrapFlatMap
+import xyz.xenondevs.nova.resources.CharSizes
+import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
 import xyz.xenondevs.nova.serialization.kotlinx.GuiTextureSerializer
+import xyz.xenondevs.nova.ui.menu.locale
+import xyz.xenondevs.nova.ui.overlay.MovedFonts
+import xyz.xenondevs.nova.util.component.adventure.isEmpty
 import xyz.xenondevs.nova.util.component.adventure.move
-import xyz.xenondevs.nova.util.component.adventure.moveToStart
+import xyz.xenondevs.nova.util.component.adventure.toMinecraftLocaleCode
+import java.util.*
+import kotlin.math.roundToInt
+
+/**
+ * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [GuiTexture.component].
+ */
+val Provider<GuiTexture>.component: Provider<Component>
+    get() = bootstrapFlatMap { it.component }
+
+/**
+ * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [GuiTexture.getTitle].
+ */
+fun Provider<GuiTexture>.getTitle(locale: Provider<Locale>): Provider<Component> =
+    bootstrapFlatMap { it.getTitle(locale) }
+
+/**
+ * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [GuiTexture.getTitle].
+ */
+fun Provider<GuiTexture>.getTitle(translate: String, locale: Provider<Locale>): Provider<Component> =
+    bootstrapFlatMap { it.getTitle(translate, locale) }
+
+/**
+ * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [GuiTexture.getTitle].
+ */
+fun Provider<GuiTexture>.getTitle(lines: List<Component>, locale: Provider<Locale>): Provider<Component> =
+    bootstrapFlatMap { it.getTitle(lines, locale) }
+
+/**
+ * Gets the title using the window viewer's locale.
+ */
+context(windowDsl: WindowDsl)
+fun Provider<GuiTexture>.getTitle(): Provider<Component> = getTitle(windowDsl.locale)
+
+/**
+ * Gets the title with [translate] using the window viewer's locale.
+ */
+context(windowDsl: WindowDsl)
+fun Provider<GuiTexture>.getTitle(translate: String): Provider<Component> = getTitle(translate, windowDsl.locale)
+
+/**
+ * Gets the title with [lines] using the window viewer's locale.
+ */
+context(windowDsl: WindowDsl)
+fun Provider<GuiTexture>.getTitle(vararg lines: Component): Provider<Component> = getTitle(lines.asList(), windowDsl.locale)
 
 @Serializable(with = GuiTextureSerializer::class)
 class GuiTexture internal constructor(
-    val id: Key,
-    internal val makeLayout: (ResourcePackBuilder) -> GuiTextureLayout
-) {
+    override val entry: RegistryEntry.Nova<GuiTexture>,
+    private val data: Provider<GuiTextureData>,
+    private val titleLines: List<TitleLine>,
+    /**
+     * Whether the inventory label (the title of the player's inventory) should be shown.
+     */
+    val hasInventoryLabel: Boolean
+) : NovaRegistryElement<GuiTexture> {
     
-    val component: Component by ResourceLookups.GUI_TEXTURE_LOOKUP.getProvider(this).map { data ->
-        checkNotNull(data)
+    /**
+     * The provider of component of the raw gui texture with no title text.
+     */
+    val component: Provider<Component> = data.map { data ->
         Component.text()
             .move(data.offset)
             .append(Component.text(Character.toString(data.codePoint), NamedTextColor.WHITE).font(data.font))
             .build()
     }
     
-    fun getTitle(translate: String): Component =
-        getTitle(Component.translatable(translate))
+    /**
+     * Gets the title using the window viewer's locale.
+     */
+    context(windowDsl: WindowDsl)
+    fun getTitle(): Provider<Component> = getTitle(windowDsl.locale)
     
-    fun getTitle(title: Component): Component =
-        Component.text()
-            .append(component)
-            .moveToStart()
-            .append(title)
-            .build()
+    /**
+     * Gets the title with [translate] using the window viewer's locale.
+     */
+    context(windowDsl: WindowDsl)
+    fun getTitle(translate: String): Provider<Component> = getTitle(translate, windowDsl.locale)
+    
+    /**
+     * Gets the title with [lines] using the window viewer's locale.
+     */
+    context(windowDsl: WindowDsl)
+    fun getTitle(vararg lines: Component): Provider<Component> = getTitle(lines.asList(), windowDsl.locale)
+    
+    /**
+     * Gets a provider of the gui texture component with all static lines for [locale].
+     */
+    fun getTitle(locale: Provider<Locale>): Provider<Component> =
+        getTitle([], locale)
+    
+    /**
+     * Gets a provider of the gui texture component with [translate] in the first dynamic line
+     * and all static lines for [locale].
+     */
+    fun getTitle(translate: String, locale: Provider<Locale>): Provider<Component> =
+        getTitle([Component.translatable(translate)], locale)
+    
+    /**
+     * Gets a provider of the gui texture component with all static lines and [lines] filling the
+     * dynamic lines in the order they are defined.
+     */
+    fun getTitle(lines: List<Component>, locale: Provider<Locale>): Provider<Component> = combinedProvider(data, locale) { data, locale ->
+        val textureWidth = CharSizes.getCharWidth(data.font, data.codePoint)
+        val textureXRange = CharSizes.getCharXRange(data.font, data.codePoint)
+        val builder = Component.text()
+            .move(data.offset)
+            .append(Component.text(Character.toString(data.codePoint), NamedTextColor.WHITE).font(data.font))
+            .move(-textureWidth.roundToInt())
+        
+        var dynamicLineIndex = 0
+        titleLines.asSequence()
+            .map { line ->
+                val text = when (line) {
+                    is TitleLine.Static -> line.text
+                    is TitleLine.Dynamic -> lines.getOrNull(dynamicLineIndex++) ?: Component.empty()
+                }
+                text to line.position
+            }
+            .filterNot { [text, _] -> text.isEmpty(locale) }
+            // render server-side to prevent client-side translation mismatch from impacting alignment
+            .map { [text, position] -> LocaleManager.render(text, locale) to position }
+            .forEach { [text, position] ->
+                val movedText = MovedFonts.moveVertically(text, position.offset.y())
+                val textSize = CharSizes.calculateComponentSize(movedText, locale.toMinecraftLocaleCode(), false)
+                val preMove = when (position.alignment) {
+                    TitlePosition.Alignment.DEFAULT -> (-data.offset + position.offset.x()).toFloat()
+                    TitlePosition.Alignment.LEFT -> textureXRange.start + position.offset.x() - textSize.xRange.start
+                    TitlePosition.Alignment.CENTER -> {
+                        val visualCenter = (textSize.xRange.start + textSize.xRange.endInclusive) / 2
+                        val textureCenter = (textureXRange.start + textureXRange.endInclusive) / 2
+                        textureCenter + position.offset.x() - visualCenter
+                    }
+                    
+                    TitlePosition.Alignment.RIGHT -> textureXRange.endInclusive + position.offset.x() - textSize.xRange.endInclusive
+                }.roundToInt()
+                builder
+                    .move(preMove)
+                    .append(movedText)
+                    .move(-textSize.width.roundToInt() - preMove)
+            }
+        
+        builder.build()
+    }
+    
+    internal sealed interface TitleLine {
+        
+        val position: TitlePosition
+        
+        data class Static(
+            override val position: TitlePosition,
+            val text: Component
+        ) : TitleLine
+        
+        data class Dynamic(
+            override val position: TitlePosition,
+            val fonts: Set<Key>
+        ) : TitleLine
+        
+    }
+    
+    /**
+     * The position of a title text in a [GuiTexture].
+     */
+    data class TitlePosition(
+        /**
+         * The alignment of the title relative to the gui texture.
+         */
+        val alignment: Alignment = Alignment.DEFAULT,
+        /**
+         * An additional offset to apply to the text.
+         */
+        val offset: Vector2ic = Vector2i(0, 0)
+    ) {
+        
+        /**
+         * Horizontal alignment of a title text line.
+         */
+        enum class Alignment {
+            
+            /**
+             * The default horizontal position of the title text line in the given menu type.
+             */
+            DEFAULT,
+            
+            /**
+             * Horizontally aligned to the left edge of the gui texture,
+             * such that the leftmost pixels of the text overlap with the leftmost pixels of the gui texture.
+             */
+            LEFT,
+            
+            /**
+             * Horizontally aligned to the center of the gui texture.
+             */
+            CENTER,
+            
+            /**
+             * Horizontally aligned to the right edge of the gui texture,
+             * such that the rightmost pixels of the text overlap with the rightmost pixels of the gui texture.
+             */
+            RIGHT
+            
+        }
+    }
+    
+    override fun toString(): String = key.asString()
     
 }

@@ -12,11 +12,13 @@ import com.sk89q.worldedit.util.eventbus.Subscribe
 import com.sk89q.worldedit.world.block.BaseBlock
 import com.sk89q.worldedit.world.block.BlockStateHolder
 import com.sk89q.worldedit.world.block.BlockTypes
+import net.kyori.adventure.key.Key
+import org.bukkit.Registry
+import org.bukkit.block.BlockType
 import xyz.xenondevs.nova.integration.Hook
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.stream.Stream
+
+// fixme: Only sets barries currently
 
 private val BLOCK_STATE = BlockTypes.BARRIER!!.defaultState
 
@@ -38,21 +40,26 @@ internal object WorldEditHook {
     
 }
 
-class NovaBlock(val novaId: String) : BaseBlock(BLOCK_STATE)
+class CustomBlock(val type: BlockType) : BaseBlock(BLOCK_STATE)
 
 internal class NovaBlockInputParser(worldEdit: WorldEdit) : InputParser<BaseBlock>(worldEdit) {
     
     override fun getSuggestions(input: String): Stream<String> {
-        return NovaRegistries.blockStream()
-            .filter { it.id.toString().startsWith(input) || it.id.value().startsWith(input) }
-            .map { it.id.toString() }
+        return Registry.BLOCK.stream()
+            .filter { it.key.asString().startsWith(input) || it.key.value().startsWith(input) }
+            .map { it.key.asString() }
     }
     
     override fun parseFromInput(input: String, context: ParserContext): BaseBlock? {
-        if (!NovaRegistries.hasBlock(input))
+        if (!Key.parseable(input))
             return null
         
-        return NovaBlock(input)
+        val key = Key.key(input)
+        val type = Registry.BLOCK.get(key)
+        if (key.namespace() == "minecraft" || type == null)
+            return null
+        
+        return CustomBlock(type)
     }
     
 }
@@ -60,9 +67,8 @@ internal class NovaBlockInputParser(worldEdit: WorldEdit) : InputParser<BaseBloc
 internal class NovaBlockExtent(private val event: EditSessionEvent) : AbstractDelegateExtent(event.extent) {
     
     override fun <T : BlockStateHolder<T>?> setBlock(vec: BlockVector3, block: T): Boolean {
-        if (block is NovaBlock) {
-            val pos = BlockPos(BukkitAdapter.adapt(event.world), vec.x, vec.y, vec.z)
-            WorldDataManager.setBlockState(pos, NovaRegistries.getBlockOrThrow(block.novaId).defaultBlockState)
+        if (block is CustomBlock) {
+            BukkitAdapter.adapt(event.world).setBlockData(vec.x, vec.y, vec.z, block.type.createBlockData())
             return true
         }
         

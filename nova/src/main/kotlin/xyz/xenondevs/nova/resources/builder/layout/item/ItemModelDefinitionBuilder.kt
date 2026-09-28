@@ -200,7 +200,7 @@ sealed class ItemModelCreationScope<S : ModelSelectorScope>(
      * Renders a hanging sign model.
      */
     fun hangingSignSpecialModel(hangingSignModel: HangingSignSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
-        HangingSignSpecialItemModelBuilder( resourcePackBuilder, selectAndBuild).apply(hangingSignModel).build()
+        HangingSignSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(hangingSignModel).build()
     
     /**
      * Renders a trident model.

@@ -28,8 +28,11 @@ internal class DefaultPackZipper(private val builder: ResourcePackBuilder) : Pac
             root.walk()
                 .filter { path -> path.isRegularFile() }
                 .filter { path -> filters.all { filter -> filter.allows(path.relativeTo(builder.resolve("assets/")).invariantSeparatorsPathString) } }
+                .sortedBy { path -> path.relativeTo(root).invariantSeparatorsPathString }
                 .forEach { path ->
-                    zip.putNextEntry(ZipEntry(path.relativeTo(root).invariantSeparatorsPathString))
+                    val entry = ZipEntry(path.relativeTo(root).invariantSeparatorsPathString)
+                    entry.time = 0L
+                    zip.putNextEntry(entry)
                     path.inputStream().use { it.copyTo(zip) }
                 }
         }

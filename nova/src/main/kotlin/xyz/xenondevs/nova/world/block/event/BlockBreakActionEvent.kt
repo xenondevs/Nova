@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.block.event
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList

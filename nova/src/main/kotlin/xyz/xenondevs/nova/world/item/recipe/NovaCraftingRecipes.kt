@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.item.recipe
 
+import xyz.xenondevs.nova.util.asBukkitMirror
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.item.crafting.BlastingRecipe

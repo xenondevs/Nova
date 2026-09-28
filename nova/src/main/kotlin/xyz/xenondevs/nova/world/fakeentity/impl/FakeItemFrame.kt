@@ -1,12 +1,16 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.world.fakeentity.impl
 
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.entity.decoration.ItemFrame
 import org.bukkit.Location
+import xyz.xenondevs.nova.world.fakeentity.FAKE_ENTITY_DEPRECATION
 import xyz.xenondevs.nova.world.fakeentity.FakeEntity
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemFrameMetadata
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 class FakeItemFrame(
     location: Location,
     autoRegister: Boolean,

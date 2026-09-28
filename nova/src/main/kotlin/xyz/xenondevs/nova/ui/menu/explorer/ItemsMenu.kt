@@ -4,59 +4,64 @@ import io.papermc.paper.datacomponent.DataComponentTypes
 import me.xdrop.fuzzywuzzy.FuzzySearch
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.SoundCategory
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mapEach
 import xyz.xenondevs.commons.provider.mapEachIndexed
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.plus
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.Click
+import xyz.xenondevs.invui.dsl.ScrollGuiDsl
+import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.invui.dsl.anvilWindow
+import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.dsl.gui
 import xyz.xenondevs.invui.dsl.item
+import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.dsl.mergedWindow
 import xyz.xenondevs.invui.dsl.pagedItemsGui
-import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.dsl.scrollItemsGui
 import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.invui.dsl.window
+import xyz.xenondevs.invui.gui.InventoryLink
 import xyz.xenondevs.invui.gui.Markers
-import xyz.xenondevs.invui.gui.SlotElement.InventoryLink
 import xyz.xenondevs.invui.inventory.Inventory
 import xyz.xenondevs.invui.inventory.ReferencingInventory
 import xyz.xenondevs.invui.inventory.event.PlayerUpdateReason
 import xyz.xenondevs.invui.inventory.get
-import xyz.xenondevs.invui.item.Item
-import xyz.xenondevs.invui.item.ItemBuilder
-import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.nova.registry.entries.ItemTypeEntries
+import xyz.xenondevs.nova.ui.menu.advancedTooltips
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.RecipesMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.handleRecipeChoiceClick
 import xyz.xenondevs.nova.ui.menu.item.NoSlotItem
-import xyz.xenondevs.nova.ui.menu.item.scrollDownItem
-import xyz.xenondevs.nova.ui.menu.item.scrollLeftItem
-import xyz.xenondevs.nova.ui.menu.item.scrollRightItem
-import xyz.xenondevs.nova.ui.menu.item.scrollUpItem
-import xyz.xenondevs.nova.ui.menu.item.scrollerItem
+import xyz.xenondevs.nova.ui.menu.item.backItem
+import xyz.xenondevs.nova.ui.menu.item.installBackgroundScrollSupport
+import xyz.xenondevs.nova.ui.menu.item.installItemScrollSupport
+import xyz.xenondevs.nova.ui.menu.item.scrollBar
+import xyz.xenondevs.nova.ui.menu.locale
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
+import xyz.xenondevs.nova.ui.overlay.guitexture.component
+import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.addItemCorrectly
-import xyz.xenondevs.nova.util.component.adventure.toPlainText
-import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.CategorizedItem
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.ItemCategories
 import xyz.xenondevs.nova.world.item.ItemCategory
+import xyz.xenondevs.nova.world.item.itemProvider
+import xyz.xenondevs.nova.world.item.itemType
 
 private const val CATEGORY_TAB_COUNT = 8
 private val TAB_BUTTON_TEXTURES = arrayOf(
@@ -88,9 +93,8 @@ internal class ItemsMenu private constructor(val player: Player) {
         val cheatMode: MutableProvider<Boolean> = mutableProvider { player.persistentDataContainer.get(CHEAT_MODE_KEY, PersistentDataType.BOOLEAN) == true }
         cheatMode.subscribe { cheatMode -> player.persistentDataContainer.set(CHEAT_MODE_KEY, PersistentDataType.BOOLEAN, cheatMode) }
         
-        val filteredItems: Provider<List<Item>> = combinedProvider(filter, ItemCategories.obtainableItems)
-            .map { (filter, obtainableItems) -> filterItems(player, filter, obtainableItems) }
-            .mapEach { i -> categorizedItemButton(i, cheatMode) }
+        val filteredItems: Provider<List<CategorizedItem>> = combinedProvider(filter, ItemCategories.obtainableItems)
+            .map { [filter, obtainableItems] -> filterItems(player, filter, obtainableItems) }
         
         mainWindow = provider {
             mergedWindow(player) {
@@ -98,7 +102,7 @@ internal class ItemsMenu private constructor(val player: Player) {
                     if (tab < playerInvTab)
                         TAB_BUTTON_TEXTURES[(tab % CATEGORY_TAB_COUNT).coerceAtLeast(0)].component
                     else DefaultGuiTextures.ITEMS_9.component
-                }
+                }.flatten()
                 gui by tabGui(
                     "p * p * p * p * s",
                     "< . . . . . . . >",
@@ -111,8 +115,29 @@ internal class ItemsMenu private constructor(val player: Player) {
                     "* * * * * * * * *",
                     "h h h h h h h h h"
                 ) {
-                    val tabButtonsPage = mutableProvider(0)
-                    val tabButtonsPageCount = mutableProvider(0)
+                    val tabButtonsPage: MutableProvider<Int>
+                    val tabButtonsPageCount: Provider<Int>
+                    'p' by pagedItemsGui(
+                        "x . x . x . x . .",
+                        ". . . . . . . . .",
+                        ". . . . . . . . .",
+                        ". . . . . . . . .",
+                        ". . . . . . . . .",
+                        ". . . . . . . . .",
+                        "x . x . x . x . ."
+                    ) {
+                        tabButtonsPage = page
+                        tabButtonsPageCount = pageCount
+                        
+                        var prevPage = page.get()
+                        page.subscribe {
+                            // adjust tab if not currently looking at player inventory tab
+                            if (it != prevPage && tab.get() != playerInvTab.get())
+                                tab.set(it * CATEGORY_TAB_COUNT)
+                        }
+                        content by ItemCategories.categories.mapEachIndexed { i, cat -> itemCategoryTabButton(i, cat, tab) }
+                    }
+                    
                     '<' by tabPageBackItem(tabButtonsPage, tabButtonsPageCount)
                     '>' by tabPageForwardItem(tabButtonsPage, tabButtonsPageCount)
                     's' by searchButton(searchWindow)
@@ -123,39 +148,20 @@ internal class ItemsMenu private constructor(val player: Player) {
                     '*' by NoSlotItem
                     'c' by cheatModeButton(cheatMode)
                     
-                    'p' by pagedItemsGui(
-                        "x . x . x . x . .",
-                        ". . . . . . . . .",
-                        ". . . . . . . . .",
-                        ". . . . . . . . .",
-                        ". . . . . . . . .",
-                        ". . . . . . . . .",
-                        "x . x . x . x . ."
-                    ) {
-                        page by tabButtonsPage
-                        page.subscribe {
-                            // adjust tab if not currently looking at player inventory tab
-                            if (tab.get() != playerInvTab.get())
-                                tab.set(it * CATEGORY_TAB_COUNT)
-                        }
-                        tabButtonsPageCount.consume(pageCount)
-                        content by ItemCategories.categories.mapEachIndexed { i, cat -> itemCategoryTabButton(i, cat, tab) }
-                    }
-                    
                     this.tab by tab
                     
                     tabs by ItemCategories.categories.mapEach { category ->
                         scrollItemsGui(
-                            ". x x x x x x x c",
-                            ". x x x x x x x u",
+                            "c x x x x x x x |",
                             ". x x x x x x x |",
-                            ". x x x x x x x d"
+                            ". x x x x x x x |",
+                            ". x x x x x x x |"
                         ) {
                             'c' by cheatModeButton(cheatMode)
-                            'u' by scrollUpItem(line)
-                            '|' by scrollerItem(serverWindowState, clientWindowState, line, maxLine)
-                            'd' by scrollDownItem(line, maxLine)
-                            content by category.items.map { i -> categorizedItemButton(i, cheatMode) }
+                            '|' by scrollBar(offset = 1)
+                            content by category.categorizedItems
+                                .mapEach { categorizedItemButton(it, cheatMode) }
+                            installBackgroundScrollSupport()
                         }
                     } + gui(
                         ". x x x x x x x h",
@@ -164,11 +170,11 @@ internal class ItemsMenu private constructor(val player: Player) {
                         ". x x x x x x o b"
                     ) {
                         val inv = ReferencingInventory.fromContents(player.inventory)
-                        'h' by InventoryLink(inv[39..39].apply { allowOnlyEquippable(EquipmentSlot.HEAD) }, 0, DefaultGuiItems.HEAD_PLACEHOLDER.clientsideProvider)
-                        'c' by InventoryLink(inv[38..38].apply { allowOnlyEquippable(EquipmentSlot.CHEST) }, 0, DefaultGuiItems.CHEST_PLACEHOLDER.clientsideProvider)
-                        'l' by InventoryLink(inv[37..37].apply { allowOnlyEquippable(EquipmentSlot.LEGS) }, 0, DefaultGuiItems.LEGS_PLACEHOLDER.clientsideProvider)
-                        'b' by InventoryLink(inv[36..36].apply { allowOnlyEquippable(EquipmentSlot.FEET) }, 0, DefaultGuiItems.FEET_PLACEHOLDER.clientsideProvider)
-                        'o' by InventoryLink(inv, 40, DefaultGuiItems.OFF_HAND_PLACEHOLDER.clientsideProvider)
+                        'h' by InventoryLink(inv[39..39].apply { allowOnlyEquippable(EquipmentSlot.HEAD) }, 0, DefaultGuiItems.HEAD_PLACEHOLDER)
+                        'c' by InventoryLink(inv[38..38].apply { allowOnlyEquippable(EquipmentSlot.CHEST) }, 0, DefaultGuiItems.CHEST_PLACEHOLDER)
+                        'l' by InventoryLink(inv[37..37].apply { allowOnlyEquippable(EquipmentSlot.LEGS) }, 0, DefaultGuiItems.LEGS_PLACEHOLDER)
+                        'b' by InventoryLink(inv[36..36].apply { allowOnlyEquippable(EquipmentSlot.FEET) }, 0, DefaultGuiItems.FEET_PLACEHOLDER)
+                        'o' by InventoryLink(inv, 40, DefaultGuiItems.OFF_HAND_PLACEHOLDER)
                         'x' by ReferencingInventory.fromPlayerStorageContents(player.inventory)[0..26]
                     }
                 }
@@ -185,15 +191,14 @@ internal class ItemsMenu private constructor(val player: Player) {
                     "x x x x x x x x x",
                     "x x x x x x x x x",
                     "x x x x x x x x x",
-                    "c . . < - > . . ^"
+                    "c - - - - - - - ^"
                 ) {
                     'x' by Markers.CONTENT_LIST_SLOT_VERTICAL
                     'c' by cheatModeButton(cheatMode)
-                    '<' by scrollLeftItem(line)
-                    '-' by scrollerItem(serverWindowState, clientWindowState, line, maxLine, provider(DefaultGuiItems.TP_SCROLLER_HORIZONTAL.clientsideProvider))
-                    '>' by scrollRightItem(line, maxLine)
+                    '-' by scrollBar(offset = -2)
                     '^' by closeSearchButton(filter, mainWindow, searchResultsWindow)
-                    content by filteredItems
+                    content by filteredItems.mapEach { categorizedItemButton(it, cheatMode) }
+                    installBackgroundScrollSupport()
                 }
                 text.subscribe(filter::set)
                 
@@ -212,23 +217,22 @@ internal class ItemsMenu private constructor(val player: Player) {
                         .append(Component.text(filter, NamedTextColor.GRAY))
                         .append(Component.text(")", NamedTextColor.DARK_GRAY))
                         .build()
-                    DefaultGuiTextures.SEARCH_RESULTS.getTitle(title)
-                }
+                    DefaultGuiTextures.SEARCH_RESULTS.getTitle([title], locale)
+                }.flatten()
                 
                 upperGui by scrollItemsGui(
-                    "x x x x x x x x c",
-                    "x x x x x x x x s",
-                    "x x x x x x x x u",
+                    "< . . . . . . . c",
                     "x x x x x x x x |",
-                    "x x x x x x x x d",
-                    "x x x x x x x x ."
+                    "x x x x x x x x |",
+                    "x x x x x x x x |",
+                    "x x x x x x x x |",
+                    "x x x x x x x x |"
                 ) {
-                    's' by searchButton(searchWindow)
+                    '<' by backItem(searchWindow, DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.itemProvider)
                     'c' by cheatModeButton(cheatMode)
-                    'u' by scrollUpItem(line)
-                    '|' by scrollerItem(serverWindowState, clientWindowState, line, maxLine)
-                    'd' by scrollDownItem(line, maxLine)
-                    content by filteredItems
+                    '|' by scrollBar(offset = 2)
+                    content by filteredItems.mapEach { categorizedItemButton(it, cheatMode) }
+                    installBackgroundScrollSupport()
                 }
                 
                 fallbackWindow by mainWindow
@@ -260,8 +264,8 @@ private fun filterItems(player: Player, filter: String, obtainableItems: List<Ca
     
     val names = obtainableItems
         .asSequence()
-        .map { it to it.name.toPlainText(player) }
-        .filter { (_, name) -> name.contains(filter, true) }
+        .map { it to it.getPlainTextName(player.locale()) }
+        .filter { [_, name] -> name.contains(filter, true) }
         .toMap(HashMap())
     val scores = FuzzySearch.extractAll(filter, names.values).associateTo(HashMap()) { it.string to it.score }
     return names.keys.sortedWith { o1, o2 ->
@@ -275,33 +279,36 @@ private fun filterItems(player: Player, filter: String, obtainableItems: List<Ca
     }
 }
 
+context(windowDsl: WindowDsl, scrollGuiDsl: ScrollGuiDsl<*>)
 private fun categorizedItemButton(item: CategorizedItem, cheatMode: Provider<Boolean>) = item {
     val itemStack = item.itemStack
-    
-    itemProvider by itemStack
+    itemProvider by item.scrollableItemProvider
     onClick {
         if (player.hasPermission(GIVE_PERMISSION) && cheatMode.get()) {
             when {
-                clickType == ClickType.MIDDLE -> player.setItemOnCursor(itemStack.clone().apply { amount = novaItem?.maxStackSize ?: type.maxStackSize })
+                clickType == ClickType.MIDDLE -> player.setItemOnCursor(itemStack.clone().apply { amount = itemType.maxStackSize })
                 clickType == ClickType.NUMBER_KEY -> player.inventory.setItem(hotbarButton, itemStack)
                 clickType.isShiftClick -> player.inventory.addItemCorrectly(itemStack)
                 clickType.isMouseClick -> {
                     if (player.itemOnCursor.isSimilar(itemStack)) {
-                        player.setItemOnCursor(player.itemOnCursor.apply { amount = (amount + 1).coerceAtMost(novaItem?.maxStackSize ?: maxStackSize) })
+                        player.setItemOnCursor(player.itemOnCursor.apply { amount = (amount + 1).coerceAtMost(itemType.maxStackSize) })
                     } else {
                         player.setItemOnCursor(itemStack)
                     }
                 }
             }
         } else {
-            handleRecipeChoiceClick(item.id, Click(player, clickType, hotbarButton))
+            handleRecipeChoiceClick(item.key.asString(), Click(player, clickType, hotbarButton))
         }
     }
+    
+    installItemScrollSupport()
 }
 
 private fun closeSearchButton(filter: Provider<String>, main: Provider<Window>, results: Provider<Window>) = item {
-    itemProvider by DefaultGuiItems.TP_ARROW_UP_ON.createClientsideItemBuilder()
-        .setName(Component.translatable("menu.nova.items.search.back", NamedTextColor.GRAY))
+    itemProvider by itemProvider(DefaultGuiItems.TP_ARROW_UP_ON) {
+        name by Component.translatable("menu.nova.items.search.back", NamedTextColor.GRAY)
+    }
     onClick {
         if (clickType.isLeftClick) {
             if (filter.get().isBlank())
@@ -313,7 +320,7 @@ private fun closeSearchButton(filter: Provider<String>, main: Provider<Window>, 
 }
 
 private fun searchButton(search: Provider<Window>) = item {
-    itemProvider by DefaultGuiItems.TP_SEARCH.clientsideProvider
+    itemProvider by DefaultGuiItems.TP_SEARCH
     onClick {
         if (clickType.isLeftClick) {
             search.get().open()
@@ -323,10 +330,10 @@ private fun searchButton(search: Provider<Window>) = item {
 }
 
 private fun cheatModeButton(cheatMode: MutableProvider<Boolean>) = item {
-    itemProvider by cheatMode.map { cheatMode ->
+    itemProvider by cheatMode.flatMap { cheatMode ->
         if (cheatMode)
-            DefaultGuiItems.TP_CHEATING_ON.clientsideProvider
-        else DefaultGuiItems.TP_CHEATING_OFF.clientsideProvider
+            DefaultGuiItems.TP_CHEATING_ON
+        else DefaultGuiItems.TP_CHEATING_OFF
     }
     onClick {
         if (clickType.isLeftClick && player.hasPermission(GIVE_PERMISSION)) {
@@ -337,7 +344,7 @@ private fun cheatModeButton(cheatMode: MutableProvider<Boolean>) = item {
 }
 
 private fun itemCategoryTabButton(tab: Int, category: ItemCategory, activeTab: MutableProvider<Int>) = item {
-    itemProvider by category.icon
+    itemProvider by category.iconProvider
     onClick {
         if (clickType.isLeftClick && activeTab.get() != tab) {
             player.playClickSound()
@@ -347,7 +354,10 @@ private fun itemCategoryTabButton(tab: Int, category: ItemCategory, activeTab: M
 }
 
 private fun playerInventoryTabButton(tab: Provider<Int>, activeTab: MutableProvider<Int>) = item {
-    itemProvider by ItemBuilder(Material.CHEST).setName(Component.translatable("menu.nova.items.player_inventory"))
+    itemProvider by itemProvider(ItemType.CHEST) {
+        name by Component.translatable("menu.nova.items.player_inventory")
+        advancedTooltips by false
+    }
     onClick {
         if (clickType.isLeftClick && activeTab.get() != tab.get()) {
             player.playClickSound()
@@ -359,11 +369,12 @@ private fun playerInventoryTabButton(tab: Provider<Int>, activeTab: MutableProvi
 private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            ItemProvider.EMPTY
+            ItemTypeEntries.AIR
         else if (page > 0)
-            DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.clientsideProvider
-        else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF.clientsideProvider
-    }
+            DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON
+        else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF
+    }.flatten()
+    
     onClick {
         if (clickType.isLeftClick && page.get() > 0) {
             page.set(page.get() - 1)
@@ -375,11 +386,11 @@ private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>
 private fun tabPageForwardItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            ItemProvider.EMPTY
+            ItemTypeEntries.AIR
         else if (page + 1 < pageCount)
-            DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON.clientsideProvider
-        else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF.clientsideProvider
-    }
+            DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON
+        else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF
+    }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() < pageCount.get() - 1) {
             page.set(page.get() + 1)
@@ -400,6 +411,6 @@ private fun Inventory.allowOnlyEquippable(slot: EquipmentSlot) {
             ?: return@addPostUpdateHandler
         val sound = event.newItem?.getData(DataComponentTypes.EQUIPPABLE)?.equipSound()
             ?: return@addPostUpdateHandler
-        player.world.playSound(player.location, sound.toString(), SoundCategory.PLAYERS, 1f, 1f)
+        player.world.playSound(player.location, sound.asString(), SoundCategory.PLAYERS, 1f, 1f)
     }
 }

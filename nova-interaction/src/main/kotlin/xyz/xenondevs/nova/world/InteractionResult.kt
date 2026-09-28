@@ -1,0 +1,85 @@
+package xyz.xenondevs.nova.world
+
+import io.papermc.paper.datacomponent.DataComponentTypes
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.util.addToInventoryPrioritizedOrDrop
+import xyz.xenondevs.nova.world.item.ItemAction
+
+/**
+ * The result of an interaction attempt.
+ */
+sealed interface InteractionResult {
+    
+    /**
+     * No interaction occurred, pass to the next handler.
+     */
+    data object Pass : InteractionResult
+    
+    /**
+     * An interaction completed successfully, stop processing further handlers.
+     */
+    data class Success(
+        /**
+         * Whether the interacting entity's hand should swing.
+         * Note that depending on client-side predictions, a hand swing may occur even if this is set to false.
+         */
+        val swing: Boolean = false,
+        /**
+         * The action to perform on the item used for the interaction.
+         * - Use `null` if the held item was not involved in the interaction.
+         * - Use [ItemAction.None] if the held item was involved but no action should be performed.
+         *   Using this instead of `null` applies additional item-related side effects, like the use cooldown.
+         * - Use any of the pre-made [ItemActions][ItemAction] or a custom one to update the affected item stack after the interaction.
+         *   Of course, this also triggers the application of side effects.
+         */
+        val action: ItemAction? = null
+    ) : InteractionResult {
+        
+        /**
+         * Whether the held item was involved in the interaction.
+         */
+        val wasItemInteraction: Boolean
+            get() = action != null
+        
+        /**
+         * Performs the actions associated with this result as if it was [entity] that used [hand].
+         * Conditionally applies post-use side effects based on [applyPostUseSideEffects].
+         */
+        fun performActions(
+            entity: LivingEntity,
+            hand: EquipmentSlot,
+            applyPostUseSideEffects: Boolean = entity.activeItemRemainingTime == 0
+        ) {
+            if (swing)
+                entity.swingHand(hand)
+            
+            if (action != null) {
+                val previousItem = entity.equipment?.getItem(hand)?.clone()
+                    ?: ItemStack.empty()
+                
+                action.apply(entity, hand)
+                
+                if (applyPostUseSideEffects) {
+                    val remainder = previousItem.getData(DataComponentTypes.USE_REMAINDER)
+                    val cooldown = previousItem.getData(DataComponentTypes.USE_COOLDOWN)
+                    if (remainder != null) {
+                        entity.addToInventoryPrioritizedOrDrop(hand, remainder.transformInto())
+                    }
+                    if (entity is Player && cooldown != null) {
+                        entity.setCooldown(previousItem, (cooldown.seconds() * 20).toInt())
+                    }
+                }
+            }
+        }
+        
+    }
+    
+    /**
+     * The interaction failed, stop processing further handlers.
+     */
+    data object Fail : InteractionResult
+    
+}

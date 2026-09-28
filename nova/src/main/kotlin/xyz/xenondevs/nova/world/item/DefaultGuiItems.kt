@@ -1,20 +1,30 @@
 package xyz.xenondevs.nova.world.item
 
-import net.kyori.adventure.key.Key
+import org.bukkit.inventory.ItemType
+import org.joml.Vector3d
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.resources.builder.data.TintSource
-import xyz.xenondevs.nova.resources.builder.layout.item.ConditionItemModelProperty
+import xyz.xenondevs.nova.registry.NovaRegistrar.item
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryLoader
+import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelCreationScope
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
+import xyz.xenondevs.nova.resources.builder.layout.item.RangeDispatchItemModelProperty
+import xyz.xenondevs.nova.resources.builder.model.Model
+import xyz.xenondevs.nova.resources.builder.task.TextureContent
 import xyz.xenondevs.nova.util.data.writeImage
-import xyz.xenondevs.nova.world.block.behavior.Waterloggable
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import java.awt.Color
 import java.awt.image.BufferedImage
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
+@InternalInit(
+    stage = InternalInitStage.PRE_WORLD,
+    runBefore = [RegistryLoader::class]
+)
 object DefaultGuiItems {
     
     //<editor-fold desc="with background">
@@ -45,19 +55,23 @@ object DefaultGuiItems {
     val PLUS_BTN_OFF = guiItem("btn/plus_off")
     val PLUS_BTN_ON = guiItem("btn/plus_on")
     val SIDE_CONFIG_BTN = guiItem("btn/side_config", "menu.nova.side_config")
-    val ENERGY_BTN_OFF = guiItem("btn/energy_off", "menu.nova.side_config.energy")
+    val ENERGY_BTN_OFF = guiItem("btn/energy_off")
     val ENERGY_BTN_ON = guiItem("btn/energy_on", "menu.nova.side_config.energy")
     val ENERGY_BTN_SELECTED = guiItem("btn/energy_selected", "menu.nova.side_config.energy")
-    val ITEM_BTN_OFF = guiItem("btn/items_off", "menu.nova.side_config.items")
+    val ITEM_BTN_OFF = guiItem("btn/items_off")
     val ITEM_BTN_ON = guiItem("btn/items_on", "menu.nova.side_config.items")
     val ITEM_BTN_SELECTED = guiItem("btn/items_selected", "menu.nova.side_config.items")
-    val FLUID_BTN_OFF = guiItem("btn/fluids_off", "menu.nova.side_config.fluids")
+    val FLUID_BTN_OFF = guiItem("btn/fluids_off")
     val FLUID_BTN_ON = guiItem("btn/fluids_on", "menu.nova.side_config.fluids")
     val FLUID_BTN_SELECTED = guiItem("btn/fluids_selected", "menu.nova.side_config.fluids")
-    val SIMPLE_MODE_BTN_OFF = guiItem("btn/simple_mode_off", "menu.nova.side_config.simple_mode")
+    val SIMPLE_MODE_BTN_OFF = guiItem("btn/simple_mode_off")
     val SIMPLE_MODE_BTN_ON = guiItem("btn/simple_mode_on", "menu.nova.side_config.simple_mode")
-    val ADVANCED_MODE_BTN_OFF = guiItem("btn/advanced_mode_off", "menu.nova.side_config.advanced_mode")
+    val ADVANCED_MODE_BTN_OFF = guiItem("btn/advanced_mode_off")
     val ADVANCED_MODE_BTN_ON = guiItem("btn/advanced_mode_on", "menu.nova.side_config.advanced_mode")
+    val SMALL_SIMPLE_MODE_BTN_OFF = guiItem("btn/small_simple_mode_off")
+    val SMALL_SIMPLE_MODE_BTN_ON = guiItem("btn/small_simple_mode_on", "menu.nova.side_config.simple_mode")
+    val SMALL_ADVANCED_MODE_BTN_OFF = guiItem("btn/small_advanced_mode_off")
+    val SMALL_ADVANCED_MODE_BTN_ON = guiItem("btn/small_advanced_mode_on", "menu.nova.side_config.advanced_mode")
     val BLUE_BTN = guiItem("btn/blue")
     val GRAY_BTN = guiItem("btn/gray")
     val GREEN_BTN = guiItem("btn/green")
@@ -117,6 +131,8 @@ object DefaultGuiItems {
         }
     }
     
+    val DISABLED_SLOT = tpGuiItem("disabled_slot", stretched = true)
+    
     //<editor-fold desc="without background">
     // legacy InvUI gui items
     val TP_LINE_CORNER_BOTTOM_LEFT = tpGuiItem("line/corner_bottom_left", null, true)
@@ -143,19 +159,23 @@ object DefaultGuiItems {
     val TP_PLUS_BTN_OFF = tpGuiItem("btn/plus_off")
     val TP_PLUS_BTN_ON = tpGuiItem("btn/plus_on")
     val TP_SIDE_CONFIG_BTN = tpGuiItem("btn/side_config", "menu.nova.side_config")
-    val TP_ENERGY_BTN_OFF = tpGuiItem("btn/energy_off", "menu.nova.side_config.energy")
+    val TP_ENERGY_BTN_OFF = tpGuiItem("btn/energy_off")
     val TP_ENERGY_BTN_ON = tpGuiItem("btn/energy_on", "menu.nova.side_config.energy")
     val TP_ENERGY_BTN_SELECTED = tpGuiItem("btn/energy_selected", "menu.nova.side_config.energy")
-    val TP_ITEM_BTN_OFF = tpGuiItem("btn/items_off", "menu.nova.side_config.items")
+    val TP_ITEM_BTN_OFF = tpGuiItem("btn/items_off")
     val TP_ITEM_BTN_ON = tpGuiItem("btn/items_on", "menu.nova.side_config.items")
     val TP_ITEM_BTN_SELECTED = tpGuiItem("btn/items_selected", "menu.nova.side_config.items")
-    val TP_FLUID_BTN_OFF = tpGuiItem("btn/fluids_off", "menu.nova.side_config.fluids")
+    val TP_FLUID_BTN_OFF = tpGuiItem("btn/fluids_off")
     val TP_FLUID_BTN_ON = tpGuiItem("btn/fluids_on", "menu.nova.side_config.fluids")
     val TP_FLUID_BTN_SELECTED = tpGuiItem("btn/fluids_selected", "menu.nova.side_config.fluids")
-    val TP_SIMPLE_MODE_BTN_OFF = tpGuiItem("btn/simple_mode_off", "menu.nova.side_config.simple_mode")
+    val TP_SIMPLE_MODE_BTN_OFF = tpGuiItem("btn/simple_mode_off")
     val TP_SIMPLE_MODE_BTN_ON = tpGuiItem("btn/simple_mode_on", "menu.nova.side_config.simple_mode")
-    val TP_ADVANCED_MODE_BTN_OFF = tpGuiItem("btn/advanced_mode_off", "menu.nova.side_config.advanced_mode")
+    val TP_ADVANCED_MODE_BTN_OFF = tpGuiItem("btn/advanced_mode_off")
     val TP_ADVANCED_MODE_BTN_ON = tpGuiItem("btn/advanced_mode_on", "menu.nova.side_config.advanced_mode")
+    val TP_SMALL_SIMPLE_MODE_BTN_OFF = tpGuiItem("btn/small_simple_mode_off")
+    val TP_SMALL_SIMPLE_MODE_BTN_ON = tpGuiItem("btn/small_simple_mode_on", "menu.nova.side_config.simple_mode")
+    val TP_SMALL_ADVANCED_MODE_BTN_OFF = tpGuiItem("btn/small_advanced_mode_off")
+    val TP_SMALL_ADVANCED_MODE_BTN_ON = tpGuiItem("btn/small_advanced_mode_on", "menu.nova.side_config.advanced_mode")
     val TP_BLUE_BTN = tpGuiItem("btn/blue")
     val TP_GRAY_BTN = tpGuiItem("btn/gray")
     val TP_GREEN_BTN = tpGuiItem("btn/green")
@@ -209,11 +229,66 @@ object DefaultGuiItems {
     val TP_SCROLLER_VERTICAL = tpGuiItem("scroller_vertical", stretched = true)
     val TP_SCROLLER_HORIZONTAL = tpGuiItem("scroller_horizontal", stretched = true)
     val TP_LIT_PROGRESS = tpGuiItem("lit_progress") // animated texture
+    
+    /**
+     * The default vertical scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
+     * 
+     * - `customModelData.floats[0]` defines the movement of the scroller, in pixels
+     * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
+     * - Height: 15px
+     */
+    val TP_SCROLL_BAR_VERTICAL = scrollBarItem(
+        "scroll_bar_vertical",
+        ResourcePath(ResourceType.Texture, "nova", "item/gui/moving_scroller_vertical"),
+        vertical = true
+    )
+    
+    /**
+     * The default vertical disabled scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
+     * 
+     * - `customModelData.floats[0]` defines whether the scroller is visible (1) or not (any other integer value)
+     * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
+     * - Height: 15px
+     */
+    val TP_SCROLL_BAR_VERTICAL_DISABLED = disabledScrollBarItem(
+        "scroll_bar_vertical_disabled",
+        ResourcePath(ResourceType.Texture, "nova", "item/gui/moving_scroller_vertical_disabled"),
+        vertical = true
+    )
+    
+    /**
+     * The default horizontal scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
+     * 
+     * - `customModelData.floats[0]` defines the movement of the scroller, in pixels
+     * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
+     * - Width: 15px
+     */
+    val TP_SCROLL_BAR_HORIZONTAL = scrollBarItem(
+        "scroll_bar_horizontal",
+        ResourcePath(ResourceType.Texture, "nova", "item/gui/moving_scroller_horizontal"),
+        vertical = false
+    )
+    
+    /**
+     * The default horizontal disabled scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
+     * 
+     * - `customModelData.floats[0]` defines whether the scroller is visible (1) or not (any other integer value)
+     * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
+     * - Width: 15px
+     */
+    val TP_SCROLL_BAR_HORIZONTAL_DISABLED = disabledScrollBarItem(
+        "scroll_bar_horizontal_disabled",
+        ResourcePath(ResourceType.Texture, "nova", "item/gui/moving_scroller_horizontal_disabled"),
+        vertical = false
+    )
     //</editor-fold>
     
 }
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
+@InternalInit(
+    stage = InternalInitStage.PRE_WORLD,
+    runBefore = [RegistryLoader::class]
+)
 object DefaultBlockOverlays {
     
     /**
@@ -234,37 +309,13 @@ object DefaultBlockOverlays {
         model = buildModel { getModel("nova:block/transparent") }
     }
     
-    /**
-     * The overlay used for the [Waterloggable] behavior in case the block is entity-backed.
-     * * `customModelData.flags[0]`: true=fully submerged, false=partially submerged
-     * * `customModelData.colors[0]`: biome water tint
-     */
-    val WATERLOGGED = hiddenItem("waterlogged") {
-        model = condition(ConditionItemModelProperty.CustomModelData(0)) {
-            onTrue = model {
-                model = { getModel("block/waterlogged/full") }
-                tintSource[0] = TintSource.CustomModelData(Color.WHITE, 0)
-            }
-            onFalse = model {
-                model = { getModel("block/waterlogged/half") }
-                tintSource[0] = TintSource.CustomModelData(Color.WHITE, 0)
-            }
-        }
-    }
-    
-}
-
-private fun item(name: String, run: NovaItemBuilder.() -> Unit): NovaItem {
-    val builder = NovaItemBuilder(Key.key("nova", name))
-    builder.run()
-    return builder.register()
 }
 
 private fun hiddenItem(
     name: String,
     localizedName: String? = null,
     vararg itemBehaviors: ItemBehaviorHolder
-): NovaItem = item(name) {
+): RegistryEntry.Paper<ItemType> = item(name) {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -279,7 +330,7 @@ private fun hiddenItem(
     name: String,
     localizedName: String? = null,
     itemModelDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit
-): NovaItem = item(name) {
+): RegistryEntry.Paper<ItemType> = item(name) {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -291,7 +342,7 @@ private fun guiItem(
     name: String,
     localizedName: String? = null,
     stretched: Boolean = false
-): NovaItem = item("gui/opaque/$name") {
+): RegistryEntry.Paper<ItemType> = item("gui/opaque/$name") {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -305,7 +356,7 @@ private fun tpGuiItem(
     name: String,
     localizedName: String? = null,
     stretched: Boolean = false
-): NovaItem = item("gui/transparent/$name") {
+): RegistryEntry.Paper<ItemType> = item("gui/transparent/$name") {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -315,7 +366,11 @@ private fun tpGuiItem(
     }
 }
 
-private fun barGuiItem(name: String, color: Color, background: Boolean): NovaItem = item(name) {
+private fun barGuiItem(
+    name: String,
+    color: Color,
+    background: Boolean
+): RegistryEntry.Paper<ItemType> = item(name) {
     name(null)
     hidden(true)
     modelDefinition {
@@ -333,3 +388,74 @@ private fun barGuiItem(name: String, color: Color, background: Boolean): NovaIte
         }
     }
 }
+
+//<editor-fold desc="scroll bar">
+private fun scrollBarItem(
+    name: String,
+    texture: ResourcePath<ResourceType.Texture>,
+    vertical: Boolean = true
+): RegistryEntry.Paper<ItemType> = item("gui/transparent/$name") {
+    name(null)
+    hidden(true)
+    modelDefinition {
+        val textureContent = resourcePackBuilder.getBuildData<TextureContent>()
+        val base = textureContent.getImage(texture)
+        model = rangeDispatch(RangeDispatchItemModelProperty.CustomModelData) {
+            val empty = buildModel { createLayeredModel("nova:item/empty") }
+            entry[-Float.MAX_VALUE] = empty
+            for (off in -15..16) {
+                val img = BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB)
+                val graphics = img.createGraphics()
+                if (vertical) {
+                    graphics.drawImage(base, 0, off, null)
+                } else {
+                    graphics.drawImage(base, off, 0, null)
+                }
+                graphics.dispose()
+                val generatedImg = ResourcePath(ResourceType.Texture, "nova", "item/gui/${name}_$off")
+                resourcePackBuilder.writeImage(generatedImg, img)
+                entry[off.toFloat()] = secondaryOffsetModel(generatedImg, vertical)
+            }
+            entry[17] = empty
+        }
+    }
+}
+
+private fun disabledScrollBarItem(
+    name: String,
+    texture: ResourcePath<ResourceType.Texture>,
+    vertical: Boolean
+): RegistryEntry.Paper<ItemType> = item("gui/transparent/$name") {
+    name(null)
+    hidden(true)
+    modelDefinition {
+        model = rangeDispatch(RangeDispatchItemModelProperty.CustomModelData) {
+            val empty = buildModel { createLayeredModel("nova:item/empty") }
+            entry[-Float.MAX_VALUE] = empty
+            entry[0] = secondaryOffsetModel(texture, vertical)
+            entry[1] = empty
+        }
+    }
+}
+
+private fun ItemModelCreationScope<ItemModelSelectorScope>.secondaryOffsetModel(
+    texture: ResourcePath<ResourceType.Texture>,
+    vertical: Boolean
+): ItemModel = rangeDispatch(RangeDispatchItemModelProperty.CustomModelData(1)) {
+    for (secondaryOff in -8..8) {
+        entry[secondaryOff.toFloat()] = buildModel {
+            val translation = if (vertical) {
+                Vector3d(secondaryOff.toDouble(), 0.0, 0.0)
+            } else {
+                Vector3d(0.0, -secondaryOff.toDouble(), 0.0)
+            }
+            createGuiModel(
+                background = false,
+                stretched = true,
+                texture,
+                display = Model.Display.Entry(translation = translation)
+            )
+        }
+    }
+}
+//</editor-fold>

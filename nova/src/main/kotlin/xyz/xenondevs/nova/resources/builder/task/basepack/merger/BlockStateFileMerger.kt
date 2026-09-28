@@ -79,14 +79,14 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerge
     private fun processVariants(configType: BackingStateConfigType<*>, obj: JsonObject) {
         try {
             val occupied = basePacks.occupiedSolidIds.getOrPut(configType, ::HashSet)
-            obj.entrySet().removeIf { (variant, obj) ->
+            obj.entrySet().removeIf { [variant, obj] ->
                 obj as JsonObject
                 val model = obj.getStringOrNull("model")
                 if (model in IGNORABLE_MODELS)
                     return@removeIf true
                 
                 val properties = variant.split(",")
-                    .associate { it.split("=").let { (key, value) -> key to value } }
+                    .associate { it.split("=").let { [key, value] -> key to value } }
                 occupied += configType.of(properties).id
                 
                 return@removeIf false

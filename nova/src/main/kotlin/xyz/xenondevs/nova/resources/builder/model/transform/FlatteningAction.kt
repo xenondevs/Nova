@@ -8,5 +8,5 @@ internal class FlatteningAction : ContextualModelBuildAction {
     override fun apply(model: Model, context: ModelContent): Model {
         return model.flattened(context)
     }
-
+    
 }

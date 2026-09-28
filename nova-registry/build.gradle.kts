@@ -1,0 +1,17 @@
+plugins {
+    id("nova.kotlin-conventions")
+    id("nova.dokka-conventions")
+    id("nova.publish-conventions-java")
+    id("nova.mockbukkit-conventions")
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.ksp)
+}
+
+dependencies {
+    api(libs.paper.api)
+    api(libs.commons.provider)
+    api(libs.kotlinx.serialization.json)
+    api(libs.cosmicBinaryFormat)
+    ksp(project(":nova-ksp:processor:registry"))
+    implementation(libs.commons.collections)
+}

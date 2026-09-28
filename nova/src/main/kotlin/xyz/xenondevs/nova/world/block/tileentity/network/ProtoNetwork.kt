@@ -1,17 +1,18 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
+import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.commons.math.insecureRandomUuid
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
-import xyz.xenondevs.nova.world.block.tileentity.network.node.MutableNetworkNodeConnection
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNodeConnection
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.format.NetworkState
 import java.util.*
@@ -22,8 +23,8 @@ import java.util.*
 class ProtoNetwork<T : Network<T>>(
     private val state: NetworkState,
     override val type: NetworkType<T>,
-    override val uuid: UUID = UUID.randomUUID(),
-    override val nodes: MutableMap<BlockPos, MutableNetworkNodeConnection> = HashMap()
+    override val uuid: UUID = insecureRandomUuid(),
+    override val nodes: MutableMap<Block, NetworkNodeConnection> = HashMap()
 ) : NetworkData<T> {
     
     /**
@@ -51,8 +52,10 @@ class ProtoNetwork<T : Network<T>>(
     fun addAll(network: NetworkData<T>) {
         for ((node, faces) in network.nodes.values) {
             require(node !is GhostNetworkNode)
-            val (_, myFaces) = this.nodes.getOrPut(node.pos) { MutableNetworkNodeConnection(node) }
-            myFaces += faces
+            nodes.compute(node.block) { _, connection ->
+                val connection = connection ?: NetworkNodeConnection(node)
+                connection.copy(faces = connection.faces + faces)
+            }
         }
         markDirty()
     }
@@ -62,62 +65,53 @@ class ProtoNetwork<T : Network<T>>(
      */
     fun addBridge(bridge: NetworkBridge) {
         require(bridge !is GhostNetworkNode)
-        nodes[bridge.pos] = MutableNetworkNodeConnection(bridge, Collections.emptySet())
+        nodes[bridge.block] = NetworkNodeConnection(bridge)
         markDirty()
     }
     
     /**
-     * Adds [face] to the [NetworkEndPoint] at [endPoint.pos][NetworkEndPoint.pos],
+     * Adds [face] to the [NetworkEndPoint] at [endPoint.pos][NetworkEndPoint.block],
      * or adds [endPoint] and [face] to the [ProtoNetwork].
      *
      * @return - `true` if the [endPoint] was added to the [ProtoNetwork]
-     * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.pos]
+     * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.block]
      */
-    fun addEndPoint(endPoint: NetworkNode, face: BlockFace): Boolean {
-        require(endPoint !is GhostNetworkNode)
-        val presentFaces = nodes[endPoint.pos]?.faces
-        if (presentFaces != null) {
-            if (presentFaces.add(face)) {
-                markDirty()
-            }
-            return false
-        } else {
-            nodes[endPoint.pos] = MutableNetworkNodeConnection(endPoint, EnumSet.of(face))
-            markDirty()
-            return true
-        }
-    }
+    fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace): Boolean =
+        addEndPoint(endPoint, CubeFaceSet.NONE + face)
     
     /**
-     * Adds [faces] to the [NetworkEndPoint] at [endPoint.pos][NetworkEndPoint.pos],
+     * Adds [faces] to the [NetworkEndPoint] at [endPoint.pos][NetworkEndPoint.block],
      * or adds [endPoint] and [faces] to the [ProtoNetwork].
      *
      * @return - `true` if the [endPoint] was added to the [ProtoNetwork]
-     * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.pos]
+     * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.block]
      */
-    fun addEndPoint(endPoint: NetworkNode, faces: Set<BlockFace>): Boolean {
+    fun addEndPoint(endPoint: NetworkEndPoint, faces: CubeFaceSet): Boolean {
         require(endPoint !is GhostNetworkNode)
-        val presentFaces = nodes[endPoint.pos]?.faces
-        if (presentFaces != null) {
-            if (presentFaces.addAll(faces)) {
+        require(faces.isNotEmpty())
+        val connection = nodes[endPoint.block]
+        if (connection != null) {
+            val updatedFaces = connection.faces + faces
+            if (updatedFaces != connection.faces) {
+                nodes[endPoint.block] = connection.copy(faces = updatedFaces)
                 markDirty()
             }
             return false
         } else {
-            nodes[endPoint.pos] = MutableNetworkNodeConnection(endPoint, faces.toEnumSet())
+            nodes[endPoint.block] = NetworkNodeConnection(endPoint, faces)
             markDirty()
             return true
         }
     }
     
     /**
-     * Remove the [NetworkNode] at [node.pos][NetworkNode.pos] from this [ProtoNetwork].
+     * Remove the [NetworkNode] at [node.pos][NetworkNode.block] from this [ProtoNetwork].
      *
      * @return - `true` if the [node] was removed
-     * - `false` if there was no [NetworkNode] at [node.pos][NetworkNode.pos]
+     * - `false` if there was no [NetworkNode] at [node.pos][NetworkNode.block]
      */
     fun removeNode(node: NetworkNode): Boolean {
-        if (nodes.remove(node.pos) != null) {
+        if (nodes.remove(node.block) != null) {
             markDirty()
             return true
         }
@@ -126,33 +120,35 @@ class ProtoNetwork<T : Network<T>>(
     
     /**
      * Removes a [face] through which the [NetworkEndPoint] at
-     * [endPoint.pos][NetworkEndPoint.pos] connects to this [ProtoNetwork].
+     * [endPoint.pos][NetworkEndPoint.block] connects to this [ProtoNetwork].
      *
      * @return - `true` if [endPoint] was completely removed from this [ProtoNetwork]
      * - `false` if [endPoint] is still connected through other faces
      */
     fun removeFace(endPoint: NetworkEndPoint, face: BlockFace): Boolean {
-        val presentFaces = nodes[endPoint.pos]?.faces
+        val connection = nodes[endPoint.block]
             ?: return false
+        val updatedFaces = connection.faces - face
         
-        if (presentFaces.remove(face)) {
+        if (updatedFaces == connection.faces)
+            return false
+        if (updatedFaces.isEmpty()) {
+            nodes -= endPoint.block
             markDirty()
-        }
-        
-        if (presentFaces.isEmpty()) {
-            nodes -= endPoint.pos
             return true
         }
         
+        nodes[endPoint.block] = connection.copy(faces = updatedFaces)
+        markDirty()
         return false
     }
     
     /**
      * Removes all [nodes] from this [NetworkData].
      */
-    fun removeAll(nodes: Set<NetworkNode>) {
+    fun removeAll(nodes: Collection<NetworkNode>) {
         for (node in nodes) {
-            this.nodes -= node.pos
+            this.nodes -= node.block
         }
         markDirty()
     }
@@ -171,50 +167,16 @@ class ProtoNetwork<T : Network<T>>(
      *
      * Does nothing if the [cluster] has already been built.
      */
-    suspend fun initCluster() {
+    suspend fun initCluster(): ProtoNetworkCluster {
         if (cluster != null)
-            return
+            return cluster!!
         
         val cluster = ProtoNetworkCluster()
-        val queue = LinkedList<ProtoNetwork<*>>()
+        val queue = ArrayDeque<ProtoNetwork<*>>()
         queue += this
         processClusterQueue(cluster, queue)
         this.cluster = cluster
-    }
-    
-    
-    /**
-     * Enlarges the [cluster] using the [ProtoNetworks][ProtoNetwork] of [node].
-     * Enlarging a cluster also initializes / updates the clusters of all
-     * [ProtoNetworks][ProtoNetwork] that are clustered with it.
-     *
-     * If no [cluster] has been built yet, [initCluster] will be called instead.
-     */
-    suspend fun enlargeCluster(node: NetworkNode) {
-        val cluster = cluster ?: return initCluster()
-        
-        val queue = LinkedList<ProtoNetwork<*>>()
-        queueWithRelatedNetworks(cluster, queue, node)
-        processClusterQueue(cluster, queue)
-    }
-    
-    /**
-     * Enlarges the [cluster] using the [ProtoNetworks][ProtoNetwork] of [nodes].
-     * Enlarging a cluster also initializes / updates the clusters of all
-     * [ProtoNetworks][ProtoNetwork] that are clustered with it.
-     *
-     * If no [cluster] has been built yet, [initCluster] will be called instead.
-     */
-    suspend fun enlargeCluster(nodes: Collection<NetworkNode>) {
-        val cluster = cluster ?: return initCluster()
-        if (nodes.isEmpty())
-            return
-        
-        val queue = LinkedList<ProtoNetwork<*>>()
-        for (node in nodes) {
-            queueWithRelatedNetworks(cluster, queue, node)
-        }
-        processClusterQueue(cluster, queue)
+        return cluster
     }
     
     private suspend fun processClusterQueue(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>) {
@@ -226,7 +188,7 @@ class ProtoNetwork<T : Network<T>>(
             cluster += network
             network.cluster = cluster
             
-            for ((node, _) in network.nodes.values) {
+            for ([node, _] in network.nodes.values) {
                 queueWithRelatedNetworks(cluster, queue, node)
             }
         }
@@ -248,7 +210,7 @@ class ProtoNetwork<T : Network<T>>(
         
         when (node) {
             is NetworkEndPoint -> {
-                for ((otherNetworkType, _, otherNetworkId) in state.getNetworks(node)) {
+                for ([otherNetworkType, _, otherNetworkId] in state.getNetworks(node)) {
                     val otherNetwork = state.getNetworkOrThrow(otherNetworkType, otherNetworkId)
                     if (otherNetwork !in cluster)
                         queue += otherNetwork
@@ -256,7 +218,7 @@ class ProtoNetwork<T : Network<T>>(
             }
             
             is NetworkBridge -> {
-                for ((otherNetworkType, otherNetworkId) in state.getNetworks(node)) {
+                for ([otherNetworkType, otherNetworkId] in state.getNetworks(node)) {
                     val otherNetwork = state.getNetworkOrThrow(otherNetworkType, otherNetworkId)
                     if (otherNetwork !in cluster)
                         queue += otherNetwork
@@ -266,22 +228,18 @@ class ProtoNetwork<T : Network<T>>(
     }
     
     /**
-     * Invalidates the [cluster] of this [ProtoNetwork], requiring it to be rebuilt via [initCluster].
+     * Unsets the [ProtoNetwork.cluster] iff it matches [cluster].
      */
-    fun invalidateCluster() {
-        cluster = null
+    fun invalidateCluster(cluster: ProtoNetworkCluster) {
+        if (this.cluster === cluster)
+            this.cluster = null
     }
     
     /**
      * Creates an immutable copy of this [ProtoNetwork].
      */
     fun immutableCopy(): NetworkData<T> =
-        ImmutableNetworkData(
-            type, uuid,
-            nodes.mapValuesTo(HashMap(nodes.size)) { (_, con) ->
-                con.copy(faces = con.faces.toEnumSet())
-            }
-        )
+        ImmutableNetworkData(type, uuid, HashMap(nodes))
     
     /**
      * Marks this [ProtoNetwork] and its [cluster] as dirty,

@@ -6,17 +6,16 @@ import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Table
 import kotlinx.coroutines.sync.Mutex
 import org.bukkit.World
+import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.collections.associateWithNotNullTo
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.commons.collections.enumSet
-import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.commons.guava.set
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.commons.math.insecureRandomUuid
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
@@ -24,13 +23,14 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.world.block.tileentity.network.node.safelyHandleNetworkUpdate
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkChunk
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
 import xyz.xenondevs.nova.world.format.chunk.NetworkNodeData
 import java.util.*
-import kotlin.reflect.full.isSuperclassOf
 
 /**
  * Contains or links to all network-related data for a specific [World].
@@ -43,7 +43,8 @@ class NetworkState internal constructor(
 ) {
     
     private val networksById = HashMap<UUID, ProtoNetwork<*>>()
-    private val nodesByPos = HashMap<BlockPos, NetworkNode>()
+    
+    private val nodesByChunk = HashMap<ChunkPos, MutableMap<Block, NetworkNode>>()
     
     /**
      * Mutex for all data governed by this [NetworkState].
@@ -60,14 +61,20 @@ class NetworkState internal constructor(
      * Adds [node] to the network state.
      */
     operator fun plusAssign(node: NetworkNode) {
-        nodesByPos[node.pos] = node
+        val nodes = nodesByChunk.getOrPut(node.block.chunkPos, ::HashMap)
+        nodes[node.block] = node
     }
     
     /**
      * Removes [node] from the network state.
      */
     operator fun minusAssign(node: NetworkNode) {
-        nodesByPos -= node.pos
+        val chunkPos = node.block.chunkPos
+        val nodes = nodesByChunk[chunkPos]
+            ?: return
+        nodes -= node.block
+        if (nodes.isEmpty())
+            nodesByChunk -= chunkPos
     }
     
     /**
@@ -103,7 +110,25 @@ class NetworkState internal constructor(
      * Checks whether a node with the same position as [node] is present in the network state.
      */
     operator fun contains(node: NetworkNode) =
-        node.pos in nodesByPos
+        getNode(node.block) != null
+    
+    /**
+     * Gets the loaded network node at [block], or null if there is none.
+     */
+    fun getNode(block: Block): NetworkNode? =
+        nodesByChunk[block.chunkPos]?.get(block)
+    
+    /**
+     * Gets all loaded network nodes in the chunk at [chunkPos].
+     */
+    fun getNodes(chunkPos: ChunkPos): Collection<NetworkNode> =
+        nodesByChunk[chunkPos]?.values ?: emptyList()
+    
+    /**
+     * Removes and returns all loaded network nodes in the chunk at [chunkPos].
+     */
+    fun removeNodes(chunkPos: ChunkPos): Map<Block, NetworkNode> =
+        nodesByChunk.remove(chunkPos) ?: emptyMap()
     
     /**
      * Gets the [ProtoNetwork] with the given [networkId] and [type], or throws an exception
@@ -124,7 +149,7 @@ class NetworkState internal constructor(
      * Creates a new [ProtoNetwork] with the given [type] and a random UUID.
      */
     fun <T : Network<T>> createNetwork(type: NetworkType<T>): ProtoNetwork<T> {
-        val networkId = UUID.randomUUID()
+        val networkId = insecureRandomUuid()
         val network = ProtoNetwork(this, type, networkId)
         networksById[networkId] = network
         return network
@@ -135,7 +160,7 @@ class NetworkState internal constructor(
      *
      * @throws IllegalArgumentException If a network with the same [networkId] exists, but is not of the given [type].
      */
-    fun <T : Network<T>> getOrCreateNetwork(type: NetworkType<T>, networkId: UUID = UUID.randomUUID()): ProtoNetwork<T> {
+    fun <T : Network<T>> getOrCreateNetwork(type: NetworkType<T>, networkId: UUID = insecureRandomUuid()): ProtoNetwork<T> {
         val network = networksById.computeIfAbsent(networkId) { ProtoNetwork(this, type, networkId) }
         if (network.type != type)
             throw IllegalArgumentException("Network with id $networkId exists, but is not of type $type")
@@ -143,41 +168,56 @@ class NetworkState internal constructor(
     }
     
     /**
-     * Resolves a [NetworkNode] by its [pos].
+     * Resolves a [NetworkNode] by its [block].
      *
-     * @throws IllegalStateException If there is no data for a node at [pos].
+     * @throws IllegalStateException If there is no data for a node at [block].
      */
-    suspend fun resolveNode(pos: BlockPos): NetworkNode {
-        val node = nodesByPos[pos]
+    suspend fun resolveNode(block: Block): NetworkNode {
+        val node = getNode(block)
         if (node != null)
             return node
         
-        return GhostNetworkNode.fromData(pos, this.getNodeData(pos))
+        return GhostNetworkNode.fromData(block, this.getNodeData(block))
     }
     
     /**
-     * Finds all nearby [NetworkNodes][NetworkNode] of [pos] using the given [faces].
+     * Finds all nearby [NetworkNodes][NetworkNode] of [block] using the given [faces].
      */
-    fun getNearbyNodes(pos: BlockPos, faces: Set<BlockFace>): Map<BlockFace, NetworkNode> =
-        faces.associateWithNotNullTo(enumMap<BlockFace, NetworkNode>()) { face -> nodesByPos[pos.advance(face, 1)] }
+    fun getNearbyNodes(block: Block, faces: CubeFaceSet): CubeFaceMap<NetworkNode?> =
+        faces.associateWith { face -> getNode(block.getRelative(face)) }
+    
+    /**
+     * Runs [action] for each nearby [NetworkNode] of [block] using the given [faces].
+     */
+    inline fun forEachNearbyNode(
+        block: Block,
+        faces: CubeFaceSet,
+        action: (face: BlockFace, neighbor: NetworkNode) -> Unit
+    ) {
+        faces.forEach { face ->
+            val neighbor = getNode(block.getRelative(face))
+            if (neighbor != null)
+                action(face, neighbor)
+        }
+    }
     
     // ---- Data ----
     
     /**
      * Gets all network node data for the given [pos].
      */
-    suspend fun getNodeData(pos: ChunkPos): Map<BlockPos, NetworkNodeData> =
+    suspend fun getNodeData(pos: ChunkPos): Map<Block, NetworkNodeData> =
         storage.getOrLoadRegionizedChunk(pos).getData()
     
     /**
-     * Gets the [NetworkNodeData] for [pos], potentially loading the corresponding
+     * Gets the [NetworkNodeData] for [block], potentially loading the corresponding
      * network region if necessary and throws an exception if there is no data.
      *
-     * @throws IllegalStateException If there is no data for a node at [pos].
+     * @throws IllegalStateException If there is no data for a node at [block].
      */
-    suspend fun getNodeData(pos: BlockPos): NetworkNodeData =
-        storage.getOrLoadRegionizedChunk(pos.chunkPos).getData(pos)
-            ?: throw IllegalStateException("No data for node at $pos")
+    suspend fun getNodeData(block: Block): NetworkNodeData =
+        storage.getOrLoadRegionizedChunk(block.chunkPos).getData(block)
+            ?: throw IllegalStateException("No data for node at $block")
     
     /**
      * Gets the [NetworkNodeData] for [node], or throws an exception if there is no data.
@@ -185,7 +225,7 @@ class NetworkState internal constructor(
      * @throws IllegalStateException If there is no data for [node].
      */
     suspend fun getNodeData(node: NetworkNode): NetworkNodeData =
-        this.getNodeData(node.pos)
+        this.getNodeData(node.block)
     
     /**
      * Gets the [NetworkBridgeData] for [bridge], or throws an exception if there is no data.
@@ -193,14 +233,14 @@ class NetworkState internal constructor(
      * @throws IllegalStateException If there is no data for [bridge].
      */
     suspend fun getBridgeData(bridge: NetworkBridge): NetworkBridgeData =
-        storage.getOrLoadRegionizedChunk(bridge.pos.chunkPos).getBridgeData(bridge.pos)
-            ?: throw IllegalStateException("No data for bridge at ${bridge.pos}")
+        storage.getOrLoadRegionizedChunk(bridge.block.chunkPos).getBridgeData(bridge.block)
+            ?: throw IllegalStateException("No data for bridge at ${bridge.block}")
     
     /**
-     * Sets [data] at [pos].
+     * Sets [data] at [block].
      */
-    suspend fun setBridgeData(pos: BlockPos, data: NetworkBridgeData) {
-        storage.getOrLoadRegionizedChunk(pos.chunkPos).setBridgeData(pos, data)
+    suspend fun setBridgeData(block: Block, data: NetworkBridgeData) {
+        storage.getOrLoadRegionizedChunk(block.chunkPos).setBridgeData(block, data)
     }
     
     /**
@@ -209,14 +249,14 @@ class NetworkState internal constructor(
      * @throws IllegalStateException If there is no data for [endPoint].
      */
     suspend fun getEndPointData(endPoint: NetworkEndPoint): NetworkEndPointData =
-        storage.getOrLoadRegionizedChunk(endPoint.pos.chunkPos).getEndPointData(endPoint.pos)
-            ?: throw IllegalStateException("No data for endpoint at ${endPoint.pos}")
+        storage.getOrLoadRegionizedChunk(endPoint.block.chunkPos).getEndPointData(endPoint.block)
+            ?: throw IllegalStateException("No data for endpoint at ${endPoint.block}")
     
     /**
-     * Sets [data] at [pos].
+     * Sets [data] at [block].
      */
-    suspend fun setEndPointData(pos: BlockPos, data: NetworkEndPointData) {
-        storage.getOrLoadRegionizedChunk(pos.chunkPos).setEndPointData(pos, data)
+    suspend fun setEndPointData(block: Block, data: NetworkEndPointData) {
+        storage.getOrLoadRegionizedChunk(block.chunkPos).setEndPointData(block, data)
     }
     
     /**
@@ -227,7 +267,7 @@ class NetworkState internal constructor(
      * @see getBridgeData
      */
     suspend fun removeNodeData(node: NetworkNode) {
-        storage.getOrLoadRegionizedChunk(node.pos.chunkPos).setData(node.pos, null)
+        storage.getOrLoadRegionizedChunk(node.block.chunkPos).setData(node.block, null)
     }
     
     /**
@@ -237,7 +277,7 @@ class NetworkState internal constructor(
      */
     suspend fun setConnection(node: NetworkNode, networkType: NetworkType<*>, face: BlockFace) {
         val data = getNodeData(node)
-        data.connections.getOrPut(networkType, ::enumSet) += face
+        data.connections[networkType] = (data.connections[networkType] ?: CubeFaceSet.NONE) + face
     }
     
     /**
@@ -247,7 +287,7 @@ class NetworkState internal constructor(
      */
     suspend fun removeConnection(node: NetworkNode, networkType: NetworkType<*>, face: BlockFace) {
         val data = getNodeData(node)
-        data.connections[networkType]?.remove(face)
+        data.connections[networkType] = (data.connections[networkType] ?: CubeFaceSet.NONE) - face
     }
     
     /**
@@ -274,10 +314,10 @@ class NetworkState internal constructor(
      * @see removeConnection
      */
     suspend fun getConnectedNode(node: NetworkNode, face: BlockFace): NetworkNode? {
-        if (getNodeData(node).connections.none { (_, faces) -> face in faces })
+        if (getNodeData(node).connections.none { [_, faces] -> face in faces })
             return null
         
-        return resolveNode(node.pos.advance(face))
+        return resolveNode(node.block.getRelative(face))
     }
     
     /**
@@ -292,7 +332,7 @@ class NetworkState internal constructor(
         if (getNodeData(node).connections[networkType]?.contains(face) != true)
             return null
         
-        return resolveNode(node.pos.advance(face))
+        return resolveNode(node.block.getRelative(face))
     }
     
     /**
@@ -315,7 +355,7 @@ class NetworkState internal constructor(
      * @see removeConnection
      */
     suspend fun hasConnection(node: NetworkNode, face: BlockFace): Boolean =
-        getNodeData(node).connections.any { (_, faces) -> face in faces }
+        getNodeData(node).connections.any { [_, faces] -> face in faces }
     
     /**
      * Iterates over all [NetworkNodes][NetworkNode] connected to [node], calling [action] for each connection.
@@ -326,9 +366,9 @@ class NetworkState internal constructor(
      */
     suspend inline fun forEachConnectedNode(node: NetworkNode, action: (NetworkType<*>, BlockFace, NetworkNode) -> Unit) {
         val connections = getNodeData(node).connections
-        for ((networkType, faces) in connections) {
-            for (face in faces) {
-                val connectedNode = resolveNode(node.pos.advance(face))
+        for ([networkType, faces] in connections) {
+            faces.forEach { face ->
+                val connectedNode = resolveNode(node.block.getRelative(face))
                 action(networkType, face, connectedNode)
             }
         }
@@ -342,8 +382,8 @@ class NetworkState internal constructor(
      */
     suspend inline fun forEachConnectedNode(node: NetworkNode, networkType: NetworkType<*>, action: (BlockFace, NetworkNode) -> Unit) {
         val faces = getNodeData(node).connections[networkType] ?: return
-        for (face in faces) {
-            val connectedNode = resolveNode(node.pos.advance(face))
+        faces.forEach { face ->
+            val connectedNode = resolveNode(node.block.getRelative(face))
             action(face, connectedNode)
         }
     }
@@ -372,11 +412,11 @@ class NetworkState internal constructor(
      *
      * @throws IllegalStateException If there is no data for [endPoint].
      */
-    suspend fun setNetwork(endPoint: NetworkEndPoint, faces: Iterable<BlockFace>, network: ProtoNetwork<*>) {
+    suspend fun setNetwork(endPoint: NetworkEndPoint, faces: CubeFaceSet, network: ProtoNetwork<*>) {
         val data = getEndPointData(endPoint)
         val type = network.type
         val uuid = network.uuid
-        for (face in faces) {
+        faces.forEach { face ->
             data.networks[type, face] = uuid
         }
     }
@@ -398,9 +438,9 @@ class NetworkState internal constructor(
     /**
      * Forgets the connection of [endPoint] to the network of [networkType] at all [faces].
      */
-    suspend fun removeNetwork(endPoint: NetworkEndPoint, networkType: NetworkType<*>, faces: Iterable<BlockFace>) {
+    suspend fun removeNetwork(endPoint: NetworkEndPoint, networkType: NetworkType<*>, faces: CubeFaceSet) {
         val data = getEndPointData(endPoint)
-        for (face in faces) {
+        faces.forEach { face ->
             data.networks.remove(networkType, face)
         }
     }
@@ -444,7 +484,7 @@ class NetworkState internal constructor(
      */
     suspend inline fun forEachNetwork(bridge: NetworkBridge, action: (NetworkType<*>, ProtoNetwork<*>) -> Unit) {
         val networks = getNetworks(bridge)
-        for ((networkType, networkId) in networks) {
+        for ([networkType, networkId] in networks) {
             val network = getNetworkOrThrow(networkType, networkId)
             action(networkType, network)
         }
@@ -460,7 +500,7 @@ class NetworkState internal constructor(
      */
     suspend inline fun forEachNetwork(endPoint: NetworkEndPoint, action: (NetworkType<*>, BlockFace, ProtoNetwork<*>) -> Unit) {
         val networks = getNetworks(endPoint)
-        for ((networkType, face, networkId) in networks) {
+        for ([networkType, face, networkId] in networks) {
             val network = getNetworkOrThrow(networkType, networkId)
             action(networkType, face, network)
         }
@@ -475,7 +515,7 @@ class NetworkState internal constructor(
      */
     suspend inline fun <T : Network<T>> forEachNetwork(endPoint: NetworkEndPoint, networkType: NetworkType<T>, action: (BlockFace, ProtoNetwork<T>) -> Unit) {
         val networks = getNetworks(endPoint).row(networkType)
-        for ((face, networkId) in networks) {
+        for ([face, networkId] in networks) {
             val network = getNetworkOrThrow(networkType, networkId)
             action(face, network)
         }
@@ -494,7 +534,7 @@ class NetworkState internal constructor(
      *
      * @throws IllegalStateException If there is no data for [bridge].
      */
-    suspend fun getBridgeFaces(bridge: NetworkBridge): MutableSet<BlockFace> =
+    suspend fun getBridgeFaces(bridge: NetworkBridge): CubeFaceSet =
         getBridgeData(bridge).bridgeFaces
     
     // ---- More complex utility functions ----
@@ -502,17 +542,16 @@ class NetworkState internal constructor(
     /**
      * Computes a set of allowed [BlockFaces][BlockFace] with which [endPoint]
      * is allowed to connect to [Networks][Network] of the given [type].
-     * Will be empty if the [NetworkEndPoint] does not contain all [required holder types][NetworkType.holderTypes].
+     * Will be empty if the [NetworkEndPoint] does not support the given [type], which is implied by [NetworkType.extractHolders] returning `null`.
      */
-    fun getAllowedFaces(endPoint: NetworkEndPoint, type: NetworkType<*>): Set<BlockFace> {
-        val holders = endPoint.holders
-        if (!type.holderTypes.all { requiredType -> holders.any { holder -> requiredType.isSuperclassOf(holder::class) } })
-            return emptySet()
-        
-        return holders.asSequence()
-            .filter { holder -> type.holderTypes.any { requiredType -> requiredType.isSuperclassOf(holder::class) } }
-            .flatMap { it.allowedFaces }
-            .toEnumSet()
+    fun getAllowedFaces(endPoint: NetworkEndPoint, type: NetworkType<*>): CubeFaceSet {
+        var allowedFaces = CubeFaceSet.ALL
+        val holders = type.extractHolders(endPoint)
+            ?: return CubeFaceSet.NONE
+        for (holder in holders) {
+            allowedFaces = allowedFaces and holder.allowedFaces
+        }
+        return allowedFaces
     }
     
     /**
@@ -522,29 +561,26 @@ class NetworkState internal constructor(
      *
      * @throws IllegalStateException If there is no data for [bridge].
      */
-    suspend fun getAllowedFaces(bridge: NetworkBridge, type: NetworkType<*>): Set<BlockFace> {
+    suspend fun getAllowedFaces(bridge: NetworkBridge, type: NetworkType<*>): CubeFaceSet {
         val data = getBridgeData(bridge)
         if (type in data.supportedNetworkTypes)
             return data.bridgeFaces
-        return emptySet()
+        return CubeFaceSet.NONE
     }
     
     /**
-     * Tries to connect [endPoint] to [bridge] from [face] over [networkType],
-     * adding all [ProtoNetworks][ProtoNetwork] whose clusters need to be enlarged
-     * with [endPoint] to [clustersToEnlarge].
+     * Tries to connect [endPoint] to [bridge] from [face] over [networkType].
      */
     suspend fun connectEndPointToBridge(
         endPoint: NetworkEndPoint, bridge: NetworkBridge,
-        networkType: NetworkType<*>, face: BlockFace,
-        clustersToEnlarge: MutableSet<ProtoNetwork<*>>
+        networkType: NetworkType<*>, face: BlockFace
     ) {
         val oppositeFace = face.oppositeFace
         val network = getNetwork(bridge, networkType)!!
         
         // add to network
-        network.addEndPoint(endPoint, face)
-        clustersToEnlarge += network
+        if (network.addEndPoint(endPoint, face))
+            network.cluster?.invalidate()
         
         // update state
         setConnection(endPoint, networkType, face)
@@ -553,16 +589,16 @@ class NetworkState internal constructor(
     }
     
     /**
-     * Connects [endPoint] to [other] from [face] over [networkType]
-     * and adds the new [ProtoNetwork] to [clustersToInit].
+     * Connects [endPoint] to [other] from [face] over [networkType].
      *
      * @return `true` if the action was successful
      */
     suspend fun <T : Network<T>> connectEndPointToEndPoint(
         endPoint: NetworkEndPoint, other: NetworkEndPoint,
-        networkType: NetworkType<T>, face: BlockFace,
-        clustersToInit: MutableSet<ProtoNetwork<*>>
+        networkType: NetworkType<T>, face: BlockFace
     ): Boolean {
+        if (!endPoint.requestsLocalNetwork(face) && !other.requestsLocalNetwork(face.oppositeFace))
+            return false
         if (!networkType.validateLocal(endPoint, other, face))
             return false
         
@@ -572,7 +608,6 @@ class NetworkState internal constructor(
         val network = createNetwork(networkType)
         network.addEndPoint(endPoint, face)
         network.addEndPoint(other, oppositeFace)
-        clustersToInit += network
         
         // update state
         setConnection(endPoint, networkType, face)
@@ -584,37 +619,27 @@ class NetworkState internal constructor(
     }
     
     /**
-     * Disconnects [endPoint] from [bridge] at [face] over [networkType],
-     * adding all [ProtoNetworks][ProtoNetwork] whose clusters need to be reinitialized
-     * to [clustersToInit].
+     * Disconnects [endPoint] from [bridge] at [face] over [networkType].
      */
     suspend fun disconnectEndPointFromBridge(
         endPoint: NetworkEndPoint, bridge: NetworkBridge,
-        networkType: NetworkType<*>, face: BlockFace,
-        clustersToInit: MutableSet<ProtoNetwork<*>>
+        networkType: NetworkType<*>, face: BlockFace
     ) {
         removeConnection(endPoint, networkType, face)
         removeConnection(bridge, networkType, face.oppositeFace)
         removeNetwork(endPoint, networkType, face)
         
         val network = getNetwork(bridge, networkType)!!
-        if (network.removeFace(endPoint, face)) {
-            network.cluster?.forEach { previouslyClusteredNetwork ->
-                previouslyClusteredNetwork.invalidateCluster()
-                clustersToInit += previouslyClusteredNetwork
-            }
-        }
+        if (network.removeFace(endPoint, face))
+            network.cluster?.invalidate()
     }
     
     /**
-     * Disconnects [endPoint] from [other] at [face] over [networkType],
-     * adding all [ProtoNetworks][ProtoNetwork] whose clusters need to be reinitialized
-     * to [clustersToInit].
+     * Disconnects [endPoint] from [other] at [face] over [networkType].
      */
     suspend fun disconnectEndPointFromEndPoint(
         endPoint: NetworkEndPoint, other: NetworkEndPoint,
-        networkType: NetworkType<*>, face: BlockFace,
-        clustersToInit: MutableSet<ProtoNetwork<*>>
+        networkType: NetworkType<*>, face: BlockFace
     ) {
         val oppositeFace = face.oppositeFace
         
@@ -630,12 +655,7 @@ class NetworkState internal constructor(
         removeNetwork(endPoint, networkType, face)
         removeNetwork(other, networkType, oppositeFace)
         
-        network.cluster?.forEach { previouslyClusteredNetwork ->
-            previouslyClusteredNetwork.invalidateCluster()
-            if (previouslyClusteredNetwork != network) {
-                clustersToInit += previouslyClusteredNetwork
-            }
-        }
+        network.cluster?.invalidate()
     }
     
     /**
@@ -646,36 +666,30 @@ class NetworkState internal constructor(
         endPoint: NetworkEndPoint,
         networkType: NetworkType<*>, face: BlockFace
     ) {
-        val clustersToEnlarge = HashSet<ProtoNetwork<*>>()
-        val clustersToInit = HashSet<ProtoNetwork<*>>()
-        
         val allowedFaces = getAllowedFaces(endPoint, networkType)
         val isCurrentlyConnected = hasConnection(endPoint, networkType, face)
-        val neighbor = nodesByPos[endPoint.pos.advance(face)]
+        val neighbor = getNode(endPoint.block.getRelative(face))
         
         if (face in allowedFaces) {
             if (!isCurrentlyConnected) {
                 when {
                     neighbor is NetworkBridge && face.oppositeFace in getAllowedFaces(neighbor, networkType) ->
-                        connectEndPointToBridge(endPoint, neighbor, networkType, face, clustersToEnlarge)
+                        connectEndPointToBridge(endPoint, neighbor, networkType, face)
                     
                     neighbor is NetworkEndPoint && face.oppositeFace in getAllowedFaces(neighbor, networkType) ->
-                        connectEndPointToEndPoint(endPoint, neighbor, networkType, face, clustersToInit)
+                        connectEndPointToEndPoint(endPoint, neighbor, networkType, face)
                 }
             }
         } else if (isCurrentlyConnected) {
             when (neighbor) {
-                is NetworkBridge -> disconnectEndPointFromBridge(endPoint, neighbor, networkType, face, clustersToInit)
-                is NetworkEndPoint -> disconnectEndPointFromEndPoint(endPoint, neighbor, networkType, face, clustersToInit)
+                is NetworkBridge -> disconnectEndPointFromBridge(endPoint, neighbor, networkType, face)
+                is NetworkEndPoint -> disconnectEndPointFromEndPoint(endPoint, neighbor, networkType, face)
                 null -> Unit
             }
         }
         
-        clustersToEnlarge.forEach { it.enlargeCluster(endPoint) }
-        clustersToInit.forEach { it.initCluster() }
-        
-        endPoint.handleNetworkUpdate(this)
-        neighbor?.handleNetworkUpdate(this)
+        endPoint.safelyHandleNetworkUpdate(this)
+        neighbor?.safelyHandleNetworkUpdate(this)
     }
     
 }

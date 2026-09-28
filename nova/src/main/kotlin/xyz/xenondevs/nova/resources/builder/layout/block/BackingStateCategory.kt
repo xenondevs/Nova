@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.resources.builder.layout.block
 
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.state.BlockState
+import org.bukkit.block.BlockType
+import org.bukkit.block.data.BlockData
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.entries.BlockTypeEntries
 import xyz.xenondevs.nova.world.block.state.model.AcaciaLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.AzaleaLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
@@ -16,28 +18,29 @@ import xyz.xenondevs.nova.world.block.state.model.MangroveLeavesBackingStateConf
 import xyz.xenondevs.nova.world.block.state.model.MushroomStemBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.OakLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.OrangePoplarLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.PaleOakLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.RedPoplarLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.SpruceLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.TripwireBackingStateConfigType
+import xyz.xenondevs.nova.world.block.state.model.YellowPoplarLeavesBackingStateConfig
 
 /**
  * Represent the different block types whose states can be used to display a custom block model.
  *
  * State-backed custom block models are generally more performant than entity-backed models, but have some limitations.
  * There is also only a certain amount of total block states available that can be used for custom block models.
- *
- * @param fallbackHitbox The hitbox block type if display entities are used instead.
  */
 enum class BackingStateCategory(
-    internal val fallbackHitbox: BlockState,
+    internal val fallbackCollider: Provider<BlockData>,
     internal vararg val backingStateConfigTypes: BackingStateConfigType<*>
 ) {
     
     /**
      * The block model uses note block states.
      *
-     * - Limited to 2024 different models
+     * - Limited to 1349 different models
      * - Models cannot be transparent
      * - Full block hitbox
      * - Full block collider
@@ -45,7 +48,7 @@ enum class BackingStateCategory(
      * - Client-side arm swing animation on right-click
      */
     NOTE_BLOCK(
-        fallbackHitbox = Blocks.BARRIER,
+        fallbackCollider = BlockTypeEntries.BARRIER,
         NoteBackingStateConfig
     ),
     
@@ -59,14 +62,14 @@ enum class BackingStateCategory(
      * - Cannot be waterlogged
      */
     MUSHROOM_BLOCK(
-        fallbackHitbox = Blocks.BARRIER,
+        fallbackCollider = BlockTypeEntries.BARRIER,
         RedMushroomBackingStateConfig, BrownMushroomBackingStateConfig, MushroomStemBackingStateConfig
     ),
     
     /**
-     * The block model uses leave block states.
+     * The block model uses leaf block states.
      *
-     * - Limited to 153 different models
+     * - Limited to 182 different models
      * - Models can be transparent, translucent textures are disabled on "fancy" graphics setting
      * - Full block hitbox
      * - Full block collider
@@ -74,11 +77,12 @@ enum class BackingStateCategory(
      * - Some shaders might animate blocks of this type to blow in the wind
      */
     LEAVES(
-        fallbackHitbox = Blocks.BARRIER,
+        fallbackCollider = BlockTypeEntries.BARRIER,
         OakLeavesBackingStateConfig, SpruceLeavesBackingStateConfig, BirchLeavesBackingStateConfig,
         JungleLeavesBackingStateConfig, AcaciaLeavesBackingStateConfig, DarkOakLeavesBackingStateConfig,
         MangroveLeavesBackingStateConfig, AzaleaLeavesBackingStateConfig, FloweringAzaleaLeavesBackingStateConfig,
-        CherryLeavesBackingStateConfig, PaleOakLeavesBackingStateConfig
+        CherryLeavesBackingStateConfig, PaleOakLeavesBackingStateConfig,
+        RedPoplarLeavesBackingStateConfig, OrangePoplarLeavesBackingStateConfig, YellowPoplarLeavesBackingStateConfig
     ),
     
     /**
@@ -91,7 +95,7 @@ enum class BackingStateCategory(
      * - Cannot be waterlogged
      */
     TRIPWIRE_UNATTACHED(
-        fallbackHitbox = Blocks.STRUCTURE_VOID,
+        fallbackCollider = BlockTypeEntries.STRUCTURE_VOID,
         TripwireBackingStateConfigType.Unattached
     ),
     
@@ -105,11 +109,11 @@ enum class BackingStateCategory(
      * - Cannot be waterlogged
      */
     TRIPWIRE_ATTACHED(
-        fallbackHitbox = Blocks.STRUCTURE_VOID,
+        fallbackCollider = BlockTypeEntries.STRUCTURE_VOID,
         TripwireBackingStateConfigType.Attached
     );
     
-    constructor(fallbackHitbox: Block, vararg backingStateConfigTypes: BackingStateConfigType<*>) :
-        this(fallbackHitbox.defaultBlockState(), *backingStateConfigTypes)
+    constructor(fallbackCollider: RegistryEntry.Paper<BlockType>, vararg backingStateConfigTypes: BackingStateConfigType<*>) :
+        this(fallbackCollider.map { it.createBlockData() }, *backingStateConfigTypes)
     
 }

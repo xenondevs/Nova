@@ -3,13 +3,12 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.entry
-import xyz.xenondevs.commons.collections.toEnumMap
-import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.observed
-import xyz.xenondevs.commons.provider.orElseNew
-import xyz.xenondevs.nova.util.TickResettingLong
+import xyz.xenondevs.commons.provider.mutableProvider
+import xyz.xenondevs.commons.provider.orElseLazily
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import kotlin.math.max
 import kotlin.math.min
@@ -28,24 +27,20 @@ class DefaultEnergyHolder(
     energy: MutableProvider<Long>,
     val maxEnergyProvider: Provider<Long>,
     override val allowedConnectionType: NetworkConnectionType,
-    blockedFaces: Set<BlockFace>,
-    defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType>
+    override val blockedFaces: CubeFaceSet,
+    defaultConnectionConfig: CubeFaceMap<NetworkConnectionType>
 ) : EnergyHolder {
     
-    private val _energyProvider: MutableProvider<Long> = energy
-    private val _energyMinus = TickResettingLong()
-    private val _energyPlus = TickResettingLong()
+    private var activeEnergyMinus = 0L
+    private var activeEnergyPlus = 0L
     
-    override val blockedFaces = blockedFaces.toEnumSet()
-    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
-        by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-            .orElseNew {
-                val map = defaultConnectionConfig().toEnumMap()
-                for (face in blockedFaces)
-                    map[face] = NetworkConnectionType.NONE
-                map
+    override var connectionConfig: CubeFaceMap<NetworkConnectionType>
+        by compound.entry<CubeFaceMap<NetworkConnectionType>>("connectionConfig")
+            .orElseLazily {
+                defaultConnectionConfig.map { face, value ->
+                    if (face !in blockedFaces) value else NetworkConnectionType.NONE
+                }
             }
-            .observed()
     
     /**
      * The maximum amount of energy this [EnergyHolder] can store.
@@ -55,32 +50,60 @@ class DefaultEnergyHolder(
     /**
      * A [Provider] for the current energy amount.
      */
-    val energyProvider: Provider<Long> get() = _energyProvider
+    val energyProvider: Provider<Long>
+        field = energy
     
     /**
-     * The amount of energy that was extracted during the last server tick.
+     * A [Provider] containing the amount of energy that was extracted between the second-to-last and last energy network tick.
+     * For visualization, this value should be normalized by dividing it by the number of game ticks between energy network ticks.
      */
-    val energyMinus: Long by _energyMinus
+    val energyMinusProvider: Provider<Long>
+        field = mutableProvider(0L)
     
     /**
-     * The amount of energy that was inserted during the last server tick.
+     * A [Provider] containing the amount of energy that was inserted between the second-to-last and last energy network tick.
+     * For visualization, this value should be normalized by dividing it by the number of game ticks between energy network ticks.
      */
-    val energyPlus: Long by _energyPlus
+    val energyPlusProvider: Provider<Long>
+        field = mutableProvider(0L)
+    
+    /**
+     * The amount of energy that was extracted between the second-to-last and last energy network tick.
+     * For visualization, this value should be normalized by dividing it by the number of game ticks between energy network ticks.
+     */
+    val energyMinus: Long by energyMinusProvider
+    
+    /**
+     * The amount of energy that was inserted between the second-to-last and last energy network tick.
+     * For visualization, this value should be normalized by dividing it by the number of game ticks between energy network ticks.
+     */
+    val energyPlus: Long by energyPlusProvider
     
     override var energy: Long
-        get() = _energyProvider.get()
+        get() = energyProvider.get()
         set(value) {
             val capped = max(min(value, maxEnergy), 0)
-            if (_energyProvider.get() != capped) {
-                val energyDelta = capped - _energyProvider.get()
+            if (energyProvider.get() != capped) {
+                val energyDelta = capped - energyProvider.get()
                 if (energyDelta > 0) {
-                    _energyPlus.add(energyDelta)
+                    activeEnergyPlus += energyDelta
                 } else {
-                    _energyMinus.add(-energyDelta)
+                    activeEnergyMinus -= energyDelta
                 }
                 
-                _energyProvider.set(capped)
+                energyProvider.set(capped)
             }
         }
+    
+    /**
+     * Called by the network group ticking the energy network of this holder to flush the accumulated
+     * energy plus and minus values to [energyPlus] and [energyMinus].
+     */
+    fun postTick() {
+        energyMinusProvider.set(activeEnergyMinus)
+        energyPlusProvider.set(activeEnergyPlus)
+        activeEnergyMinus = 0L
+        activeEnergyPlus = 0L
+    }
     
 }

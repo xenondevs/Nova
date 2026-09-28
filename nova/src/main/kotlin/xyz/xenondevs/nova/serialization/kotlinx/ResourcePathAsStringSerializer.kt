@@ -17,7 +17,7 @@ internal class ResourcePathSerializer<T : ResourceType>(
     private val resourceType: T by lazy { Json.decodeFromString(contextSerializer, "{}") }
     
     override fun serialize(encoder: Encoder, value: ResourcePath<T>) {
-        encoder.encodeString(value.toString())
+        encoder.encodeString(value.asString())
     }
     
     override fun deserialize(decoder: Decoder): ResourcePath<T> {

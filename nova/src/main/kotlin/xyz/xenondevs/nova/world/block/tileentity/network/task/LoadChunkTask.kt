@@ -10,11 +10,12 @@ import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.world.block.tileentity.network.NetworkNodeSnapshot
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.world.block.tileentity.network.node.safelyHandleNetworkLoaded
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
@@ -22,6 +23,7 @@ import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
 internal class LoadChunkTask(
     state: NetworkState,
     override val chunkPos: ChunkPos,
+    private val snapshot: NetworkNodeSnapshot
 ) : NetworkTask(state) {
     
     //<editor-fold desc="jfr event", defaultstate="collapsed">
@@ -29,39 +31,43 @@ internal class LoadChunkTask(
     @Name("xyz.xenondevs.LoadChunk")
     @Label("Load Chunk")
     @Category("Nova", "TileEntity Network")
-    private inner class LoadChunkTaskEvent : Event() {
+    private class LoadChunkTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = this@LoadChunkTask.chunkPos.toString()
+        var pos: String = ""
         
     }
     
-    override val event: Event = LoadChunkTaskEvent()
+    override val event: Event
+        get() = LoadChunkTaskEvent()
+    
+    override fun populateEvent(event: Event) {
+        (event as LoadChunkTaskEvent).pos = chunkPos.toString()
+    }
     //</editor-fold>
     
     override suspend fun run(): Boolean {
         val updatedNetworks = HashMap<ProtoNetwork<*>, MutableSet<NetworkNode>>()
         
-        val chunkNodes = NetworkManager.getNodes(chunkPos).associateByTo(HashMap(), NetworkNode::pos)
         val networkChunk = state.storage.getOrLoadRegionizedChunk(chunkPos)
         val networkNodes = networkChunk.getData()
         
-        for ((pos, data) in networkNodes) {
-            val node = chunkNodes[pos]
+        for ([pos, data] in networkNodes) {
+            val node = snapshot.nodes[pos]
             
             // the network data of unknown nodes should not be removed in order to prevent data loss of addons that weren't loaded
-            if (node == null && NetworkManager.isUnknown(pos))
+            if (node == null && pos in snapshot.unknownBlocks)
                 continue
             
             when {
                 node != null && node in state -> {
-                    LOGGER.error("Node at pos $pos is already loaded", Exception())
+                    LOGGER.error("Error while loading network chunk at $chunkPos: Node at pos $pos is already loaded")
                     continue
                 }
                 
                 node is NetworkBridge && data is NetworkBridgeData -> {
                     val networks = data.networks
-                    for ((type, id) in networks) {
+                    for ([type, id] in networks) {
                         val network = state.getOrCreateNetwork(type, id)
                         network.addBridge(node)
                         updatedNetworks.getOrPut(network, ::HashSet) += node
@@ -70,7 +76,7 @@ internal class LoadChunkTask(
                 
                 node is NetworkEndPoint && data is NetworkEndPointData -> {
                     val networks = data.networks
-                    for ((type, face, id) in networks) {
+                    for ([type, face, id] in networks) {
                         val network = state.getOrCreateNetwork(type, id)
                         network.addEndPoint(node, face)
                         updatedNetworks.getOrPut(network, ::HashSet) += node
@@ -79,7 +85,11 @@ internal class LoadChunkTask(
                 
                 else -> {
                     // node is null or node and data type do not match
-                    LOGGER.error("Node type and data type mismatch: $node does not match $data. (Removing from network data storage)", Exception())
+                    if (node == null) {
+                        LOGGER.error("Error while loading network chunk at $chunkPos: Expected node at $pos, but found none. (Removing from network data storage)")
+                    } else {
+                        LOGGER.error("Error while loading network chunk at $chunkPos: Node type and data type mismatch: $node does not match $data. (Removing from network data storage)")
+                    }
                     networkChunk.setData(pos, null)
                     continue
                 }
@@ -88,12 +98,12 @@ internal class LoadChunkTask(
             state += node
         }
         
-        for ((network, nodes) in updatedNetworks) {
+        for ([network, nodes] in updatedNetworks) {
             for (node in nodes) {
-                node.handleNetworkLoaded(state)
+                node.safelyHandleNetworkLoaded(state)
             }
             
-            network.enlargeCluster(nodes)
+            network.cluster?.invalidate()
         }
         
         return updatedNetworks.isNotEmpty()

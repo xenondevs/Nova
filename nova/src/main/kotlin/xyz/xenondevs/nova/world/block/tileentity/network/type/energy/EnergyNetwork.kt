@@ -10,10 +10,11 @@ import xyz.xenondevs.nova.config.node
 import xyz.xenondevs.nova.util.sumOfNoOverflow
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
+import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.EnergyHolder
-import java.util.BitSet
+import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToLong
 
@@ -32,7 +33,7 @@ class EnergyNetwork internal constructor(
         var transferRate = DEFAULT_TRANSFER_RATE
         var complexity = 0
         
-        for ((pos, con) in networkData.nodes) {
+        for ([pos, con] in networkData.nodes) {
             val (node, faces) = con
             try {
                 if (node is NetworkEndPoint) {
@@ -41,9 +42,8 @@ class EnergyNetwork internal constructor(
                     
                     var insert = false
                     var extract = false
-                    for (face in faces) {
+                    faces.forEach { face ->
                         val connectionType = energyHolder.connectionConfig[face]
-                            ?: throw IllegalArgumentException("Missing connection config for $face")
                         insert = insert || connectionType.insert
                         extract = extract || connectionType.extract
                     }
@@ -153,7 +153,7 @@ class EnergyNetwork internal constructor(
             if (energyPerHolder <= 0)
                 break
             
-            for ((idx, holder) in holders.withIndex()) {
+            for ([idx, holder] in holders.withIndex()) {
                 if (ignored[idx])
                     continue
                 
@@ -169,7 +169,7 @@ class EnergyNetwork internal constructor(
         // The remaining energy is smaller than the non-ignored holder count and can thus not be distributed equally to all holders.
         // Instead, the remaining energy is just given to the first holders that can take it.
         if (remaining > 0) {
-            for ((idx, holder) in holders.withIndex()) {
+            for ([idx, holder] in holders.withIndex()) {
                 if (ignored[idx])
                     continue
                 
@@ -238,7 +238,7 @@ class EnergyNetwork internal constructor(
         private val ENERGY_NETWORK = MAIN_CONFIG.node("network", "energy")
         val TICK_DELAY_PROVIDER: Provider<Int> = ENERGY_NETWORK.entry<Int>("tick_delay")
         val DEFAULT_TRANSFER_RATE: Long by combinedProvider(ENERGY_NETWORK.entry<Double>("default_transfer_rate"), TICK_DELAY_PROVIDER)
-            .map { (defaultTransferRate, tickDelay) -> (defaultTransferRate * tickDelay).roundToLong() }
+            .map { [defaultTransferRate, tickDelay] -> (defaultTransferRate * tickDelay).roundToLong() }
             .map { defaultTransferRate -> if (defaultTransferRate < 0) Long.MAX_VALUE else defaultTransferRate }
         val MAX_COMPLEXITY: Int by ENERGY_NETWORK.entry<Int>("max_complexity")
         
@@ -250,6 +250,9 @@ class EnergyNetwork internal constructor(
             
             return conFrom != conTo || conFrom == NetworkConnectionType.BUFFER
         }
+        
+        internal fun extractHolders(endPoint: NetworkEndPoint): List<EndPointDataHolder>? =
+            endPoint.holders.firstInstanceOfOrNull<EnergyHolder>()?.let(::listOf)
         
     }
     

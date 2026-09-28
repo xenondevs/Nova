@@ -3,119 +3,116 @@ package xyz.xenondevs.nova.ui.menu.sideconfig
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.commons.collections.after
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.Click
-import xyz.xenondevs.invui.item.notifyWindows
-import xyz.xenondevs.nova.ui.menu.item.AsyncItem
-import xyz.xenondevs.nova.ui.menu.item.BUTTON_COLORS
+import xyz.xenondevs.commons.provider.MutableProvider
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
+import xyz.xenondevs.commons.provider.mutableProvider
+import xyz.xenondevs.invui.dsl.gui
+import xyz.xenondevs.invui.dsl.item
+import xyz.xenondevs.invui.dsl.itemProvider
+import xyz.xenondevs.invui.dsl.tabGui
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.ui.menu.item.TP_BUTTON_COLORS
 import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.playClickSound
-import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.node.ContainerEndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
+import xyz.xenondevs.nova.world.chunkPos
+import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.itemProvider
 
 abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPointDataHolder<C>> internal constructor(
     endPoint: NetworkEndPoint,
-    networkType: NetworkType<*>,
+    networkType: RegistryEntry.Nova<NetworkType<*>>,
     holder: H,
-    private val namedContainers: Map<C, String>
+    protected val namedContainers: Map<C, String>
 ) : AbstractSideConfigMenu<H>(endPoint, networkType, holder) {
     
-    protected abstract val hasSimpleVersion: Boolean
-    protected abstract val hasAdvancedVersion: Boolean
-    
     private val containers: List<C> = namedContainers.keys.toList()
-    private val containerConfigItems = enumMap<BlockFace, ContainerConfigItem>()
-    private val simpleModeBtn = SimplicityModeItem(true)
-    private val advancedModeBtn = SimplicityModeItem(false)
     
-    private val simpleGui = Gui.builder()
-        .setStructure(
-            "# # # # u # # # #",
-            "# # # l f r # # #",
-            "# # # # d b # # #"
-        )
-        .addIngredient('u', ConnectionConfigItem(BlockSide.TOP))
-        .addIngredient('l', ConnectionConfigItem(BlockSide.LEFT))
-        .addIngredient('f', ConnectionConfigItem(BlockSide.FRONT))
-        .addIngredient('r', ConnectionConfigItem(BlockSide.RIGHT))
-        .addIngredient('d', ConnectionConfigItem(BlockSide.BOTTOM))
-        .addIngredient('b', ConnectionConfigItem(BlockSide.BACK))
-        .build()
+    protected val simpleMode = mutableProvider(SimplicityMode.ADVANCED)
+    private val isSimpleConfiguration = mutableProvider(false)
+    private val containersAtFace: CubeFaceMap<MutableProvider<C?>> =
+        CubeFaceMap { mutableProvider(null) }
     
-    private val advancedGui = Gui.builder()
-        .setStructure(
-            "# # u # # # 1 # #",
-            "# l f r # 2 3 4 #",
-            "# # d b # # 5 6 #"
-        )
-        .addIngredient('u', ConnectionConfigItem(BlockSide.TOP))
-        .addIngredient('l', ConnectionConfigItem(BlockSide.LEFT))
-        .addIngredient('f', ConnectionConfigItem(BlockSide.FRONT))
-        .addIngredient('r', ConnectionConfigItem(BlockSide.RIGHT))
-        .addIngredient('d', ConnectionConfigItem(BlockSide.BOTTOM))
-        .addIngredient('b', ConnectionConfigItem(BlockSide.BACK))
-        .addIngredient('1', ContainerConfigItem(BlockSide.TOP))
-        .addIngredient('2', ContainerConfigItem(BlockSide.LEFT))
-        .addIngredient('3', ContainerConfigItem(BlockSide.FRONT))
-        .addIngredient('4', ContainerConfigItem(BlockSide.RIGHT))
-        .addIngredient('5', ContainerConfigItem(BlockSide.BOTTOM))
-        .addIngredient('6', ContainerConfigItem(BlockSide.BACK))
-        .build()
-    
-    override fun initAsync() {
-        super.initAsync()
-        val isSimple = isSimpleConfiguration()
-        simpleModeBtn.updateAsync()
-        advancedModeBtn.updateAsync()
-        runTask {
-            if (hasSimpleVersion && hasAdvancedVersion) {
-                advancedGui.setItem(8, 0, simpleModeBtn)
-                simpleGui.setItem(8, 0, advancedModeBtn)
-            }
-            switchSimplicity(isSimple)
-        }
+    override val gui = tabGui(
+        "x x x x x x x x",
+        "x x x x x x x x",
+        "x x x x x x x x",
+        "x x x x x x x x",
+    ) {
+        'u' by connectionConfigItem(BlockSide.TOP)
+        'l' by connectionConfigItem(BlockSide.LEFT)
+        'f' by connectionConfigItem(BlockSide.FRONT)
+        'r' by connectionConfigItem(BlockSide.RIGHT)
+        'd' by connectionConfigItem(BlockSide.BOTTOM)
+        'b' by connectionConfigItem(BlockSide.BACK)
+        '1' by containerConfigItem(BlockSide.TOP)
+        '2' by containerConfigItem(BlockSide.LEFT)
+        '3' by containerConfigItem(BlockSide.FRONT)
+        '4' by containerConfigItem(BlockSide.RIGHT)
+        '5' by containerConfigItem(BlockSide.BOTTOM)
+        '6' by containerConfigItem(BlockSide.BACK)
+        's' by simplicityModeItem(simpleMode, isSimpleConfiguration)
+        
+        val simpleGui = gui(
+            ". . . . . . . .",
+            ". . . . u . . s",
+            ". . . l f r . .",
+            ". . . . d b . ."
+        ) {}
+        
+        val advancedGui = gui(
+            ". . . . . . . .",
+            ". . u . . . 1 s",
+            ". l f r . 2 3 4",
+            ". . d b . . 5 6"
+        ) {}
+        
+        tabs by listOf(simpleGui, advancedGui)
+        tab by simpleMode.map(SimplicityMode::tab, SimplicityMode.entries::get)
     }
     
-    private fun switchSimplicity(simple: Boolean) {
-        gui.fillRectangle(0, 0, if (simple) simpleGui else advancedGui, true)
+    override fun refresh(state: NetworkState) {
+        super.refresh(state)
+        isSimpleConfiguration.set(isSimpleConfiguration())
+        containersAtFace.forEach { face, container -> container.set(holder.containerConfig[face]) }
     }
     
     private fun queueCycleContainer(face: BlockFace, move: Int) {
         if (containers.size <= 1)
             return
         
-        NetworkManager.queueWrite(endPoint.pos.chunkPos) { state ->
+        NetworkManager.queueWrite(endPoint.block.chunkPos) { state ->
+            var containerConfig = holder.containerConfig
+            var connectionConfig = holder.connectionConfig
+            
             // cycle container
-            val currentContainer = holder.containerConfig[face]!!
+            val currentContainer = containerConfig[face]!!
             val newContainer = containers.after(currentContainer, move)
-            holder.containerConfig[face] = newContainer
+            containerConfig = containerConfig.with(face, newContainer)
+            
             // adjust connection type
             val allowedTypes = holder.containers[newContainer]!!.supertypes
-            if (holder.connectionConfig[face] !in allowedTypes)
-                holder.connectionConfig[face] = allowedTypes[0]
+            if (connectionConfig[face] !in allowedTypes)
+                connectionConfig = connectionConfig.with(face, allowedTypes[0])
+            
+            holder.containerConfig = containerConfig    
+            holder.connectionConfig = connectionConfig
             
             state.getNetwork(endPoint, networkType, face)?.markDirty()
             state.handleEndPointAllowedFacesChange(endPoint, networkType, face)
             
             // update ui
-            connectionConfigItems[face]?.forEach(AsyncItem::updateAsync)
-            containerConfigItems[face]?.updateAsync()
-            simpleModeBtn.updateAsync()
-            runTask {
-                connectionConfigItems[face]?.notifyWindows()
-                containerConfigItems[face]?.notifyWindows()
-                simpleModeBtn.notifyWindows()
-            }
+            refresh(state)
         }
     }
     
@@ -126,64 +123,81 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
             ?: NetworkConnectionType.NONE
     
     override fun getConnectionType(face: BlockFace): NetworkConnectionType {
-        return holder.connectionConfig[face]!!
+        return holder.connectionConfig[face]
     }
     
     override fun setConnectionType(face: BlockFace, type: NetworkConnectionType) {
-        holder.connectionConfig[face] = type
+        holder.connectionConfig = holder.connectionConfig.with(face, type)
     }
     
     protected abstract fun isSimpleConfiguration(): Boolean
     
-    private inner class ContainerConfigItem(side: BlockSide) : ConfigItem(side) {
+    private fun containerConfigItem(side: BlockSide) = item {
+        val [_, face] = getFaceFromSide(side)
         
-        init {
-            containerConfigItems[face] = this
-        }
-        
-        override fun updateAsync() {
-            val container = holder.containerConfig[face] ?: throw IllegalStateException("No container at $face")
-            val color = BUTTON_COLORS[containers.indexOf(container)]
-            
-            val builder = color.createClientsideItemBuilder()
-                .setName(getSideName(blockSide, face))
-                .addLoreLines(Component.translatable(
-                    namedContainers[container] ?: throw IllegalArgumentException("Missing name for $container"),
+        itemProvider by itemProvider {
+            type by containersAtFace[face].flatMap { container ->
+                if (container != null)
+                    TP_BUTTON_COLORS[containers.indexOf(container)]
+                else DefaultGuiItems.GRAY_BTN
+            }
+            name by containersAtFace[face].map { container ->
+                Component.translatable(
+                    namedContainers[container] ?: "",
                     NamedTextColor.AQUA
-                ))
-            
-            provider.set(builder)
+                )
+            }
         }
         
-        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
+        onClick {
             player.playClickSound()
             queueCycleContainer(face, if (clickType.isLeftClick) 1 else -1)
         }
-        
     }
     
-    private inner class SimplicityModeItem(private val simple: Boolean) : AsyncItem() {
+    private fun simplicityModeItem(
+        currentMode: MutableProvider<SimplicityMode>,
+        isSimpleConfiguration: Provider<Boolean>
+    ) = item {
+        itemProvider by combinedProvider(
+            currentMode, isSimpleConfiguration
+        ) { currentMode, isSimpleConfiguration ->
+            when (currentMode) {
+                SimplicityMode.SIMPLE_ONLY, SimplicityMode.ADVANCED_ONLY -> DefaultGuiItems.INVISIBLE_ITEM.itemProvider
+                SimplicityMode.ADVANCED if isSimpleConfiguration -> DefaultGuiItems.TP_SMALL_SIMPLE_MODE_BTN_ON.itemProvider
+                SimplicityMode.ADVANCED -> DefaultGuiItems.TP_SMALL_SIMPLE_MODE_BTN_OFF.itemProvider
+                else -> DefaultGuiItems.TP_SMALL_ADVANCED_MODE_BTN_ON.itemProvider
+            }
+        }.flatten()
         
-        override fun updateAsync() {
-            val builder = if (simple) {
-                if (isSimpleConfiguration()) {
-                    DefaultGuiItems.SIMPLE_MODE_BTN_ON.clientsideProvider
-                } else DefaultGuiItems.SIMPLE_MODE_BTN_OFF.createClientsideItemBuilder()
-                    .setName(Component.translatable("menu.nova.side_config.simple_mode"))
-                    .addLoreLines(Component.translatable("menu.nova.side_config.simple_mode.unavailable", NamedTextColor.GRAY))
-            } else DefaultGuiItems.ADVANCED_MODE_BTN_ON.clientsideProvider
-            
-            provider.set(builder)
+        onClick {
+            if (currentMode.get().canSwitch(isSimpleConfiguration.get())) {
+                player.playClickSound()
+                currentMode.set(!currentMode.get())
+            }
+        }
+    }
+    
+    protected enum class SimplicityMode(val tab: Int) {
+        
+        SIMPLE(0),
+        SIMPLE_ONLY(0),
+        ADVANCED(1),
+        ADVANCED_ONLY(1);
+        
+        fun canSwitch(isSimpleConfiguration: Boolean): Boolean = when (this) {
+            SIMPLE -> true
+            SIMPLE_ONLY -> false
+            ADVANCED -> isSimpleConfiguration
+            ADVANCED_ONLY -> false
         }
         
-        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
-            if (simple && !isSimpleConfiguration())
-                return
-            
-            player.playClickSound()
-            switchSimplicity(simple)
+        operator fun not(): SimplicityMode = when (this) {
+            SIMPLE -> ADVANCED
+            SIMPLE_ONLY -> SIMPLE_ONLY
+            ADVANCED -> SIMPLE
+            ADVANCED_ONLY -> ADVANCED_ONLY
         }
         
     }
-    
 }

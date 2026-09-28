@@ -4,6 +4,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.DefaultNetworkTypes
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.world.format.NetworkState
 
 fun ItemSideConfigMenu(
     endPoint: NetworkEndPoint,
@@ -23,11 +24,22 @@ class ItemSideConfigMenu(
     private val mergedInventory: NetworkedInventory?
 ) : ContainerSideConfigMenu<NetworkedInventory, ItemHolder>(endPoint, DefaultNetworkTypes.ITEM, holder, namedInventories) {
     
-    override val hasSimpleVersion: Boolean = mergedInventory != null
-    override val hasAdvancedVersion: Boolean = mergedInventory == null || namedInventories.size > 2
+    private val hasSimpleVersion = mergedInventory != null
+    private val hasAdvancedVersion = mergedInventory == null || namedContainers.size > 2
     
     init {
         require(namedInventories.isNotEmpty())
+    }
+    
+    override fun init(state: NetworkState) {
+        super.init(state)
+        
+        simpleMode.set(when {
+            hasSimpleVersion && !hasAdvancedVersion -> SimplicityMode.SIMPLE_ONLY
+            !hasSimpleVersion -> SimplicityMode.ADVANCED_ONLY
+            isSimpleConfiguration() -> SimplicityMode.SIMPLE
+            else -> SimplicityMode.ADVANCED
+        })
     }
     
     override fun isSimpleConfiguration(): Boolean {

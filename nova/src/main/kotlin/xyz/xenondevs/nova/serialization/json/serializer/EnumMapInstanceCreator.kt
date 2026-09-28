@@ -6,7 +6,7 @@ import java.lang.reflect.Type
 import java.util.*
 
 internal object EnumMapInstanceCreator : InstanceCreator<EnumMap<*, *>> {
-
+    
     override fun createInstance(type: Type) =
         createEnumMap((type as ParameterizedType).actualTypeArguments[0] as Class<*>)
     

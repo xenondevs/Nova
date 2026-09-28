@@ -16,10 +16,8 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries.ABILITY_TYPE
 import xyz.xenondevs.nova.serialization.persistentdata.get
 import xyz.xenondevs.nova.serialization.persistentdata.set
-import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
-import kotlin.collections.set
 
 private val ABILITIES_KEY = NamespacedKey("nova", "abilities1")
 
@@ -82,7 +80,7 @@ object AbilityManager : Listener {
     }
     
     private fun saveActiveAbilities(player: Player) {
-        val abilities = activeAbilities[player]?.map { it.key.id }
+        val abilities = activeAbilities[player]?.map { it.key.key }
         val dataContainer = player.persistentDataContainer
         
         if (abilities != null)

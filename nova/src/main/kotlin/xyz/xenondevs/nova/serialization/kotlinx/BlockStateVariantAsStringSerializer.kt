@@ -12,7 +12,7 @@ internal object BlockStateVariantAsStringSerializer : KSerializer<BlockStateDefi
     override val descriptor = PrimitiveSerialDescriptor("xyz.xenondevs.nova.VariantAsStringSerializer", PrimitiveKind.STRING)
     
     override fun serialize(encoder: Encoder, value: BlockStateDefinition.Variant) {
-        encoder.encodeString(value.properties.entries.joinToString(",") { (k, v) -> "$k=$v" })
+        encoder.encodeString(value.properties.entries.joinToString(",") { [k, v] -> "$k=$v" })
     }
     
     override fun deserialize(decoder: Decoder): BlockStateDefinition.Variant {

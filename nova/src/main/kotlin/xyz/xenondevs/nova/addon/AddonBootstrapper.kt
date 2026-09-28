@@ -18,11 +18,9 @@ import kotlin.io.path.notExists
 @Suppress("unused") // called by generated bootstrap code
 internal object AddonBootstrapper {
     
-    private val _addons = ArrayList<Addon>()
-    
     @JvmStatic
     val addons: List<Addon>
-        get() = _addons
+        field = ArrayList()
     
     @JvmStatic
     fun bootstrap(context: BootstrapContext, classLoader: ClassLoader) {
@@ -31,13 +29,14 @@ internal object AddonBootstrapper {
         checkRequiredNovaVersion(context, addonMeta)
         checkRequiredMinecraftVersion(context)
         
+        // TODO: create addon instance later when starting init, this is too early at the moment
         val addon = getAddonInstance(addonMeta, classLoader)
         addon.pluginMeta = context.pluginMeta
         addon.file = context.pluginSource
         addon.dataFolder = Path("plugins", context.pluginMeta.name)
         addon.logger = context.logger
         
-        _addons += addon
+        addons += addon
         BOOTSTRAPPER.handleAddonBootstrap(context)
     }
     
@@ -71,7 +70,7 @@ internal object AddonBootstrapper {
     
     private fun checkRequiredNovaVersion(context: PluginProviderContext, addonMeta: ConfigurationNode) {
         val novaVersion = LaunchEntryPointHandler.INSTANCE.storage.asSequence()
-            .flatMap { (_, storage) -> storage.registeredProviders }
+            .flatMap { [_, storage] -> storage.registeredProviders }
             .first { it.meta.name == "Nova" }
             .meta.version
             .let(::Version)

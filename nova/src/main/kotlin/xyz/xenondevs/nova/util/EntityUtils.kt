@@ -1,6 +1,10 @@
 package xyz.xenondevs.nova.util
 
 import com.mojang.authlib.GameProfile
+import io.papermc.paper.datacomponent.DataComponentType
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.Tool
+import io.papermc.paper.datacomponent.item.Weapon
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.NbtIo
@@ -17,6 +21,7 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.storage.TagValueOutput
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.block.Block
 import org.bukkit.craftbukkit.entity.CraftEntity
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
@@ -25,14 +30,9 @@ import org.joml.Vector3d
 import org.joml.Vector3dc
 import org.joml.primitives.AABBdc
 import org.joml.primitives.Rayd
-import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.util.data.NBTUtils
-import xyz.xenondevs.nova.util.item.novaItem
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
-import xyz.xenondevs.nova.world.item.behavior.Damageable
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
-import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -66,47 +66,19 @@ fun BukkitLivingEntity.damageItemInOffHand(damage: Int = 1): Boolean =
     damageItemInHand(BukkitEquipmentSlot.OFF_HAND, damage)
 
 /**
- * Damages the item in the specified [hand] by [damage] amount
- * as if the entity caused it and returns whether the item broke.
- */
-fun BukkitLivingEntity.damageItemInHand(hand: BukkitEquipmentSlot, damage: Int = 1): Boolean {
-    if (damage <= 0)
-        return false
-    
-    val itemInHand = nmsEntity.getItemInHand(hand.nmsInteractionHand)
-    var broken = false
-    itemInHand.hurtAndBreak(damage, world.serverLevel, nmsEntity, {
-        nmsEntity.onEquippedItemBroken(it, hand.nmsEquipmentSlot)
-        broken = true
-    }, true)
-    
-    return broken
-}
-
-/**
  * Damages the tool in the [entity's][BukkitLivingEntity] main hand as if they've broken a block.
  */
-fun BukkitLivingEntity.damageToolBreakBlock() = damageToolInMainHand(Damageable::itemDamageOnBreakBlock, VanillaToolCategory::itemDamageOnBreakBlock)
+fun BukkitLivingEntity.damageToolBreakBlock() = damageToolInMainHand(DataComponentTypes.TOOL, Tool::damagePerBlock)
 
 /**
  * Damages the tool in the [entity's][BukkitLivingEntity] main hand as if they've attack an entity.
  */
-fun BukkitLivingEntity.damageToolAttackEntity() = damageToolInMainHand(Damageable::itemDamageOnAttackEntity, VanillaToolCategory::itemDamageOnAttackEntity)
+fun BukkitLivingEntity.damageToolAttackEntity() = damageToolInMainHand(DataComponentTypes.WEAPON, Weapon::itemDamagePerAttack)
 
-private inline fun BukkitLivingEntity.damageToolInMainHand(getNovaDamage: (Damageable) -> Int, getVanillaDamage: (VanillaToolCategory) -> Int) {
-    val itemStack = nmsEntity.mainHandItem
-    val novaItem = itemStack.novaItem
-    
-    val damage: Int
-    if (novaItem != null) {
-        val damageable = novaItem.getBehaviorOrNull<Damageable>() ?: return
-        damage = getNovaDamage(damageable)
-    } else {
-        val toolCategory = ToolCategory.ofItem(itemStack.asBukkitMirror()).firstInstanceOfOrNull<VanillaToolCategory>() ?: return
-        damage = getVanillaDamage(toolCategory)
-    }
-    
-    damageItemInMainHand(damage)
+private inline fun <T : Any> BukkitLivingEntity.damageToolInMainHand(type: DataComponentType.Valued<T>, getValue: (T) -> Int) {
+    val damage = equipment?.itemInMainHand?.getData(type)?.let(getValue) ?: 0
+    if (damage > 0)
+        damageItemInMainHand(damage)
 }
 
 /**
@@ -121,7 +93,7 @@ fun BukkitEntity.teleport(modifyLocation: Location.() -> Unit) {
 /**
  * The translation key for the name of this [BukkitEntity].
  */
-val BukkitEntity.localizedName: String?
+val BukkitEntity.localizedName: String
     get() = (this as CraftEntity).handle.type.descriptionId
 
 /**
@@ -132,7 +104,7 @@ val BukkitEntity.eyeInWater: Boolean
 
 object EntityUtils {
     
-    internal val DUMMY_PLAYER = createFakePlayer(Location(Bukkit.getWorlds()[0], 0.0, 0.0, 0.0), UUID.randomUUID(), "Nova Dummy Player")
+    internal val DUMMY_PLAYER = createFakePlayer(Location(Bukkit.getWorlds()[0], 0.0, 0.0, 0.0), insecureRandomUuid(), "Nova Dummy Player")
     private val DEFAULT_DESERIALIZATION_DISALLOWED_ENTITY_TYPES: Set<EntityType> = buildSet {
         add(EntityType.COMMAND_BLOCK_MINECART)
         add(EntityType.FALLING_BLOCK) // command block falling block (for good measure, command doesn't seem to be there after landing)
@@ -158,15 +130,15 @@ object EntityUtils {
     }
     
     /**
-     * Creates not-spawned [item entities][ItemEntity] based on the specified [items] and [pos].
+     * Creates not-spawned [item entities][ItemEntity] based on the specified [items] and [block].
      */
-    fun createBlockDropItemEntities(pos: BlockPos, items: Iterable<ItemStack>): List<ItemEntity> =
+    fun createBlockDropItemEntities(block: Block, items: Iterable<ItemStack>): List<ItemEntity> =
         items.map {
             ItemEntity(
-                pos.world.serverLevel,
-                pos.x + 0.5 + Random.nextDouble(-0.25, 0.25),
-                pos.y + 0.5 + Random.nextDouble(-0.25, 0.25),
-                pos.z + 0.5 + Random.nextDouble(-0.25, 0.25),
+                block.world.serverLevel,
+                block.x + 0.5 + Random.nextDouble(-0.25, 0.25),
+                block.y + 0.5 + Random.nextDouble(-0.25, 0.25),
+                block.z + 0.5 + Random.nextDouble(-0.25, 0.25),
                 it.unwrap().copy()
             ).apply(ItemEntity::setDefaultPickUpDelay)
         }
@@ -242,7 +214,7 @@ object EntityUtils {
         val entities = ArrayList<MojangEntity>()
         NMSEntityType.loadEntityRecursive(compoundTag, level, EntitySpawnRequest(spawnReason, false)) { entity ->
             // assign new uuid
-            entity.uuid = UUID.randomUUID()
+            entity.uuid = insecureRandomUuid()
             
             // (deferred) add entity to world
             entities += entity
@@ -262,7 +234,7 @@ object EntityUtils {
      */
     fun createFakePlayer(
         location: Location,
-        uuid: UUID = UUID.randomUUID(),
+        uuid: UUID = insecureRandomUuid(),
         name: String = "Nova FakePlayer",
         hasEvents: Boolean = false
     ): ServerPlayer {

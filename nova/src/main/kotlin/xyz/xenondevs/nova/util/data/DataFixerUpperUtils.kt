@@ -11,6 +11,10 @@ import net.minecraft.core.Registry
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
 import net.minecraft.tags.TagKey
+import xyz.xenondevs.nova.registry.NovaRegistry
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.util.toIdentifier
+import xyz.xenondevs.nova.util.toKey
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.reader
@@ -80,6 +84,13 @@ fun <R> Result<R>.asDataResult(): DataResult<R> {
 
 fun <R : Any> R?.asDataResult(error: String): DataResult<R> =
     if (this != null) DataResult.success(this) else DataResult.error { error }
+
+fun <T : NovaRegistryElement<T>> NovaRegistry<T>.byNameCodec(): Codec<T> {
+    return Identifier.CODEC.flatXmap(
+        { runCatching { getValueOrThrow(it.toKey()) }.asDataResult() },
+        { runCatching { it.key.toIdentifier() }.asDataResult() }
+    )
+}
 
 class IdentifierOrTagKey<T : Any> internal constructor(internal val either: Either<Identifier, TagKey<T>>) {
     

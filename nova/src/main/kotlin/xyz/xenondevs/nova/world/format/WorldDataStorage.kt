@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.util.concurrent.checkServerThread
 internal class WorldDataStorage(val world: World) {
     
     private val fileAccess = AsyncFileAccess()
-    val blockStorage = RegionFileStorage(world, "nova_region", "nvr", fileAccess, RegionFile)
     val networkStorage = RegionFileStorage(world, "nova_network_region", "nvnr", fileAccess, NetworkRegionFile)
     val networkState = NetworkState(networkStorage)
     
@@ -18,12 +17,18 @@ internal class WorldDataStorage(val world: World) {
      */
     suspend fun save(unload: Boolean = true) = withContext(Dispatchers.Default) {
         networkState.mutex.withLock { // network-related data is stored in network region files and tile-entity data (block region files)
-            blockStorage.saveAndUnload { _, regionFile -> unload && regionFile.isInactive() }
-            networkStorage.saveAndUnload { rid, _ ->
-                // network region files that don't have a corresponding block region file can be unloaded
-                // (at least most of the time, modifications to big networks may cause them to be loaded again)
-                // TODO: a better solution may be to track last access time
-                unload && !blockStorage.isLoaded(rid)
+            networkStorage.saveAndUnload { _, f ->
+                if (!unload)
+                    return@saveAndUnload false
+                
+                // unload if network region file was not accessed since the last time it was saved
+                var accessedSinceLastSave = false
+                for (chunk in f.chunks) {
+                    if (chunk.accessedSinceLastSave)
+                        accessedSinceLastSave = true
+                    chunk.accessedSinceLastSave = false
+                }
+                !accessedSinceLastSave
             }
         }
     }
@@ -34,12 +39,6 @@ internal class WorldDataStorage(val world: World) {
      */
     suspend fun shutdownAndWait() {
         checkServerThread()
-        
-        // disable all chunks
-        blockStorage.awaitRegionizedFiles()
-            .flatMap(RegionFile::chunks)
-            .onEach { it.disable() }
-            .onEach { it.awaitShutdown() }
         
         // save data
         save(unload = false)

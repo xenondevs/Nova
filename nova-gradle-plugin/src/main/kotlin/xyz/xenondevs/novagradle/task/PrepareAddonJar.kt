@@ -365,7 +365,7 @@ internal abstract class PrepareAddonJar : DefaultTask() {
             invokeVirtual("io/papermc/paper/plugin/loader/library/impl/MavenLibraryResolver", "addRepository", "(Lorg/eclipse/aether/repository/RemoteRepository;)V")
             
             // resolver.addRepository(new RemoteRepository.Builder(repo.name, "default", repo.url).build())
-            for ((i, url) in repositoryUrls.withIndex()) {
+            for ([i, url] in repositoryUrls.withIndex()) {
                 dup()
                 new($$"org/eclipse/aether/repository/RemoteRepository$Builder")
                 dup()

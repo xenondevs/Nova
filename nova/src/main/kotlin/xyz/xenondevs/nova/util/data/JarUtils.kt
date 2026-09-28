@@ -18,8 +18,6 @@ internal data class AnnotationSearchResult(
 
 internal object JarUtils {
     
-    // TODO: find annotated classes during build and write them to a file 
-    
     fun findAnnotatedClasses(
         file: Path,
         classAnnotations: List<KClass<out Annotation>>,

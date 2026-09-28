@@ -20,7 +20,7 @@ internal class NetworkedMultiVirtualInventory(
     
     val inventories: Map<VirtualInventory, NetworkConnectionType> =
         inventories.entries
-            .sortedBy { (inv, _) -> inv.getGuiPriority(OperationCategory.ADD) }
+            .sortedBy { [inv, _] -> inv.getGuiPriority(OperationCategory.ADD) }
             .associate { it.toPair() }
     
     private val inventoryBySlot: Array<VirtualInventory>
@@ -45,7 +45,7 @@ internal class NetworkedMultiVirtualInventory(
     
     override fun add(itemStack: ItemStack, amount: Int): Int {
         var amountLeft = amount
-        for ((inv, conType) in inventories) {
+        for ([inv, conType] in inventories) {
             if (!conType.insert)
                 continue
             
@@ -96,9 +96,9 @@ internal class NetworkedMultiVirtualInventory(
     
     override fun copyContents(destination: Array<ItemStack>) {
         var invStartIdx = 0
-        for ((inv, conType) in inventories) {
+        for ([inv, conType] in inventories) {
             if (conType.extract) {
-                for ((idx, itemStack) in inv.unsafeItems.withIndex()) {
+                for ([idx, itemStack] in inv.unsafeItems.withIndex()) {
                     destination[invStartIdx + idx] = itemStack?.clone() ?: ItemStack.empty()
                 }
             }

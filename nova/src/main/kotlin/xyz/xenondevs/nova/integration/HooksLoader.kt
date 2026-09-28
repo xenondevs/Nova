@@ -32,7 +32,7 @@ internal object HooksLoader {
             NOVA_JAR,
             listOf(Hook::class), emptyList(),
             "xyz/xenondevs/nova/hook/impl/"
-        ).classes[Hook::class]?.forEach { (className, annotations) ->
+        ).classes[Hook::class]?.forEach { [className, annotations] ->
             val annotation = annotations.first()
             try {
                 val plugins = annotation["plugins"] as? List<String> ?: emptyList()

@@ -119,7 +119,7 @@ class DtoSerializationTest {
                 try {
                     var expected = content
                     expected = expected.removeConditionally(conditionalRemovals)
-                    expected = reserializations.fold(expected) { acc, (n, d, s) ->
+                    expected = reserializations.fold(expected) { acc, [n, d, s] ->
                         d as DeserializationStrategy<Any>
                         s as SerializationStrategy<Any>
                         acc.reserializeNamed(n, d, s)
@@ -142,8 +142,8 @@ class DtoSerializationTest {
     private fun JsonElement.withoutKeys(discardKeys: Set<String>): JsonElement = when (this) {
         is JsonObject -> JsonObject(
             entries
-                .filterNot { (key, _) -> key in discardKeys }
-                .associate { (key, value) -> key to value.withoutKeys(discardKeys) }
+                .filterNot { [key, _] -> key in discardKeys }
+                .associate { [key, value] -> key to value.withoutKeys(discardKeys) }
         )
         
         is JsonArray -> JsonArray(map { it.withoutKeys(discardKeys) })
@@ -154,8 +154,8 @@ class DtoSerializationTest {
     private fun JsonElement.removeConditionally(conditions: Map<String, (JsonElement) -> Boolean>): JsonElement = when (this) {
         is JsonObject -> JsonObject(
             entries
-                .filterNot { (k, v) -> k in conditions && conditions[k]!!.invoke(v) }
-                .associate { (k, v) -> k to v.removeConditionally(conditions) }
+                .filterNot { [k, v] -> k in conditions && conditions[k]!!.invoke(v) }
+                .associate { [k, v] -> k to v.removeConditionally(conditions) }
         )
         
         is JsonArray -> JsonArray(map { it.removeConditionally(conditions) })
@@ -168,7 +168,7 @@ class DtoSerializationTest {
         deserializer: DeserializationStrategy<T>,
         serializer: SerializationStrategy<T>
     ): JsonElement = when (this) {
-        is JsonObject -> JsonObject(entries.associate { (key, value) ->
+        is JsonObject -> JsonObject(entries.associate { [key, value] ->
             val newValue = if (key == name)
                 value.reserialize(deserializer, serializer)
             else value.reserializeNamed(name, deserializer, serializer)
@@ -200,8 +200,8 @@ class DtoSerializationTest {
     
     private fun JsonElement.sanitizedEquals(other: JsonElement): Boolean {
         return when (this) {
-            is JsonObject if other is JsonObject -> this.all { (key, value) -> other[key]?.sanitizedEquals(value) ?: false }
-            is JsonArray if other is JsonArray -> this.size == other.size && this.withIndex().all { (i, value) -> value.sanitizedEquals(other.getOrNull(i) ?: return false) }
+            is JsonObject if other is JsonObject -> this.all { [key, value] -> other[key]?.sanitizedEquals(value) ?: false }
+            is JsonArray if other is JsonArray -> this.size == other.size && this.withIndex().all { [i, value] -> value.sanitizedEquals(other.getOrNull(i) ?: return false) }
             is JsonPrimitive if other is JsonPrimitive -> this.sanitizedEquals(other)
             else -> this == other
         }
@@ -209,8 +209,8 @@ class DtoSerializationTest {
     
     private fun JsonElement.sanitizedContainsAll(other: JsonElement): Boolean {
         return when (this) {
-            is JsonObject if other is JsonObject -> other.all { (key, value) -> this[key]?.sanitizedContainsAll(value) ?: false }
-            is JsonArray if other is JsonArray -> other.withIndex().all { (i, value) -> this.getOrNull(i)?.sanitizedContainsAll(value) ?: false }
+            is JsonObject if other is JsonObject -> other.all { [key, value] -> this[key]?.sanitizedContainsAll(value) ?: false }
+            is JsonArray if other is JsonArray -> other.withIndex().all { [i, value] -> this.getOrNull(i)?.sanitizedContainsAll(value) ?: false }
             is JsonPrimitive if other is JsonPrimitive -> this.sanitizedEquals(other)
             else -> this == other
         }

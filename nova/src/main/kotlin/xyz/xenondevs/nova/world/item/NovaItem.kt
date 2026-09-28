@@ -1,22 +1,22 @@
-@file:Suppress("unused", "MemberVisibilityCanBePrivate", "UNCHECKED_CAST")
-
 package xyz.xenondevs.nova.world.item
 
+import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
+import io.papermc.paper.registry.RegistryKey
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.Style
-import net.minecraft.core.component.DataComponentPatch
-import net.minecraft.core.component.DataComponents
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
 import net.minecraft.world.InteractionHand
-import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
-import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.block.BlockType
+import org.bukkit.craftbukkit.inventory.CraftItemType
 import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -26,210 +26,268 @@ import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import org.spongepowered.configurate.CommentedConfigurationNode
-import xyz.xenondevs.cbf.Cbf
+import org.bukkit.inventory.ItemType
+import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
-import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
-import xyz.xenondevs.nova.resources.builder.task.VanillaMaterialTypes
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
+import xyz.xenondevs.nova.registry.NovaItemBuilder
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.bootstrapFlatMap
+import xyz.xenondevs.nova.util.asBukkitCopy
 import xyz.xenondevs.nova.util.blockFace
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.util.item.ItemUtils
-import xyz.xenondevs.nova.util.toNovaPos
+import xyz.xenondevs.nova.util.nmsInteractionHand
+import xyz.xenondevs.nova.util.nmsItem
+import xyz.xenondevs.nova.util.toBlock
+import xyz.xenondevs.nova.util.toIdentifier
 import xyz.xenondevs.nova.util.toVector3d
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
-import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
-import xyz.xenondevs.nova.world.item.behavior.BlockItemBehavior
-import xyz.xenondevs.nova.world.item.behavior.DefaultBehavior
 import xyz.xenondevs.nova.world.item.behavior.ItemBehavior
-import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorFactory
-import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.world.item.logic.PacketItems
 import xyz.xenondevs.nova.world.toNms
+import java.lang.invoke.MethodHandles
+import java.lang.invoke.VarHandle
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 import net.minecraft.world.InteractionResult as NmsInteractionResult
 import net.minecraft.world.entity.Entity as NmsEntity
+import net.minecraft.world.entity.LivingEntity as NmsLivingEntity
 import net.minecraft.world.entity.player.Player as NmsPlayer
 import net.minecraft.world.item.ItemStack as NmsItemStack
+
+private val ITEM_CACHED_TYPE: VarHandle = MethodHandles
+    .privateLookupIn(Item::class.java, MethodHandles.lookup())
+    .findVarHandle(Item::class.java, $$"nova$cachedType", ItemType::class.java)
+
+private val ITEM_CACHED_TYPE_ENTRY: VarHandle = MethodHandles
+    .privateLookupIn(Item::class.java, MethodHandles.lookup())
+    .findVarHandle(Item::class.java, $$"nova$cachedTypeEntry", Any::class.java)
+
+private val ITEM_CACHED_ITEM_PROVIDER: VarHandle = MethodHandles
+    .privateLookupIn(Item::class.java, MethodHandles.lookup())
+    .findVarHandle(Item::class.java, $$"nova$itemProvider", Any::class.java)
+
+private val ITEM_CACHED_GUI_ITEM_PROVIDER: VarHandle = MethodHandles
+    .privateLookupIn(Item::class.java, MethodHandles.lookup())
+    .findVarHandle(Item::class.java, $$"nova$guiItemProvider", Any::class.java)
+
+internal val Item.itemType: ItemType
+    get() {
+        val cached = ITEM_CACHED_TYPE.get(this)
+        if (cached != null)
+            return cached as ItemType
+        val itemType = CraftItemType.minecraftToBukkitNew(this)
+        ITEM_CACHED_TYPE.set(this, itemType)
+        return itemType
+    }
+
+@Suppress("UNCHECKED_CAST")
+private val Item.itemTypeEntry: RegistryEntry.Paper<ItemType>
+    get() {
+        val cached = ITEM_CACHED_TYPE_ENTRY.get(this)
+        if (cached != null)
+            return cached as RegistryEntry.Paper<ItemType>
+        val entry = RegistryEntry.paper(RegistryKey.ITEM, itemType)
+        ITEM_CACHED_TYPE_ENTRY.set(this, entry)
+        return entry
+    }
+
+@Suppress("UNCHECKED_CAST")
+private val Item.itemProvider: Provider<ItemProvider>
+    get() {
+        val cached = ITEM_CACHED_ITEM_PROVIDER.get(this)
+        if (cached != null)
+            return cached as Provider<ItemProvider>
+        val provider = provider(ItemWrapper(itemType.createItemStack()))
+        ITEM_CACHED_ITEM_PROVIDER.set(this, provider)
+        return provider
+    }
+
+@Suppress("UNCHECKED_CAST")
+private val Item.guiItemProvider: Provider<ItemProvider>
+    get() {
+        val cached = ITEM_CACHED_GUI_ITEM_PROVIDER.get(this)
+        if (cached != null)
+            return cached as Provider<ItemProvider>
+        val provider = provider(ItemWrapper(itemType.createItemStack().apply {
+            editPersistentDataContainer { pdc ->
+                pdc.set(PacketItems.ADVANCED_TOOLTIP_OVERRIDE, PersistentDataType.BOOLEAN, false)
+            }
+        }))
+        ITEM_CACHED_GUI_ITEM_PROVIDER.set(this, provider)
+        return provider
+    }
+
+internal val ItemStack.novaItem: NovaItem?
+    get() = unwrap().item as? NovaItem
+
+internal val NmsItemStack.novaItem: NovaItem?
+    get() = item as? NovaItem
+
+@PublishedApi
+internal val ItemType.novaItem: NovaItem?
+    get() = (this as CraftItemType<*>).handle as? NovaItem
+
+@PublishedApi
+internal fun <T : Any> ItemType.hasBehavior(type: KClass<T>): Boolean =
+    novaItem?.behaviors?.any { type.isSuperclassOf(it::class) } == true
+
+@PublishedApi
+@Suppress("UNCHECKED_CAST")
+internal fun <T : Any> ItemType.getBehaviorOrNull(type: KClass<T>): T? =
+    novaItem?.behaviors?.firstOrNull { type.isSuperclassOf(it::class) } as T?
+
+@PublishedApi
+internal fun <T : Any> ItemType.getBehaviorOrThrow(type: KClass<T>): T =
+    getBehaviorOrNull(type) ?: throw NoSuchElementException("${key.asString()} has no behavior of type ${type.simpleName}")
+
+val ItemStack.itemType: ItemType
+    get() = unwrap().item.itemType
+
+val ItemStack.itemTypeEntry: RegistryEntry.Paper<ItemType>
+    get() = unwrap().item.itemTypeEntry
+
+val ItemType.blockTypeOrNull: BlockType?
+    get() = if (hasBlockType()) blockType else null
+
+/**
+ * Gets whether this [ItemType] is a custom item from Nova.
+ */
+val ItemType.isNova: Boolean
+    get() = novaItem != null
+
+val ItemType.name: Component
+    get() = getDefaultData(DataComponentTypes.ITEM_NAME) ?: Component.empty()
+
+/**
+ * Gets whether this [ItemType][ItemType] [is hidden][NovaItemBuilder.hidden]. `false` for non-Nova items.
+ */
+val ItemType.isHidden: Boolean
+    get() = novaItem?.isHidden ?: false
+
+fun ItemType.hasBehavior(behavior: ItemBehavior): Boolean =
+    novaItem?.behaviors?.contains(behavior) == true
+
+inline fun <reified T : Any> ItemType.hasBehavior(): Boolean =
+    hasBehavior(T::class)
+
+inline fun <reified T : Any> ItemType.getBehaviorOrNull(): T? =
+    getBehaviorOrNull(T::class)
+
+inline fun <reified T : Any> ItemType.getBehaviorOrThrow(): T =
+    getBehaviorOrThrow(T::class)
+
+/**
+ * Creates an [ItemStack] for the [ItemType] of the [RegistryEntry].
+ * 
+ * Cannot be called during bootstrap (pre-registry-freeze).
+ */
+fun Provider<ItemType>.createItemStack(amount: Int = 1): ItemStack =
+    get().createItemStack(amount)
+
+/**
+ * Shortcut for `bootstrapFlatMap { it.config }` 
+ */
+val Provider<ItemType>.config: Provider<ConfigProvider>
+    get() = bootstrapFlatMap { it.config }
+
+/**
+ * Gets the type's config if [ItemType.isNova], otherwise [ConfigProvider.Empty].
+ */
+val ItemType.config: Provider<ConfigProvider>
+    get() = novaItem?.config ?: provider(ConfigProvider.Empty)
+
+/**
+ * Shortcut for `bootstrapFlatMap { it.itemProvider }`
+ */
+val RegistryEntry.Paper<ItemType>.itemProvider: Provider<ItemProvider>
+    get() = bootstrapFlatMap { it.itemProvider }
+
+/**
+ * Shortcut for `bootstrapFlatMap { it.guiItemProvider }`
+ */
+val RegistryEntry.Paper<ItemType>.guiItemProvider: Provider<ItemProvider>
+    get() = bootstrapFlatMap { it.guiItemProvider }
+
+/**
+ * An [ItemProvider] provider of an [ItemStack] with size 1 of this [ItemType], intended for usage in InvUI DSLs.
+ */
+val ItemType.itemProvider: Provider<ItemProvider>
+    get() = nmsItem.itemProvider
+
+/**
+ * An [ItemProvider] provider of an [ItemStack] with size 1 of this [ItemType], intended for usage in InvUI DSLs.
+ * 
+ * The only difference to [itemProvider] is that this one does not have advanced tooltips (`/nova advancedTooltips`).
+ */
+val ItemType.guiItemProvider: Provider<ItemProvider>
+    get() = nmsItem.guiItemProvider
+
+@Deprecated("", ReplaceWith("guiItemProvider"))
+val RegistryEntry.Paper<ItemType>.clientsideProvider: Provider<ItemProvider>
+    get() = guiItemProvider
+
+@Deprecated("", ReplaceWith("guiItemProvider"))
+val ItemType.clientsideProvider: Provider<ItemProvider>
+    get() = guiItemProvider
 
 /**
  * Represents a custom Nova item type.
  */
-class NovaItem internal constructor(
-    val id: Key,
-    val name: Component?,
-    val lore: List<Component>,
-    val style: Style,
-    behaviorHolders: List<ItemBehaviorHolder>,
-    val maxStackSize: Int,
-    private val _craftingRemainingItem: Key?,
-    val isHidden: Boolean,
-    val block: NovaBlock?,
-    configId: String,
-    val tooltipStyle: TooltipStyle?,
-    internal val configureDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit
-) {
+internal class NovaItem(
+    val entry: RegistryEntry.Paper<ItemType>,
+    behaviors: Provider<List<ItemBehavior>>,
+    craftingRemainingItem: Provider<RegistryEntry.Paper<ItemType>>,
+    isHidden: Provider<Boolean>,
+    block: Provider<RegistryEntry.Paper<BlockType>?>,
+    val config: Provider<ConfigProvider>,
+) : Item(Properties().setId(ResourceKey.create(Registries.ITEM, entry.key.toIdentifier()))) {
     
-    /**
-     * The configuration for this [NovaItem].
-     * May be an empty node if the config file does not exist.
-     */
-    val config: Provider<CommentedConfigurationNode> = Configs[configId]
+    val key: Key
+        get() = entry.key
     
-    /**
-     * The [ItemStack] that is left over after this [NovaItem] was
-     * used in a crafting recipe, or an empty stack if there is no remainder.
-     */
-    val craftingRemainingItem: ItemStack
-        get() = _craftingRemainingItem?.let(ItemUtils::getItemStack) ?: ItemStack.empty()
+    val behaviors: List<ItemBehavior> by behaviors
+    val isHidden: Boolean by isHidden
+    val block: BlockType? by block.flatten()
     
-    /**
-     * The [ItemBehaviors][ItemBehavior] of this [NovaItem].
-     */
-    val behaviors: List<ItemBehavior> = buildList {
-        add(DefaultBehavior.create(this@NovaItem))
-        if (block != null)
-            add(BlockItemBehavior(provider(block)))
-        for (holder in behaviorHolders) {
-            when (holder) {
-                is ItemBehavior -> add(holder)
-                is ItemBehaviorFactory<*> -> add(holder.create(this@NovaItem))
-            }
-        }
-    }
+    private val craftRemainder: ItemStackTemplate?
+        by craftingRemainingItem.flatten().map { ItemStackTemplate(it.nmsItem) }
     
-    /**
-     * An [ItemProvider] containing the client-side [ItemStack] of this [NovaItem],
-     * intended for use in [Guis][Gui].
-     */
-    val clientsideProvider: ItemProvider by lazy {
-        val clientStack = PacketItems.getClientSideStack(
-            player = null,
-            itemStack = createItemStack().unwrap(),
-            storeServerSideTag = false
-        )
-        
-        // remove existing custom data and tag item to not receive server-side tooltip (again)
-        clientStack.set(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag().apply {
-            putBoolean(PacketItems.SKIP_SERVER_SIDE_TOOLTIP, true)
-        }))
-        
-        ItemWrapper(clientStack.asBukkitMirror())
-    }
-    
-    /**
-     * The underlying vanilla material of this [NovaItem].
-     */
-    internal val vanillaMaterial: Material by combinedProvider(
-        behaviors.map(ItemBehavior::vanillaMaterialProperties)
-    ) { properties -> VanillaMaterialTypes.getMaterial(properties.flatten().toHashSet()) }
+    override fun getCraftingRemainder() = craftRemainder
     
     /**
      * The base data components of this [NovaItem].
      */
-    val baseDataComponents: DataComponentMap by combinedProvider(
-        behaviors.map(ItemBehavior::baseDataComponents)
-    ) { maps -> DataComponentMap(ItemUtils.mergeDataComponentMaps(maps.map(DataComponentMap::handle))) }
-    
-    /**
-     * The default components patch applied to all [ItemStacks][ItemStack] of this [NovaItem].
-     */
-    internal val defaultPatch: DataComponentPatch by combinedProvider(
-        behaviors.map(ItemBehavior::defaultCompound)
-    ) { defaultCompounds ->
-        val defaultCompound = NamespacedCompound()
-        for (defaultCompound in defaultCompounds) {
-            defaultCompound.putAll(defaultCompound)
+    val baseDataComponents: DataComponentMap by behaviors.flatMap { behaviors ->
+        combinedProvider(behaviors.map(ItemBehavior::baseDataComponents)) { maps ->
+            DataComponentMap(ItemUtils.mergeDataComponentMaps(maps.map(DataComponentMap::handle)))
         }
-        
-        DataComponentPatch.builder()
-            .set(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag().also { compoundTag ->
-                compoundTag.put("nova", CompoundTag().also {
-                    it.putString("id", id.toString())
-                })
-                if (defaultCompound.isNotEmpty()) {
-                    compoundTag.putByteArray("nova_cbf", Cbf.write(defaultCompound))
-                }
-            }))
-            .build()
     }
     
     /**
-     * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in server-side format.
-     */
-    fun createItemBuilder(): ItemBuilder =
-        ItemBuilder(createItemStack(1))
-    
-    /**
-     * Creates an [ItemStack] of this [NovaItem] with the given [amount] in server-side format.
-     */
-    fun createItemStack(amount: Int = 1): ItemStack =
-        NmsItemStack(PacketItems.SERVER_SIDE_ITEM_HOLDER, amount, defaultPatch).asBukkitMirror()
-    
-    /**
-     * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in client-side format,
-     * intended for use in [Guis][Gui].
-     */
-    fun createClientsideItemBuilder(): ItemBuilder =
-        ItemBuilder(clientsideProvider.get())
-    
-    /**
      * Checks whether this [NovaItem] has an [ItemBehavior] of the reified type [T], or a subclass of it.
-     */
-    inline fun <reified T : Any> hasBehavior(): Boolean =
-        hasBehavior(T::class)
-    
-    /**
-     * Checks whether this [NovaItem] has an [ItemBehavior] of the specified class [type], or a subclass of it.
-     */
-    fun <T : Any> hasBehavior(type: KClass<T>): Boolean =
-        behaviors.any { type.isSuperclassOf(it::class) }
-    
-    /**
-     * Checks whether this [NovaItem] has an [ItemBehavior] of the specified class [type], or a subclass of it.
      */
     fun <T : Any> hasBehavior(type: Class<T>): Boolean =
         behaviors.any { type.isAssignableFrom(it::class.java) }
     
     /**
-     * Checks whether this [NovaItem] has the specific [behavior] instance.
-     */
-    fun hasBehavior(behavior: ItemBehavior): Boolean =
-        behaviors.contains(behavior)
-    
-    /**
      * Gets the first [ItemBehavior] that is an instance of [T], or null if there is none.
-     */
-    inline fun <reified T : Any> getBehaviorOrNull(): T? =
-        getBehaviorOrNull(T::class)
-    
-    /**
-     * Gets the first [ItemBehavior] that is an instance of [type] or a subclass, or null if there is none.
-     */
-    fun <T : Any> getBehaviorOrNull(type: KClass<T>): T? =
-        behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
-    
-    /**
-     * Gets the first [ItemBehavior] that is an instance of [type] or a subclass, or null if there is none.
      */
     fun <T : Any> getBehaviorOrNull(type: Class<T>): T? =
         behaviors.firstOrNull { type.isAssignableFrom(it::class.java) } as T?
@@ -237,20 +295,8 @@ class NovaItem internal constructor(
     /**
      * Gets the first [ItemBehavior] that is an instance of [T], or throws an [IllegalStateException] if there is none.
      */
-    inline fun <reified T : Any> getBehavior(): T =
-        getBehavior(T::class)
-    
-    /**
-     * Gets the first [ItemBehavior] that is an instance of [behavior], or throws an [IllegalStateException] if there is none.
-     */
-    fun <T : Any> getBehavior(behavior: KClass<T>): T =
-        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
-    
-    /**
-     * Gets the first [ItemBehavior] that is an instance of [behavior], or throws an [IllegalStateException] if there is none.
-     */
-    fun <T : Any> getBehavior(behavior: Class<T>): T =
-        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
+    fun <T : Any> getBehaviorOrThrow(behavior: Class<T>): T =
+        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item ${key.asString()} does not have a behavior of type ${behavior.simpleName}")
     
     //<editor-fold desc="item behavior functionality", defaultstate="collapsed">
     /**
@@ -273,8 +319,8 @@ class NovaItem internal constructor(
     fun modifyClientSideItemType(
         player: Player?,
         server: ItemStack,
-        client: Material
-    ): Material = runSafely("modify client-side item type", client, allowOffMain = true) {
+        client: ItemType
+    ): ItemType = runSafely("modify client-side item type", client, allowOffMain = true) {
         behaviors.fold(client) { current, behavior -> behavior.modifyClientSideItemType(player, server.clone(), current) }
     }
     
@@ -286,7 +332,7 @@ class NovaItem internal constructor(
         server: ItemStack,
         client: ItemStack
     ): ItemStack = runSafely("modify client-side stack", client, allowOffMain = true) {
-        behaviors.fold(client) { stack, behavior -> behavior.modifyClientSideStack(player, server.clone(), client.clone()) }
+        behaviors.fold(client.clone()) { stack, behavior -> behavior.modifyClientSideStack(player, server.clone(), stack) }
     }
     
     internal fun useNms(
@@ -342,14 +388,14 @@ class NovaItem internal constructor(
         val player = nmsCtx.player?.bukkitEntity
         val itemStack = nmsItemStack.asBukkitCopy()
         val hand = nmsCtx.hand.bukkitEquipmentSlot
-        val pos = nmsCtx.clickedPos.toNovaPos(nmsCtx.level.world)
+        val pos = nmsCtx.clickedPos.toBlock(nmsCtx.level.world)
         val face = nmsCtx.clickedFace.blockFace
         
         if (player is Player && !ProtectionManager.canUseBlock(player, itemStack, pos))
             return NmsInteractionResult.FAIL
         
         val ctx = Context.intention(BlockInteract)
-            .param(BlockInteract.BLOCK_POS, pos)
+            .param(BlockInteract.BLOCK, pos)
             .param(BlockInteract.SOURCE_ENTITY, player)
             .param(BlockInteract.HELD_ITEM_STACK, itemStack)
             .param(BlockInteract.HELD_HAND, hand)
@@ -559,54 +605,74 @@ class NovaItem internal constructor(
         behaviors.forEach { it.handleEquipmentTick(player, itemStack.clone(), slot) }
     }
     
-    /**
-     * Handles a use tick for [entity] with [itemStack] with this [NovaItem] in [hand]
-     * with [passedUseTicks] passed and [remainingUseTicks] remaining.
-     */
-    fun handleUseTick(
-        entity: LivingEntity,
-        itemStack: ItemStack,
-        hand: EquipmentSlot,
-        passedUseTicks: Int,
+    override fun onUseTick(
+        nmsLevel: Level,
+        nmsLivingEntity: NmsLivingEntity,
+        nmsItemStack: NmsItemStack,
         remainingUseTicks: Int
-    ): Unit = runSafely("handle use tick") {
-        behaviors.forEach { it.handleUseTick(entity, itemStack.clone(), hand, remainingUseTicks) }
+    ) {
+        val entity = nmsLivingEntity.bukkitEntity
+        val hand = nmsLivingEntity.usedItemHand.bukkitEquipmentSlot
+        
+        InteractionResult.Success(
+            swing = false,
+            action = runSafely("handle use finished", ItemAction.None) {
+                behaviors.mapNotNull { it.handleUseTick(entity, nmsItemStack.asBukkitCopy(), hand, remainingUseTicks) }
+                    .takeUnlessEmpty()
+                    ?.let(ItemAction::Composite)
+            }
+        ).performActions(entity, hand, true)
     }
     
-    /**
-     * Handles the use of [itemStack] with this [NovaItem] finishing for [entity] in [hand].
-     */
-    fun handleUseFinished(
-        entity: LivingEntity,
-        itemStack: ItemStack,
-        hand: EquipmentSlot,
-    ): ItemAction = runSafely("handle use finished", ItemAction.None) {
-        ItemAction.Composite(behaviors.map { it.handleUseFinished(entity, itemStack.clone(), hand) })
+    override fun finishUsingItem(
+        nmsItemStack: NmsItemStack,
+        nmsLevel: Level,
+        nmsEntity: NmsLivingEntity
+    ): NmsItemStack {
+        val entity = nmsEntity.bukkitEntity
+        val hand = nmsEntity.usedItemHand.bukkitEquipmentSlot
+        
+        InteractionResult.Success(
+            swing = false,
+            action = runSafely("handle use finished", ItemAction.None) {
+                ItemAction.Composite(behaviors.map { it.handleUseFinished(entity, nmsItemStack.asBukkitCopy(), hand) })
+            }
+        ).performActions(entity, hand, true)
+        
+        return super.finishUsingItem(nmsEntity.getItemInHand(hand.nmsInteractionHand), nmsLevel, nmsEntity)
     }
     
-    /**
-     * Handles the use of [itemStack] with this [NovaItem] being stopped for [entity] in [hand]
-     * and [remainingUseTicks] left.
-     */
-    fun handleUseStopped(
-        entity: LivingEntity,
-        itemStack: ItemStack,
-        hand: EquipmentSlot,
-        remainingUseTicks: Int
-    ): Unit = runSafely("handle use stopped") {
-        behaviors.forEach { it.handleUseStopped(entity, itemStack.clone(), hand, remainingUseTicks) }
+    override fun releaseUsing(
+        nmsItemStack: NmsItemStack,
+        nmsLevel: Level,
+        nmsEntity: NmsLivingEntity,
+        remainingTime: Int
+    ): Boolean {
+        val entity = nmsEntity.bukkitEntity
+        val hand = nmsEntity.usedItemHand.bukkitEquipmentSlot
+        
+        InteractionResult.Success(
+            swing = false,
+            action = runSafely("handle use finished", ItemAction.None) {
+                behaviors.mapNotNull { it.handleUseStopped(entity, nmsItemStack.asBukkitCopy(), hand, remainingTime) }
+                    .takeUnlessEmpty()
+                    ?.let(ItemAction::Composite)
+            }
+        ).performActions(entity, hand, true)
+        
+        return false
     }
     
-    /**
-     * Modifies the use [duration] of [itemStack] with this [NovaItem] for [entity].
-     */
-    fun modifyUseDuration(
-        entity: LivingEntity,
-        itemStack: ItemStack,
-        duration: Int
-    ): Int = runSafely("modify use duration", duration) {
-        behaviors.fold(duration) { currentDuration, behavior ->
-            behavior.modifyUseDuration(entity, itemStack.clone(), currentDuration)
+    override fun getUseDuration(
+        nmsItemStack: NmsItemStack,
+        nmsUser: NmsLivingEntity
+    ): Int {
+        val base = super.getUseDuration(nmsItemStack, nmsUser)
+        val user = nmsUser.bukkitEntity
+        return runSafely("modify use duration", base) {
+            behaviors.fold(base) { currentDuration, behavior ->
+                behavior.modifyUseDuration(user, nmsItemStack.asBukkitCopy(), currentDuration)
+            }
         }
     }
     
@@ -627,19 +693,13 @@ class NovaItem internal constructor(
         try {
             return run()
         } catch (t: Throwable) {
-            LOGGER.error("Failed to $name for $id", t)
+            LOGGER.error("Failed to $name for ${key.asString()}", t)
         }
         return fallback
     }
     
     //</editor-fold>
     
-    override fun toString() = id.toString()
-    
-    companion object {
-        
-        val CODEC = NovaRegistries.ITEM.byNameCodec()
-        
-    }
+    override fun toString(): String = key.asString()
     
 }

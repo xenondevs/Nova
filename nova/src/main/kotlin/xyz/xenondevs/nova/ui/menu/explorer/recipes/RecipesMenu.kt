@@ -2,14 +2,17 @@ package xyz.xenondevs.nova.ui.menu.explorer.recipes
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.Material
+import net.kyori.adventure.text.format.ShadowColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.dsl.pagedGuisGui
 import xyz.xenondevs.invui.dsl.pagedItemsGui
@@ -19,16 +22,15 @@ import xyz.xenondevs.invui.gui.pageCountProvider
 import xyz.xenondevs.invui.gui.pageProvider
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
-import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.nova.registry.entries.ItemTypeEntries
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
+import xyz.xenondevs.nova.ui.menu.locale
+import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.PlayerMapManager
-import xyz.xenondevs.nova.util.component.adventure.appendCentered
-import xyz.xenondevs.nova.util.component.adventure.font
-import xyz.xenondevs.nova.util.component.adventure.moveToCenter
-import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.itemType
 import xyz.xenondevs.nova.world.item.recipe.RecipeContainer
 import xyz.xenondevs.nova.world.item.recipe.RecipeRegistry
 import java.util.*
@@ -38,7 +40,7 @@ import java.util.*
  * and returns whether the attempt was successful, i.e. if there were any recipes for the item.
  */
 fun Player.showRecipes(item: ItemStack): Boolean =
-    showRecipes(ItemUtils.getId(item).toString())
+    showRecipes(item.itemType.key.asString())
 
 /**
  * Tries to open the recipe explorer for the recipes for [id],
@@ -52,7 +54,7 @@ fun Player.showRecipes(id: String): Boolean =
  * and returns whether the attempt was successful, i.e. if there were any usages for the item.
  */
 fun Player.showUsages(item: ItemStack): Boolean =
-    showUsages(ItemUtils.getId(item).toString())
+    showUsages(item.itemType.key.asString())
 
 /**
  * Tries to open the recipe explorer for the usages for [id],
@@ -110,7 +112,7 @@ internal class RecipesMenu(
                 '<' by tabPageBackItem(page, pageCount)
                 '>' by tabPageForwardItem(page, pageCount)
                 content by buildList {
-                    addAll(recipes.mapIndexed { i, (group, _) -> recipeGroupTabButton(i, group, tab) })
+                    addAll(recipes.mapIndexed { i, [group, _] -> recipeGroupTabButton(i, group, tab) })
                     if (info != null)
                         add(itemInfoButton(info))
                 }
@@ -118,7 +120,7 @@ internal class RecipesMenu(
             
             // tab content
             this.tab by tab
-            tabs by recipes.map { (group, recipes) ->
+            tabs by recipes.map { [group, recipes] ->
                 pagedGuisGui(
                     "< . . . . . . . >",
                     "x x x x x x x x x",
@@ -138,14 +140,12 @@ internal class RecipesMenu(
             val activePage = activeTab.flatMap { it?.pageProvider ?: provider(0) }
             val activePageCount = activeTab.flatMap { it?.pageCountProvider ?: provider(0) }
             title by combinedProvider(tab, activePage, activePageCount) { tab, activePage, activePageCount ->
-                val pageNumberString = "${activePage + 1} / $activePageCount"
-                val pageNumberComponent = Component.text(pageNumberString, NamedTextColor.WHITE).font("nova:recipes_numbers")
-                Component.text()
-                    .append(recipes[tab].first.texture.component)
-                    .moveToCenter()
-                    .appendCentered(pageNumberComponent)
-                    .build()
-            }
+                recipes[tab].first.texture.getTitle(
+                    [Component.text("${activePage + 1} / $activePageCount", NamedTextColor.WHITE)
+                        .shadowColor(ShadowColor.shadowColor(0xFF282828.toInt()))],
+                    locale
+                )
+            }.flatten()
         }
         
         onOpen { active[player] = this@RecipesMenu }
@@ -212,7 +212,7 @@ internal class RecipesMenu(
 }
 
 private fun backButton(): Item = item {
-    itemProvider by DefaultGuiItems.TP_ARROW_LEFT_ON.clientsideProvider
+    itemProvider by DefaultGuiItems.TP_ARROW_LEFT_ON
     onClick {
         player.playClickSound()
         RecipesMenu.popFromHistory(player)?.open() ?: ItemsMenu.open(player)
@@ -237,7 +237,7 @@ private fun recipeGroupTabButton(tab: Int, group: RecipeGroup<*>, activeTab: Mut
 }
 
 private fun itemInfoButton(info: String): Item = item {
-    itemProvider by ItemBuilder(Material.KNOWLEDGE_BOOK)
+    itemProvider by ItemBuilder(ItemType.KNOWLEDGE_BOOK)
         .setName(Component.translatable("menu.nova.recipe.item_info"))
     onClick {
         if (clickType.isLeftClick) {
@@ -250,11 +250,11 @@ private fun itemInfoButton(info: String): Item = item {
 private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            ItemProvider.EMPTY
+            ItemTypeEntries.AIR
         else if (page > 0)
-            DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON_ALIGNED_RIGHT.clientsideProvider
-        else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF_ALIGNED_RIGHT.clientsideProvider
-    }
+            DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON_ALIGNED_RIGHT
+        else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF_ALIGNED_RIGHT
+    }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() > 0) {
             page.set(page.get() - 1)
@@ -266,11 +266,11 @@ private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>
 private fun tabPageForwardItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            ItemProvider.EMPTY
+            ItemTypeEntries.AIR
         else if (page + 1 < pageCount)
-            DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON_ALIGNED_LEFT.clientsideProvider
-        else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF_ALIGNED_LEFT.clientsideProvider
-    }
+            DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON_ALIGNED_LEFT
+        else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF_ALIGNED_LEFT
+    }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() < pageCount.get() - 1) {
             page.set(page.get() + 1)
@@ -282,9 +282,9 @@ private fun tabPageForwardItem(page: MutableProvider<Int>, pageCount: Provider<I
 private fun recipePageBackButton(page: MutableProvider<Int>): Item = item {
     itemProvider by page.map { page ->
         if (page > 0)
-            DefaultGuiItems.TP_ARROW_LEFT_BTN_ON.clientsideProvider
-        else DefaultGuiItems.TP_ARROW_LEFT_BTN_OFF.clientsideProvider
-    }
+            DefaultGuiItems.TP_ARROW_LEFT_BTN_ON
+        else DefaultGuiItems.TP_ARROW_LEFT_BTN_OFF
+    }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() > 0) {
             page.set(page.get() - 1)
@@ -296,9 +296,9 @@ private fun recipePageBackButton(page: MutableProvider<Int>): Item = item {
 private fun recipePageForwardButton(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (page + 1 < pageCount)
-            DefaultGuiItems.TP_ARROW_RIGHT_BTN_ON.clientsideProvider
-        else DefaultGuiItems.TP_ARROW_RIGHT_BTN_OFF.clientsideProvider
-    }
+            DefaultGuiItems.TP_ARROW_RIGHT_BTN_ON
+        else DefaultGuiItems.TP_ARROW_RIGHT_BTN_OFF
+    }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() < pageCount.get() - 1) {
             page.set(page.get() + 1)

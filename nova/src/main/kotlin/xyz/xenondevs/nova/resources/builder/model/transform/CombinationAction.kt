@@ -30,7 +30,7 @@ internal data class CombinationAction(val other: ModelBuilder) : ContextualModel
     
     // assumes flattened model
     private fun Model.withPrefixedTextureKeys(prefix: String): Model = copy(
-        textures = textures.entries.associate { (key, value) ->
+        textures = textures.entries.associate { [key, value] ->
             val sprite = value.sprite
             if (sprite.startsWith('#')) {
                 prefix + key to value.copy(sprite = "#" + prefix + sprite.substring(1))
@@ -39,7 +39,7 @@ internal data class CombinationAction(val other: ModelBuilder) : ContextualModel
             }
         },
         elements = elements?.map { element ->
-            element.copy(faces = element.faces.mapValues { (_, face) ->
+            element.copy(faces = element.faces.mapValues { [_, face] ->
                 face.copy(texture = "#" + prefix + face.texture.substring(1))
             })
         }

@@ -3,6 +3,8 @@
 package xyz.xenondevs.nova.resources.builder.layout.item
 
 import org.bukkit.DyeColor
+import org.joml.Matrix4f
+import org.joml.Matrix4fc
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -29,9 +31,15 @@ abstract class SpecialItemModelBuilder<S : ModelSelectorScope> internal construc
 ) {
     
     /**
-     * A function that selects the base model, which will be used for transformations, particle texture, GUI light, etc.
+     * A function that selects the base model, which will be used for transformationations, particle texture, GUI light, etc.
      */
     var base: S.() -> ModelBuilder = { getModel("minecraft:block/block") }
+    
+    /**
+     * An additional transformationation matrix that is applied to the special model on top of the
+     * transformationations defined in the [base] model.
+     */
+    var transformation: Matrix4fc = Matrix4f()
     
     internal abstract fun build(): ItemModel.Special
     
@@ -55,7 +63,8 @@ class BannerSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor
     
     override fun build() = ItemModel.Special(
         SpecialModel.Banner(color, attachment),
-        selectAndBuild(base)
+        selectAndBuild(base),
+        transformation
     )
     
 }
@@ -78,7 +87,8 @@ class BedSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
     
     override fun build() = ItemModel.Special(
         SpecialModel.Bed(texture, part),
-        selectAndBuild(base)
+        selectAndBuild(base),
+        transformation
     )
     
 }
@@ -108,7 +118,8 @@ class BookSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
     
     override fun build() = ItemModel.Special(
         SpecialModel.Book(openAngle, page1, page2),
-        selectAndBuild(base)
+        selectAndBuild(base),
+        transformation
     )
     
 }
@@ -136,7 +147,8 @@ class ChestSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
     
     override fun build() = ItemModel.Special(
         SpecialModel.Chest(texture, openness, type),
-        selectAndBuild(base)
+        selectAndBuild(base),
+        transformation
     )
     
 }
@@ -159,7 +171,8 @@ class CopperGolemStatueSpecialItemModelBuilder<S : ModelSelectorScope> internal 
     
     override fun build() = ItemModel.Special(
         SpecialModel.CopperGolemStatue(pose, texture),
-        selectAndBuild(base)
+        selectAndBuild(base),
+        transformation
     )
     
 }
@@ -177,7 +190,8 @@ class EndCubeSpecialItemModelBuilder<S : ModelSelectorScope> internal constructo
     
     override fun build() = ItemModel.Special(
         SpecialModel.EndCube(effect),
-        selectAndBuild(base)
+        selectAndBuild(base),
+        transformation
     )
     
 }
@@ -209,11 +223,13 @@ class HangingSignSpecialItemModelBuilder<S : ModelSelectorScope> internal constr
         
         return ItemModel.Special(
             SpecialModel.HangingSign(woodType ?: WoodType.OAK, texture, attachment),
-            selectAndBuild(base)
+            selectAndBuild(base),
+            transformation
         )
     }
     
 }
+
 @RegistryElementBuilderDsl
 class HeadSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
     resourcePackBuilder: ResourcePackBuilder,
@@ -237,7 +253,8 @@ class HeadSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
     
     override fun build() = ItemModel.Special(
         SpecialModel.Head(kind, texture, animation),
-        selectAndBuild(base)
+        selectAndBuild(base),
+        transformation
     )
     
 }
@@ -260,7 +277,8 @@ class ShulkerBoxSpecialItemModelBuilder<S : ModelSelectorScope> internal constru
     
     override fun build() = ItemModel.Special(
         SpecialModel.ShulkerBox(texture, openness),
-        selectAndBuild(base)
+        selectAndBuild(base),
+        transformation
     )
     
 }
@@ -291,7 +309,8 @@ class StandingSignSpecialItemModelBuilder<S : ModelSelectorScope> internal const
         
         return ItemModel.Special(
             SpecialModel.StandingSign(woodType ?: WoodType.OAK, texture, attachment),
-            selectAndBuild(base)
+            selectAndBuild(base),
+            transformation
         )
     }
     
@@ -304,6 +323,6 @@ class GenericSpecialItemModelBuilder<S : ModelSelectorScope> internal constructo
     private val selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
 ) : SpecialItemModelBuilder<S>(resourcePackBuilder) {
     
-    override fun build() = ItemModel.Special(model, selectAndBuild(base))
+    override fun build() = ItemModel.Special(model, selectAndBuild(base), transformation)
     
 }

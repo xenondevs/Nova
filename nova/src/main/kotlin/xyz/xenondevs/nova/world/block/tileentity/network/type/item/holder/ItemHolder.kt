@@ -1,6 +1,9 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder
 
+import xyz.xenondevs.nova.world.*
+
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.world.block.tileentity.network.node.ContainerEndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
@@ -19,11 +22,11 @@ interface ItemHolder : ContainerEndPointDataHolder<NetworkedInventory> {
     /**
      * Stores the insertion [ItemFilters][ItemFilter] per [BlockFace].
      */
-    val insertFilters: MutableMap<BlockFace, ItemFilter<*>>
+    var insertFilters: CubeFaceMap<ItemFilter<*>?>
     
     /**
      * Stores the extraction [ItemFilters][ItemFilter] per [BlockFace].
      */
-    val extractFilters: MutableMap<BlockFace, ItemFilter<*>>
+    var extractFilters: CubeFaceMap<ItemFilter<*>?>
     
 }

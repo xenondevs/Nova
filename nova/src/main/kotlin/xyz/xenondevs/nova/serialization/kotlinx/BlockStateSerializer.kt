@@ -13,6 +13,7 @@ import kotlinx.serialization.encoding.encodeStructure
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
+import xyz.xenondevs.nova.util.toPropertyStringMap
 import kotlin.jvm.optionals.getOrNull
 
 @Suppress("UNCHECKED_CAST")
@@ -30,13 +31,10 @@ internal object BlockStateSerializer : KSerializer<BlockState> {
             encodeSerializableElement(
                 descriptor, 1,
                 MapSerializer(String.serializer(), String.serializer()),
-                value.properties.associate { property -> stringifyPropertyValue(property, value.getValue(property)) }
+                value.toPropertyStringMap()
             )
         }
     }
-    
-    private fun <T: Comparable<T>> stringifyPropertyValue(prop: Property<T>, value: Any): Pair<String, String> =
-        prop.name to prop.getName(value as T)
     
     override fun deserialize(decoder: Decoder): BlockState {
         return decoder.decodeStructure(descriptor) {
@@ -50,6 +48,7 @@ internal object BlockStateSerializer : KSerializer<BlockState> {
                         descriptor, index,
                         MapSerializer(String.serializer(), String.serializer())
                     )
+                    
                     else -> break
                 }
             }
@@ -58,7 +57,7 @@ internal object BlockStateSerializer : KSerializer<BlockState> {
                 throw SerializationException("Missing property 'block'")
             
             val allPropertiesByName = block.defaultBlockState().properties.associateBy { it.name }
-            return@decodeStructure properties.entries.fold(block.defaultBlockState()) { blockState, (name, value) ->
+            return@decodeStructure properties.entries.fold(block.defaultBlockState()) { blockState, [name, value] ->
                 blockState.setValue<String, String>(allPropertiesByName, name, value)
             }
         }

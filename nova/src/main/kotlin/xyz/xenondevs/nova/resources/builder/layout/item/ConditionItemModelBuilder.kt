@@ -4,6 +4,8 @@ package xyz.xenondevs.nova.resources.builder.layout.item
 
 import io.papermc.paper.datacomponent.DataComponentType
 import net.kyori.adventure.key.Key
+import org.joml.Matrix4f
+import org.joml.Matrix4fc
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -31,15 +33,21 @@ class ConditionItemModelBuilder<S : ModelSelectorScope> internal constructor(
      */
     var onFalse: ItemModel = ItemModel.Empty
     
+    /**
+     * An additional transformationation matrix that is applied to the resulting model on top of the
+     * transformationations defined in [onTrue] and [onFalse].
+     */
+    var transformation: Matrix4fc = Matrix4f()
+    
     internal fun build(): ItemModel.Condition =
-        property.buildModel(onTrue, onFalse)
+        property.buildModel(onTrue, onFalse, transformation)
     
 }
 
 sealed class ConditionItemModelProperty(internal val property: ItemModel.Condition.Property) {
     
-    internal open fun buildModel(onTrue: ItemModel, onFalse: ItemModel) =
-        ItemModel.Condition(property, onTrue, onFalse)
+    internal open fun buildModel(onTrue: ItemModel, onFalse: ItemModel, transformation: Matrix4fc) =
+        ItemModel.Condition(property, onTrue, onFalse, transformation)
     
     /**
      * Returns `true` if the player is currently using this item.
@@ -70,8 +78,8 @@ sealed class ConditionItemModelProperty(internal val property: ItemModel.Conditi
             ignoreDefault: Boolean = false
         ) : this(component.key(), ignoreDefault)
         
-        override fun buildModel(onTrue: ItemModel, onFalse: ItemModel) =
-            ItemModel.Condition(property, onTrue, onFalse, component = component, ignoreDefault = ignoreDefault)
+        override fun buildModel(onTrue: ItemModel, onFalse: ItemModel, transformation: Matrix4fc) =
+            ItemModel.Condition(property, onTrue, onFalse, transformation, component = component, ignoreDefault = ignoreDefault)
         
     }
     
@@ -109,8 +117,8 @@ sealed class ConditionItemModelProperty(internal val property: ItemModel.Conditi
         private val keybind: Keybind
     ) : ConditionItemModelProperty(ItemModel.Condition.Property.KEYBIND_DOWN) {
         
-        override fun buildModel(onTrue: ItemModel, onFalse: ItemModel) =
-            ItemModel.Condition(property, onTrue, onFalse, keybind = keybind)
+        override fun buildModel(onTrue: ItemModel, onFalse: ItemModel, transformation: Matrix4fc) =
+            ItemModel.Condition(property, onTrue, onFalse, transformation, keybind = keybind)
         
     }
     
@@ -128,8 +136,8 @@ sealed class ConditionItemModelProperty(internal val property: ItemModel.Conditi
         private val index: Int = 0
     ) : ConditionItemModelProperty(ItemModel.Condition.Property.CUSTOM_MODEL_DATA) {
         
-        override fun buildModel(onTrue: ItemModel, onFalse: ItemModel) =
-            ItemModel.Condition(property, onTrue, onFalse, index = index)
+        override fun buildModel(onTrue: ItemModel, onFalse: ItemModel, transformation: Matrix4fc) =
+            ItemModel.Condition(property, onTrue, onFalse, transformation, index = index)
         
         companion object : CustomModelData(0)
         

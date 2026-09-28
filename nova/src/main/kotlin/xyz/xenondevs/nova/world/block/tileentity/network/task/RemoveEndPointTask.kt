@@ -22,14 +22,19 @@ internal class RemoveEndPointTask(
     @Name("xyz.xenondevs.RemoveEndPoint")
     @Label("Remove EndPoint")
     @Category("Nova", "TileEntity Network")
-    private inner class RemoveEndPointTaskEvent : Event() {
+    private class RemoveEndPointTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = node.pos.toString()
+        var pos: String = ""
         
     }
     
-    override val event: Event = RemoveEndPointTaskEvent()
+    override val event: Event
+        get() = RemoveEndPointTaskEvent()
+    
+    override fun populateEvent(event: Event) {
+        (event as RemoveEndPointTaskEvent).pos = node.block.toString()
+    }
     //</editor-fold>
     
     override suspend fun remove() {
@@ -44,16 +49,13 @@ internal class RemoveEndPointTask(
         }
         
         // remove endpoint from all networks
-        for ((networkType, _, networkId) in state.getNetworks(node)) {
+        for ([networkType, _, networkId] in state.getNetworks(node)) {
             val network = state.getNetworkOrThrow(networkType, networkId)
             network.removeNode(node)
             
-            if (network.isEmpty()) {
+            if (network.isEmpty())
                 state -= network
-                reclusterize(network)
-            } else {
-                reclusterize(network)
-            }
+            invalidateCluster(network)
         }
     }
     

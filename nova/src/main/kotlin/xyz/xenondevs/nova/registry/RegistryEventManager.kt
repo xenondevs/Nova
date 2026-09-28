@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.registry
 
-import io.papermc.paper.tag.TagEventConfig
 import net.kyori.adventure.key.Key
 import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
@@ -8,9 +7,6 @@ import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
-import net.minecraft.tags.TagEntry
-import net.minecraft.tags.TagKey
-import net.minecraft.tags.TagLoader
 import xyz.xenondevs.commons.collections.concurrentHashSet
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
@@ -28,12 +24,12 @@ internal object RegistryEventManager {
     
     private val preFreezeListeners = ConcurrentHashMap<ResourceKey<*>, ArrayList<PreFreezeListener<*>>>()
     private val postFreezeListeners = ConcurrentHashMap<ResourceKey<*>, ArrayList<PostFreezeListener<*>>>()
-    private val frozen = concurrentHashSet<ResourceKey<*>>()
-    private val additionalTagEntries = ConcurrentHashMap<ResourceKey<*>, HashMap<TagKey<*>, ArrayList<Identifier>>>()
+    private val frozen = concurrentHashSet<ResourceKey<out Registry<*>>>()
     
     @JvmStatic
     fun handlePreFreeze(registry: WritableRegistry<*>, lookup: RegistryOps.RegistryInfoLookup) {
         val key = registry.key()
+        frozen += key
         try {
             preFreezeListeners.remove(key)?.forEach { it(registry, lookup) }
         } catch (t: Throwable) {
@@ -53,6 +49,7 @@ internal object RegistryEventManager {
         } catch (t: Throwable) {
             LOGGER.error("An exception occurred while running registry post-freeze listeners for $key", t)
         }
+        frozen += key
     }
     
     @JvmStatic
@@ -67,24 +64,7 @@ internal object RegistryEventManager {
             } catch (t: Throwable) {
                 LOGGER.error("An exception occurred while running registry post-freeze listeners for $key", t)
             }
-        }
-    }
-    
-    @JvmStatic
-    fun handleTagsBuild(
-        map: MutableMap<Identifier, MutableList<TagLoader.EntryWithSource>>, // Map<Tag ID, List<Entry ID / other Tag ID>>
-        config: TagEventConfig<*, *>?
-    ) {
-        if (config == null)
-            return
-        
-        val key = ResourceKey.createRegistryKey<Any>(config.apiRegistryKey().key().toIdentifier())
-        val additionalEntriesForRegistry = additionalTagEntries[key]
-            ?: return
-        
-        for ((tagKey, entries) in additionalEntriesForRegistry) {
-            val mappedEntries = entries.map { TagLoader.EntryWithSource(TagEntry.element(it), "Nova") }
-            map.getOrPut(tagKey.location, ::ArrayList) += mappedEntries
+            frozen += key
         }
     }
     
@@ -98,12 +78,6 @@ internal object RegistryEventManager {
     fun <T : Any> addPostFreezeListener(key: ResourceKey<out Registry<T>>, listener: PostFreezeListener<T>) {
         check(key !in frozen) { "Registry $key is already frozen!" }
         postFreezeListeners.getOrPut(key, ::ArrayList) += listener as PostFreezeListener<*>
-    }
-    
-    fun addTagEntry(key: TagKey<*>, value: Identifier) {
-        additionalTagEntries
-            .getOrPut(key.registry(), ::HashMap)
-            .getOrPut(key, ::ArrayList) += value
     }
     
 }
@@ -132,12 +106,4 @@ internal operator fun <T : Any> ResourceKey<out Registry<T>>.set(id: Key, value:
 
 internal operator fun <T : Any> ResourceKey<out Registry<T>>.set(id: ResourceKey<T>, value: T) {
     preFreeze { registry, _ -> registry[id] = value }
-}
-
-internal operator fun TagKey<*>.plusAssign(id: Identifier) {
-    RegistryEventManager.addTagEntry(this, id)
-}
-
-internal operator fun TagKey<*>.plusAssign(id: Key) {
-    this += id.toIdentifier()
 }

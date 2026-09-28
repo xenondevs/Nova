@@ -1,112 +1,112 @@
 package xyz.xenondevs.nova.registry
 
-import net.kyori.adventure.key.Key
-import net.minecraft.core.Holder
-import net.minecraft.core.Registry
-import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.RegistryOps
-import net.minecraft.resources.ResourceKey
+import org.bukkit.Keyed
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.util.Identifier
-import xyz.xenondevs.nova.util.Key
-import xyz.xenondevs.nova.util.contains
-import xyz.xenondevs.nova.util.register
-import xyz.xenondevs.nova.util.toKey
 
-@DslMarker
-internal annotation class RegistryElementBuilderDsl
-
-@RegistryElementBuilderDsl
-abstract class RegistryElementBuilder<T : Any> internal constructor(
-    protected val registry: WritableRegistry<in T>,
-    val id: Key
-) {
+/**
+ * A builder of a registry element, either [Nova] or [Vanilla].
+ * You will only need to use this interface if you've created a custom [NovaRegistry] that you want
+ * to load via [RegistryLoader].
+ * Things like [NovaItemBuilder] intentionally do not implement this interface directly to hide
+ * the build functions.
+ */
+sealed interface RegistryElementBuilder<out E : RegistryEntry<*>> : RegistryEntryBuilder<E> {
     
-    protected abstract fun build(): T
+    /**
+     * Prepares the builder for build.
+     * This function is called after the builder has been configured, but before the build function is called.
+     * This allows for e.g. queuing asset generation in resource pack tasks, which will be done before the build function is called.
+     */
+    fun prepareBuild() = Unit
     
-    internal open fun register(): T {
-        if (id in registry)
-            throw IllegalStateException("Tried to register duplicate element $id in $registry")
+    /**
+     * A builder of a [NovaRegistryElement].
+     */
+    interface Nova<out T : NovaRegistryElement<T>> :
+        RegistryElementBuilder<RegistryEntry.Nova<T>>,
+        RegistryEntryBuilder.Nova<T> {
         
-        val element = build()
-        val holder = registry.register(id, element)
-        holder.bindValue(element)
-        return element
-    }
-    
-}
-
-@RegistryElementBuilderDsl
-abstract class LazyRegistryElementBuilder<T : Any, NMS : Any> internal constructor(
-    protected val registryKey: ResourceKey<Registry<NMS>>,
-    private val nmsToBukkit: (Holder<NMS>) -> T,
-    protected val id: Key
-) {
-    
-    protected abstract fun build(lookup: RegistryOps.RegistryInfoLookup): NMS
-    
-    @Suppress("UNCHECKED_CAST")
-    internal open fun register(): Provider<T> {
-        val provider = mutableProvider<Holder<NMS>> {
-            throw UninitializedRegistryElementException(registryKey, id)
+        /**
+         * A reloadable set of tags that the element built by this builder belongs in.
+         * Can be updated at any time (independently of registry reloading).
+         */
+        val tags: Provider<Set<RegistryEntrySet.Nova.Tag<T>>>
+        
+        /**
+         * Builds the registry element.
+         */
+        fun build(): T
+        
+        companion object {
+            
+            /**
+             * Creates an anonymous element builder for [entry] that creates an intermediary
+             * result in [prepare] which is then used to [build] the final element.
+             */
+            fun <T : NovaRegistryElement<T>, I : Any> anonymous(
+                entry: RegistryEntry.Nova<T>,
+                prepare: (RegistryEntry.Nova<T>) -> I,
+                build: (RegistryEntry.Nova<T>, I) -> T
+            ): Nova<T> = object : Nova<T> {
+                
+                override val entry = entry
+                final override val tags: Provider<Set<RegistryEntrySet.Nova.Tag<T>>>
+                    field = mutableProvider(emptySet())
+                
+                private lateinit var prep: I
+                
+                override fun tags(vararg tags: RegistryEntrySet.Nova.Tag<T>) {
+                    this.tags.set(this.tags.get() + tags)
+                }
+                
+                override fun prepareBuild() {
+                    prep = prepare(entry)
+                }
+                
+                override fun build(): T = build(entry, prep)
+                
+            }
+            
         }
         
-        registryKey.preFreeze { registry, lookup ->
-            val element = build(lookup)
-            val holder = registry.register(id, element)
-            provider.set(holder)
-        }
+    }
+    
+    /**
+     * A builder of something that is registered in a vanilla registry.
+     */
+    interface Vanilla<out API : Keyed, out NMS : Any> :
+        RegistryElementBuilder<RegistryEntry.Paper<API>>,
+        RegistryEntryBuilder.Paper<API> {
         
-        return provider.map(nmsToBukkit)
+        /**
+         * A reloadable set of tags that the element built by this builder belongs in.
+         * Can be updated at any time (independently of registry re-running).
+         */
+        val tags: Provider<Set<RegistryEntrySet.Paper.Tag<API>>>
+        
+        /**
+         * Builds the registry element.
+         * Can use [lookup] to get holders for other registry elements.
+         */
+        fun build(lookup: RegistryOps.RegistryInfoLookup): NMS
+        
+    }
+    
+    /**
+     * A [Vanilla] builder that can be reset and re-run. How updates are propagated to the elements
+     * is left to the implementation. [prepareBuild] is called again on re-run, but [build] is not.
+     * Intended for non-reloadable vanilla registries.
+     */
+    interface RerunnableVanilla<out API : Keyed, out NMS : Any> : Vanilla<API, NMS> {
+        
+        /**
+         * Resets the builder to its initial state.
+         * Called immediately before re-running configuration on the builder.
+         */
+        fun reset()
+        
     }
     
 }
-
-internal fun <T : Any, B : RegistryElementBuilder<T>> buildRegistryElementLater(
-    addon: Addon, name: String,
-    registryKey: ResourceKey<out Registry<T>>,
-    makeBuilder: (Key, WritableRegistry<T>, RegistryOps.RegistryInfoLookup) -> B,
-    configureBuilder: B.() -> Unit
-): ResourceKey<T> {
-    val id = Identifier(addon, name)
-    val key = ResourceKey.create(registryKey, id)
-    registryKey.preFreeze { registry, lookup ->
-        makeBuilder(id.toKey(), registry, lookup).apply(configureBuilder).register()
-    }
-    return key
-}
-
-@JvmName("buildRegistryElementLazily1")
-internal fun <T : Any, B : RegistryElementBuilder<T>> buildRegistryElementLater(
-    addon: Addon, name: String,
-    registryKey: ResourceKey<out Registry<T>>,
-    makeBuilder: (Key, WritableRegistry<T>) -> B,
-    configureBuilder: B.() -> Unit
-): ResourceKey<T> {
-    val id = Identifier(addon, name)
-    val key = ResourceKey.create(registryKey, id)
-    registryKey.preFreeze { registry, _ ->
-        makeBuilder(id.toKey(), registry).apply(configureBuilder).register()
-        
-    }
-    return key
-}
-
-@JvmName("buildRegistryElementLazily2")
-internal fun <T : Any, B : RegistryElementBuilder<T>> buildRegistryElementLater(
-    addon: Addon, name: String,
-    registryKey: ResourceKey<out Registry<*>>,
-    makeBuilder: (Key, RegistryOps.RegistryInfoLookup) -> B,
-    configureBuilder: B.() -> Unit
-) {
-    val id = Key(addon, name)
-    registryKey.preFreeze { lookup ->
-        makeBuilder(id, lookup).apply(configureBuilder).register()
-    }
-}
-
-class UninitializedRegistryElementException(registryKey: ResourceKey<*>, id: Key) : Exception(
-    "Tried to access unregistered registry element $id in $registryKey"
-)

@@ -37,14 +37,14 @@ internal object NamespacedTypeAdapters : TypeAdapterFactory {
             NamespacedKey::class -> NamespacedKeyTypeAdapter
             Identifier::class -> IdentifierTypeAdapter
             else -> if (representedClass?.isSubclassOf(Key::class) == true) GenericKeyTypeAdapter else null
-       
+            
         } as TypeAdapter<T?>?
     }
     
     private class ResourcePathTypeAdapter<T : ResourceType>(private val type: T) : TypeAdapter<ResourcePath<T>>() {
         
         override fun write(writer: JsonWriter, value: ResourcePath<T>) {
-            writer.value(value.toString())
+            writer.value(value.asString())
         }
         
         override fun read(reader: JsonReader): ResourcePath<T> {
@@ -56,7 +56,7 @@ internal object NamespacedTypeAdapters : TypeAdapterFactory {
     private object NamespacedKeyTypeAdapter : TypeAdapter<NamespacedKey>() {
         
         override fun write(writer: JsonWriter, value: NamespacedKey) {
-            writer.value(value.toString())
+            writer.value(value.asString())
         }
         
         override fun read(reader: JsonReader): NamespacedKey {
@@ -69,7 +69,7 @@ internal object NamespacedTypeAdapters : TypeAdapterFactory {
     private object GenericKeyTypeAdapter : TypeAdapter<Key>() {
         
         override fun write(writer: JsonWriter, value: Key) {
-            writer.value(value.toString())
+            writer.value(value.asString())
         }
         
         override fun read(reader: JsonReader): Key {

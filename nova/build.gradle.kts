@@ -1,9 +1,9 @@
 plugins {
     id("nova.kotlin-conventions")
     id("nova.dokka-conventions")
-    id("nova.publish-conventions")
+    id("nova.publish-conventions-java")
     alias(libs.plugins.kotlinx.serialization)
-    alias(origamiLibs.plugins.origami)
+    id("nova.origami-conventions")
     alias(libs.plugins.pluginPublish)
     id("xyz.xenondevs.bundler-jar-plugin")
 }
@@ -18,6 +18,11 @@ dependencies {
     novaLoaderApi(libs.kotlinx.serialization.json)
     api(origamiLibs.mixin)
     api(origamiLibs.mixinextras)
+    api(project(":nova-config"))
+    api(project(":nova-interaction"))
+    api(project(":nova-network"))
+    api(project(":nova-packet-entity"))
+    api(project(":nova-registry"))
     
     // internal dependencies
     compileOnly(project(":nova-api"))
@@ -39,19 +44,24 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotlin.test.junit)
     testRuntimeOnly(libs.junit.platformLauncher)
+    
+    compileOnly("xyz.xenondevs.origami:origami:0.5.0")
 }
 
-// configure java sources location
-sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
-
 origami {
-    paperDevBundle(libs.versions.paper.get())
-    librariesDirectory = "lib"
-    
     runServer {
-        workingDirectory.set(layout.dir(providers.gradleProperty("serverDir").map(::File)))
-        plugins.from(tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output })
+        // prefer DCEVM capabilities over AOT cache
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = JavaLanguageVersion.of(25)
+            vendor = JvmVendorSpec.JETBRAINS
+        }
+        workingDirectory = layout.dir(providers.gradleProperty("serverDir").map(::File))
+        plugins.from(tasks.named<Zip>("loaderJar").flatMap { it.archiveFile })
         jvmArgs.addAll(
+            // DCEVM
+            "-XX:+AllowEnhancedClassRedefinition",
+            // other
+            "-ea",
             "-XX:+EnableDynamicAgentLoading",
             "--enable-native-access=ALL-UNNAMED",
             "-DNovaDev",
@@ -63,21 +73,30 @@ origami {
         // w/o novaLoader on application classpath: record+build: 103s exec: ~8s
     }
 }
-
 val mcVersion = libs.versions.paper.map {
     val versionRegex = Regex("""(\d+\.\d+(?:\.\d+)?(?:-(?:rc|pre|snapshot)-\d+)?).*""")
     versionRegex.matchEntire(it)!!.groupValues[1]
 }
 
-val novaApiJar = project(":nova-api").tasks.withType<Jar>().matching { it.name == "jar" }
-val hookJars = rootProject.subprojects
-    .filter { it.name.startsWith("nova-hook-") }
-    .map { hook -> hook.tasks.withType<Jar>().matching { it.name == "jar" } }
+origami {
+    transitiveAccessWidenerSources.from(configurations.named("runtimeClasspath"))
+}
 
 loaderJar {
     gameVersion = mcVersion
-    novaInput = tasks.named<Jar>("origamiJar").flatMap { it.archiveFile }
-    input.from(novaApiJar, hookJars)
+    merge.from(tasks.named<Jar>("origamiJar").flatMap { it.archiveFile })
+    val projectJars = listOf(
+        ":nova-api",
+        ":nova-config",
+        ":nova-interaction",
+        ":nova-network",
+        ":nova-packet-entity",
+        ":nova-registry",
+    ).map { projectName -> project(projectName).tasks.withType<Jar>().matching { it.name == "jar" } }
+    val hookJars = rootProject.subprojects
+        .filter { it.name.startsWith("nova-hook-") }
+        .map { hook -> hook.tasks.withType<Jar>().matching { it.name == "jar" } }
+    merge.from(projectJars, hookJars)
 }
 
 val resourceProperties = mapOf(
@@ -98,7 +117,6 @@ tasks {
 kotlin {
     compilerOptions {
         optIn.addAll(
-            "kotlin.contracts.ExperimentalContracts",
             "kotlinx.coroutines.ExperimentalCoroutinesApi",
             "xyz.xenondevs.invui.ExperimentalReactiveApi",
             "xyz.xenondevs.invui.dsl.ExperimentalDslApi",
@@ -108,7 +126,7 @@ kotlin {
 }
 
 pluginPublish {
-    file = tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output }
+    file = tasks.named<Zip>("loaderJar").flatMap { it.archiveFile }
     githubRepository = "xenondevs/Nova"
     discord()
     hangar("Nova") {
@@ -119,12 +137,10 @@ pluginPublish {
         incompatibleDependency("z4HZZnLr") // FastAsyncWorldEdit
     }
 }
-
 publishing {
     publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-            artifact(tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output }) {
+        named<MavenPublication>("maven") {
+            artifact(tasks.named<Zip>("loaderJar").flatMap { it.archiveFile }) {
                 classifier = "loader"
                 extension = "jar"
             }

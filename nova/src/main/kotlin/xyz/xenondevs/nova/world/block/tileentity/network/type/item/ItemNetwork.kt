@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type.item
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
+import xyz.xenondevs.commons.collections.identityHashSet
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.nova.config.MAIN_CONFIG
@@ -9,21 +10,23 @@ import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.config.node
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
+import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.channel.ItemChannelsBuilder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.channel.ItemDistributor
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
+import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.NetworkedNMSInventory
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-// TODO: block updates?
 class ItemNetwork internal constructor(
     networkData: NetworkData<ItemNetwork>
 ) : Network<ItemNetwork>, NetworkData<ItemNetwork> by networkData {
     
     private val endPoints = ArrayList<NetworkEndPoint>()
     internal val channels: Array<ItemDistributor?>
+    private val nmsInventories = identityHashSet<NetworkedNMSInventory>()
     private val transferRate: Int
     val complexity: Int
     
@@ -33,7 +36,7 @@ class ItemNetwork internal constructor(
         var transferRate = DEFAULT_TRANSFER_RATE
         var complexity = 0
         val channelsBuilder = ItemChannelsBuilder()
-        for ((pos, con) in nodes) {
+        for ([pos, con] in nodes) {
             val (node, faces) = con
             try {
                 if (node is NetworkEndPoint) {
@@ -54,6 +57,21 @@ class ItemNetwork internal constructor(
         this.transferRate = transferRate
         this.complexity = complexity
         channels = channelsBuilder.build()
+        
+        for (distributor in channels) {
+            if (distributor == null)
+                continue
+            
+            // last priority level contains all inventories
+            for ((inventory) in distributor.providerLevels.lastOrNull().orEmpty()) {
+                if (inventory is NetworkedNMSInventory)
+                    nmsInventories += inventory
+            }
+            for ((inventory) in distributor.consumerLevels.lastOrNull().orEmpty()) {
+                if (inventory is NetworkedNMSInventory)
+                    nmsInventories += inventory
+            }
+        }
     }
     
     override fun isValid(): Boolean =
@@ -75,6 +93,10 @@ class ItemNetwork internal constructor(
         } while (transfersLeft != 0 && nextChannel != startingChannel)
     }
     
+    internal fun postTickSync() {
+        nmsInventories.forEach(NetworkedNMSInventory::postNetworkTickSync)
+    }
+    
     override fun toString(): String {
         return "ItemNetwork(nodes=$nodes)"
     }
@@ -84,12 +106,12 @@ class ItemNetwork internal constructor(
         private val ITEM_NETWORK = MAIN_CONFIG.node("network", "item")
         val TICK_DELAY_PROVIDER: Provider<Int> = ITEM_NETWORK.entry<Int>("tick_delay")
         val DEFAULT_TRANSFER_RATE: Int by combinedProvider(ITEM_NETWORK.entry<Double>("default_transfer_rate"), TICK_DELAY_PROVIDER)
-            .map { (defaultTransferRate, tickDelay) -> (defaultTransferRate * tickDelay).roundToInt() }
+            .map { [defaultTransferRate, tickDelay] -> (defaultTransferRate * tickDelay).roundToInt() }
             .map { defaultTransferRate -> if (defaultTransferRate < 0) Int.MAX_VALUE else defaultTransferRate }
         val CHANNEL_AMOUNT: Int by ITEM_NETWORK.entry<Int>("channel_amount")
         val MAX_COMPLEXITY: Int by ITEM_NETWORK.entry<Int>("max_complexity")
         
-        fun validateLocal(from: NetworkEndPoint, to: NetworkEndPoint, face: BlockFace): Boolean {
+        internal fun validateLocal(from: NetworkEndPoint, to: NetworkEndPoint, face: BlockFace): Boolean {
             val itemHolderFrom = from.holders.firstInstanceOfOrNull<ItemHolder>() ?: return false
             val itemHolderTo = to.holders.firstInstanceOfOrNull<ItemHolder>() ?: return false
             val conFrom = itemHolderFrom.connectionConfig[face]
@@ -97,6 +119,9 @@ class ItemNetwork internal constructor(
             
             return conFrom != conTo || conFrom == NetworkConnectionType.BUFFER
         }
+        
+        internal fun extractHolders(endPoint: NetworkEndPoint): List<EndPointDataHolder>? =
+            endPoint.holders.firstInstanceOfOrNull<ItemHolder>()?.let(::listOf)
         
     }
     

@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.util
 
-import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
+import io.papermc.paper.math.BlockPosition
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.particles.ParticleTypes
@@ -9,10 +8,8 @@ import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
-import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.ProblemReporter
 import net.minecraft.world.InteractionHand
@@ -22,6 +19,7 @@ import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.item.crafting.AbstractCookingRecipe
 import net.minecraft.world.level.block.DoorBlock
+import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.TallFlowerBlock
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.level.storage.TagValueInput
@@ -30,7 +28,11 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
+import org.bukkit.Color
 import org.bukkit.Location
+import org.bukkit.Sound
+import org.bukkit.SoundCategory
+import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.Campfire
@@ -48,32 +50,31 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
+import org.joml.Vector3i
+import org.joml.primitives.AABBd
+import org.joml.primitives.AABBf
+import org.joml.primitives.AABBi
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
+import xyz.xenondevs.nova.context.intention.ImplicitIntentions
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.util.BlockUtils.breakBlock
-import xyz.xenondevs.nova.util.BlockUtils.placeBlock
-import xyz.xenondevs.nova.util.item.hasNoBreakParticles
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
-import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.particle.block
 import xyz.xenondevs.nova.util.particle.particle
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.behavior.BlockSounds
-import xyz.xenondevs.nova.world.block.behavior.Breakable
+import xyz.xenondevs.nova.world.block.NovaBlockState
+import xyz.xenondevs.nova.world.block.blockType
+import xyz.xenondevs.nova.world.block.isNova
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
+import xyz.xenondevs.nova.world.block.novaBlock
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
-import xyz.xenondevs.nova.world.format.WorldDataManager
-import xyz.xenondevs.nova.world.pos
-import java.util.*
+import xyz.xenondevs.nova.world.item.itemType
 import kotlin.math.floor
 import kotlin.random.Random
 import net.minecraft.core.BlockPos as MojangBlockPos
@@ -81,71 +82,10 @@ import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.level.block.Block as MojangBlock
 
-/**
- * The [Key] of this block, considering blocks from Nova, custom item services and vanilla.
- */
-val Block.id: Key
-    get() = WorldDataManager.getBlockState(pos)?.block?.id
-        ?: CustomItemServiceManager.getId(this)?.let { Key.key(it) }
-        ?: type.key()
+// TODO: doc    
 
-/**
- * The [NovaBlockState] at the position of this [Block].
- */
-var Block.novaBlockState: NovaBlockState?
-    get() = WorldDataManager.getBlockState(pos)
-    set(blockState) {
-        if (blockState == null) {
-            val ctx = Context.intention(BlockBreak)
-                .param(BlockBreak.BLOCK_POS, pos)
-                .param(BlockBreak.BLOCK_BREAK_EFFECTS, false)
-                .build()
-            BlockUtils.breakBlock(ctx)
-        } else {
-            val ctx = Context.intention(BlockPlace)
-                .param(BlockPlace.BLOCK_POS, pos)
-                .param(BlockPlace.BLOCK_STATE_NOVA, blockState)
-                .param(BlockPlace.BLOCK_PLACE_EFFECTS, false)
-                .build()
-            BlockUtils.placeBlock(ctx)
-        }
-    }
-
-/**
- * The [NovaBlock] of the [NovaBlockState] at the position of this [Block].
- */
-var Block.novaBlock: NovaBlock?
-    get() = novaBlockState?.block
-    set(block) {
-        novaBlockState = block?.defaultBlockState
-    }
-
-/**
- * The hardness of this block, also considering the custom hardness of Nova blocks.
- */
-val Block.hardness: Double
-    get() {
-        val novaBlock = WorldDataManager.getBlockState(pos)?.block
-        if (novaBlock != null) {
-            val breakable = novaBlock.getBehaviorOrNull<Breakable>()
-            return breakable?.hardness ?: -1.0
-        } else {
-            return type.hardness.toDouble()
-        }
-    }
-
-/**
- * The sound group of this block, also considering custom sound groups of Nova blocks.
- */
-val Block.novaSoundGroup: SoundGroup?
-    get() {
-        val novaBlock = novaBlock
-        if (novaBlock != null) {
-            return novaBlock.getBehaviorOrNull<BlockSounds>()?.soundGroup
-        }
-        
-        return if (!type.isAir) SoundGroup.from(type.soundGroup) else null
-    }
+fun BlockPosition.toBlock(world: World): Block =
+    world.getBlockAt(blockX(), blockY(), blockZ())
 
 /**
  * The block that is one y-level above the current one.
@@ -160,10 +100,71 @@ val Block.below: Block
     get() = world.getBlockAt(x, y - 1, z)
 
 /**
+ * Schedules a tick at [this] block in [delay] ticks.
+ * Canceled if the block's type changes.
+ */
+fun Block.scheduleTick(delay: Int) {
+    require(delay >= 0) { "Delay must not be negative" }
+    world.serverLevel.scheduleTick(nmsPos, nmsBlockState.block, delay)
+}
+
+/**
  * The location at the center of this block.
  */
 val Block.center: Location
     get() = Location(world, x + 0.5, y + 0.5, z + 0.5)
+
+/**
+ * The sound group of this block. Supports custom sound groups.
+ */
+val Block.novaSoundGroup: SoundGroup
+    get() = SoundGroup.from(nmsBlockState.soundType)
+
+/**
+ * The water color of the biome at this block's position.
+ */
+val Block.waterColor: Color
+    get() = Color.fromARGB(world.serverLevel.getBiome(nmsPos).value().waterColor)
+
+@Deprecated("Use Bukkit equivalent", ReplaceWith("getRelative(x, y, z)"))
+fun Block.add(x: Int, y: Int, z: Int): Block =
+    getRelative(x, y, z)
+
+@Deprecated("Use Bukkit equivalent", ReplaceWith("getRelative(face, step)"))
+fun Block.advance(face: BlockFace, step: Int = 1): Block =
+    getRelative(face, step)
+
+fun Block.playSound(sound: String, volume: Float, pitch: Float) {
+    world.playSound(Location(world, x + .5, y + .5, z + .5), sound, volume, pitch)
+}
+
+fun Block.playSound(sound: String, category: SoundCategory, volume: Float, pitch: Float) {
+    world.playSound(Location(world, x + .5, y + .5, z + .5), sound, category, volume, pitch)
+}
+
+fun Block.playSound(sound: Sound, volume: Float, pitch: Float) {
+    world.playSound(Location(world, x + .5, y + .5, z + .5), sound, volume, pitch)
+}
+
+/**
+ * Converts this [Block's][Block] position to a [Vector3i].
+ */
+fun Block.toVector3i(): Vector3i = Vector3i(x, y, z)
+
+/**
+ * Converts this [Block] to an [AABBi] from `(x, y, z)` to `(x + 1, y + 1, z + 1)`.
+ */
+fun Block.toAABBi() = AABBi(x, y, z, x + 1, y + 1, z + 1)
+
+/**
+ * Converts this [Block] to an [AABBd] from `(x, y, z)` to `(x + 1, y + 1, z + 1)`.
+ */
+fun Block.toAABBd() = AABBd(x.toDouble(), y.toDouble(), z.toDouble(), x + 1.0, y + 1.0, z + 1.0)
+
+/**
+ * Converts this [Block] to an [AABBf] from `(x, y, z)` to `(x + 1, y + 1, z + 1)`.
+ */
+fun Block.toAABBf() = AABBf(x.toFloat(), y.toFloat(), z.toFloat(), x + 1.0f, y + 1.0f, z + 1.0f)
 
 /**
  * Spawns an experience orb of [exp] from this block after calling the [BlockExpEvent].
@@ -190,9 +191,9 @@ fun Block.spawnExpOrb(exp: Int, location: Location = this.location.add(.5, .5, .
  * A different number will cause the breaking texture to disappear.
  */
 fun Block.setBreakStage(entityId: Int, stage: Int) {
-    val novaBlockState = WorldDataManager.getBlockState(pos)
-    if (novaBlockState != null) {
-        BlockBreaking.setBreakStage(pos, entityId, stage)
+    val type = blockType
+    if (type.isNova) {
+        BlockBreaking.setBreakStage(this, entityId, stage)
     } else {
         broadcastDestructionStage(entityId, stage)
     }
@@ -209,7 +210,7 @@ fun Block.setBreakStage(entityId: Int, stage: Int) {
  * @see Block.setBreakStage
  */
 fun Block.broadcastDestructionStage(entityId: Int, stage: Int) {
-    val packet = ClientboundBlockDestructionPacket(entityId, location.blockPos, stage)
+    val packet = ClientboundBlockDestructionPacket(entityId, location.Block, stage)
     MINECRAFT_SERVER.playerList.broadcast(location, 32.0, packet)
 }
 
@@ -224,7 +225,7 @@ fun Block.broadcastDestructionStage(entityId: Int, stage: Int) {
  * @see Block.setBreakStage
  */
 fun Block.broadcastDestructionStage(player: Player, stage: Int) {
-    val packet = ClientboundBlockDestructionPacket(player.entityId, location.blockPos, stage)
+    val packet = ClientboundBlockDestructionPacket(player.entityId, location.Block, stage)
     MINECRAFT_SERVER.playerList.broadcast(player, location, 32.0, packet)
 }
 
@@ -233,28 +234,11 @@ fun Block.broadcastDestructionStage(player: Player, stage: Int) {
  * causing break particles and sounds to be played. Only works with vanilla blocks.
  */
 fun Block.broadcastBreakEvent() {
-    val packet = ClientboundLevelEventPacket(2001, pos.nmsPos, MojangBlock.getId(nmsState), false)
+    val packet = ClientboundLevelEventPacket(2001, nmsPos, MojangBlock.getId(nmsBlockState), false)
     MINECRAFT_SERVER.playerList.broadcast(null as MojangPlayer?, this, 64.0, packet)
 }
 
 object BlockUtils {
-    
-    /**
-     * Changes the state of the custom Nova block at [pos] to [blockState].
-     *
-     * @throws IllegalArgumentException If there is no custom Nova block of the same block type at [pos].
-     * For such cases, use [breakBlock] and [placeBlock] instead.
-     */
-    fun updateBlockState(pos: BlockPos, blockState: NovaBlockState) {
-        val prevBlockState = WorldDataManager.getBlockState(pos)
-        if (prevBlockState == blockState)
-            return
-        
-        require(prevBlockState != null && prevBlockState.block == blockState.block) { "New block state needs to be of the same block type" }
-        
-        blockState.modelProvider.replace(pos, prevBlockState.modelProvider)
-        WorldDataManager.setBlockState(pos, blockState)
-    }
     
     /**
      * Places a block using the given [Context].
@@ -264,37 +248,34 @@ object BlockUtils {
      * @param ctx The context to use
      * @return If a block has been placed
      */
-    fun placeBlock(ctx: Context<BlockPlace>): Boolean {
-        val pos = ctx[BlockPlace.BLOCK_POS]
-        
-        // break previous block (if present)
-        val breakCtx = Context.intention(BlockBreak)
-            .param(BlockBreak.BLOCK_POS, pos)
-            .param(BlockBreak.BLOCK_BREAK_EFFECTS, false)
-            .build()
-        breakBlock(breakCtx)
-        
-        val novaBlockState = ctx[BlockPlace.BLOCK_STATE_NOVA]
-        if (novaBlockState != null) {
-            placeNovaBlock(pos, novaBlockState, ctx)
-            return true
-        }
-        
-        // TODO: place block by block state / id
-        val itemStack: ItemStack? = ctx[BlockPlace.BLOCK_ITEM_STACK]
-        val placeEffects = ctx[BlockPlace.BLOCK_PLACE_EFFECTS]
-        if (itemStack != null) {
-            if (CustomItemServiceManager.placeBlock(itemStack, pos.location, placeEffects))
-                return true
+    fun placeBlock(ctx: Context<BlockPlace>): Boolean = ScopedValue.where(ImplicitIntentions.BLOCK_PLACE, ctx).exec {
+        val block = ctx[BlockPlace.BLOCK]
+        val state = ctx[BlockPlace.BLOCK_STATE]
+        if (state is NovaBlockState) {
+            val flags = ctx[BlockPlace.BLOCK_UPDATE_FLAGS]
+            val level = block.world.serverLevel
+            level.setBlock(block.nmsPos, state.nmsBlockState, flags.value)
             
-            if (itemStack.type.isBlock) {
+            if (ctx[BlockPlace.BLOCK_PLACE_EFFECTS])
+                block.novaSoundGroup.playPlaceSound(block)
+            
+            return@exec true
+        } else {
+            // TODO: place block by block state
+            // TODO: respect block update flags
+            val itemStack: ItemStack? = ctx[BlockPlace.BLOCK_ITEM_STACK]
+            val placeEffects = ctx[BlockPlace.BLOCK_PLACE_EFFECTS]
+            if (itemStack != null && CustomItemServiceManager.placeBlock(itemStack, block.location, placeEffects))
+                return@exec true
+            
+            if (itemStack != null && itemStack.itemType.hasBlockType()) {
                 val fakePlayer = EntityUtils.createFakePlayer(
-                    ctx[BlockPlace.SOURCE_LOCATION] ?: pos.location,
-                    UUID.randomUUID(), ""
+                    ctx[BlockPlace.SOURCE_LOCATION] ?: block.location,
+                    insecureRandomUuid(), ""
                 )
                 
-                return placeVanillaBlock(
-                    pos,
+                return@exec placeVanillaBlock(
+                    block,
                     ctx[BlockPlace.CLICKED_BLOCK_FACE] ?: BlockFace.UP,
                     fakePlayer,
                     itemStack,
@@ -303,22 +284,9 @@ object BlockUtils {
             }
         }
         
-        return false
+        return@exec false
     }
     
-    internal fun placeNovaBlock(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>) {
-        val block = state.block
-        WorldDataManager.setBlockState(pos, state)
-        block.handlePlace(pos, state, ctx)
-        
-        // sounds
-        if (ctx[BlockPlace.BLOCK_PLACE_EFFECTS]) {
-            val soundGroup = block.getBehaviorOrNull<BlockSounds>()?.soundGroup
-            if (soundGroup != null) {
-                pos.playSound(soundGroup.placeSound, soundGroup.placeVolume, soundGroup.placePitch)
-            }
-        }
-    }
     
     /**
      * Places the [itemStack] at the position of this Block
@@ -328,25 +296,25 @@ object BlockUtils {
      * @param placeEffects If the place effects should be played
      * @return If the item could be placed
      */
-    internal fun placeVanillaBlock(pos: BlockPos, clickedFace: BlockFace, player: ServerPlayer, itemStack: ItemStack, placeEffects: Boolean): Boolean {
+    internal fun placeVanillaBlock(block: Block, clickedFace: BlockFace, player: ServerPlayer, itemStack: ItemStack, placeEffects: Boolean): Boolean {
         val nmsStack = itemStack.unwrap().copy()
         val blockItem = nmsStack.item as BlockItem
         val result = blockItem.place(BlockPlaceContext(UseOnContext(
-            pos.world.serverLevel,
+            block.world.serverLevel,
             player,
             InteractionHand.MAIN_HAND,
             nmsStack,
             BlockHitResult(
-                Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()),
+                Vec3(block.x.toDouble(), block.y.toDouble(), block.z.toDouble()),
                 clickedFace.nmsDirection,
-                pos.nmsPos,
+                block.nmsPos,
                 false
             )
         )))
         
         if (result.consumesAction()) {
-            setBlockEntityDataFromItemStack(pos, itemStack)
-            if (placeEffects) itemStack.type.playPlaceSoundEffect(pos.location)
+            setBlockEntityDataFromItemStack(block, itemStack)
+            if (placeEffects) itemStack.type.playPlaceSoundEffect(block.location)
             return true
         }
         
@@ -360,12 +328,12 @@ object BlockUtils {
      *
      * @param itemStack The [ItemStack] to load the data from
      */
-    private fun setBlockEntityDataFromItemStack(pos: BlockPos, itemStack: ItemStack) {
+    private fun setBlockEntityDataFromItemStack(block: Block, itemStack: ItemStack) {
         val tileEntityTag = itemStack.unwrap().get(DataComponents.BLOCK_ENTITY_DATA)?.copyTagWithBlockEntityId()
             ?: return
         
-        val input = TagValueInput.create(ProblemReporter.DISCARDING, pos.world.serverLevel.registryAccess(), tileEntityTag)
-        pos.world.serverLevel.getBlockEntity(pos.nmsPos)?.loadWithComponents(input)
+        val input = TagValueInput.create(ProblemReporter.DISCARDING, block.world.serverLevel.registryAccess(), tileEntityTag)
+        block.world.serverLevel.getBlockEntity(block.nmsPos)?.loadWithComponents(input)
     }
     
     /**
@@ -379,16 +347,15 @@ object BlockUtils {
      * @param ctx The [Context] to be used
      */
     fun breakBlockNaturally(ctx: Context<BlockBreak>) {
-        val pos = ctx[BlockBreak.BLOCK_POS]
+        val block = ctx[BlockBreak.BLOCK]
         val items = breakBlockInternal(ctx, sendEffectsToBreaker = true)
         
         val player = ctx[BlockBreak.SOURCE_ENTITY] as? Player
-        val block = pos.block
-        val itemEntities = EntityUtils.createBlockDropItemEntities(pos, items)
+        val itemEntities = EntityUtils.createBlockDropItemEntities(block, items)
         if (player != null) {
             CraftEventFactory.handleBlockDropItemEvent(block, block.state, player.serverPlayer, itemEntities)
         } else {
-            itemEntities.forEach(pos.world.serverLevel::addFreshEntity)
+            itemEntities.forEach(block.world.serverLevel::addFreshEntity)
         }
     }
     
@@ -407,56 +374,55 @@ object BlockUtils {
     }
     
     internal fun breakBlockInternal(ctx: Context<BlockBreak>, sendEffectsToBreaker: Boolean): List<ItemStack> {
-        val pos = ctx[BlockBreak.BLOCK_POS]
-        val bukkitBlock = pos.block
-        val breakEffects = ctx[BlockBreak.BLOCK_BREAK_EFFECTS]
-        val drops = ctx[BlockBreak.BLOCK_DROPS]
-        
-        if (CustomItemServiceManager.getId(bukkitBlock) != null) {
-            val itemDrops = if (drops)
-                CustomItemServiceManager.getDrops(bukkitBlock, ctx[BlockBreak.TOOL_ITEM_STACK]) ?: emptyList()
+        val block = ctx[BlockBreak.BLOCK]
+        if (CustomItemServiceManager.getId(block) != null) {
+            val drops = if (ctx[BlockBreak.BLOCK_DROPS])
+                CustomItemServiceManager.getDrops(block, ctx[BlockBreak.TOOL_ITEM_STACK]) ?: emptyList()
             else emptyList()
-            CustomItemServiceManager.removeBlock(bukkitBlock, breakEffects)
-            return itemDrops
+            CustomItemServiceManager.removeBlock(block, ctx[BlockBreak.BLOCK_BREAK_EFFECTS])
+            return drops
         }
         
-        val novaBlockState = WorldDataManager.getBlockState(pos)
-        if (novaBlockState != null) {
-            val itemDrops = novaBlockState.block.getDrops(pos, novaBlockState, ctx)
-            breakNovaBlockInternal(ctx, sendEffectsToBreaker)
-            return itemDrops
+        return ScopedValue.where(ImplicitIntentions.BLOCK_BREAK, ctx).exec {
+            val blockState = ctx[BlockBreak.BLOCK_STATE]
+            if (blockState is NovaBlockState) {
+                val novaBlock = blockState.novaBlock
+                val drops = novaBlock.getDrops(block, blockState, ctx)
+                val level = block.world.serverLevel
+                val pos = block.nmsPos
+                
+                if (ctx[BlockBreak.BLOCK_BREAK_EFFECTS]) {
+                    playBreakEffects(
+                        blockState,
+                        block,
+                        if (sendEffectsToBreaker) null else ctx[BlockBreak.SOURCE_ENTITY] as? Player
+                    )
+                }
+                
+                level.setBlock(pos, level.getFluidState(pos).createLegacyBlock(), ctx[BlockBreak.BLOCK_UPDATE_FLAGS].value)
+                return@exec drops
+            } else {
+                return@exec breakVanillaBlock(
+                    block,
+                    ctx[BlockBreak.SOURCE_ENTITY]?.nmsEntity as? ServerPlayer ?: EntityUtils.DUMMY_PLAYER,
+                    ctx[BlockBreak.TOOL_ITEM_STACK],
+                    ctx[BlockBreak.BLOCK_DROPS],
+                    ctx[BlockBreak.BLOCK_BREAK_EFFECTS],
+                    sendEffectsToBreaker
+                )
+            }
         }
-        
-        val nmsPlayer = ctx[BlockBreak.SOURCE_ENTITY]?.nmsEntity as? ServerPlayer ?: EntityUtils.DUMMY_PLAYER
-        val tool = ctx[BlockBreak.TOOL_ITEM_STACK]
-        return breakVanillaBlock(pos, nmsPlayer, tool, drops, breakEffects, sendEffectsToBreaker)
     }
     
-    internal fun breakNovaBlockInternal(ctx: Context<BlockBreak>, sendEffectsToBreaker: Boolean): Boolean {
-        val pos = ctx[BlockBreak.BLOCK_POS]
-        val state = WorldDataManager.getBlockState(pos)
-            ?: return false
-        
-        if (ctx[BlockBreak.BLOCK_BREAK_EFFECTS]) {
-            playBreakEffects(state, ctx, pos, sendEffectsToBreaker)
-        }
-        
-        WorldDataManager.setBlockState(pos, null)
-        state.block.handleBreak(pos, state, ctx)
-        
-        return true
-    }
-    
-    private fun playBreakEffects(state: NovaBlockState, ctx: Context<BlockBreak>, pos: BlockPos, sendEffectsToBreaker: Boolean) {
-        val player = ctx[BlockBreak.SOURCE_ENTITY] as? Player
-        val level = pos.world.serverLevel
+    internal fun playBreakEffects(state: NovaBlockState, block: Block, excludedPlayer: Player?) {
+        val level = block.world.serverLevel
         val dimension = level.dimension()
-        val nmsPos = pos.nmsPos
+        val nmsPos = block.nmsPos
         
-        fun broadcast(packet: Packet<*>, sendEffectsToBreaker: Boolean) {
+        fun broadcast(packet: Packet<*>, excludedPlayer: Player? = null) {
             MINECRAFT_SERVER.playerList.broadcast(
-                if (sendEffectsToBreaker) null else player?.serverPlayer,
-                pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(),
+                excludedPlayer?.serverPlayer,
+                block.x.toDouble(), block.y.toDouble(), block.z.toDouble(),
                 64.0,
                 dimension,
                 packet
@@ -465,7 +431,7 @@ object BlockUtils {
         
         fun broadcastBreakSound(soundGroup: SoundGroup) {
             val soundPacket = ClientboundSoundPacket(
-                Holder.direct(SoundEvent.createVariableRangeEvent(Identifier.parse(soundGroup.breakSound))),
+                Holder.direct(soundGroup.nmsSoundType.breakSound),
                 SoundSource.BLOCKS,
                 nmsPos.x + 0.5,
                 nmsPos.y + 0.5,
@@ -475,52 +441,54 @@ object BlockUtils {
                 Random.nextLong()
             )
             
-            broadcast(soundPacket, true)
+            broadcast(soundPacket)
         }
         
-        fun broadcastCustomBreakParticles(sendToBreaker: Boolean) {
-            val breakParticlesMaterial = state.block.getBehaviorOrNull<Breakable>()?.breakParticles
+        fun broadcastCustomBreakParticles(includeExcludedPlayer: Boolean) {
+            val breakParticlesBlock = state.novaBlock.breakParticles
                 ?: return
-            val breakParticles = particle(ParticleTypes.BLOCK, pos.location.add(0.5, 0.5, 0.5)) {
-                block(breakParticlesMaterial)
+            val breakParticles = particle(ParticleTypes.BLOCK, block.location.add(0.5, 0.5, 0.5)) {
+                block(breakParticlesBlock)
                 offset(0.3, 0.3, 0.3)
                 amount(70)
             }
-            broadcast(breakParticles, sendToBreaker)
+            broadcast(breakParticles, if (includeExcludedPlayer) null else excludedPlayer)
         }
         
-        val soundGroup = state.block.getBehaviorOrNull<BlockSounds>()?.soundGroup
-        val modelProvider = state.modelProvider
+        val soundGroup = SoundGroup.from(state.nmsBlockState.soundType)
+        val modelProvider = state.novaBlock.modelProviders.get()[state.nmsBlockState]
+            ?: return
+        val clientsideBlockState = modelProvider.clientsideBlockState
+        val hasNoBreakParticles = clientsideBlockState.renderShape == RenderShape.INVISIBLE || !clientsideBlockState.shouldSpawnTerrainParticles()
         if (modelProvider is BackingStateBlockModelProvider || modelProvider is ModelLessBlockModelProvider) {
             // use the level event packet for blocks that use block states (sound & particles)
-            val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, pos.nmsBlockState.id, false)
-            broadcast(levelEventPacket, sendEffectsToBreaker)
+            val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, state.nmsBlockState.id, false)
+            broadcast(levelEventPacket, excludedPlayer)
             
-            if (soundGroup != null && SoundEngine.overridesSound(pos.block.type.soundGroup.breakSound.key.key))
+            if (SoundEngine.overridesSound(clientsideBlockState.soundType.breakSound))
                 broadcastBreakSound(soundGroup)
             
             // if no break particles were displayed with the level event packet, send custom ones
-            if (modelProvider is ModelLessBlockModelProvider && modelProvider.info.bukkitMaterial.hasNoBreakParticles())
+            if (modelProvider is ModelLessBlockModelProvider && hasNoBreakParticles)
                 broadcastCustomBreakParticles(true)
         } else if (modelProvider is DisplayEntityBlockModelProvider) {
             // send sound and break particles manually for display entity blocks
-            if (soundGroup != null)
-                broadcastBreakSound(soundGroup)
-            broadcastCustomBreakParticles(sendEffectsToBreaker || modelProvider.info.hitboxType.bukkitMaterial.hasNoBreakParticles())
+            broadcastBreakSound(soundGroup)
+            broadcastCustomBreakParticles(hasNoBreakParticles)
         }
     }
     
     internal fun breakVanillaBlock(
-        pos: BlockPos,
+        block: Block,
         player: ServerPlayer,
         tool: ItemStack?,
         drops: Boolean,
         breakEffects: Boolean,
         sendEffectsToBreaker: Boolean
     ): List<ItemStack> {
-        val level = pos.world.serverLevel
-        val nmsPos = pos.nmsPos
-        val state = pos.nmsBlockState
+        val level = block.world.serverLevel
+        val nmsPos = block.nmsPos
+        val state = block.nmsBlockState
         val block = state.block
         
         if (state.isAir)
@@ -551,25 +519,23 @@ object BlockUtils {
     
     /**
      * Gets a list of [ItemStacks][ItemStack] containing the drops of this [Block] for the specified [ctx].
-     *
-     * Works for vanilla blocks, Nova blocks and blocks from custom item integrations.
      */
     fun getDrops(ctx: Context<BlockBreak>): List<ItemStack> {
-        val pos = ctx[BlockBreak.BLOCK_POS]
+        val pos = ctx[BlockBreak.BLOCK]
+        val state = ctx[BlockBreak.BLOCK_STATE]
         val tool = ctx[BlockBreak.TOOL_ITEM_STACK]
         
         // fixme: custom item services ignore block & storage drops params
-        if (CustomItemServiceManager.getBlockType(pos.block) != null)
-            return CustomItemServiceManager.getDrops(pos.block, tool) ?: emptyList()
+        if (CustomItemServiceManager.getBlockType(pos) != null)
+            return CustomItemServiceManager.getDrops(pos, tool) ?: emptyList()
         
-        val novaBlockState = WorldDataManager.getBlockState(pos)
-        if (novaBlockState != null)
-            return novaBlockState.block.getDrops(pos, novaBlockState, ctx)
+        if (state is NovaBlockState)
+            return state.novaBlock.getDrops(pos, state, ctx)
         
         val drops = ArrayList<ItemStack>()
         if (ctx[BlockBreak.BLOCK_STORAGE_DROPS]) {
             // note: storage drops in nms are implemented via BlockEntity#preRemoveSideEffects
-            when (val state = pos.block.state) {
+            when (state) {
                 is Chest ->
                     drops += state.blockInventory.contents.asSequence().filterNotNull().map(ItemStack::clone)
                 
@@ -588,7 +554,7 @@ object BlockUtils {
         }
         
         if (ctx[BlockBreak.BLOCK_DROPS]) {
-            val mainPos = pos.block.getMainHalf().pos
+            val mainPos = pos.getMainHalf()
             val builder = LootParams.Builder(mainPos.world.serverLevel)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(mainPos.nmsPos))
                 .withParameter(LootContextParams.TOOL, tool.unwrap())
@@ -602,7 +568,7 @@ object BlockUtils {
     
     private fun Block.getMainHalf(): Block {
         val data = blockData
-        val nmsBlock = type.nmsBlock
+        val nmsBlock = nmsBlockState.block
         if (nmsBlock is TallFlowerBlock || nmsBlock is DoorBlock) { // 2 block tall
             data as Bisected
             if (data.half == Bisected.Half.TOP) {
@@ -620,13 +586,13 @@ object BlockUtils {
     }
     
     /**
-     * Gets the experience that would be dropped if the block were to be broken.
+     * Gets the experience that would be dropped if the block were to be broken with [ctx].
      */
     fun getExp(ctx: Context<BlockBreak>): Int {
-        val pos = ctx[BlockBreak.BLOCK_POS]
-        val novaState = WorldDataManager.getBlockState(pos)
-        if (novaState != null)
-            return novaState.block.getExp(pos, novaState, ctx)
+        val pos = ctx[BlockBreak.BLOCK]
+        val state = ctx[BlockBreak.BLOCK_STATE]
+        if (state is NovaBlockState)
+            return state.novaBlock.getExp(pos, state, ctx)
         
         val serverLevel = pos.world.serverLevel
         val mojangPos = pos.nmsPos
@@ -669,26 +635,17 @@ object BlockUtils {
     }
     
     /**
-     * Gets the name of [block] as a [Component]. Works for Nova blocks, custom item services and vanilla blocks.
-     */
-    fun getName(block: Block): Component {
-        return CustomItemServiceManager.getName(block, "en_us")
-            ?: WorldDataManager.getBlockState(block.pos)?.block?.name
-            ?: Component.translatable(block.type.nmsBlock.descriptionId)
-    }
-    
-    /**
      * Checks if a block is blocked by the hitbox of an entity.
      */
-    internal fun isUnobstructed(pos: BlockPos, entity: Entity?, blockData: BlockData): Boolean {
+    internal fun isUnobstructed(block: Block, entity: Entity?, blockData: BlockData): Boolean {
         val context = entity?.let { CollisionContext.of(entity.nmsEntity) } ?: CollisionContext.empty()
-        return pos.world.serverLevel.isUnobstructed(blockData.nmsBlockState, pos.nmsPos, context)
+        return block.world.serverLevel.isUnobstructed(blockData.nmsBlockState, block.nmsPos, context)
     }
     
-    internal fun broadcastBlockUpdate(pos: BlockPos) {
-        val level = pos.world.serverLevel
-        val nmsPos = pos.nmsPos
-        val nmsState = pos.nmsBlockState
+    internal fun broadcastBlockUpdate(block: Block) {
+        val level = block.world.serverLevel
+        val nmsPos = block.nmsPos
+        val nmsState = block.nmsBlockState
         level.notifyAndUpdatePhysics(nmsPos, level.getChunkAt(nmsPos), nmsState, nmsState, nmsState, 3, 512)
     }
     

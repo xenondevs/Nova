@@ -3,38 +3,20 @@ package xyz.xenondevs.nova.world.block.state.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.minecraft.world.level.block.state.BlockState
-import xyz.xenondevs.nova.serialization.kotlinx.BlockStateSerializer
-import xyz.xenondevs.nova.util.setBlockState
-import xyz.xenondevs.nova.util.setBlockStateNoUpdate
-import xyz.xenondevs.nova.util.setBlockStateSilently
-import xyz.xenondevs.nova.util.withoutBlockMigration
-import xyz.xenondevs.nova.world.BlockPos
+import org.bukkit.block.data.BlockData
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.nova.serialization.kotlinx.ModelLessBlockModelProviderSerializer
+import xyz.xenondevs.nova.util.nmsBlockState
 
 /**
  * A block model provider that just places a vanilla block state that is not associated with any custom model.
  */
-@Serializable
+@Serializable(ModelLessBlockModelProviderSerializer::class)
 @SerialName("model_less")
 internal class ModelLessBlockModelProvider(
-    @Serializable(with = BlockStateSerializer::class)
-    val info: BlockState
+    val infoProvider: Provider<BlockData>
 ) : BlockModelProvider {
-    
-    override fun set(pos: BlockPos, method: BlockUpdateMethod) {
-        withoutBlockMigration(pos) {
-            when (method) {
-                BlockUpdateMethod.DEFAULT -> pos.setBlockState(info)
-                BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info)
-                BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info)
-            }
-        }
-    }
-    
-    override fun replace(pos: BlockPos, method: BlockUpdateMethod) {
-        set(pos, method)
-    }
-    
-    override fun load(pos: BlockPos) = Unit
-    override fun unload(pos: BlockPos) = Unit
-    
+    val info: BlockData by infoProvider
+    override val clientsideBlockState: BlockState
+        get() = info.nmsBlockState
 }

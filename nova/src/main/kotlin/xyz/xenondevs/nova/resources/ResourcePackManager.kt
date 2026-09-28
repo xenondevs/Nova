@@ -45,7 +45,7 @@ object ResourcePackManager : Listener {
     
     private val packApplyOverrides: MutableMap<UUID, MutableMap<Key, Boolean>> =
         (PermanentStorage.retrieve<Map<UUID, Map<Key, Boolean>>>(PACK_APPLY_OVERRIDES_KEY) ?: emptyMap())
-            .mapValuesTo(ConcurrentHashMap()) { (_, map) -> ConcurrentHashMap(map) }
+            .mapValuesTo(ConcurrentHashMap()) { [_, map] -> ConcurrentHashMap(map) }
     
     private val packStatusFutures = ConcurrentHashMap<UUID, CompletableFuture<Boolean>>()
     
@@ -72,10 +72,10 @@ object ResourcePackManager : Listener {
             when (status) {
                 ResourcePackStatus.SUCCESSFULLY_LOADED -> packStatusFuture.complete(true)
                 
-                ResourcePackStatus.DECLINED, 
+                ResourcePackStatus.DECLINED,
                 ResourcePackStatus.INVALID_URL,
                 ResourcePackStatus.FAILED_DOWNLOAD,
-                ResourcePackStatus.FAILED_RELOAD, 
+                ResourcePackStatus.FAILED_RELOAD,
                 ResourcePackStatus.DISCARDED -> packStatusFuture.complete(false)
                 
                 ResourcePackStatus.ACCEPTED, ResourcePackStatus.DOWNLOADED -> Unit
@@ -100,7 +100,7 @@ object ResourcePackManager : Listener {
     fun getEnabledPacks(player: OfflinePlayer): Set<Key> {
         val overrides: Map<Key, Boolean> = packApplyOverrides[player.uniqueId] ?: emptyMap()
         val enabled = ResourcePackBuilder.configurations
-            .filter { (id, factory) -> overrides[id] ?: factory.isEnabledByDefault }
+            .filter { [id, factory] -> overrides[id] ?: factory.isEnabledByDefault }
             .keys
         return enabled
     }

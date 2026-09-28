@@ -1,10 +1,14 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.world.fakeentity.metadata.impl
 
 import net.kyori.adventure.text.Component
 import net.minecraft.network.syncher.EntityDataSerializers
 import org.bukkit.entity.TextDisplay.TextAlignment
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
+import xyz.xenondevs.nova.world.fakeentity.FAKE_ENTITY_DEPRECATION
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 class TextDisplayMetadata : DisplayMetadata() {
     
     var text: Component by entry(23, EntityDataSerializers.COMPONENT, Component.empty()) { it.toNMSComponent() }

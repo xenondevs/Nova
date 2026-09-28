@@ -7,14 +7,13 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
-import xyz.xenondevs.commons.collections.enumSet
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.commons.guava.set
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.getValueOrThrow
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import java.util.*
 
@@ -22,7 +21,7 @@ sealed interface NetworkNodeData {
     
     val owner: UUID
     
-    val connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>>
+    val connections: MutableMap<NetworkType<*>, CubeFaceSet>
     
     fun write(writer: ByteWriter)
     
@@ -31,19 +30,19 @@ sealed interface NetworkNodeData {
 data class NetworkBridgeData(
     val typeId: Key,
     override val owner: UUID,
-    override val connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>> = HashMap(),
+    override val connections: MutableMap<NetworkType<*>, CubeFaceSet> = HashMap(),
     val networks: MutableMap<NetworkType<*>, UUID> = HashMap(),
     val supportedNetworkTypes: MutableSet<NetworkType<*>> = HashSet(),
-    val bridgeFaces: MutableSet<BlockFace> = enumSet()
+    val bridgeFaces: CubeFaceSet = CubeFaceSet.NONE
 ) : NetworkNodeData {
     
     constructor(
         typeId: Key,
         owner: OfflinePlayer?,
-        connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>> = HashMap(),
+        connections: MutableMap<NetworkType<*>, CubeFaceSet> = HashMap(),
         networks: MutableMap<NetworkType<*>, UUID> = HashMap(),
         supportedNetworkTypes: MutableSet<NetworkType<*>> = HashSet(),
-        bridgeFaces: MutableSet<BlockFace> = enumSet()
+        bridgeFaces: CubeFaceSet = CubeFaceSet.NONE
     ) : this(
         typeId,
         owner?.uniqueId ?: UUID(0L, 0L),
@@ -54,12 +53,12 @@ data class NetworkBridgeData(
     )
     
     override fun write(writer: ByteWriter) {
-        writer.writeString(typeId.toString())
+        writer.writeString(typeId.asString())
         writer.writeUUID(owner)
         writer.writeNetworkTypeCubeFaceSetMap(connections)
         writer.writeNetworkTypeUUIDMap(networks)
         writer.writeNetworkTypeSet(supportedNetworkTypes)
-        writer.writeCubeFaceSet(bridgeFaces)
+        writer.writeByte(bridgeFaces.data)
     }
     
     companion object {
@@ -71,7 +70,7 @@ data class NetworkBridgeData(
                 reader.readNetworkTypeCubeFaceSetMap(),
                 reader.readNetworkTypeUUIDMap(),
                 reader.readNetworkTypeSet(),
-                reader.readCubeFaceSet()
+                CubeFaceSet(reader.readByte())
             )
         
     }
@@ -80,13 +79,13 @@ data class NetworkBridgeData(
 
 data class NetworkEndPointData(
     override val owner: UUID,
-    override val connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>> = HashMap(),
+    override val connections: MutableMap<NetworkType<*>, CubeFaceSet> = HashMap(),
     val networks: Table<NetworkType<*>, BlockFace, UUID> = HashBasedTable.create()
 ) : NetworkNodeData {
     
     constructor(
         owner: OfflinePlayer?,
-        connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>> = HashMap(),
+        connections: MutableMap<NetworkType<*>, CubeFaceSet> = HashMap(),
         networks: Table<NetworkType<*>, BlockFace, UUID> = HashBasedTable.create()
     ) : this(
         owner?.uniqueId ?: UUID(0L, 0L),
@@ -113,12 +112,12 @@ data class NetworkEndPointData(
     
 }
 
-private fun ByteReader.readNetworkTypeCubeFaceSetMap(): MutableMap<NetworkType<*>, MutableSet<BlockFace>> {
+private fun ByteReader.readNetworkTypeCubeFaceSetMap(): MutableMap<NetworkType<*>, CubeFaceSet> {
     val size = readVarInt()
-    val map = HashMap<NetworkType<*>, MutableSet<BlockFace>>(size)
+    val map = HashMap<NetworkType<*>, CubeFaceSet>(size)
     repeat(size) {
-        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
-        val set = readCubeFaceSet()
+        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(Key.key(readString()))
+        val set = CubeFaceSet(readByte())
         
         map[networkType] = set
     }
@@ -126,11 +125,11 @@ private fun ByteReader.readNetworkTypeCubeFaceSetMap(): MutableMap<NetworkType<*
     return map
 }
 
-private fun ByteWriter.writeNetworkTypeCubeFaceSetMap(map: Map<NetworkType<*>, Set<BlockFace>>) {
+private fun ByteWriter.writeNetworkTypeCubeFaceSetMap(map: Map<NetworkType<*>, CubeFaceSet>) {
     writeVarInt(map.size)
-    for ((networkType, set) in map) {
-        writeString(networkType.id.toString())
-        writeCubeFaceSet(set)
+    for ([networkType, set] in map) {
+        writeString(networkType.key.asString())
+        writeByte(set.data)
     }
 }
 
@@ -138,7 +137,7 @@ private fun ByteReader.readNetworkTypeBlockFaceUUIDTable(): Table<NetworkType<*>
     val size = readVarInt()
     val table = HashBasedTable.create<NetworkType<*>, BlockFace, UUID>()
     repeat(size) {
-        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
+        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(Key.key(readString()))
         val face = BlockFace.entries[readByte().toInt()]
         val uuid = readUUID()
         
@@ -150,8 +149,8 @@ private fun ByteReader.readNetworkTypeBlockFaceUUIDTable(): Table<NetworkType<*>
 
 private fun ByteWriter.writeNetworkTypeBlockFaceUUIDTable(table: Table<NetworkType<*>, BlockFace, UUID>) {
     writeVarInt(table.size())
-    for ((networkType, face, uuid) in table) {
-        writeString(networkType.id.toString())
+    for ([networkType, face, uuid] in table) {
+        writeString(networkType.key.asString())
         writeByte(face.ordinal.toByte())
         writeUUID(uuid)
     }
@@ -159,8 +158,8 @@ private fun ByteWriter.writeNetworkTypeBlockFaceUUIDTable(table: Table<NetworkTy
 
 private fun ByteWriter.writeNetworkTypeUUIDMap(map: Map<NetworkType<*>, UUID>) {
     writeVarInt(map.size)
-    for ((networkType, uuid) in map) {
-        writeString(networkType.id.toString())
+    for ([networkType, uuid] in map) {
+        writeString(networkType.key.asString())
         writeUUID(uuid)
     }
 }
@@ -169,7 +168,7 @@ private fun ByteReader.readNetworkTypeUUIDMap(): MutableMap<NetworkType<*>, UUID
     val size = readVarInt()
     val map = HashMap<NetworkType<*>, UUID>(size)
     repeat(size) {
-        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
+        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(Key.key(readString()))
         val uuid = readUUID()
         
         map[networkType] = uuid
@@ -181,7 +180,7 @@ private fun ByteReader.readNetworkTypeUUIDMap(): MutableMap<NetworkType<*>, UUID
 private fun ByteWriter.writeNetworkTypeSet(set: Set<NetworkType<*>>) {
     writeVarInt(set.size)
     for (networkType in set) {
-        writeString(networkType.id.toString())
+        writeString(networkType.key.asString())
     }
 }
 
@@ -189,43 +188,8 @@ private fun ByteReader.readNetworkTypeSet(): MutableSet<NetworkType<*>> {
     val size = readVarInt()
     val set = HashSet<NetworkType<*>>(size)
     repeat(size) {
-        set += NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
+        set += NovaRegistries.NETWORK_TYPE.getValueOrThrow(Key.key(readString()))
     }
     
-    return set
-}
-
-internal fun ByteWriter.writeCubeFaceSet(set: Set<BlockFace>) {
-    var b = 0
-    if (BlockFace.NORTH in set)
-        b = b or 0b100000
-    if (BlockFace.EAST in set)
-        b = b or 0b010000
-    if (BlockFace.SOUTH in set)
-        b = b or 0b001000
-    if (BlockFace.WEST in set)
-        b = b or 0b000100
-    if (BlockFace.UP in set)
-        b = b or 0b000010
-    if (BlockFace.DOWN in set)
-        b = b or 0b000001
-    writeByte(b.toByte())
-}
-
-internal fun ByteReader.readCubeFaceSet(): MutableSet<BlockFace> {
-    val b = readByte().toInt()
-    val set = enumSet<BlockFace>()
-    if (b and 0b100000 != 0)
-        set += BlockFace.NORTH
-    if (b and 0b010000 != 0)
-        set += BlockFace.EAST
-    if (b and 0b001000 != 0)
-        set += BlockFace.SOUTH
-    if (b and 0b000100 != 0)
-        set += BlockFace.WEST
-    if (b and 0b000010 != 0)
-        set += BlockFace.UP
-    if (b and 0b000001 != 0)
-        set += BlockFace.DOWN
     return set
 }

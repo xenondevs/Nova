@@ -3,12 +3,13 @@
 package xyz.xenondevs.nova.util
 
 import com.mojang.datafixers.util.Either
-import io.netty.buffer.Unpooled
 import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation
+import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.set.RegistryKeySet
 import io.papermc.paper.registry.tag.Tag
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Namespaced
 import net.minecraft.core.DefaultedRegistry
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
@@ -21,7 +22,6 @@ import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.Rotations
 import net.minecraft.core.WritableRegistry
-import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.RegistryOps.RegistryInfoLookup
@@ -35,45 +35,57 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStackTemplate
+import net.minecraft.world.item.ItemInstance
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
 import net.minecraft.world.level.chunk.LevelChunk
 import net.minecraft.world.level.chunk.LevelChunkSection
+import net.minecraft.world.level.material.MapColor
+import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
+import org.bukkit.Color
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.block.BlockType
+import org.bukkit.block.PistonMoveReaction
 import org.bukkit.block.data.BlockData
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.CraftWorld
+import org.bukkit.craftbukkit.block.CraftBlockType
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.entity.CraftEntity
+import org.bukkit.craftbukkit.entity.CraftFallingBlock
 import org.bukkit.craftbukkit.entity.CraftLivingEntity
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.inventory.CraftItemStack
+import org.bukkit.craftbukkit.inventory.CraftItemType
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
+import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.util.Vector
 import org.joml.Vector3d
+import xyz.xenondevs.invui.util.ColorPalette
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.addon.id
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.migrator.BlockMigrator
+import xyz.xenondevs.nova.world.block.NoteBlockInstrument
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
@@ -83,12 +95,13 @@ import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 import net.minecraft.world.entity.Pose as MojangPose
 import net.minecraft.world.entity.ai.attributes.Attribute as MojangAttribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier as MojangAttributeModifier
+import net.minecraft.world.entity.item.FallingBlockEntity as MojangFallingBlockEntity
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.item.ItemUseAnimation as MojangItemUseAnimation
 import net.minecraft.world.level.block.Block as MojangBlock
-
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument as MojangNoteBlockInstrument
 
 val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
 val REGISTRY_ACCESS: RegistryAccess by lazy { MINECRAFT_SERVER.registryAccess() }
@@ -103,16 +116,38 @@ val LivingEntity.nmsEntity: MojangLivingEntity
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
 
+val FallingBlock.nmsEntity: MojangFallingBlockEntity
+    get() = (this as CraftFallingBlock).handle
+
 fun ItemStack?.unwrap(): MojangStack =
     this?.let(CraftItemStack::unwrap) ?: MojangStack.EMPTY
+
+fun MojangStack.asBukkitMirror(): ItemStack =
+    CraftItemStack.asBukkitMirror(this)
+
+fun ItemInstance.asBukkitCopy(): ItemStack =
+    CraftItemStack.asBukkitCopy(this)
 
 val BlockData.nmsBlockState: BlockState
     get() = (this as CraftBlockData).state
 
 val BlockState.bukkitBlockData: BlockData
-    get() = CraftBlockData.createData(this)
+    get() = asBlockData()
 
-val Location.blockPos: MojangBlockPos
+internal fun BlockState.toPropertyStringMap(): Map<String, String> =
+    properties.associate { serializeProperty(this, it) }
+
+private fun <T : Comparable<T>> serializeProperty(state: BlockState, property: Property<T>): Pair<String, String> =
+    property.name to property.getName(state.getValue(property))
+
+internal fun Color?.toNmsMapColor(): MapColor {
+    if (this == null)
+        return MapColor.NONE
+    val packedColor = ColorPalette.getColor(this).toInt() and 0xFF
+    return MapColor.byId(packedColor shr 2)
+}
+
+val Location.Block: MojangBlockPos
     get() = MojangBlockPos(blockX, blockY, blockZ)
 
 val Location.vec3: Vec3
@@ -326,26 +361,72 @@ val ItemUseAnimation.nmsItemUseAnimation: MojangItemUseAnimation
         ItemUseAnimation.TRIDENT -> MojangItemUseAnimation.TRIDENT
     }
 
-val Material.nmsBlock: MojangBlock
-    get() = CraftMagicNumbers.getBlock(this)
+val PistonMoveReaction.nmsPushReaction: PushReaction
+    get() = when (this) {
+        PistonMoveReaction.MOVE -> PushReaction.PUSH_PULL
+        PistonMoveReaction.BREAK -> PushReaction.POPPED
+        PistonMoveReaction.BLOCK -> PushReaction.IMMOVEABLE
+        PistonMoveReaction.IGNORE -> PushReaction.IGNORE_ENTITY
+        PistonMoveReaction.PUSH_ONLY -> PushReaction.PUSH
+    }
 
-val Material.nmsItem: MojangItem
-    get() = CraftMagicNumbers.getItem(this)
+internal val NoteBlockInstrument.nmsNoteBlockInstrument: MojangNoteBlockInstrument
+    get() = when (this) {
+        NoteBlockInstrument.HARP -> MojangNoteBlockInstrument.HARP
+        NoteBlockInstrument.BASS_DRUM -> MojangNoteBlockInstrument.BASEDRUM
+        NoteBlockInstrument.SNARE_DRUM -> MojangNoteBlockInstrument.SNARE
+        NoteBlockInstrument.CLICKS_AND_STICKS -> MojangNoteBlockInstrument.HAT
+        NoteBlockInstrument.BASS_GUITAR -> MojangNoteBlockInstrument.BASS
+        NoteBlockInstrument.FLUTE -> MojangNoteBlockInstrument.FLUTE
+        NoteBlockInstrument.BELL -> MojangNoteBlockInstrument.BELL
+        NoteBlockInstrument.GUITAR -> MojangNoteBlockInstrument.GUITAR
+        NoteBlockInstrument.CHIME -> MojangNoteBlockInstrument.CHIME
+        NoteBlockInstrument.XYLOPHONE -> MojangNoteBlockInstrument.XYLOPHONE
+        NoteBlockInstrument.IRON_XYLOPHONE -> MojangNoteBlockInstrument.IRON_XYLOPHONE
+        NoteBlockInstrument.COW_BELL -> MojangNoteBlockInstrument.COW_BELL
+        NoteBlockInstrument.DIDGERIDOO -> MojangNoteBlockInstrument.DIDGERIDOO
+        NoteBlockInstrument.BIT -> MojangNoteBlockInstrument.BIT
+        NoteBlockInstrument.BANJO -> MojangNoteBlockInstrument.BANJO
+        NoteBlockInstrument.PLING -> MojangNoteBlockInstrument.PLING
+        NoteBlockInstrument.TRUMPET -> MojangNoteBlockInstrument.TRUMPET
+        NoteBlockInstrument.EXPOSED_TRUMPET -> MojangNoteBlockInstrument.TRUMPET_EXPOSED
+        NoteBlockInstrument.WEATHERED_TRUMPET -> MojangNoteBlockInstrument.TRUMPET_WEATHERED
+        NoteBlockInstrument.OXIDIZED_TRUMPET -> MojangNoteBlockInstrument.TRUMPET_OXIDIZED
+        NoteBlockInstrument.ZOMBIE -> MojangNoteBlockInstrument.ZOMBIE
+        NoteBlockInstrument.SKELETON -> MojangNoteBlockInstrument.SKELETON
+        NoteBlockInstrument.CREEPER -> MojangNoteBlockInstrument.CREEPER
+        NoteBlockInstrument.DRAGON -> MojangNoteBlockInstrument.DRAGON
+        NoteBlockInstrument.WITHER_SKELETON -> MojangNoteBlockInstrument.WITHER_SKELETON
+        NoteBlockInstrument.PIGLIN -> MojangNoteBlockInstrument.PIGLIN
+    }
 
-val MojangBlock.bukkitMaterial: Material
-    get() = CraftMagicNumbers.getMaterial(this)
+val BlockType.nmsBlock: MojangBlock
+    get() = (this as CraftBlockType<*>).handle
 
-val MojangItem.bukkitMaterial: Material
-    get() = CraftMagicNumbers.getMaterial(this)
+val ItemType.nmsItem: MojangItem
+    get() = (this as CraftItemType<*>).handle
 
+val MojangItem.bukkitItemType: ItemType
+    get() = CraftItemType.minecraftToBukkitNew(this)
+
+val Block.nmsPos: MojangBlockPos
+    get() = MojangBlockPos(x, y, z)
+
+@Deprecated("", ReplaceWith("nmsBlockState"))
 val Block.nmsState: BlockState
-    get() = world.serverLevel.getBlockState(MojangBlockPos(x, y, z))
+    get() = nmsBlockState
+
+val Block.nmsBlockState: BlockState
+    get() = world.serverLevel.getBlockState(nmsPos)
+
+val Block.nmsBlockEntity: BlockEntity?
+    get() = world.serverLevel.getBlockEntity(nmsPos)
 
 val BlockState.id: Int
     get() = MojangBlock.getId(this)
 
-fun MojangBlockPos.toNovaPos(world: World): BlockPos =
-    BlockPos(world, x, y, z)
+fun MojangBlockPos.toBlock(world: World): Block =
+    world.getBlockAt(x, y, z)
 
 fun Vec3.toVector3d(): Vector3d =
     Vector3d(x, y, z)
@@ -356,25 +437,7 @@ fun ItemStack.toNmsTemplate(): ItemStackTemplate? =
 fun MojangStack.toTemplate(): ItemStackTemplate? =
     if (!isEmpty) ItemStackTemplate.fromNonEmptyStack(this) else null
 
-fun Player.send(vararg packets: Packet<*>) {
-    val connection = serverPlayer.connection
-    packets.forEach { connection.send(it) }
-}
-
-fun Player.send(packets: Iterable<Packet<*>>) {
-    val connection = serverPlayer.connection
-    packets.forEach { connection.send(it) }
-}
-
-fun Packet<*>.sendTo(vararg players: Player) {
-    players.forEach { it.send(this) }
-}
-
-fun Packet<*>.sendTo(players: Iterable<Player>) {
-    players.forEach { it.send(this) }
-}
-
-fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
+fun Rotations.with(x: Float? = null, y: Float? = null, z: Float? = null) =
     Rotations(x ?: this.x, y ?: this.y, z ?: this.z)
 
 fun Rotations.add(x: Float, y: Float, z: Float) =
@@ -400,37 +463,37 @@ fun <T : Comparable<T>> BlockState.hasProperty(property: Property<T>, value: T):
     return hasProperty(property) && getValue(property) == value
 }
 
-fun BlockPos.setBlockStateNoUpdate(state: BlockState) {
+fun Block.setBlockStateNoUpdate(state: BlockState) {
     val section = chunkSection
     val old = section.getBlockState(this)
     section.setBlockStateSilently(this, state)
     world.serverLevel.sendBlockUpdated(nmsPos, old, state, 3)
 }
 
-fun BlockPos.setBlockStateSilently(state: BlockState) {
+fun Block.setBlockStateSilently(state: BlockState) {
     chunkSection.setBlockStateSilently(this, state)
 }
 
-fun BlockPos.setBlockState(state: BlockState) {
+fun Block.setBlockState(state: BlockState) {
     world.serverLevel.setBlock(nmsPos, state, 11)
 }
 
-fun BlockPos.getBlockState(): BlockState {
+fun Block.getBlockState(): BlockState {
     return chunkSection.getBlockState(this)
 }
 
-val BlockPos.chunkSection: LevelChunkSection
+val Block.chunkSection: LevelChunkSection
     get() {
         val chunk = world.serverLevel.getChunk(x shr 4, z shr 4)
         return chunk.getSection(chunk.getSectionIndex(y))
     }
 
-fun LevelChunkSection.setBlockStateSilently(pos: BlockPos, state: BlockState) {
-    setBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF, state)
+fun LevelChunkSection.setBlockStateSilently(block: Block, state: BlockState) {
+    setBlockState(block.x and 0xF, block.y and 0xF, block.z and 0xF, state)
 }
 
-fun LevelChunkSection.getBlockState(pos: BlockPos): BlockState {
-    return getBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF)
+fun LevelChunkSection.getBlockState(block: Block): BlockState {
+    return getBlockState(block.x and 0xF, block.y and 0xF, block.z and 0xF)
 }
 
 inline fun Level.captureDrops(run: () -> Unit): List<ItemEntity> {
@@ -516,8 +579,24 @@ fun <T : Any> Registry<T>.getValueOrThrow(key: String): T {
     return getValueOrThrow(Identifier.parse(key))
 }
 
+fun <T : Any> Registry<T>.getValueOrThrow(key: Key): T {
+    return getValueOrThrow(key.toIdentifier())
+}
+
 fun <T : Any> Registry<T>.getValueOrThrow(id: Identifier): T {
     return getOrThrow(ResourceKey.create(key(), id)).value()
+}
+
+fun <T : Any> Registry<T>.getValueOrNull(key: String): T? {
+    return Identifier.tryParse(key)?.let(::getValueOrThrow)
+}
+
+fun <T : Any> Registry<T>.getValueOrNull(key: Key): T? {
+    return getValueOrNull(key.toIdentifier())
+}
+
+fun <T : Any> Registry<T>.getValueOrNull(id: Identifier): T? {
+    return getOrNull(id)?.takeIf { it.isBound }?.value()
 }
 
 fun <T : Any> Registry<T>.getOrCreateHolder(id: Identifier): Holder<T> {
@@ -637,51 +716,57 @@ fun <T : Any> ResourceKey<Registry<T>>.getValue(key: String): T? {
 }
 
 fun <T : Any> RegistryAccess.getOrThrow(key: ResourceKey<T>): Holder.Reference<T> {
-    return REGISTRY_ACCESS.get(key).get()
+    return get(key).get()
 }
 
 fun <T : Any> RegistryAccess.getValue(key: ResourceKey<T>): T? {
-    return REGISTRY_ACCESS.get(key).getOrNull()?.value()
+    return get(key).getOrNull()?.value()
 }
 
 fun <T : Any> RegistryAccess.getValueOrThrow(key: ResourceKey<T>): T {
-    return REGISTRY_ACCESS.get(key).get().value()
+    return get(key).get().value()
 }
 
 fun <T : Any> RegistryInfoLookup.lookupGetterOrThrow(key: ResourceKey<Registry<T>>): HolderGetter<T> {
-    return lookup(key).getOrNull()?.getter ?: throw IllegalArgumentException("Registry not found: $key")
+    return lookup(key).getOrNull() ?: throw IllegalArgumentException("Registry not found: $key")
 }
 
 fun Identifier.toString(separator: String): String {
     return namespace + separator + path
 }
 
-fun Identifier(addon: Addon, name: String): Identifier {
-    return Identifier.fromNamespaceAndPath(addon.id, name)
+fun Identifier(namespaced: Namespaced, name: String): Identifier {
+    return parseKey(name, namespaced).toIdentifier()
 }
 
-fun <T : Any> io.papermc.paper.registry.tag.TagKey<*>.toNmsTagKey(registry: ResourceKey<out Registry<T>>): TagKey<T> =
-    TagKey.create(registry, key().toIdentifier())
+fun <T : Any> io.papermc.paper.registry.tag.TagKey<*>.toNmsTagKey(): TagKey<T> =
+    TagKey.create(registryKey().toResourceKey(), key().toIdentifier())
 
-fun <T : Any> TypedKey<*>.toResourceKey(registry: ResourceKey<out Registry<T>>): ResourceKey<T> =
-    ResourceKey.create(registry, key().toIdentifier())
+fun <T : Any> RegistryKey<*>.toResourceKey(): ResourceKey<Registry<T>> =
+    ResourceKey.createRegistryKey(key().toIdentifier())
 
-fun <T : Any> Iterable<TypedKey<*>>.toHolderSet(
-    registryKey: ResourceKey<out Registry<T>>,
-    registry: HolderGetter<T>
-): HolderSet<T> {
-    return map { it.toResourceKey(registryKey) }
-        .map { registry.getOrThrow(it) }
-        .let { HolderSet.direct(it) }
-}
+fun <T : Any> TypedKey<*>.toResourceKey(): ResourceKey<T> =
+    ResourceKey.create(registryKey().toResourceKey(), key().toIdentifier())
 
-fun <T : Any> RegistryKeySet<*>.toNmsHolderSet(
-    registryKey: ResourceKey<out Registry<T>>,
-    registry: HolderGetter<T>
-): HolderSet<T> {
+fun <T : Any> Iterable<TypedKey<*>>.toHolderSet(registry: HolderGetter<T>): HolderSet<T> =
+    HolderSet.direct(map { registry.getOrThrow(it.toResourceKey()) })
+
+fun <T : Any> RegistryKeySet<*>.toHolderSet(registry: HolderGetter<T>): HolderSet<T> {
     return when (this) {
-        is Tag -> registry.getOrThrow(tagKey().toNmsTagKey(registryKey))
-        else -> values().toHolderSet(registryKey, registry)
+        is Tag -> registry.getOrThrow(tagKey().toNmsTagKey())
+        else -> values().toHolderSet(registry)
+    }
+}
+
+fun <T : Any> RegistryEntry.Paper<*>.toHolder(registry: HolderGetter<T>): Holder.Reference<T> =
+    registry.getOrThrow(ResourceKey.create(this.registry.toResourceKey(), key.toIdentifier()))
+
+fun <T : Any> RegistryEntrySet.Paper<*>.toHolderSet(registry: HolderGetter<T>): HolderSet<T> {
+    return when (this) {
+        is RegistryEntrySet.Paper.Tag<*> -> registry.getOrThrow(tagKey.toNmsTagKey())
+        is RegistryEntrySet.Paper.Direct<*> -> HolderSet.direct(entries.map {
+            registry.getOrThrow(ResourceKey.create(this.registry.toResourceKey(), it.key.toIdentifier()))
+        })
     }
 }
 
@@ -711,18 +796,6 @@ fun forcePacketBroadcast(run: () -> Unit) {
         NMSUtils.broadcastIgnoreExcludedPlayer.set(false)
     }
 }
-
-internal inline fun withoutBlockMigration(pos: BlockPos, run: () -> Unit) {
-    BlockMigrator.migrationSuppression.set(BlockMigrator.migrationSuppression.get() + 1)
-    try {
-        run.invoke()
-    } finally {
-        BlockMigrator.migrationSuppression.set(BlockMigrator.migrationSuppression.get() - 1)
-    }
-}
-
-fun RegistryFriendlyByteBuf(): RegistryFriendlyByteBuf =
-    RegistryFriendlyByteBuf(Unpooled.buffer(), REGISTRY_ACCESS)
 
 @PublishedApi
 internal object NMSUtils {

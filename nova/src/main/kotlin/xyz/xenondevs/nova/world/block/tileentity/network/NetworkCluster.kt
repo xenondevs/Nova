@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
@@ -14,9 +15,8 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     
     private val tickOffset: Int // load balancing
     private val groups = networks.groupBy { it.type }
-        .map { (type, networks) -> createGroup(type, networks) }
+        .map { [type, networks] -> createGroup(type, networks) }
     
-    @Volatile
     private var isValid: Boolean = false
     
     init {
@@ -25,7 +25,6 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     }
     
     fun preTickSync(tick: Int) {
-        updateIsValid()
         tickNetworks(tick, NetworkGroup<*>::preTickSync)
     }
     
@@ -40,7 +39,7 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
         return (type as NetworkType<T>).createGroup(data)
     }
     
-    private fun updateIsValid() {
+    fun updateIsValid() {
         for (network in networks) {
             if (!network.isValid()) {
                 isValid = false
@@ -82,7 +81,7 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
  */
 class ProtoNetworkCluster : Iterable<ProtoNetwork<*>> {
     
-    val uuid: UUID = UUID.randomUUID()
+    val uuid: UUID = insecureRandomUuid()
     private val networks = HashSet<ProtoNetwork<*>>()
     
     lateinit var cluster: NetworkCluster
@@ -113,6 +112,16 @@ class ProtoNetworkCluster : Iterable<ProtoNetwork<*>> {
     
     operator fun contains(network: ProtoNetwork<*>) =
         network in networks
+    
+    /**
+     * Invalidates this cluster by clearing the cluster reference of all contained [ProtoNetworks][ProtoNetwork].
+     */
+    fun invalidate() {
+        for (network in networks) {
+            network.invalidateCluster(this)
+        }
+        networks.clear()
+    }
     
     override operator fun iterator() =
         networks.iterator()

@@ -1,9 +1,13 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.world.fakeentity.metadata.impl
 
 import net.minecraft.core.BlockPos
 import net.minecraft.network.syncher.EntityDataSerializers
 import org.joml.Vector3ic
+import xyz.xenondevs.nova.world.fakeentity.FAKE_ENTITY_DEPRECATION
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 open class LivingEntityMetadata internal constructor() : EntityMetadata() {
     
     private val sharedFlags = sharedFlags(8)

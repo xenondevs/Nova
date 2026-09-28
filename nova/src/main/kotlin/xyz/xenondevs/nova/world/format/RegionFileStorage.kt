@@ -97,7 +97,7 @@ internal class RegionFileStorage<C : RegionizedChunk, F : RegionizedFile<C>>(
      * Saves all loaded region files to disk and unloads them if the [unloadCondition] is met.
      */
     suspend fun saveAndUnload(unloadCondition: (Long, F) -> Boolean) = coroutineScope {
-        for ((rid, deferredRegionFile) in regionFiles) {
+        for ([rid, deferredRegionFile] in regionFiles) {
             launch {
                 val regionFile = deferredRegionFile.await()
                 val bin = regionFile.save()

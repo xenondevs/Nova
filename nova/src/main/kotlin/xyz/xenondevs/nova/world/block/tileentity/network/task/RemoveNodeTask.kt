@@ -2,6 +2,8 @@ package xyz.xenondevs.nova.world.block.tileentity.network.task
 
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.world.block.tileentity.network.node.safelyHandleNetworkUpdate
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.format.NetworkState
 
 internal abstract class RemoveNodeTask<T : NetworkNode>(
@@ -10,10 +12,9 @@ internal abstract class RemoveNodeTask<T : NetworkNode>(
     private val updateNodes: Boolean
 ) : NetworkTask(state) {
     
-    override val chunkPos = node.pos.chunkPos
+    override val chunkPos = node.block.chunkPos
     
     protected val nodesToUpdate = HashSet<NetworkNode>()
-    protected val clustersToInit = HashSet<ProtoNetwork<*>>()
     
     final override suspend fun run(): Boolean {
         if (node !in state)
@@ -23,16 +24,9 @@ internal abstract class RemoveNodeTask<T : NetworkNode>(
         remove()
         state.removeNodeData(node)
         
-        for (network in clustersToInit) {
-            if (network !in state)
-                continue
-            
-            network.initCluster()
-        }
-        
         if (updateNodes) {
             for (node in nodesToUpdate) {
-                node.handleNetworkUpdate(state)
+                node.safelyHandleNetworkUpdate(state)
             }
         }
         
@@ -42,18 +36,9 @@ internal abstract class RemoveNodeTask<T : NetworkNode>(
     abstract suspend fun remove()
     
     /**
-     * Invalidates the cluster of all [ProtoNetworks][ProtoNetwork] clustered with [network] and
-     * schedules them for re-initialization in via [clustersToInit].
-     * Only registered networks' clusters will actually be re-initialized.
+     * Invalidates the cluster of all [ProtoNetworks][ProtoNetwork] clustered with [network].
      */
-    protected fun reclusterize(network: ProtoNetwork<*>) {
-        val cluster = network.cluster
-            ?: return
-        
-        for (previouslyClusteredNetwork in cluster) {
-            previouslyClusteredNetwork.invalidateCluster()
-            clustersToInit += previouslyClusteredNetwork
-        }
-    }
+    protected fun invalidateCluster(network: ProtoNetwork<*>) =
+        network.cluster?.invalidate()
     
 }

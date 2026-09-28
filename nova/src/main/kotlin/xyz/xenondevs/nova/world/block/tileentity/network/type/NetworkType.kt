@@ -1,12 +1,17 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type
 
-import net.kyori.adventure.key.Key
+import kotlinx.serialization.Serializable
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.registry.NovaRegistrar.registerNetworkType
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.registry.RegistryLoader
+import xyz.xenondevs.nova.serialization.kotlinx.NetworkTypeEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.NetworkTypeEntrySetSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.NetworkTypeSerializer
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkGroup
@@ -22,104 +27,106 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.Fluid
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemNetworkGroup
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
-import kotlin.reflect.KClass
-
-internal typealias NetworkConstructor<T> = (NetworkData<T>) -> T
-internal typealias NetworkGroupConstructor<T> = (NetworkGroupData<T>) -> NetworkGroup<T>
-internal typealias LocalValidator = (NetworkEndPoint, NetworkEndPoint, BlockFace) -> Boolean
 
 /**
- * A [Network] type.
- *
- * @param id The unique identifier of this [NetworkType].
- * @param createNetwork The constructor to instantiate a [Network] of this [NetworkType].
- * @param tickDelay The delay between [network ticks][NetworkGroup.tick].
- * @param holderTypes The types of [EndPointDataHolders][EndPointDataHolder]
- * that are required for end points of this [NetworkType].
+ * Serializable type alias for `RegistryEntry.Nova<NetworkType<T>>` using [NetworkTypeEntrySerializer].
  */
+typealias NetworkTypeEntry<T> = @Serializable(with = NetworkTypeEntrySerializer::class) RegistryEntry.Nova<NetworkType<T>>
+
+/**
+ * Serializable type alias for `RegistryEntrySet.Nova<NetworkType<T>>` using [NetworkTypeEntrySetSerializer].
+ */
+typealias NetworkTypeEntrySet<T> = @Serializable(with = NetworkTypeEntrySetSerializer::class) RegistryEntrySet.Nova<NetworkType<T>>
+
+/**
+ * Typealias for a local network validator. The lambda is called to check whether a local (a network of only two end points)
+ * can be created by connecting `from` to `to` through `face`.
+ */
+typealias LocalNetworkValidator = (from: NetworkEndPoint, to: NetworkEndPoint, face: BlockFace) -> Boolean
+
+/**
+ * A network type. Specifies how and when to create a [Network] and the associated [NetworkGroup].
+ */
+@Serializable(with = NetworkTypeSerializer::class)
 class NetworkType<T : Network<T>> internal constructor(
-    val id: Key,
-    val createNetwork: NetworkConstructor<T>,
-    val createGroup: NetworkGroupConstructor<T>,
-    val validateLocal: LocalValidator,
-    tickDelay: Provider<Int>,
-    val holderTypes: Set<KClass<out EndPointDataHolder>>
-) {
-    
+    override val entry: RegistryEntry.Nova<NetworkType<T>>,
+    /**
+     * The constructor to instantiate a [Network] of this type.
+     */
+    val createNetwork: (NetworkData<T>) -> T,
+    /**
+     * The constructor to instantiate a [NetworkGroup] of this type.
+     */
+    val createGroup: (NetworkGroupData<T>) -> NetworkGroup<T>,
+    /**
+     * A function that checks whether a local network can be created between two end points.
+     * 
+     * A local network will only be created it this validator returns `true` and at least one of the
+     * end points [requests][NetworkEndPoint.requestsLocalNetwork] a local network.
+     */
+    val validateLocal: LocalNetworkValidator,
+    /**
+     * A function that gets the required [data holders][EndPointDataHolder] from an [end point's holders][NetworkEndPoint.holders].
+     * Only if all returned [data holders][EndPointDataHolder] [allow a connection at a face][EndPointDataHolder.allowedFaces]
+     * a network will be created there. Can return `null` if the given end point does not support this network type.
+     */
+    val extractHolders: (NetworkEndPoint) -> List<EndPointDataHolder>?,
     /**
      * The delay between [network ticks][NetworkGroup.tick].
      */
-    val tickDelay: Int by tickDelay
+    val tickDelay: Int
+) : NovaRegistryElement<NetworkType<T>> {
     
-    override fun toString(): String {
-        return id.toString()
-    }
-    
-    override fun equals(other: Any?): Boolean {
-        return other is NetworkType<*> && id == other.id
-    }
-    
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+    override fun toString(): String = key.asString()
+    override fun hashCode(): Int = key.hashCode()
+    override fun equals(other: Any?): Boolean = other is NetworkType<*> && key == other.key
     
 }
 
 /**
  * The default network types provided by Nova.
  */
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
+@InternalInit(
+    stage = InternalInitStage.PRE_WORLD,
+    runBefore = [RegistryLoader::class]
+)
 object DefaultNetworkTypes {
     
     /**
      * The default network type responsible for distributing energy provided through [EnergyHolders][EnergyHolder].
      */
-    val ENERGY = register(
+    val ENERGY = registerNetworkType(
         "energy",
-        ::EnergyNetwork, ::EnergyNetworkGroup, EnergyNetwork::validateLocal,
-        EnergyNetwork.TICK_DELAY_PROVIDER,
-        EnergyHolder::class
+        ::EnergyNetwork,
+        ::EnergyNetworkGroup,
+        EnergyNetwork::validateLocal,
+        EnergyNetwork::extractHolders,
+        EnergyNetwork.TICK_DELAY_PROVIDER.get(),
     )
     
     /**
      * The default network type responsible for distributing items provided through [ItemHolders][ItemHolder].
      */
-    val ITEM = register(
+    val ITEM = registerNetworkType(
         "item",
-        ::ItemNetwork, ::ItemNetworkGroup, ItemNetwork::validateLocal,
-        ItemNetwork.TICK_DELAY_PROVIDER,
-        ItemHolder::class
+        ::ItemNetwork,
+        ::ItemNetworkGroup,
+        ItemNetwork::validateLocal,
+        ItemNetwork::extractHolders,
+        ItemNetwork.TICK_DELAY_PROVIDER.get(),
     )
     
     /**
      * The default network type responsible for distributing fluids provided through [FluidHolders][FluidHolder].
      */
-    val FLUID = register(
+    val FLUID = registerNetworkType(
         "fluid",
-        ::FluidNetwork, ::FluidNetworkGroup, FluidNetwork::validateLocal,
-        FluidNetwork.TICK_DELAY_PROVIDER,
-        FluidHolder::class
+        ::FluidNetwork,
+        ::FluidNetworkGroup,
+        FluidNetwork::validateLocal,
+        FluidNetwork::extractHolders,
+        FluidNetwork.TICK_DELAY_PROVIDER.get(),
     )
-    
-    private fun <T : Network<T>> register(
-        name: String,
-        createNetwork: NetworkConstructor<T>,
-        createGroup: NetworkGroupConstructor<T>,
-        validateLocal: LocalValidator,
-        tickDelay: Provider<Int>,
-        vararg holderTypes: KClass<out EndPointDataHolder>
-    ): NetworkType<T> {
-        val id = Key.key("nova", name)
-        val type = NetworkType(
-            id,
-            createNetwork, createGroup,
-            validateLocal,
-            tickDelay,
-            holderTypes.toHashSet()
-        )
-        NovaRegistries.NETWORK_TYPE[id] = type
-        return type
-    }
     
 }
 

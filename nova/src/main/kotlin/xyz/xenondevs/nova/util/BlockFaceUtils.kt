@@ -9,7 +9,6 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
 import xyz.xenondevs.commons.collections.after
-import xyz.xenondevs.nova.world.BlockPos
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -52,6 +51,30 @@ enum class BlockSide(private val rotation: Int) {
                 NESW[rot]
             }
         }
+    
+    companion object {
+        
+        /**
+         * Gets the [BlockSide] that corresponds to [face] when [front] is the front direction.
+         */
+        fun of(front: BlockFace, face: BlockFace): BlockSide {
+            require(front in NESW) { "Front must be one of the cardinal directions." }
+            return when (face) {
+                UP -> TOP
+                DOWN -> BOTTOM
+                front -> FRONT
+                else -> {
+                    when ((NESW.indexOf(face) - NESW.indexOf(front)).mod(4)) {
+                        1 -> LEFT
+                        2 -> BACK
+                        3 -> RIGHT
+                        else -> throw AssertionError()
+                    }
+                }
+            }
+        }
+        
+    }
     
 }
 
@@ -218,14 +241,26 @@ object BlockFaceUtils {
     /**
      * Determines the block closest block face of [block] to the given [location].
      */
-    fun determineBlockFace(block: Block, location: Location): BlockFace {
-        val result = listOf(
-            Axis.X to location.x - (block.x + 0.5),
-            Axis.Y to location.y - (block.y + 0.5),
-            Axis.Z to location.z - (block.z + 0.5)
-        ).sortedByDescending { it.second.absoluteValue }[0]
+    fun determineBlockFace(block: Block, location: Location): BlockFace =
+        determineBlockFace(
+            location.x - (block.x + 0.5),
+            location.y - (block.y + 0.5),
+            location.z - (block.z + 0.5)
+        )
+    
+    /**
+     * Determines the closest block face for a position relative to the center of a cube at `(0, 0, 0)`.
+     */
+    fun determineBlockFace(relativeX: Double, relativeY: Double, relativeZ: Double): BlockFace {
+        val x = relativeX.absoluteValue
+        val y = relativeY.absoluteValue
+        val z = relativeZ.absoluteValue
         
-        return toFace(result.first, result.second >= 0)
+        return when {
+            x >= y && x >= z -> toFace(Axis.X, relativeX >= 0.0)
+            y >= z -> toFace(Axis.Y, relativeY >= 0.0)
+            else -> toFace(Axis.Z, relativeZ >= 0.0)
+        }
     }
     
     /**
@@ -250,7 +285,7 @@ object BlockFaceUtils {
      * Determines the block face that needs to be used to advance from [from] to [to] with step size 1,
      * or null if the two positions are not adjacent.
      */
-    fun determineBlockFaceBetween(from: BlockPos, to: BlockPos): BlockFace? {
+    fun determineBlockFaceBetween(from: Block, to: Block): BlockFace? {
         val x = to.x - from.x
         val y = to.y - from.y
         val z = to.z - from.z

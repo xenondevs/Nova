@@ -1,0 +1,62 @@
+package xyz.xenondevs.nova.registry
+
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.TypedKey
+import io.papermc.paper.registry.tag.TagKey
+import org.bukkit.Keyed
+import org.slf4j.Logger
+import java.util.*
+
+/**
+ * Service for working with paper registries.
+ */
+interface RegistryContext {
+    
+    /**
+     * The logger of the managing plugin.
+     */
+    val logger: Logger
+    
+    /**
+     * Whether the server is currently in the bootstrap phase,
+     * during which paper registries cannot be accessed.
+     */
+    val isInBootstrapPhase: Boolean
+    
+    /**
+     * Remembers that an unresolved registry entry for [key] was created during bootstrap which
+     * needs to be present to complete server startup.
+     */
+    fun <T : Keyed> trackUnresolvedEntry(
+        key: TypedKey<T>,
+        registryAccess: RegistryAccess
+    )
+    
+    /**
+     * Remembers that an unresolved registry entry set for [key] was created during bootstrap which
+     * needs to be present to complete server startup.
+     */
+    fun <T : Keyed> trackUnresolvedTag(
+        key: TagKey<T>,
+        registryAccess: RegistryAccess
+    )
+    
+    /**
+     * Schedules a reload of the server's Minecraft data. Multiple requests may be coalesced.
+     */
+    fun scheduleDataReload()
+    
+    /**
+     * Registers a lister that is called after tags of paper registries were reloaded.
+     */
+    fun registerPostTagReloadListener(listener: () -> Unit)
+    
+    /**
+     * Service provider for [RegistryContext].
+     */
+    companion object : RegistryContext by ServiceLoader.load(
+        RegistryContext::class.java,
+        RegistryContext::class.java.classLoader
+    ).single()
+    
+}

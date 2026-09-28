@@ -70,10 +70,19 @@ class ExtractTask(private val builder: ResourcePackBuilder) : PackTask {
     private fun extractAssetPack(assetPack: AssetPack, namespaceDir: Path, fileFilter: (String) -> Boolean) {
         val namespace = assetPack.namespace
         fun extractDir(sourceDir: Path, dirName: String) {
+            val targetDir = namespaceDir.resolve("$dirName/")
             sourceDir.copyToRecursively(
                 target = namespaceDir.resolve("$dirName/"),
                 followLinks = false,
             ) { source, target ->
+                // https://youtrack.jetbrains.com/issue/KT-85020/Path.copyToRecursively-does-not-work-across-file-systems-with-different-separators
+                val target = targetDir.resolve(
+                    target.relativeTo(targetDir).invariantSeparatorsPathString.replace(
+                        sourceDir.fileSystem.separator, 
+                        targetDir.fileSystem.separator
+                    )
+                )
+                
                 if (source.isDirectory())
                     return@copyToRecursively CopyActionResult.CONTINUE
                 

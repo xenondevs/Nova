@@ -8,6 +8,7 @@ import net.kyori.adventure.text.TranslationArgument
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.`object`.ObjectContents
 import xyz.xenondevs.nova.i18n.LocaleManager
+import java.util.*
 import kotlin.streams.asSequence
 
 /**
@@ -39,12 +40,21 @@ sealed interface StyledElement {
 }
 
 /**
+ * Flattens this [Component] into a sequence of [StyledElements][StyledElement] using the specified [locale] for translations.
+ * 
+ * Supported component types: [TextComponent], [TranslatableComponent], [ObjectComponent].
+ * Other component types will be ignored.
+ */
+fun Component.elements(locale: Locale = Locale.US): Sequence<StyledElement> =
+    elements(locale.toMinecraftLocaleCode())
+
+/**
  * Flattens this [Component] into a sequence of [StyledElements][StyledElement] using the specified [lang] for translations.
  * 
  * Supported component types: [TextComponent], [TranslatableComponent], [ObjectComponent].
  * Other component types will be ignored.
  */
-fun Component.elements(lang: String = "en_us"): Sequence<StyledElement> =
+fun Component.elements(lang: String): Sequence<StyledElement> =
     elements({ LocaleManager.getFormatStringOrNull(lang, it) }, Style.empty())
 
 /**
@@ -96,7 +106,7 @@ private fun elements(
         FSTR_PATTERN.findAll(fstr).forEach { result ->
             yieldAll(fstr.substring(i, result.range.first).styledCodePoints(style))
             
-            val (explicitArgIdx, formatType) = result.destructured
+            val [explicitArgIdx, formatType] = result.destructured
             when (formatType) {
                 "%" -> yield(StyledElement.CodePoint(style, '%'.code))
                 "s" if explicitArgIdx.isNotEmpty() -> {
@@ -125,7 +135,7 @@ private fun elements(
 private fun checkFstrIsInvalid(matches: List<MatchResult>, args: Int): Boolean {
     var currentArgIdx = 0
     for (result in matches) {
-        val (explicitArgIdx, formatType) = result.destructured
+        val [explicitArgIdx, formatType] = result.destructured
         
         if (formatType != "%" && formatType != "s")
             return true

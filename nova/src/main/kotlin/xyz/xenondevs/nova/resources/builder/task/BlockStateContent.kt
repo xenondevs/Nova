@@ -93,11 +93,11 @@ class BlockStateContent(private val builder: ResourcePackBuilder) : PackBuildDat
                     }
                 }
             
-            for ((path, definition) in vanilla.awaitAll()) {
+            for ([path, definition] in vanilla.awaitAll()) {
                 vanillaDefinitions[path] = definition
             }
             
-            for ((path, definition) in custom.awaitAll()) {
+            for ([path, definition] in custom.awaitAll()) {
                 customDefinitions[path] = definition
             }
         }
@@ -112,7 +112,7 @@ class BlockStateContent(private val builder: ResourcePackBuilder) : PackBuildDat
                     dest += async {
                         val path = ResourcePath(
                             ResourceType.BlockStateDefinition,
-                            namespace, 
+                            namespace,
                             file.relativeTo(dir).invariantSeparatorsPathString
                         )
                         path to loadDefinition(file)
@@ -128,7 +128,7 @@ class BlockStateContent(private val builder: ResourcePackBuilder) : PackBuildDat
     inner class Write : PackTask {
         
         override suspend fun run() = coroutineScope {
-            for ((path, definition) in customDefinitions) {
+            for ([path, definition] in customDefinitions) {
                 if (definition == null)
                     continue
                 launch { builder.writeJson(path, definition) }

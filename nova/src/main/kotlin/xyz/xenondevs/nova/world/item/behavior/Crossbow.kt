@@ -10,27 +10,26 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.item.CrossbowItem
 import net.minecraft.world.item.Items
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.resources.builder.layout.item.ChargedType
-import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.setCustomModelDataStrings
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
+import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.ItemAction
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
+import xyz.xenondevs.nova.world.item.itemType
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -138,7 +137,7 @@ interface CrossbowLogic {
         }
         
         private fun createDummyCrossbow(novaCrossbow: ItemStack): ItemStack {
-            val dummyCrossbow = ItemStack.of(Material.CROSSBOW)
+            val dummyCrossbow = ItemType.CROSSBOW.createItemStack()
             novaCrossbow.getData(DataComponentTypes.ENCHANTMENTS)
                 ?.let { dummyCrossbow.setData(DataComponentTypes.ENCHANTMENTS, it) }
             return dummyCrossbow
@@ -148,7 +147,7 @@ interface CrossbowLogic {
     
 }
 
-private val CAN_USE_KEY = NamespacedKey(Nova, "can_use_crossbow")
+private val CAN_USE_KEY = novaKey("can_use_crossbow")
 private const val USE_DURATION = 72000
 
 /**
@@ -214,6 +213,9 @@ class Crossbow(
         if (projectiles.isNotNullOrEmpty()) {
             val result = logic.shoot(entity, hand, itemStack.clone())
             return InteractionResult.Success(action = ItemAction.ConvertStack(result))
+        } else if (logic.canDraw(entity, itemStack.clone())) {
+            entity.startUsingItem(hand)
+            return InteractionResult.Success(swing = false, action = ItemAction.None)
         }
         
         return InteractionResult.Pass
@@ -225,26 +227,28 @@ class Crossbow(
         return 0
     }
     
-    override fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) {
+    override fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int): ItemAction? {
         val tick = USE_DURATION - remainingUseTicks
         logic.handleDrawTick(entity, itemStack.clone(), tick)
         
         if (tick >= logic.getDrawTime(entity, itemStack.clone()) && !isCharged(itemStack)) {
             val projectiles = logic.chooseProjectile(entity, itemStack.clone())
-                ?: return
+                ?: return ItemAction.None
             
             val chargedCrossbow = itemStack.clone().apply {
                 setData(DataComponentTypes.CHARGED_PROJECTILES, projectiles)
             }
             
-            entity.equipment?.setItem(hand, chargedCrossbow)
+            return ItemAction.ConvertStack(chargedCrossbow)
         }
+        
+        return null
     }
     
     override fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {
         val projectiles = server.getData(DataComponentTypes.CHARGED_PROJECTILES)?.projectiles()
         if (projectiles.isNotNullOrEmpty()) {
-            client.setCustomModelDataStrings(customModelDataOffset, projectiles.map { ItemUtils.getId(it).toString() })
+            client.setCustomModelDataStrings(customModelDataOffset, projectiles.map { it.itemType.key.asString() })
         }
         
         return client
@@ -268,9 +272,9 @@ class Crossbow(
         }
     }
     
-    override fun modifyClientSideItemType(player: Player?, server: ItemStack, client: Material): Material {
+    override fun modifyClientSideItemType(player: Player?, server: ItemStack, client: ItemType): ItemType {
         if (logic == CrossbowLogic.Vanilla || server.persistentDataContainer.has(CAN_USE_KEY))
-            return Material.CROSSBOW
+            return ItemType.CROSSBOW
         return client
     }
     //</editor-fold>

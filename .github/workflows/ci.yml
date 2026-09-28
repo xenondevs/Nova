@@ -24,9 +24,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
         with:
           cache-disabled: true
-        
+
       - name: Build Nova
-        run: ./gradlew test loaderJar -PoutDir=artifacts -Prelease
+        run: ./gradlew test _oriMixin loaderJar -PoutDir=artifacts -Prelease
 
       - name: Upload Artifacts
         id: upload
@@ -50,6 +50,7 @@ jobs:
         with:
           arguments: |
             pluginPublish
+            -Prelease
             --githubReleaseId ${{ github.event.release.id }}
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}

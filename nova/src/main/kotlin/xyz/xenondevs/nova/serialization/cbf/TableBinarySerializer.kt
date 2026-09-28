@@ -46,7 +46,7 @@ internal class TableBinarySerializer<R : Any, C : Any, V : Any>(
         // count serialized elements instead of obj.size to prevent concurrent modifications from causing corrupted data
         var size = 0
         val temp = byteWriter {
-            for ((rowKey, columnKey, value) in obj.cellSet()) {
+            for ([rowKey, columnKey, value] in obj.cellSet()) {
                 rowKeySerializer.write(rowKey, this)
                 columnKeySerializer.write(columnKey, this)
                 valueSerializer.write(value, this)
@@ -60,7 +60,7 @@ internal class TableBinarySerializer<R : Any, C : Any, V : Any>(
     
     override fun copyNonNull(obj: Table<R?, C?, V?>): Table<R?, C?, V?> {
         val copy = createTable()
-        for ((rowKey, columnKey, value) in obj.cellSet()) {
+        for ([rowKey, columnKey, value] in obj.cellSet()) {
             copy[rowKeySerializer.copy(rowKey), columnKeySerializer.copy(columnKey)] = valueSerializer.copy(value)
         }
         return copy

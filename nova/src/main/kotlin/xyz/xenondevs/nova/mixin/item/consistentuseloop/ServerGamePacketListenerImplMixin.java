@@ -124,7 +124,7 @@ abstract class ServerGamePacketListenerImplMixin {
             nova$isInClickLoop++;
             
             var listener = ((ServerGamePacketListener) this);
-            var useItemPacket = new ServerboundUseItemPacket(packet.getHand(), packet.getSequence(), player.getYRot(), player.getXRot());
+            var useItemPacket = new ServerboundUseItemPacket(packet.hand(), packet.sequence(), player.getYRot(), player.getXRot());
             listener.handleUseItem(useItemPacket);
         } finally {
             nova$isInClickLoop--;
@@ -220,8 +220,8 @@ abstract class ServerGamePacketListenerImplMixin {
             ci.cancel();
             
             // but still update player rotation with new info (probably not that important)
-            var xRot = Mth.wrapDegrees(packet.getXRot());
-            var yRot = Mth.wrapDegrees(packet.getYRot());
+            var xRot = Mth.wrapDegrees(packet.xRot());
+            var yRot = Mth.wrapDegrees(packet.yRot());
             if (xRot != player.getXRot() || yRot != player.getYRot())
                 player.absSnapRotationTo(yRot, xRot);
         }
@@ -252,7 +252,7 @@ abstract class ServerGamePacketListenerImplMixin {
     @Inject(method = "handleUseItem", at = @At("RETURN"))
     private void maybeContinueClickLoop(ServerboundUseItemPacket packet, CallbackInfo ci) {
         // use item for off-hand is the last in the click loop
-        if (nova$stopClickLoop || packet.getHand() == InteractionHand.OFF_HAND)
+        if (nova$stopClickLoop || packet.hand() == InteractionHand.OFF_HAND)
             return;
         try {
             nova$isInClickLoop++;
@@ -261,8 +261,8 @@ abstract class ServerGamePacketListenerImplMixin {
             if (nova$clickInitiationPacket instanceof ServerboundUseItemOnPacket originalPacket) {
                 var nextPacket = new ServerboundUseItemOnPacket(
                     InteractionHand.OFF_HAND,
-                    originalPacket.getHitResult(),
-                    originalPacket.getSequence()
+                    originalPacket.hitResult(),
+                    originalPacket.sequence()
                 );
                 listener.handleUseItemOn(nextPacket);
             } else if (nova$clickInitiationPacket instanceof ServerboundInteractPacket originalPacket) {
@@ -276,9 +276,9 @@ abstract class ServerGamePacketListenerImplMixin {
             } else {
                 var nextPacket = new ServerboundUseItemPacket(
                     InteractionHand.OFF_HAND,
-                    packet.getSequence(),
-                    packet.getYRot(),
-                    packet.getXRot()
+                    packet.sequence(),
+                    packet.yRot(),
+                    packet.xRot()
                 );
                 listener.handleUseItem(nextPacket);
             }

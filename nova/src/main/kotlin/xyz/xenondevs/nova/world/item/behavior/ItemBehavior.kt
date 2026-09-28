@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.item.behavior
 
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
-import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -14,19 +13,21 @@ import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.ItemAction
 import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
 
 /**
  * Either [ItemBehavior] or [ItemBehaviorFactory]
@@ -47,16 +48,10 @@ interface ItemBehavior : ItemBehaviorHolder {
         get() = provider(DataComponentMap.EMPTY)
     
     /**
-     * The [NamespacedCompound] that every new [ItemStack] of an item with this [ItemBehavior] has by default.
+     * The tags that every item with this [ItemBehavior] is in.
      */
-    val defaultCompound: Provider<NamespacedCompound>
-        get() = provider(NamespacedCompound())
-    
-    /**
-     * The vanilla material properties that an item with this [ItemBehavior] requires.
-     */
-    val vanillaMaterialProperties: Provider<List<VanillaMaterialProperty>>
-        get() = provider(emptyList())
+    val tags: Provider<Set<RegistryEntrySet.Paper.Tag<ItemType>>>
+        get() = provider(emptySet())
     
     /**
      * Uses the [itemStack] with this behavior by itself, without targeting a block or entity.
@@ -143,13 +138,19 @@ interface ItemBehavior : ItemBehaviorHolder {
     
     /**
      * Called every tick while an [itemStack] with this behavior is being used by [entity] in [hand], with [remainingUseTicks] left.
+     * 
+     * The returned [ItemAction] will be applied to the item. As with [InteractionResult.Success], `null` signifies that the item was
+     * NOT used (e.g. don't apply cooldown), whereas [ItemAction.None] signifies that the item was used but not transformed (applies cooldown, if any).
      */
-    fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) = Unit
+    fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int): ItemAction? = null
     
     /**
      * Called when [entity] stops using (multi-tick right-click action) an [itemStack] with this behavior in [hand], with [remainingUseTicks] left.
+     * 
+     * The returned [ItemAction] will be applied to the item. As with [InteractionResult.Success], `null` signifies that the item was
+     * NOT used (e.g. don't apply cooldown), whereas [ItemAction.None] signifies that the item was used but not transformed (applies cooldown, if any).
      */
-    fun handleUseStopped(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) = Unit
+    fun handleUseStopped(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int): ItemAction? = null
     
     /**
      * Called when [entity] finishes using (multi-tick right-click action) an [itemStack] with this behavior in [hand].
@@ -159,7 +160,6 @@ interface ItemBehavior : ItemBehaviorHolder {
     /**
      * Modifies the server-side use duration of [itemStack] with this behavior for [entity].
      * The initial value of [duration] may stem from [baseDataComponents].
-     * If the use duration is <= 0, the item has no right click and hold action.
      *
      * Note that the client may predict a different use duration, which this method does not handle.
      */
@@ -176,7 +176,7 @@ interface ItemBehavior : ItemBehaviorHolder {
      * This is called before [modifyClientSideStack] and influences the generation of the client-side [ItemStack]'s patch.
      * Called off-main thread.
      */
-    fun modifyClientSideItemType(player: Player?, server: ItemStack, client: Material): Material = client
+    fun modifyClientSideItemType(player: Player?, server: ItemStack, client: ItemType): ItemType = client
     
     /**
      * Updates the [client-side item stack][client] that is to be viewed by [player] in place of the [server-side item stack][server].
@@ -197,8 +197,8 @@ interface ItemBehavior : ItemBehaviorHolder {
 fun interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
     
     /**
-     * Creates a new [ItemBehavior] instance for the given [item].
+     * Creates a new [ItemBehavior] for [entry] configured by [config].
      */
-    fun create(item: NovaItem): T
+    fun create(entry: RegistryEntry.Paper<ItemType>, config: ConfigProvider): T
     
 }

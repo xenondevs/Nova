@@ -19,18 +19,18 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.network.event.PacketListener
-import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 
 private val PLAYER_EQUIPMENT_SLOTS = listOf(
-    EquipmentSlot.HAND, 
-    EquipmentSlot.OFF_HAND, 
-    EquipmentSlot.FEET, 
+    EquipmentSlot.HAND,
+    EquipmentSlot.OFF_HAND,
+    EquipmentSlot.FEET,
     EquipmentSlot.LEGS,
-    EquipmentSlot.CHEST, 
+    EquipmentSlot.CHEST,
     EquipmentSlot.HEAD
 )
 
@@ -48,7 +48,7 @@ internal object ItemListener : Listener, PacketListener {
     
     private fun handleTick() {
         for (player in Bukkit.getOnlinePlayers()) {
-            for ((slot, itemStack) in player.inventory.contents.withIndex()) {
+            for ([slot, itemStack] in player.inventory.contents.withIndex()) {
                 val novaItem = itemStack?.novaItem
                     ?: continue
                 novaItem.handleInventoryTick(player, itemStack, slot)
@@ -92,8 +92,8 @@ internal object ItemListener : Listener, PacketListener {
         val player = event.entity as? Player
             ?: return
         
-        for ((slot, change) in event.equipmentChanges) {
-            val oldNovaItem  = change.oldItem().novaItem
+        for ([slot, change] in event.equipmentChanges) {
+            val oldNovaItem = change.oldItem().novaItem
             val newNovaItem = change.newItem().novaItem
             if (oldNovaItem == newNovaItem)
                 continue

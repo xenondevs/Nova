@@ -29,7 +29,7 @@ abstract class PaperPluginInstanceManagerMixin {
             return true;
         
         // don't close the classloader for Nova or any addon
-        return !plugin.getName().equals("Nova") 
+        return !plugin.getName().equals("Nova")
                && AddonBootstrapper.getAddons().stream()
                    .noneMatch(addon -> addon.getPlugin() == plugin);
     }

@@ -3,7 +3,9 @@
 package xyz.xenondevs.nova.util.item
 
 import com.mojang.brigadier.StringReader
+import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Namespaced
 import net.kyori.adventure.text.Component
 import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.core.component.DataComponentMap
@@ -11,7 +13,6 @@ import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.component.TypedDataComponent
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.AdventureModePredicate
@@ -25,61 +26,33 @@ import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Registry
 import org.bukkit.Tag
-import org.bukkit.World
-import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.cbf.Cbf
-import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
+import xyz.xenondevs.nova.serialization.persistentdata.get
+import xyz.xenondevs.nova.serialization.persistentdata.set
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
-import xyz.xenondevs.nova.util.bukkitMaterial
-import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
-import xyz.xenondevs.nova.util.contains
-import xyz.xenondevs.nova.util.data.getByteArrayOrNull
-import xyz.xenondevs.nova.util.data.getCompoundOrNull
-import xyz.xenondevs.nova.util.data.getStringOrNull
-import xyz.xenondevs.nova.util.getValue
-import xyz.xenondevs.nova.util.serverLevel
+import xyz.xenondevs.nova.util.asBukkitMirror
 import xyz.xenondevs.nova.util.unwrap
-import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.isNova
+import xyz.xenondevs.nova.world.item.itemType
 import xyz.xenondevs.nova.world.item.logic.PacketItems
+import xyz.xenondevs.nova.world.item.name
 import xyz.xenondevs.nova.world.item.recipe.ComplexTest
 import xyz.xenondevs.nova.world.item.recipe.CustomRecipeChoice
-import xyz.xenondevs.nova.world.item.recipe.NovaIdTest
+import xyz.xenondevs.nova.world.item.recipe.ItemTypeTest
 import xyz.xenondevs.nova.world.item.recipe.NovaNameTest
 import xyz.xenondevs.nova.world.item.recipe.TagTest
-import xyz.xenondevs.nova.world.item.recipe.VanillaMaterialTest
 import java.util.*
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.contracts.contract
 import kotlin.math.max
 import net.minecraft.world.item.ItemStack as MojangStack
 
-/**
- * The [NovaItem] of [this][ItemStack], or `null` if it's not one.
- */
-val ItemStack.novaItem: NovaItem?
-    get() = unwrap().novaItem
-
-/**
- * The [NovaItem] of [this][MojangStack], or `null` if it's not one.
- */
-val MojangStack.novaItem: NovaItem?
-    get() = unsafeNovaTag
-        ?.getStringOrNull("id")
-        ?.let(NovaRegistries.ITEM::getValue)
-
 @Suppress("DEPRECATION")
 internal val MojangStack.unsafeCustomData: CompoundTag?
     get() = components.get(DataComponents.CUSTOM_DATA)?.unsafe
-
-internal val MojangStack.unsafeNovaTag: CompoundTag?
-    get() = unsafeCustomData?.getCompoundOrNull("nova")
 
 internal val ItemStack.namelessCopyOrSelf: ItemStack
     get() {
@@ -96,23 +69,10 @@ internal val ItemStack.namelessCopyOrSelf: ItemStack
     }
 
 /**
- * The [ItemStack] that remains in the crafting slots after using it in a recipe.
- * Empty if there is no remaining item.
- */
-val ItemStack.craftingRemainingItem: ItemStack
-    get() {
-        val novaItem = novaItem
-        if (novaItem != null)
-            return novaItem.craftingRemainingItem
-        
-        return type.craftingRemainingItem?.let(::ItemStack) ?: ItemStack.empty()
-    }
-
-/**
  * Returns `null` if [this][ItemStack] [is empty][isEmpty], otherwise returns [this][ItemStack].
  */
 fun ItemStack.takeUnlessEmpty(): ItemStack? =
-    if (type.isAir || amount <= 0) null else this
+    if (isEmpty) null else this
 
 /**
  * Returns `true` if [this][ItemStack] is either null or an empty item stack,
@@ -139,86 +99,41 @@ fun ItemStack?.isNotNullOrEmpty(): Boolean {
 internal fun <T : Any> MojangStack.update(type: DataComponentType<T>, action: (T) -> T): T? =
     get(type)?.let { set(type, action(it)) }
 
-/**
- * Damages the [this][ItemStack] by [amount] and returns the resulting [ItemStack],
- * which may be `null` if the item broke.
- */
-fun ItemStack.damage(amount: Int, world: World): ItemStack? {
-    val nms = unwrap()
-    val ref = AtomicReference(nms)
-    nms.hurtAndBreak(amount, world.serverLevel, null) {
-        ref.set(MojangStack.EMPTY)
-    }
-    return ref.get().asBukkitMirror().takeUnlessEmpty()
-}
-
 internal fun ItemStack.clientsideCopy(): ItemStack =
     PacketItems.getClientSideStack(null, unwrap(), true).asBukkitMirror()
 
-//<editor-fold desc="Nova Compound", defaultstate="collapsed">
-var ItemStack.novaCompound: NamespacedCompound?
-    get() = unwrap().novaCompound
-    set(novaCompound) {
-        CraftItemStack.unwrap(this).novaCompound = novaCompound
-    }
+//<editor-fold desc="Nova item data", defaultstate="collapsed">
+inline fun <reified T : Any> ItemStack.retrieveData(key: Key): T? = persistentDataContainer[key]
+inline fun <reified T : Any> ItemStack.retrieveData(addon: Namespaced, key: String): T? = retrieveData(addon.namespace(), key)
+inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, key: String): T? = retrieveData(Key.key(namespace, key))
 
-var MojangStack.novaCompound: NamespacedCompound?
-    get() = unsafeCustomData
-        ?.getByteArrayOrNull("nova_cbf")
-        ?.let(Cbf::read)
-    set(novaCompound) {
-        if (novaCompound != null) {
-            update(DataComponents.CUSTOM_DATA, CustomData.EMPTY) { customData ->
-                customData.update { compoundTag ->
-                    compoundTag.putByteArray("nova_cbf", Cbf.write(novaCompound))
-                }
-            }
-        } else {
-            var customData = get(DataComponents.CUSTOM_DATA) ?: return
-            customData = customData.update { it.remove("nova_cbf") }
-            set(DataComponents.CUSTOM_DATA, customData)
-        }
-    }
-
-inline fun <reified T : Any> ItemStack.retrieveData(key: Key): T? = retrieveData(key.namespace(), key.value())
-inline fun <reified T : Any> ItemStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.id, key)
-inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, key: String): T? = novaCompound?.get(namespace, key)
-
-inline fun <reified T : Any> ItemStack.storeData(key: Key, data: T?) = storeData(key.namespace(), key.value(), data)
-inline fun <reified T : Any> ItemStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.id, key, data)
-inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String, data: T?) {
-    val novaCompound = this.novaCompound ?: NamespacedCompound()
-    novaCompound[namespace, key] = data
-    this.novaCompound = novaCompound
+inline fun <reified T : Any> ItemStack.storeData(key: Key, data: T?) {
+    editPersistentDataContainer { it[key] = data }
 }
 
-inline fun <reified T : Any> MojangStack.retrieveData(key: Key): T? = retrieveData(key.namespace(), key.value())
-inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.id, key)
-inline fun <reified T : Any> MojangStack.retrieveData(namespace: String, key: String): T? = novaCompound?.get(namespace, key)
+inline fun <reified T : Any> ItemStack.storeData(addon: Namespaced, key: String, data: T?) = storeData(addon.namespace(), key, data)
+inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String, data: T?) = storeData(Key.key(namespace, key), data)
 
-inline fun <reified T : Any> MojangStack.storeData(key: Key, data: T?) = storeData(key.namespace(), key.value(), data)
-inline fun <reified T : Any> MojangStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.id, key, data)
-inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: String, data: T?) {
-    val novaCompound = this.novaCompound ?: NamespacedCompound()
-    novaCompound[namespace, key] = data
-    this.novaCompound = novaCompound
-}
+inline fun <reified T : Any> MojangStack.retrieveData(key: Key): T? = asBukkitMirror().retrieveData(key)
+inline fun <reified T : Any> MojangStack.retrieveData(addon: Namespaced, key: String): T? = retrieveData(addon.namespace(), key)
+inline fun <reified T : Any> MojangStack.retrieveData(namespace: String, key: String): T? = retrieveData(Key.key(namespace, key))
+
+inline fun <reified T : Any> MojangStack.storeData(key: Key, data: T?) = asBukkitMirror().storeData(key, data)
+inline fun <reified T : Any> MojangStack.storeData(addon: Namespaced, key: String, data: T?) = storeData(addon.namespace(), key, data)
+inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: String, data: T?) = storeData(Key.key(namespace, key), data)
 //</editor-fold>
 
 object ItemUtils {
     
     fun isIdRegistered(id: String): Boolean {
-        try {
-            val nid = Key.key(id)
-            return when (nid.namespace()) {
-                "minecraft" -> runCatching { Material.valueOf(nid.value().uppercase()) }.isSuccess
-                "nova" -> NovaRegistries.ITEM.getByName(nid.value()).isNotEmpty()
-                else -> nid in NovaRegistries.ITEM || CustomItemServiceManager.getItemByName(id) != null
-            }
-        } catch (ignored: Exception) {
+        if (CustomItemServiceManager.getItemByName(id) != null)
+            return true
+        val namespace = id.substringBefore(':')
+        val name = id.substringAfter(':')
+        return when (namespace) {
+            "nova" -> Registry.ITEM.any { it.isNova && it.key.value() == name }
+            else -> Key.parseable(id) && Registry.ITEM.get(Key.key(id)) != null
         }
-        
-        return false
     }
     
     fun getRecipeChoice(nameList: List<String>): RecipeChoice {
@@ -236,27 +151,15 @@ object ItemUtils {
                     return@map ComplexTest(toItemStack(id))
                 
                 when (id.substringBefore(':')) {
-                    "minecraft" -> {
-                        val material = Material.valueOf(id.drop(10).uppercase())
-                        return@map VanillaMaterialTest(material, ItemStack(material))
-                    }
-                    
                     "nova" -> {
                         val name = id.substringAfter(':')
-                        val novaItems = NovaRegistries.ITEM.getByName(name)
+                        val novaItems = Registry.ITEM.filter { it.isNova && it.key.value() == name }
                         if (novaItems.isNotEmpty()) {
                             return@map NovaNameTest(name, novaItems.map { it.createItemStack() })
                         } else throw IllegalArgumentException("Not an item name in Nova: $name")
                     }
                     
-                    else -> {
-                        val novaItems = NovaRegistries.ITEM.getValue(id)
-                        if (novaItems != null) {
-                            return@map NovaIdTest(id, novaItems.createItemStack())
-                        } else {
-                            return@map CustomItemServiceManager.getItemTest(id)!!
-                        }
-                    }
+                    else -> ItemTypeTest(Registry.ITEM.getOrThrow(Key.key(id)))
                 }
             } catch (ex: Exception) {
                 throw IllegalArgumentException("Unknown item $id", ex)
@@ -271,51 +174,33 @@ object ItemUtils {
      * Resolves ids from vanilla, nova and custom item services. Can also parse snbt.
      */
     fun getItemStack(s: String): ItemStack {
-        return when (s.substringBefore(':')) {
+        val namespace = s.substringBefore(':')
+        val name = s.substringAfter(':')
+        return when (namespace) {
             "minecraft" -> toItemStack(s)
-            else -> getItemStack(Key.key(s))
+            "nova" -> Registry.ITEM.firstOrNull { it.isNova && it.key.value() == name }
+                ?.createItemStack()
+                ?: throw IllegalArgumentException("Unknown Nova item: $name")
+            else -> CustomItemServiceManager.getItemByName(s) ?: getItemStack(Key.key(s))
         }
     }
     
     /**
      * Creates an [ItemStack] from the given [id]. Resolves ids from vanilla, nova and custom item services.
      */
-    fun getItemStack(id: Key): ItemStack {
-        return when (id.namespace()) {
-            "minecraft" -> ItemStack(BuiltInRegistries.ITEM.getValue(id).bukkitMaterial)
-            "nova" -> NovaRegistries.ITEM.getByName(id.value()).firstOrNull()?.createItemStack()
-            else -> NovaRegistries.ITEM.getValue(id)?.createItemStack()
-                ?: CustomItemServiceManager.getItemByName(id.toString())
-        } ?: throw IllegalArgumentException("Could not find item with id $id")
-    }
+    @Deprecated("Use registry instead", ReplaceWith("Registry.ITEM.get(id).createItemStack()", imports = ["org.bukkit.Registry"]))
+    fun getItemStack(id: Key): ItemStack =
+        Registry.ITEM.get(id)?.createItemStack() ?: throw IllegalArgumentException("Unknown item $id")
     
     /**
      * Gets the actually displayed name of the given [itemStack].
      * If the [itemStack] has a custom display name, that will be returned. Otherwise, the localized name will be returned.
      */
     fun getName(itemStack: ItemStack): Component =
-        getName(itemStack.unwrap())
-    
-    /**
-     * Gets the actually displayed name of the given [itemStack].
-     * If the [itemStack] has a custom display name, that will be returned. Otherwise, the localized name will be returned.
-     */
-    internal fun getName(itemStack: MojangStack): Component {
-        val displayName = itemStack.get(DataComponents.CUSTOM_NAME)?.toAdventureComponent()
-        
-        if (displayName != null)
-            return displayName
-        
-        val novaItem = itemStack.novaItem
-        if (novaItem != null)
-            return novaItem.name ?: Component.empty()
-        
-        return itemStack.item.getName(itemStack).toAdventureComponent()
-    }
+        itemStack.getData(DataComponentTypes.CUSTOM_NAME) ?: itemStack.itemType.name
     
     /**
      * Converts the given string to an [ItemStack].
-     * Does not understand custom item ids.
      */
     fun toItemStack(s: String): ItemStack {
         val parser = ItemParser(REGISTRY_ACCESS)
@@ -326,30 +211,27 @@ object ItemUtils {
     /**
      * Gets the id of the given [itemStack].
      */
-    fun getId(itemStack: ItemStack): Key {
-        val novaItem = itemStack.novaItem
-        if (novaItem != null) return novaItem.id
-        
-        val customNameKey = CustomItemServiceManager.getId(itemStack)
-        if (customNameKey != null) return Key.key(customNameKey)
-        
-        return itemStack.type.key()
-    }
+    @Deprecated("Use ItemType instead", ReplaceWith("itemStack.itemType.key", imports = ["xyz.xenondevs.nova.world.item.itemType"]))
+    fun getId(itemStack: ItemStack): Key = itemStack.itemType.key
     
     @Suppress("UNCHECKED_CAST")
     internal fun mergeDataComponentPatches(dataComponentPatches: List<DataComponentPatch>): DataComponentPatch {
         val components = HashMap<DataComponentType<Any>, ArrayList<Optional<Any>>>()
         
         for (dataComponentPatch in dataComponentPatches) {
-            for ((type, newValueOpt) in dataComponentPatch.entrySet()) {
+            val (added, removed) = dataComponentPatch.split()
+            for (component in added) {
+                val type = component.type as DataComponentType<Any>
+                components.getOrPut(type, ::ArrayList) += Optional.of(component.value)
+            }
+            for (type in removed) {
                 type as DataComponentType<Any>
-                newValueOpt as Optional<Any>
-                components.getOrPut(type, ::ArrayList) += newValueOpt
+                components.getOrPut(type, ::ArrayList) += Optional.empty()
             }
         }
         
         val builder = DataComponentPatch.builder()
-        for ((type, valueOpts) in components) {
+        for ([type, valueOpts] in components) {
             // only merge in data components that were added after the last unset (empty optional)
             val valuesAfterUnset = ArrayList<Any>()
             for (valueOpt in valueOpts) {
@@ -382,7 +264,7 @@ object ItemUtils {
         }
         
         val builder = DataComponentMap.builder()
-        for ((type, values) in components) {
+        for ([type, values] in components) {
             builder.set(type, mergeDataComponents(type, values))
         }
         return builder.build()
@@ -438,7 +320,7 @@ object ItemUtils {
     internal fun mergeEnchantments(values: List<ItemEnchantments>): ItemEnchantments {
         val enchantments = ItemEnchantments.Mutable(ItemEnchantments.EMPTY)
         for (itemEnchantments in values) {
-            for ((enchantment, level) in itemEnchantments.entrySet()) {
+            for ([enchantment, level] in itemEnchantments.entrySet()) {
                 enchantments.set(enchantment, max(enchantments.getLevel(enchantment), level))
             }
         }

@@ -3,16 +3,17 @@
 package xyz.xenondevs.nova.world.block.tileentity
 
 import kotlinx.coroutines.Job
-import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
 import org.bukkit.OfflinePlayer
+import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mapNonNull
-import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
@@ -22,35 +23,36 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
+import xyz.xenondevs.nova.packetentity.PacketItemDisplay
 import xyz.xenondevs.nova.serialization.DataHolder
-import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.util.item.storeData
+import xyz.xenondevs.nova.util.nmsBlockState
+import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.salt
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.InteractionResult
-import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
+import xyz.xenondevs.nova.world.block.BlockUpdateFlags
+import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
-import xyz.xenondevs.nova.world.block.tileentity.menu.MenuContainer
+import xyz.xenondevs.nova.world.block.behavior.TileEntityDrops
+import xyz.xenondevs.nova.world.block.behavior.TileEntityInteractive
+import xyz.xenondevs.nova.world.block.blockType
+import xyz.xenondevs.nova.world.block.itemTypeOrNull
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityModelProviderManager
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.FluidContainer
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
-import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.region.DynamicRegion
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
-import kotlin.reflect.KClass
-import kotlin.reflect.full.hasAnnotation
-import xyz.xenondevs.nova.world.block.tileentity.menu.TileEntityMenuClass as TileEntityMenuAnnotation
 
 /**
  * A custom tile entity.
  */
 abstract class TileEntity(
-    val pos: BlockPos,
+    val block: Block,
     blockState: NovaBlockState,
     override val data: Compound
 ) : DataHolder(true) {
@@ -65,14 +67,14 @@ abstract class TileEntity(
         /**
          * The key under which [TileEntity] data is stored in [ItemStacks][ItemStack].
          */
-        val TILE_ENTITY_DATA_KEY = Key.key("nova", "tileentity")
+        val TILE_ENTITY_DATA_KEY = NamespacedKey("nova", "tileentity")
         
     }
     
     /**
      * The [UUID] of this [TileEntity].
      */
-    val uuid: UUID by storedValue("uuid") { UUID.randomUUID() }
+    val uuid: UUID by storedValue("uuid") { insecureRandomUuid() }
     
     private var _ownerUuid = storedValue<UUID>("ownerUuid")
     
@@ -91,18 +93,19 @@ abstract class TileEntity(
      */
     var blockState: NovaBlockState = blockState
         internal set
+        get() = field.clone()
     
     /**
-     * The [NovaTileEntityBlock] this [TileEntity].
+     * The [BlockType] of this [TileEntity].
      */
-    val block: NovaTileEntityBlock
-        get() = blockState.block as NovaTileEntityBlock
+    val blockType: BlockType
+        get() = blockState.blockType
     
     /**
-     * The [FakeItemDisplay(s)][FakeItemDisplay] used to display the model of this [TileEntity], if it is entity-backed.
+     * The [PacketItemDisplay(s)][PacketItemDisplay] used to display the model of this [TileEntity], if it is entity-backed.
      */
-    val displayEntities: List<FakeItemDisplay>?
-        get() = DisplayEntityBlockModelProvider.entities[pos]
+    val displayEntities: List<PacketItemDisplay>?
+        get() = DisplayEntityModelProviderManager.getDisplayEntities(block)
     
     /**
      * Whether this [TileEntity] is enabled.
@@ -111,39 +114,28 @@ abstract class TileEntity(
         internal set
     
     /**
-     * The [MenuContainer] for this [TileEntity's][TileEntity] gui.
-     * May stay uninitialized if the [TileEntity] has no gui.
+     * Whether this [TileEntity] is ticking.
      */
-    lateinit var menuContainer: MenuContainer
-        private set
+    var isTicking: Boolean = false
+        internal set
+    
+    /**
+     * This [TileEntity's][TileEntity] menu.
+     * Also tracks other [Windows][Window] that belong to this [TileEntity].
+     */
+    open val menu: TileEntityMenu = TileEntityMenu.none()
     
     /**
      * The supervisor [Job] for coroutines of this [TileEntity].
      *
-     * Will be available for use after ticking was enabled, indicated by [handleEnableTicking].
-     * Will be automatically cancelled when ticking is disabled, indicated by [handleDisableTicking].
+     * Will be available after ticking was enabled, indicated by [handleEnableTicking].
+     * Will be automatically cancelled and reset to `null` when ticking is disabled, indicated by [handleDisableTicking].
      */
-    lateinit var coroutineSupervisor: Job
+    var coroutineSupervisor: Job? = null
         internal set
     
     private val dropProviders = ArrayList<() -> Collection<ItemStack>>()
     private val disableHandlers = ArrayList<() -> Unit>()
-    
-    init {
-        // look through the nested classes of this::class and all its superclasses for a class annotated with @TileEntityMenuClass
-        var guiClass: KClass<*>? = null
-        var clazz: KClass<*>? = this::class
-        while (clazz != null && guiClass == null) {
-            guiClass = clazz.nestedClasses.firstOrNull { it.hasAnnotation<TileEntityMenuAnnotation>() }
-            clazz = clazz.java.superclass?.kotlin
-        }
-        
-        // if a class was found, create a MenuContainer for it
-        if (guiClass != null) {
-            @Suppress("LeakingThis")
-            menuContainer = MenuContainer.of(this, guiClass)
-        }
-    }
     
     /**
      * Called when this [TileEntity] is placed.
@@ -168,8 +160,7 @@ abstract class TileEntity(
      * May not add or remove any [TileEntities][TileEntity].
      */
     open fun handleDisable() {
-        if (::menuContainer.isInitialized)
-            menuContainer.closeWindows()
+        menu.close()
         disableHandlers.forEach { it() }
     }
     
@@ -193,36 +184,35 @@ abstract class TileEntity(
     open fun handleTick() = Unit
     
     /**
-     * @see BlockBehavior.useItemOn
+     * Same as [BlockBehavior.useItemOn].
+     * Requires the [TileEntityInteractive] behavior on the block in order to be called.
      */
     open fun useItemOn(ctx: Context<BlockInteract>): InteractionResult {
         return InteractionResult.Pass
     }
     
     /**
-     * @see BlockBehavior.use
+     * Same as [BlockBehavior.use].
+     * Requires the [TileEntityInteractive] behavior on the block in order to be called.
      */
     open fun use(ctx: Context<BlockInteract>): InteractionResult {
         val player = ctx[BlockInteract.SOURCE_ENTITY] as? Player
             ?: return InteractionResult.Pass
-        
-        if (::menuContainer.isInitialized) {
-            menuContainer.openWindow(player)
-            return InteractionResult.Success()
-        }
-        
+        if (menu.open(player))
+            return InteractionResult.Success(swing = true)
         return InteractionResult.Pass
     }
     
     /**
      * Gets a list of [ItemStacks][ItemStack] to be dropped when this [TileEntity] is destroyed.
+     * Requires the [TileEntityDrops] behavior on the block in order to be called.
      */
     open fun getDrops(includeSelf: Boolean): List<ItemStack> {
         val drops = ArrayList<ItemStack>()
         if (includeSelf) {
             saveData()
             
-            val item = block.item?.createItemStack()
+            val item = blockType.itemTypeOrNull?.createItemStack()
             if (item != null) {
                 if (persistentData.isNotEmpty()) {
                     item.storeData(TILE_ENTITY_DATA_KEY, persistentData)
@@ -253,23 +243,29 @@ abstract class TileEntity(
      * visible for.
      */
     fun getViewers(): List<Player> =
-        FakeEntityManager.getChunkViewers(pos.chunkPos)
+        FakeEntityManager.getChunkViewers(block.chunkPos)
     
     /**
      * Changes the block state of this [TileEntity] to [blockState].
      *
+     * This retains the existing tile entity and does not invoke block placement handling.
+     *
+     * @param flags The notifications and block updates to perform.
      * @throws IllegalArgumentException If [blockState] is not of this [TileEntity's][TileEntity] block type.
      */
-    fun updateBlockState(blockState: NovaBlockState) {
+    fun updateBlockState(
+        blockState: NovaBlockState,
+        flags: BlockUpdateFlags = BlockUpdateFlags.ALL
+    ) {
         require(isEnabled) { "TileEntity needs to be enabled" }
-        require(blockState.block == block) { "New block state needs to be of the same block type" }
+        require(blockState.blockType == blockType) { "New block state needs to be of the same block type" }
         
-        val prevBlockState = this.blockState
-        if (blockState == prevBlockState)
+        if (blockState == this.blockState)
             return
         
-        blockState.modelProvider.replace(pos, prevBlockState.modelProvider)
-        WorldDataManager.setBlockState(pos, blockState)
+        val updateFlags = flags + BlockUpdateFlags.SKIP_ON_PLACE
+        if (block.world.serverLevel.setBlock(block.nmsPos, blockState.nmsBlockState, updateFlags.value))
+            this.blockState = blockState.clone()
     }
     
     /**
@@ -286,21 +282,30 @@ abstract class TileEntity(
      *
      * If the inventory is not [persistent], it will also be registered as a drop provider, i.e. it's contents
      * will be dropped when the [TileEntity] is destroyed.
-     *
-     * Note that [size] and [maxStackSizes] are only used when creating a new inventory, which means that the
-     * inventory retrieved may not necessarily be of that size or have those max stack sizes.
      */
     fun storedInventory(
         name: String,
         size: Int,
         persistent: Boolean = false,
-        maxStackSizes: IntArray = IntArray(size) { 64 },
+        maxStackSizes: IntArray = IntArray(size) { 99 },
         preUpdateHandler: ((ItemPreUpdateEvent) -> Unit)? = null,
         postUpdateHandler: ((ItemPostUpdateEvent) -> Unit)? = null,
     ): VirtualInventory {
-        val inventory = storedValue(name, persistent) {
+        var inventory by storedValue(name, persistent) {
             VirtualInventory(UUID.nameUUIDFromBytes(name.toByteArray()), size, null, maxStackSizes)
-        }.get()
+        }
+        
+        if (inventory.size != size) {
+            val prevItems = inventory.items
+            inventory = VirtualInventory(
+                inventory.uuid,
+                size,
+                Array(size) { prevItems.getOrNull(it) },
+                maxStackSizes
+            )
+        }
+        
+        inventory.maxStackSizes = maxStackSizes
         
         if (preUpdateHandler != null)
             inventory.addPreUpdateHandler(preUpdateHandler)
@@ -318,9 +323,6 @@ abstract class TileEntity(
      *
      * The inventory will also be registered as a drop provider, i.e. it's contents will be dropped when the
      * [TileEntity] is destroyed.
-     *
-     * Note that [size] is only used when creating a new inventory, which means that the inventory retrieved may
-     * not necessarily be of that size.
      */
     fun storedInventory(
         name: String,
@@ -381,68 +383,7 @@ abstract class TileEntity(
     }
     
     override fun toString(): String {
-        return "${javaClass.simpleName}(blockState=$blockState, pos=$pos, data=$data)"
-    }
-    
-    /**
-     * A menu for a [TileEntity].
-     */
-    abstract inner class TileEntityMenu internal constructor(protected val texture: GuiTexture? = null) {
-        
-        open fun getTitle(): Component =
-            texture?.getTitle(block.name) ?: block.name
-        
-    }
-    
-    /**
-     * A menu for a [TileEntity] that uses the same instance for all players.
-     */
-    abstract inner class GlobalTileEntityMenu(
-        texture: GuiTexture? = null
-    ) : TileEntityMenu(texture) {
-        
-        abstract val gui: Gui
-        open val windowBuilder: Window.Builder<*, *> by lazy {
-            Window.builder()
-                .setUpperGui(gui)
-                .setTitle(getTitle())
-        }
-        
-        /**
-         * Opens a [Window] to this menu for the specified [player].
-         */
-        open fun openWindow(player: Player) {
-            val window = windowBuilder.build(player)
-            menuContainer.registerWindow(window)
-            window.open()
-        }
-        
-    }
-    
-    /**
-     * A menu for a [TileEntity] that uses a separate instance for each player.
-     */
-    abstract inner class IndividualTileEntityMenu(
-        protected val player: Player,
-        texture: GuiTexture? = null
-    ) : TileEntityMenu(texture) {
-        
-        abstract val gui: Gui
-        open val windowBuilder: Window.Builder<*, *> by lazy {
-            Window.builder()
-                .setUpperGui(gui)
-                .setTitle(getTitle())
-        }
-        
-        /**
-         * Opens a [Window] to this menu for the specified [player].
-         */
-        open fun openWindow() {
-            val window = windowBuilder.build(player)
-            menuContainer.registerWindow(window)
-            window.open()
-        }
-        
+        return "${javaClass.simpleName}(blockState=$blockState, block=$block, data=$data)"
     }
     
 }

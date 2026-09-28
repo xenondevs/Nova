@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.resources.builder.layout.item
 
+import net.kyori.adventure.key.Key
 import org.joml.Vector3d
 import org.joml.Vector4d
 import xyz.xenondevs.commons.collections.mapToArray
@@ -14,29 +15,31 @@ import xyz.xenondevs.nova.resources.builder.model.Model.Element
 import xyz.xenondevs.nova.resources.builder.model.Model.Element.Face
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.ModelContent
-import xyz.xenondevs.nova.world.item.NovaItem
 
 @RegistryElementBuilderDsl
 class ItemModelSelectorScope internal constructor(
-    item: NovaItem,
-    val resourcePackBuilder: ResourcePackBuilder,
-    val modelContent: ModelContent
-) : ModelSelectorScope {
-    
     /**
      * The ID of the item.
      */
-    val id = item.id
+    val id: Key,
+    /**
+     * The [ResourcePackBuilder] instance that builds the current resource pack.
+     */
+    val resourcePackBuilder: ResourcePackBuilder,
+    /**
+     * The [ModelContent] instance of the current resource pack build session.
+     */
+    val modelContent: ModelContent
+) : ModelSelectorScope {
     
     /**
      * The default model for this item under `namespace:item/name` or a new
      * layered model using the texture under `namespace:item/name`.
      */
     override val defaultModel: ModelBuilder by lazy {
-        val path = ResourcePath(ResourceType.Model, id.namespace(), "item/${id.value()}")
-        modelContent[path]
+        modelContent[ResourcePath(ResourceType.Model, id.namespace(), "item/${id.value()}")]
             ?.let(::ModelBuilder)
-            ?: createLayeredModel(path)
+            ?: createLayeredModel(ResourcePath(ResourceType.Texture, id.namespace(), "item/${id.value()}"))
     }
     
     /**
@@ -44,7 +47,7 @@ class ItemModelSelectorScope internal constructor(
      */
     override fun getModel(path: ResourcePath<ResourceType.Model>): ModelBuilder =
         modelContent[path]?.let(::ModelBuilder)
-            ?: throw IllegalArgumentException("Model $path does not exist")
+            ?: throw IllegalArgumentException("Model ${path.asString()} does not exist")
     
     /**
      * Gets the model under the given [path] or throws an exception if it does not exist.
@@ -56,15 +59,15 @@ class ItemModelSelectorScope internal constructor(
      * Creates a new layered model using the given [layers] as the textures.
      */
     fun createLayeredModel(vararg layers: String): ModelBuilder =
-        createLayeredModel(*layers.map { ResourcePath.of(ResourceType.Model, it, id.namespace()) }.toTypedArray())
+        createLayeredModel(*layers.map { ResourcePath.of(ResourceType.Texture, it, id.namespace()) }.toTypedArray())
     
     /**
      * Creates a new layered model using the given [layers] as raw paths to the textures.
      */
-    fun createLayeredModel(vararg layers: ResourcePath<ResourceType.Model>): ModelBuilder = ModelBuilder(
+    fun createLayeredModel(vararg layers: ResourcePath<ResourceType.Texture>): ModelBuilder = ModelBuilder(
         Model(
             parent = ResourcePath(ResourceType.Model, "minecraft", "item/generated"),
-            textures = layers.mapIndexed { index, layer -> "layer$index" to Model.Texture(layer.toString()) }.toMap()
+            textures = layers.mapIndexed { index, layer -> "layer$index" to Model.Texture(layer.asString()) }.toMap()
         )
     )
     
@@ -79,7 +82,7 @@ class ItemModelSelectorScope internal constructor(
      * Using [display], additional transformations can be applied.
      */
     fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: String, display: Model.Display.Entry? = null): ModelBuilder =
-        createGuiModel(background, stretched, *layers.mapToArray { ResourcePath.of(ResourceType.Model, it, id.namespace()) }, display = display)
+        createGuiModel(background, stretched, *layers.mapToArray { ResourcePath.of(ResourceType.Texture, it, id.namespace()) }, display = display)
     
     /**
      * Creates a new GUI model using the given [layers] as texture
@@ -91,15 +94,14 @@ class ItemModelSelectorScope internal constructor(
      * 
      * Using [display], additional transformations can be applied.
      */
-    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: ResourcePath<ResourceType.Model>, display: Model.Display.Entry? = null): ModelBuilder {
+    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: ResourcePath<ResourceType.Texture>, display: Model.Display.Entry? = null): ModelBuilder {
         val elements = ArrayList<Element>()
         if (background) {
             elements += Element(
                 Vector3d(-1.0, -1.0, -1.0),
                 Vector3d(17.0, 17.0, -1.0),
                 null,
-                mapOf(Direction.SOUTH to Face(Vector4d(0.0, 0.0, 16.0, 16.0), "#background")),
-                true
+                mapOf(Direction.SOUTH to Face(Vector4d(0.0, 0.0, 16.0, 16.0), "#background"))
             )
         }
         val from = if (stretched) -1.0 else 0.0
@@ -116,8 +118,7 @@ class ItemModelSelectorScope internal constructor(
                 Vector3d(from, from, (idx.toDouble() / layers.size.toDouble())),
                 Vector3d(to, to, (idx.toDouble() / layers.size.toDouble())),
                 null,
-                mapOf(Direction.SOUTH to Face(uv, name)),
-                true
+                mapOf(Direction.SOUTH to Face(uv, name))
             )
         }
         
@@ -132,9 +133,9 @@ class ItemModelSelectorScope internal constructor(
         if (background) {
             textures["background"] = Model.Texture("nova:item/gui/inventory_part")
         }
-        for ((idx, layer) in layers.withIndex()) {
+        for ([idx, layer] in layers.withIndex()) {
             val name = if (idx == 0) "particle" else idx.toString()
-            textures[name] = Model.Texture(layer.toString())
+            textures[name] = Model.Texture(layer.asString())
         }
         val model = Model(parentId, textures)
         

@@ -10,6 +10,8 @@ import kotlinx.serialization.json.JsonPrimitive
 import net.kyori.adventure.key.Key
 import net.minecraft.resources.RegistryOps
 import org.bukkit.entity.EntityType
+import org.joml.Matrix4f
+import org.joml.Matrix4fc
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -89,8 +91,14 @@ class SelectItemModelBuilder<T, S : ModelSelectorScope> internal constructor(
      */
     var fallback: ItemModel? = null
     
+    /**
+     * An additional transformationation matrix that is applied to the resulting model on top of the
+     * transformationations defined in the selected case (or [fallback]).
+     */
+    var transformation: Matrix4fc = Matrix4f()
+    
     internal fun build(): ItemModel.Select {
-        return property.buildModel(case.cases, fallback)
+        return property.buildModel(case.cases, fallback, transformation)
     }
     
 }
@@ -101,9 +109,10 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
     
     internal open fun buildModel(
         cases: List<ItemModel.Select.Case>,
-        fallback: ItemModel?
+        fallback: ItemModel?,
+        transformation: Matrix4fc
     ): ItemModel.Select {
-        return ItemModel.Select(property, cases, fallback)
+        return ItemModel.Select(property, cases, fallback, transformation)
     }
     
     /**
@@ -127,8 +136,8 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
         private val type: DataComponentType.Valued<T>
     ) : SelectItemModelProperty<T>(ItemModel.Select.Property.COMPONENT) {
         
-        override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?): ItemModel.Select {
-            return ItemModel.Select(property, cases, fallback, component = type.key())
+        override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?, transformation: Matrix4fc): ItemModel.Select {
+            return ItemModel.Select(property, cases, fallback, transformation, component = type.key())
         }
         
         override fun toJson(value: T): JsonElement {
@@ -167,11 +176,12 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
         
         override fun toJson(value: String) = JsonPrimitive(value)
         
-        override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?) =
+        override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?, transformation: Matrix4fc) =
             ItemModel.Select(
                 property,
                 cases,
                 fallback,
+                transformation,
                 blockStateProperty = propertyName
             )
         
@@ -208,11 +218,12 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
         
         override fun toJson(value: String) = JsonPrimitive(value)
         
-        override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?) =
+        override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?, transformation: Matrix4fc) =
             ItemModel.Select(
                 property,
                 cases,
                 fallback,
+                transformation,
                 locale = locale,
                 timeZone = timeZone,
                 pattern = pattern
@@ -241,11 +252,12 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
         
         override fun toJson(value: String) = JsonPrimitive(value)
         
-        override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?) =
+        override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?, transformation: Matrix4fc) =
             ItemModel.Select(
                 property,
                 cases,
                 fallback,
+                transformation,
                 index = index
             )
         

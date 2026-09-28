@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import org.bukkit.plugin.Plugin
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.serialization.kotlinx.ResourcePathSerializer
 
 /**
@@ -95,7 +94,7 @@ class ResourcePath<out T : ResourceType>(val type: T, val namespace: String, val
          * if no namespace is specified in [id].
          */
         fun <T : ResourceType> of(type: T, id: String, fallbackNamespace: Addon): ResourcePath<T> =
-            of(type, id, fallbackNamespace.id)
+            of(type, id, fallbackNamespace.namespace())
         
         /**
          * Creates a new [ResourcePath] in [type] using the given [id], falling back to [fallbackNamespace]

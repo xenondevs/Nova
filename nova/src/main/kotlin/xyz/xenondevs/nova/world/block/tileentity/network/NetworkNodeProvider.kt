@@ -1,12 +1,37 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.block.DefaultBlocks
-import xyz.xenondevs.nova.world.block.tileentity.TileEntity
+import org.bukkit.Chunk
+import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
-import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
-import xyz.xenondevs.nova.world.format.WorldDataManager
+
+/**
+ * A snapshot of the network nodes and unknown blocks in a chunk.
+ *
+ * @property nodes The discovered network nodes, keyed by their block.
+ * @property unknownBlocks Tile entity blocks from addons that were not loaded.
+ * This information may be used by the network system to determine whether to delete network data or not.
+ */
+data class NetworkNodeSnapshot(
+    val nodes: Map<Block, NetworkNode>,
+    val unknownBlocks: Set<Block>
+) {
+    
+    /**
+     * Combines this snapshot with [other].
+     */
+    operator fun plus(other: NetworkNodeSnapshot): NetworkNodeSnapshot =
+        NetworkNodeSnapshot(nodes + other.nodes, unknownBlocks + other.unknownBlocks)
+    
+    companion object {
+        
+        /**
+         * An empty [NetworkNodeSnapshot].
+         */
+        val EMPTY = NetworkNodeSnapshot(emptyMap(), emptySet())
+        
+    }
+    
+}
 
 /**
  * Used to discover [NetworkNodes][NetworkNode].
@@ -14,60 +39,16 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 interface NetworkNodeProvider {
     
     /**
-     * Gets the [NetworkNode] at the specified block [pos] or null if there is none.
+     * Gets the live [NetworkNode] represented by [block], or null if there is none.
+     * Must be called from the server thread.
      */
-    suspend fun getNode(pos: BlockPos): NetworkNode?
+    fun getNode(block: Block): NetworkNode?
     
     /**
-     * Gets all [NetworkNodes][NetworkNode] in the specified chunk [pos].
+     * Creates and returns a snapshot of all [NetworkNodes][NetworkNode] and unknown blocks in [chunk].
+     * Must be called from the server thread.
      */
-    suspend fun getNodes(pos: ChunkPos): Sequence<NetworkNode>
-    
-    /**
-     * Checks whether the block at the specified [pos] is unknown.
-     * For example, blocks of addons that weren't loaded but may be a [NetworkNode] should be considered unknown.
-     *
-     * This information may be used by the network system to determine whether to delete network data or not.
-     */
-    suspend fun isUnknown(pos: BlockPos): Boolean = false
+    fun getNodes(chunk: Chunk): NetworkNodeSnapshot
     
 }
 
-/**
- * A [NetworkNodeProvider] for all [TileEntities][TileEntity] that are [NetworkNodes][NetworkNode].
- */
-internal object NovaNetworkNodeProvider : NetworkNodeProvider {
-    
-    override suspend fun getNode(pos: BlockPos): NetworkNode? {
-        return WorldDataManager.getOrLoadTileEntity(pos) as? NetworkNode
-    }
-    
-    override suspend fun isUnknown(pos: BlockPos): Boolean {
-        return WorldDataManager.getOrLoadBlockState(pos)?.block == DefaultBlocks.UNKNOWN
-    }
-    
-    override suspend fun getNodes(pos: ChunkPos): Sequence<NetworkNode> {
-        return WorldDataManager.getOrLoadTileEntities(pos)
-            .asSequence()
-            .filterIsInstance<NetworkNode>()
-    }
-    
-}
-
-/**
- * A [NetworkNodeProvider] for all vanilla [VanillaTileEntities][VanillaTileEntity] that are [NetworkNodes][NetworkNode].
- 
- */
-internal object VanillaNetworkNodeProvider : NetworkNodeProvider {
-    
-    override suspend fun getNode(pos: BlockPos): NetworkNode? {
-        return WorldDataManager.getOrLoadVanillaTileEntity(pos) as? NetworkNode
-    }
-    
-    override suspend fun getNodes(pos: ChunkPos): Sequence<NetworkNode> {
-        return WorldDataManager.getOrLoadVanillaTileEntities(pos)
-            .asSequence()
-            .filterIsInstance<NetworkNode>()
-    }
-    
-}

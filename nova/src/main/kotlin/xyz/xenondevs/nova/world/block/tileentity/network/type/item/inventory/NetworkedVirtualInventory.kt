@@ -53,7 +53,7 @@ open class NetworkedInvUIInventory(
     }
     
     override fun copyContents(destination: Array<ItemStack>) {
-        for ((slot, item) in inventory.unsafeItems.withIndex()) {
+        for ([slot, item] in inventory.unsafeItems.withIndex()) {
             destination[slot] = item?.clone() ?: ItemStack.empty()
         }
     }

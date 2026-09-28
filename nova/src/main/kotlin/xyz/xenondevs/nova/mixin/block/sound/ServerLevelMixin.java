@@ -10,15 +10,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.xenondevs.nova.util.BlockUtilsKt;
+import xyz.xenondevs.nova.world.block.logic.PacketBlocks;
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine;
-import xyz.xenondevs.nova.world.block.sound.SoundGroup;
 
 @Mixin(ServerLevel.class)
 abstract class ServerLevelMixin {
     
     @Inject(method = "levelEvent", at = @At("HEAD"))
     private void playerWillDestroy(
-        Entity entity,
+        Entity source,
         int type,
         BlockPos pos,
         int data,
@@ -34,9 +34,12 @@ abstract class ServerLevelMixin {
             return;
         
         var volume = soundGroup.getBreakVolume();
-        var vanillaBlockState = Block.BLOCK_STATE_REGISTRY.byId(data);
-        var oldSound = vanillaBlockState != null
-            ? SoundGroup.Companion.from(vanillaBlockState.getSoundType()).getBreakSound()
+        var serverBlockState = Block.BLOCK_STATE_REGISTRY.byId(data);
+        var clientBlockState = serverBlockState != null
+            ? PacketBlocks.getClientSideState(serverBlockState)
+            : null;
+        var oldSound = clientBlockState != null
+            ? clientBlockState.getSoundType().getBreakSound().location().toString()
             : "";
         
         SoundEngine.broadcastIfOverridden(

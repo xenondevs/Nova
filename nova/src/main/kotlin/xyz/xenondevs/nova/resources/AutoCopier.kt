@@ -16,7 +16,7 @@ internal object AutoCopier {
     private val copyDestinations: List<String> by MAIN_CONFIG.entry("resource_pack", "auto_copy")
     
     suspend fun copyToDestinations(id: Key, bin: ByteArray) = withContext(Dispatchers.IO) {
-        val sanitizedName = id.toString().replace(Regex("[:/]"), "_")
+        val sanitizedName = id.asString().replace(Regex("[:/]"), "_")
         for (destination in copyDestinations) {
             try {
                 if (Path(destination).isDirectory()) {
@@ -27,8 +27,8 @@ internal object AutoCopier {
                     destPath.createParentDirectories()
                     destPath.writeBytes(bin)
                 }
-            } catch(e: Exception) {
-                LOGGER.warn("Failed to copy resource pack file '$id' to destination '$destination'.", e)
+            } catch (e: Exception) {
+                LOGGER.warn("Failed to copy resource pack file '${id.asString()}' to destination '$destination'.", e)
             }
         }
     }

@@ -2,11 +2,16 @@ package xyz.xenondevs.nova.util
 
 import java.util.*
 
-// TODO: move to commons
-
 private val FORMATTING_FILTER_REGEX = Regex("§.")
 
 fun String.capitalize() = replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+
+internal fun String.pluralize(): String = when {
+    endsWith("s") -> this
+    endsWith("ch") || endsWith("sh") || endsWith("x") || endsWith("z") -> "${this}es"
+    endsWith("y") && length > 1 && this[length - 2] !in "aeiou" -> dropLast(1) + "ies"
+    else -> "${this}s"
+}
 
 fun String.capitalizeAll(): String {
     if (isEmpty()) return this

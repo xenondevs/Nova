@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.task
 
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.world.block.tileentity.network.node.safelyHandleNetworkUpdate
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.format.NetworkState
 
 internal abstract class AddNodeTask<T : NetworkNode>(
@@ -9,7 +11,7 @@ internal abstract class AddNodeTask<T : NetworkNode>(
     private val updateNodes: Boolean
 ) : ProtectedNodeNetworkTask(state) {
     
-    override val chunkPos = node.pos.chunkPos
+    override val chunkPos = node.block.chunkPos
     
     protected val nodesToUpdate = HashSet<NetworkNode>()
     
@@ -22,9 +24,9 @@ internal abstract class AddNodeTask<T : NetworkNode>(
         
         if (updateNodes) {
             for (node in nodesToUpdate) {
-                node.handleNetworkUpdate(state)
+                node.safelyHandleNetworkUpdate(state)
             }
-            node.handleNetworkUpdate(state)
+            node.safelyHandleNetworkUpdate(state)
         }
         
         return true

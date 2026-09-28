@@ -1,23 +1,27 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.world.fakeentity.metadata
 
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.network.syncher.EntityDataSerializers
-import xyz.xenondevs.nova.network.PacketIdRegistry
-import xyz.xenondevs.nova.util.RegistryFriendlyByteBuf
+import xyz.xenondevs.nova.network.RegistryFriendlyByteBuf
+import xyz.xenondevs.nova.network.packet.PacketIds
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.fakeentity.FAKE_ENTITY_DEPRECATION
 import xyz.xenondevs.nova.world.item.logic.PacketItems
 import java.util.*
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 abstract class Metadata internal constructor() {
     
     private val entries = ArrayList<MetadataEntry<*>>()
     
     internal fun packDirty(entityId: Int): FriendlyByteBuf {
         val buf = RegistryFriendlyByteBuf()
-        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_SET_ENTITY_DATA)
+        buf.writeVarInt(PacketIds.PLAY_CLIENTBOUND_SET_ENTITY_DATA)
         buf.writeVarInt(entityId)
         
         entries.forEach {
@@ -33,7 +37,7 @@ abstract class Metadata internal constructor() {
     
     internal fun pack(entityId: Int): FriendlyByteBuf {
         val buf = RegistryFriendlyByteBuf()
-        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_SET_ENTITY_DATA)
+        buf.writeVarInt(PacketIds.PLAY_CLIENTBOUND_SET_ENTITY_DATA)
         buf.writeVarInt(entityId)
         
         entries.forEach {
@@ -78,7 +82,7 @@ abstract class Metadata internal constructor() {
     }
     
     internal fun itemStack(index: Int, useName: Boolean, default: BukkitStack? = null): MappedNonNullMetadataEntry<BukkitStack?, MojangStack> {
-        val entry = MappedNonNullMetadataEntry<BukkitStack?, MojangStack>(
+        val entry = MappedNonNullMetadataEntry(
             index, EntityDataSerializers.ITEM_STACK,
             { PacketItems.getClientSideStack(null, it.unwrap().copy(), useName) },
             default

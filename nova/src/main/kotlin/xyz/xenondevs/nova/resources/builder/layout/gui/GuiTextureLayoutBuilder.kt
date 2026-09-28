@@ -9,27 +9,18 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 
 internal class GuiTextureLayout(
     val texture: ResourcePath<ResourceType.Texture>,
-    val alignment: GuiTextureAlignment,
-    val hasInventoryLabel: Boolean
+    val alignment: GuiTextureAlignment
 )
 
 @RegistryElementBuilderDsl
 class GuiTextureLayoutBuilder internal constructor(
     private val namespace: String,
+    private val name: String,
     val resourcePackBuilder: ResourcePackBuilder
 ) {
     
     private var texture: ResourcePath<ResourceType.Texture>? = null
     private var alignment: GuiTextureAlignment? = null
-    private var hasInventoryLabel: Boolean = true
-    
-    /**
-     * Enables or disables the "Inventory" text that is displayed above the player's inventory slots.
-     * Defaults to `true`, meaning the text is shown.
-     */
-    fun inventoryLabel(hasInventoryText: Boolean) {
-        this.hasInventoryLabel = hasInventoryText
-    }
     
     /**
      * Sets the [path] to the gui texture.
@@ -40,6 +31,7 @@ class GuiTextureLayoutBuilder internal constructor(
     
     /**
      * Sets the path to the gui texture.
+     * Defaults to `gui/<gui texture name>`.
      */
     fun path(name: String) {
         this.texture = ResourcePath.of(ResourceType.Texture, name, namespace)
@@ -47,6 +39,7 @@ class GuiTextureLayoutBuilder internal constructor(
     
     /**
      * Configures how the gui texture should be aligned.
+     * Defaults to [GuiTextureAlignment.TopLeft] (chest, no extra offset).
      */
     fun alignment(alignment: GuiTextureAlignment) {
         this.alignment = alignment
@@ -73,9 +66,8 @@ class GuiTextureLayoutBuilder internal constructor(
     
     internal fun build(): GuiTextureLayout =
         GuiTextureLayout(
-            texture ?: throw IllegalStateException("Gui texture path not set"),
-            alignment ?: GuiTextureAlignment.TopLeft(),
-            hasInventoryLabel
+            texture ?: ResourcePath(ResourceType.Texture, namespace, "gui/$name"),
+            alignment ?: GuiTextureAlignment.TopLeft()
         )
     
 }

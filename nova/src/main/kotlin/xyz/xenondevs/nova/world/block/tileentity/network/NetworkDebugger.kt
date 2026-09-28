@@ -5,12 +5,12 @@ import org.bukkit.Bukkit
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
+import xyz.xenondevs.nova.network.sendTo
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.filterInRange
 import xyz.xenondevs.nova.util.particle.color
 import xyz.xenondevs.nova.util.particle.particle
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.util.sendTo
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
@@ -87,7 +87,7 @@ internal object NetworkDebugger {
     
     private fun showNetwork(color: Color, network: Network<*>, players: List<Player>) {
         for ((node, faces) in network.nodes.values) {
-            val receivers = players.filterInRange(node.pos.location, 64.0)
+            val receivers = players.filterInRange(node.block.location, 64.0)
             if (receivers.isEmpty())
                 continue
             
@@ -99,12 +99,12 @@ internal object NetworkDebugger {
     }
     
     private fun showNetworkBridge(bridge: NetworkBridge, color: Color, players: List<Player>) {
-        val particleLocation = bridge.pos.location.add(0.5, 0.5, 0.5)
+        val particleLocation = bridge.block.location.add(0.5, 0.5, 0.5)
         particle(ParticleTypes.DUST, particleLocation) { color(color) }.sendTo(players)
     }
     
     private fun showNetworkEndPoint(endPoint: NetworkEndPoint, face: BlockFace, color: Color, players: List<Player>) {
-        val particleLocation = endPoint.pos.location
+        val particleLocation = endPoint.block.location
             .add(0.5, 0.5, 0.5)
             .advance(face, 0.5)
         particle(ParticleTypes.DUST, particleLocation) { color(color) }.sendTo(players)

@@ -1,29 +1,30 @@
 package xyz.xenondevs.nova.api
 
+import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.World
 import xyz.xenondevs.nova.api.tileentity.TileEntity
-import xyz.xenondevs.nova.world.format.WorldDataManager
-import xyz.xenondevs.nova.world.pos
+import xyz.xenondevs.nova.world.block.novaTileEntities
+import xyz.xenondevs.nova.world.block.novaTileEntity
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
 internal object ApiTileEntityManager : ITileEntityManager {
     
     override fun getTileEntity(location: Location): TileEntity? {
-        return WorldDataManager.getTileEntity(location.pos)?.let(::ApiTileEntityWrapper)
+        return location.block.novaTileEntity?.let(::ApiTileEntityWrapper)
     }
     
     override fun getTileEntities(chunk: Chunk): List<TileEntity> {
-        return WorldDataManager.getTileEntities(chunk.pos).map(::ApiTileEntityWrapper)
+        return chunk.novaTileEntities.map(::ApiTileEntityWrapper)
     }
     
     override fun getTileEntities(world: World): List<TileEntity> {
-        return WorldDataManager.getTileEntities(world).map(::ApiTileEntityWrapper)
+        return world.loadedChunks.flatMap(::getTileEntities)
     }
     
     override fun getTileEntities(): List<TileEntity> {
-        return WorldDataManager.getTileEntities().map(::ApiTileEntityWrapper)
+        return Bukkit.getWorlds().flatMap(::getTileEntities)
     }
     
 }

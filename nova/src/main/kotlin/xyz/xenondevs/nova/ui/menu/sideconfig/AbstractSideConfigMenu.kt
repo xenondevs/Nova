@@ -5,17 +5,17 @@ package xyz.xenondevs.nova.ui.menu.sideconfig
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.commons.collections.after
-import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.commons.provider.MutableProvider
+import xyz.xenondevs.commons.provider.flatten
+import xyz.xenondevs.commons.provider.mutableProvider
+import xyz.xenondevs.invui.dsl.item
+import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.Click
-import xyz.xenondevs.invui.item.notifyWindows
-import xyz.xenondevs.nova.ui.menu.item.AsyncItem
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.playClickSound
-import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
@@ -23,47 +23,33 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
+import xyz.xenondevs.nova.world.chunkPos
+import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 
 abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal constructor(
     protected val endPoint: NetworkEndPoint,
-    protected val networkType: NetworkType<*>,
+    networkType: RegistryEntry.Nova<NetworkType<*>>,
     protected val holder: H
 ) {
     
-    val gui = Gui.empty(9, 3)
+    protected val connectionTypes: CubeFaceMap<MutableProvider<NetworkConnectionType>> =
+        CubeFaceMap { mutableProvider(NetworkConnectionType.NONE) }
     
-    private val configItems = ArrayList<ConfigItem>()
-    internal val connectionConfigItems = enumMap<BlockFace, ArrayList<ConnectionConfigItem>>()
+    protected val networkType by networkType
     
-    open fun initAsync() {
-        configItems.forEach { it.updateAsync() }
-        runTask { configItems.forEach { it.notifyWindows() } }
+    abstract val gui: Gui
+    
+    open fun init(state: NetworkState) {
+        refresh(state)
     }
     
-    private fun getFaceFromSide(blockSide: BlockSide): Pair<BlockSide?, BlockFace> {
-        val facing = (endPoint as? TileEntity)?.blockState?.get(DefaultBlockStateProperties.FACING)
-        return if (facing != null)
-            blockSide to blockSide.getBlockFace(facing)
-        else null to blockSide.getBlockFace(0f)
-    }
-    
-    protected fun getSideName(blockSide: BlockSide?, blockFace: BlockFace): Component {
-        if (blockSide != null) {
-            return Component.text()
-                .color(NamedTextColor.GRAY)
-                .append(Component.translatable("menu.nova.side_config.${blockSide.name.lowercase()}"))
-                .append(Component.text(" ("))
-                .append(Component.translatable("menu.nova.side_config.${blockFace.name.lowercase()}"))
-                .append(Component.text(")"))
-                .build()
-        } else {
-            return Component.translatable("menu.nova.side_config.${blockFace.name.lowercase()}", NamedTextColor.GRAY)
-        }
+    open fun refresh(state: NetworkState) {
+        connectionTypes.forEach { face, type -> type.set(getConnectionType(face)) }
     }
     
     private fun queueCycleConnectionType(face: BlockFace, move: Int) {
-        NetworkManager.queueWrite(endPoint.pos.chunkPos) { state ->
+        NetworkManager.queueWrite(endPoint.block.chunkPos) { state ->
             // cycle connection type
             val allowedTypes = getAllowedConnectionType(face).supertypes
             val currentType = getConnectionType(face)
@@ -73,8 +59,7 @@ abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal construct
             state.handleEndPointAllowedFacesChange(endPoint, networkType, face)
             
             // ui update
-            connectionConfigItems[face]?.forEach(AsyncItem::updateAsync)
-            runTask { connectionConfigItems[face]?.notifyWindows() }
+            refresh(state)
         }
     }
     
@@ -84,54 +69,54 @@ abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal construct
     
     protected abstract fun setConnectionType(face: BlockFace, type: NetworkConnectionType)
     
-    internal inner class ConnectionConfigItem(blockSide: BlockSide) : ConfigItem(blockSide) {
+    protected fun connectionConfigItem(side: BlockSide) = item {
+        val [side, face] = getFaceFromSide(side)
+        val connectionType = connectionTypes[face]
         
-        init {
-            connectionConfigItems.getOrPut(face, ::ArrayList) += this
+        val btnType = connectionType.map { type ->
+            when (type) {
+                NetworkConnectionType.NONE -> DefaultGuiItems.TP_GRAY_BTN
+                NetworkConnectionType.EXTRACT -> DefaultGuiItems.TP_ORANGE_BTN
+                NetworkConnectionType.INSERT -> DefaultGuiItems.TP_BLUE_BTN
+                NetworkConnectionType.BUFFER -> DefaultGuiItems.TP_GREEN_BTN
+            }
+        }.flatten()
+        itemProvider by itemProvider(btnType) {
+            if (side != null) {
+                name by Component.text()
+                    .color(NamedTextColor.GRAY)
+                    .append(Component.translatable("menu.nova.side_config.${side.name.lowercase()}"))
+                    .append(Component.text(" ("))
+                    .append(Component.translatable("menu.nova.side_config.${side.name.lowercase()}"))
+                    .append(Component.text(")"))
+                    .build()
+            } else {
+                name by Component.translatable("menu.nova.side_config.${face.name.lowercase()}", NamedTextColor.GRAY)
+            }
+            lore by connectionType.map { type ->
+                listOf(when (type) {
+                    NetworkConnectionType.NONE -> Component.translatable("menu.nova.side_config.none", NamedTextColor.GRAY)
+                    NetworkConnectionType.EXTRACT -> Component.translatable("menu.nova.side_config.output", NamedTextColor.GOLD)
+                    NetworkConnectionType.INSERT -> Component.translatable("menu.nova.side_config.input", NamedTextColor.AQUA)
+                    NetworkConnectionType.BUFFER -> Component.translatable("menu.nova.side_config.input_output", NamedTextColor.GREEN)
+                })
+            }
         }
         
-        override fun updateAsync() {
-            val connectionType = getConnectionType(face)
-            provider.set(
-                when (connectionType) {
-                    NetworkConnectionType.NONE ->
-                        DefaultGuiItems.GRAY_BTN.createClientsideItemBuilder()
-                            .addLoreLines(Component.translatable("menu.nova.side_config.none", NamedTextColor.GRAY))
-                    
-                    NetworkConnectionType.EXTRACT ->
-                        DefaultGuiItems.ORANGE_BTN.createClientsideItemBuilder()
-                            .addLoreLines(Component.translatable("menu.nova.side_config.output", NamedTextColor.GOLD))
-                    
-                    NetworkConnectionType.INSERT ->
-                        DefaultGuiItems.BLUE_BTN.createClientsideItemBuilder()
-                            .addLoreLines(Component.translatable("menu.nova.side_config.input", NamedTextColor.AQUA))
-                    
-                    NetworkConnectionType.BUFFER ->
-                        DefaultGuiItems.GREEN_BTN.createClientsideItemBuilder()
-                            .addLoreLines(Component.translatable("menu.nova.side_config.input_output", NamedTextColor.GREEN))
-                }.setName(getSideName(blockSide, face))
-            )
-        }
-        
-        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
+        onClick {
             player.playClickSound()
             queueCycleConnectionType(face, if (clickType.isLeftClick) 1 else -1)
         }
-        
     }
     
-    internal abstract inner class ConfigItem(blockSide: BlockSide) : AsyncItem() {
-        
-        protected val blockSide: BlockSide?
-        protected val face: BlockFace
-        
-        init {
-            val pair = getFaceFromSide(blockSide)
-            this.blockSide = pair.first
-            this.face = pair.second
-            configItems += this
+    protected fun getFaceFromSide(blockSide: BlockSide): Pair<BlockSide?, BlockFace> {
+        val blockState = (endPoint as? TileEntity)?.blockState
+        val facing = blockState?.let { state ->
+            DefaultBlockStateProperties.FACING_PROPERTIES.firstNotNullOfOrNull { state[it] }
         }
-        
+        return if (facing != null)
+            blockSide to blockSide.getBlockFace(facing)
+        else null to blockSide.getBlockFace(0f)
     }
     
 }

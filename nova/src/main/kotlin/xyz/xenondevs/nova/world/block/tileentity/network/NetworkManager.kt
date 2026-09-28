@@ -3,8 +3,9 @@ package xyz.xenondevs.nova.world.block.tileentity.network
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import org.bukkit.Bukkit
+import org.bukkit.Chunk
 import org.bukkit.World
-import org.bukkit.block.BlockFace
+import org.bukkit.block.Block
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -17,9 +18,10 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.util.CubeFaceSet
+import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
@@ -43,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [DefaultNetworkTypes::class, ProtectionManager::class]
+    runAfter = [DefaultNetworkTypes::class, ProtectionManager::class]
 )
 object NetworkManager : Listener {
     
@@ -69,7 +71,7 @@ object NetworkManager : Listener {
     private fun runConfigurators() {
         for (world in Bukkit.getWorlds()) {
             for (chunk in world.loadedChunks) {
-                queueLoadChunk(chunk.pos)
+                queueLoadChunk(chunk)
             }
         }
         
@@ -79,7 +81,7 @@ object NetworkManager : Listener {
     
     @DisableFun(dispatcher = Dispatcher.ASYNC)
     private suspend fun disable() {
-        for ((_, configurator) in configurators) {
+        for ([_, configurator] in configurators) {
             configurator.awaitShutdown()
         }
         SUPERVISOR.cancel("NetworkManager disabled")
@@ -129,7 +131,7 @@ object NetworkManager : Listener {
      *
      * @throws IllegalArgumentException If [bridge] also implements [NetworkEndPoint].
      */
-    fun queueAddBridge(bridge: NetworkBridge, supportedNetworkTypes: Set<NetworkType<*>>, bridgeFaces: Set<BlockFace>, updateNodes: Boolean = true) =
+    fun queueAddBridge(bridge: NetworkBridge, supportedNetworkTypes: Set<NetworkType<*>>, bridgeFaces: CubeFaceSet, updateNodes: Boolean = true) =
         queueTask(bridge) { AddBridgeTask(it, bridge, supportedNetworkTypes, bridgeFaces, updateNodes) }
     
     /**
@@ -153,10 +155,12 @@ object NetworkManager : Listener {
         queueTask(bridge) { RemoveBridgeTask(it, bridge, updateNodes) }
     
     /**
-     * Queues a network task to load the chunk at [pos].
+     * Queues a network task to load [chunk].
      */
-    private fun queueLoadChunk(pos: ChunkPos) =
-        queueTask(pos.world!!) { LoadChunkTask(it, pos) }
+    private fun queueLoadChunk(chunk: Chunk) {
+        val snapshot = getNodes(chunk)
+        queueTask(chunk.world) { LoadChunkTask(it, chunk.pos, snapshot) }
+    }
     
     /**
      * Queues a network task to unload the chunk at [pos].
@@ -173,7 +177,7 @@ object NetworkManager : Listener {
         if (node is NetworkBridge && node is NetworkEndPoint)
             throw IllegalArgumentException("Types that inherit from both NetworkBridge and NetworkEndPoint are not allowed")
         
-        queueTask(node.pos.world, makeTask)
+        queueTask(node.block.world, makeTask)
     }
     
     /**
@@ -187,40 +191,36 @@ object NetworkManager : Listener {
     
     /**
      * Registers a new [NetworkNodeProvider], which will be used to discover
-     * [NetworkNodes][NetworkNode] during chunk load and end point / bridge add tasks.
+     * [NetworkNodes][NetworkNode] during chunk load.
      */
     fun registerNetworkNodeProvider(provider: NetworkNodeProvider) {
         nodeProviders += provider
     }
     
     /**
-     * Gets all [NetworkNodes][NetworkNode] in the chunk at [pos]
+     * Creates a snapshot of all [NetworkNodes][NetworkNode] and unknown blocks in [chunk]
      * using the registered [NetworkNodeProviders][NetworkNodeProvider].
+     *
+     * Unrelated to [NetworkState].
+     * Must be called from the server thread.
      */
-    suspend fun getNodes(pos: ChunkPos): List<NetworkNode> {
-        return nodeProviders.flatMap { it.getNodes(pos) }
+    fun getNodes(chunk: Chunk): NetworkNodeSnapshot {
+        checkServerThread()
+        return nodeProviders.fold(NetworkNodeSnapshot.EMPTY) { snapshot, provider ->
+            snapshot + provider.getNodes(chunk)
+        }
     }
     
     /**
      * Gets the [NetworkNode] at the specified block [pos] using the registered
-     * [NetworkNodeProviders][NetworkNodeProvider] or null if there is none.
+     * [NetworkNodeProviders][NetworkNodeProvider], or null if there is none.
+     *
+     * Unrelated to [NetworkState].
+     * Must be called from the server thread.
      */
-    suspend fun getNode(pos: BlockPos): NetworkNode? {
-        for (nodeProvider in nodeProviders) {
-            val node = nodeProvider.getNode(pos)
-            if (node != null)
-                return node
-        }
-        
-        return null
-    }
-    
-    /**
-     * Checks whether it is [unknown][NetworkNodeProvider.isUnknown] if the block at [pos] is a [NetworkNode]
-     * using the registered [NetworkNodeProviders][NetworkNodeProvider].
-     */
-    suspend fun isUnknown(pos: BlockPos): Boolean {
-        return nodeProviders.any { it.isUnknown(pos) }
+    fun getNode(block: Block): NetworkNode? {
+        checkServerThread()
+        return nodeProviders.firstNotNullOfOrNull { it.getNode(block) }
     }
     
     @EventHandler
@@ -230,7 +230,7 @@ object NetworkManager : Listener {
     
     @EventHandler(priority = EventPriority.LOW) // WorldDataManager is LOWEST
     private fun handleChunkLoad(event: ChunkLoadEvent) {
-        queueLoadChunk(event.chunk.pos)
+        queueLoadChunk(event.chunk)
     }
     
     @EventHandler

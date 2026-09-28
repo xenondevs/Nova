@@ -77,7 +77,7 @@ internal class Short2ByteMapCompactIntStorage(override val map: Short2ByteMap) :
     
     override fun write(writer: ByteWriter) {
         writer.writeVarInt(map.size)
-        for ((index, value) in map.short2ByteEntrySet()) {
+        for ([index, value] in map.short2ByteEntrySet()) {
             writer.writeShort(index)
             writer.writeByte(value)
         }
@@ -103,7 +103,7 @@ internal class Short2ShortMapCompactIntStorage(override val map: Short2ShortMap)
     
     override fun write(writer: ByteWriter) {
         writer.writeVarInt(map.size)
-        for ((index, value) in map.short2ShortEntrySet()) {
+        for ([index, value] in map.short2ShortEntrySet()) {
             writer.writeShort(index)
             writer.writeShort(value)
         }

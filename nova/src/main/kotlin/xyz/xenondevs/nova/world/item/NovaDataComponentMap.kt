@@ -4,7 +4,7 @@ import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentType
 import xyz.xenondevs.nova.LOGGER
 
-// this delegating structure is necessary to allow config reloading
+// this delegating structure is necessary to allow config- and registry reloading
 internal class NovaDataComponentMap(private val novaItem: NovaItem) : DataComponentMap {
     
     override fun <T : Any> get(type: DataComponentType<out T>): T? {
@@ -27,17 +27,9 @@ internal class NovaDataComponentMap(private val novaItem: NovaItem) : DataCompon
         return emptySet()
     }
     
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        
-        other as NovaDataComponentMap
-        
-        return novaItem == other.novaItem
-    }
+    override fun equals(other: Any?): Boolean =
+        this === other || (other is NovaDataComponentMap && novaItem == other.novaItem)
     
-    override fun hashCode(): Int {
-        return novaItem.hashCode()
-    }
+    override fun hashCode(): Int = novaItem.hashCode()
     
 }

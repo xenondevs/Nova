@@ -7,6 +7,7 @@ import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import org.bukkit.attribute.Attribute
+import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -16,43 +17,32 @@ import org.joml.Intersectionf
 import org.joml.Vector2f
 import org.joml.Vector3f
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.network.event.PacketHandler
-import xyz.xenondevs.nova.network.event.PacketListener
-import xyz.xenondevs.nova.network.event.registerPacketListener
-import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
-import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.packetentity.PacketInteraction
+import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.serverLevel
+import xyz.xenondevs.nova.util.toBlock
 import xyz.xenondevs.nova.util.toLocation
-import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.util.toVec3
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.fakeentity.impl.FakeInteraction
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
-import java.util.*
 import org.bukkit.event.block.Action as BlockAction
 
-object HitboxManager : Listener, PacketListener {
+object HitboxManager : Listener {
     
-    private val physicalHitboxes = HashMap<PhysicalHitbox, FakeInteraction>()
-    private val physicalHitboxesById = HashMap<Int, PhysicalHitbox>()
+    private val physicalHitboxes = HashMap<PhysicalHitbox, PacketInteraction>()
     
     private val virtualHitboxes = HashSet<VirtualHitbox>()
-    private val virtualHitboxesByBlock = HashMap<BlockPos, ArrayList<VirtualHitbox>>()
+    private val virtualHitboxesByBlock = HashMap<Block, ArrayList<VirtualHitbox>>()
     
-    private val visualizers = Collections.newSetFromMap<Player>(WeakHashMap())
+    private val visualizers = PlayerMapManager.createSet()
     
     init {
-        registerPacketListener()
         registerEvents()
     }
     
     //<editor-fold desc="visualization", defaultstate="collapsed">
-    // fixme: since there is no distance filtering, the server will crash if there are too many hitboxes
     internal fun toggleVisualizer(player: Player): Boolean {
         return if (player in visualizers) {
             visualizers -= player
@@ -93,21 +83,19 @@ object HitboxManager : Listener, PacketListener {
     }
     
     private fun addPhysicalHitbox(hitbox: PhysicalHitbox) {
-        val fakeInteraction = hitbox.createInteractionEntity()
+        val fakeInteraction = hitbox.createInteractionEntity().apply { spawn() }
         physicalHitboxes[hitbox] = fakeInteraction
-        physicalHitboxesById[fakeInteraction.entityId] = hitbox
     }
     
     private fun removePhysicalHitbox(hitbox: PhysicalHitbox) {
         val fakeInteraction = physicalHitboxes.remove(hitbox) ?: return
-        fakeInteraction.remove()
-        physicalHitboxesById -= fakeInteraction.entityId
+        fakeInteraction.despawn()
     }
     
     private fun addVirtualHitbox(hitbox: VirtualHitbox) {
-        for (blockPos in hitbox.blocks) {
+        for (block in hitbox.blocks) {
             virtualHitboxes += hitbox
-            virtualHitboxesByBlock.getOrPut(blockPos) { ArrayList(1) } += hitbox
+            virtualHitboxesByBlock.getOrPut(block) { ArrayList(1) } += hitbox
             visualizers.forEach { showVirtualHitbox(hitbox, it) }
         }
     }
@@ -115,34 +103,14 @@ object HitboxManager : Listener, PacketListener {
     private fun removeVirtualHitbox(hitbox: VirtualHitbox) {
         virtualHitboxes -= hitbox
         visualizers.forEach { hideVirtualHitbox(hitbox, it) }
-        for (blockPos in hitbox.blocks) {
-            val hitboxes = virtualHitboxesByBlock[blockPos] ?: continue
+        for (block in hitbox.blocks) {
+            val hitboxes = virtualHitboxesByBlock[block] ?: continue
             if (hitboxes.size > 1) {
                 hitboxes -= hitbox
             } else {
-                virtualHitboxesByBlock -= blockPos
+                virtualHitboxesByBlock -= block
             }
         }
-    }
-    
-    @PacketHandler
-    private fun handleEntityInteractPacket(event: ServerboundInteractPacketEvent) {
-        val hitbox = physicalHitboxesById[event.entityId] ?: return
-        event.isCancelled = true
-        
-        runTask {
-            val player = event.player
-            val location = event.location.toVector3f()
-            hitbox.rightClickHandlers.forEach { it.invoke(player, location) }
-        }
-    }
-    
-    @PacketHandler
-    private fun handleEntityAttackPacket(event: ServerboundAttackPacketEvent) {
-        val hitbox = physicalHitboxesById[event.entityId]
-            ?: return
-        event.isCancelled = true
-        runTask { hitbox.leftClickHandlers.forEach { it(event.player) } }
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
@@ -165,10 +133,10 @@ object HitboxManager : Listener, PacketListener {
                 wrappedEvent.actionPerformed = true
                 
                 // check protection integrations & invoke handler
-                val (hitbox, relHitLoc) = hitboxResult
+                val [hitbox, relHitLoc] = hitboxResult
                 val clickedBlockPos = hitbox.baseCenter
                     .add(relHitLoc, Vector3f())
-                    .toLocation(player.location.world).pos
+                    .toLocation(player.location.world).block
                 val handlers = if (action.isLeftClick) hitbox.leftClickHandlers else hitbox.rightClickHandlers
                 if (ProtectionManager.canUseBlock(player, event.item, clickedBlockPos)) {
                     handlers.forEach { it.invoke(player, relHitLoc) }
@@ -197,7 +165,7 @@ object HitboxManager : Listener, PacketListener {
         var relHitLoc: Vector3f? = null // hit location relative to hitbox.center
         
         BlockGetter.traverseBlocks(origin, dest, ctx, { _, pos ->
-            val novaPos = pos.toNovaPos(world)
+            val novaPos = pos.toBlock(world)
             
             // check for collision with vanilla hitboxes
             val blockState: BlockState = level.getBlockState(pos)

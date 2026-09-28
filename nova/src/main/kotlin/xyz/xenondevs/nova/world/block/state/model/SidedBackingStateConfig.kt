@@ -1,38 +1,36 @@
 package xyz.xenondevs.nova.world.block.state.model
 
-import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.collections.enumSet
-import xyz.xenondevs.commons.collections.mapToBooleanArray
-import xyz.xenondevs.nova.util.MathUtils
+import org.bukkit.block.BlockType
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.util.CubeFaceSet
+import xyz.xenondevs.nova.util.nmsBlock
 
-private val POSSIBLE_FACES = arrayOf(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN)
-
-internal abstract class SidedBackingStateConfig(val faces: Set<BlockFace>, block: Block) : BackingStateConfig() {
+internal abstract class SidedBackingStateConfig(
+    val faces: CubeFaceSet,
+    override val blockType: RegistryEntry.Paper<BlockType>
+) : BackingStateConfig() {
     
-    override val id = getIdOf(faces)
+    override val id = faces.data.toInt()
     override val waterlogged = false
-    override val variantMap = POSSIBLE_FACES.associate { it.name.lowercase() to (it in faces).toString() }
-    override val vanillaBlockState: BlockState = block.defaultBlockState()
-        .setValue(BlockStateProperties.NORTH, BlockFace.NORTH in faces)
-        .setValue(BlockStateProperties.EAST, BlockFace.EAST in faces)
-        .setValue(BlockStateProperties.SOUTH, BlockFace.SOUTH in faces)
-        .setValue(BlockStateProperties.WEST, BlockFace.WEST in faces)
-        .setValue(BlockStateProperties.UP, BlockFace.UP in faces)
-        .setValue(BlockStateProperties.DOWN, BlockFace.DOWN in faces)
-    
-    companion object {
-        fun getIdOf(faces: Collection<BlockFace>): Int {
-            return MathUtils.convertBooleanArrayToInt(POSSIBLE_FACES.mapToBooleanArray { it in faces })
-        }
+    override val variantMap = CubeFaceSet.ALL.map { it.name.lowercase() to (it in faces).toString() }.toMap()
+    override val vanillaBlockState: BlockState by blockType.map {
+        it.nmsBlock.defaultBlockState()
+            .setValue(BlockStateProperties.NORTH, BlockFace.NORTH in faces)
+            .setValue(BlockStateProperties.EAST, BlockFace.EAST in faces)
+            .setValue(BlockStateProperties.SOUTH, BlockFace.SOUTH in faces)
+            .setValue(BlockStateProperties.WEST, BlockFace.WEST in faces)
+            .setValue(BlockStateProperties.UP, BlockFace.UP in faces)
+            .setValue(BlockStateProperties.DOWN, BlockFace.DOWN in faces)
     }
+    override val maskedBlockState: BlockState by blockType.map { it.nmsBlock.defaultBlockState }
     
 }
 
 internal abstract class SidedBackingStateConfigType<T : SidedBackingStateConfig>(
-    private val constructor: (Set<BlockFace>) -> T,
+    private val constructor: (CubeFaceSet) -> T,
     fileName: String
 ) : DefaultingBackingStateConfigType<T>(63, fileName) {
     
@@ -45,21 +43,15 @@ internal abstract class SidedBackingStateConfigType<T : SidedBackingStateConfig>
         if (waterlogged)
             throw UnsupportedOperationException("${this.javaClass.simpleName} cannot be waterlogged")
         
-        var i = id
-        val faces = enumSet<BlockFace>()
-        repeat(POSSIBLE_FACES.size) {
-            if (i and 1 == 1)
-                faces += POSSIBLE_FACES[POSSIBLE_FACES.lastIndex - it]
-            
-            i = i shr 1
-        }
-        
-        return constructor(faces)
+        return constructor(CubeFaceSet(id))
     }
     
     final override fun of(properties: Map<String, String>): T {
-        val faces = properties.entries.mapNotNullTo(enumSet()) { (face, enabled) ->
-            BlockFace.valueOf(face.uppercase()).takeIf { enabled.toBoolean() }
+        var faces = CubeFaceSet.NONE
+        for ([faceName, enabled] in properties) {
+            val face = BlockFace.valueOf(faceName.uppercase())
+            if (enabled.toBoolean())
+                faces += face
         }
         
         return constructor(faces)

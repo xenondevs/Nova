@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.util
 
+import xyz.xenondevs.nova.world.*
+
 import com.google.common.base.Preconditions
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
@@ -21,6 +23,7 @@ import xyz.xenondevs.commons.collections.enumSetOf
 import xyz.xenondevs.nova.util.item.isTraversable
 import xyz.xenondevs.nova.util.particle.ParticleBuilder
 import xyz.xenondevs.nova.util.particle.color
+import xyz.xenondevs.nova.world.block.blockType
 import java.awt.Color
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -266,7 +269,7 @@ fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Loca
     val location = clone()
     if (!countSelf) location.y -= 1
     while (location.y >= (world?.minHeight ?: -64)) {
-        val type = location.block.type
+        val type = location.block.blockType
         if (!type.isAir && (!requiresSolid || type.isSolid)) return location
         location.y -= 1
     }
@@ -317,7 +320,7 @@ fun Location.getRectangle(to: Location, omitCorners: Boolean): Map<Axis, List<Lo
 inline fun Location.fullCuboidTo(to: Location, run: (Location) -> Boolean) {
     Preconditions.checkArgument(world != null && to.world == world)
     
-    val (min, max) = LocationUtils.sort(this, to)
+    val [min, max] = LocationUtils.sort(this, to)
     for (x in min.blockX..max.blockX) {
         for (y in min.blockY..max.blockY) {
             for (z in min.blockZ..max.blockZ) {
@@ -375,7 +378,7 @@ fun Location.getFullCuboid(other: Location): List<Location> {
     Preconditions.checkArgument(world != null && other.world == world)
     
     val list = ArrayList<Location>()
-    val (min, max) = LocationUtils.sort(this, other)
+    val [min, max] = LocationUtils.sort(this, other)
     for (x in min.blockX..max.blockX) {
         for (y in min.blockY..max.blockY) {
             for (z in min.blockZ..max.blockZ) {

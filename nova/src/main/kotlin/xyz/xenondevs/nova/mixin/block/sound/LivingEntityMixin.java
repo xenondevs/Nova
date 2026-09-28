@@ -1,40 +1,54 @@
 package xyz.xenondevs.nova.mixin.block.sound;
 
-import net.minecraft.util.Mth;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import xyz.xenondevs.nova.util.BlockUtilsKt;
-import xyz.xenondevs.nova.util.item.MaterialUtilsKt;
-import xyz.xenondevs.nova.world.BlockPos;
+import org.spongepowered.asm.mixin.injection.At;
+import xyz.xenondevs.nova.world.block.NovaBlock;
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine;
 
 @Mixin(LivingEntity.class)
 abstract class LivingEntityMixin {
     
-    @SuppressWarnings({"OverwriteAuthorRequired", "resource", "removal"})
-    @Overwrite
-    protected void playBlockFallSound() {
-        var entity = (LivingEntity) (Object) this;
-        if (entity.isSilent())
+    @WrapOperation(
+        method = "playBlockFallSound",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/LivingEntity;playSound(Lnet/minecraft/sounds/SoundEvent;FF)V"
+        )
+    )
+    private void playBlockFallSound(
+        LivingEntity entity,
+        SoundEvent sound,
+        float volume,
+        float pitch,
+        Operation<Void> original,
+        @Local(name = "state") BlockState state
+    ) {
+        if (!(entity instanceof Player player)) {
+            original.call(entity, sound, volume, pitch);
             return;
+        }
         
-        int x = Mth.floor(entity.getX());
-        int y = Mth.floor(entity.getY() - 0.2f);
-        int z = Mth.floor(entity.getZ());
+        var clientsideState = state;
+        if (state.getBlock() instanceof NovaBlock block) {
+            var replacement = block.getClientsideBlockStates().get(state);
+            if (replacement != null)
+                clientsideState = replacement;
+        }
         
-        var novaPos = new BlockPos(entity.level().getWorld(), x, y, z);
-        var block = novaPos.getBlock();
-        if (block.getType().isAir())
-            return;
-        
-        var soundGroup = BlockUtilsKt.getNovaSoundGroup(block);
-        if (soundGroup == null)
-            return;
-        
-        var newSound = soundGroup.getFallSound();
-        var oldSound = MaterialUtilsKt.getSoundGroup(block.getType()).getFallSound().getKey().value();
-        SoundEngine.broadcast(entity, oldSound, newSound, soundGroup.getFallVolume(), soundGroup.getFallPitch());
+        SoundEngine.broadcast(
+            player,
+            clientsideState.getSoundType().getFallSound(),
+            sound,
+            volume,
+            pitch
+        );
     }
     
 }

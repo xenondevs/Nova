@@ -10,7 +10,7 @@ internal class FluidDistributor(
 ) {
     
     private val fluidContainers: Set<NetworkedFluidContainer> = HashSet<NetworkedFluidContainer>().also {
-        priorityLevels.forEach { (consumers, providers, buffers) ->
+        priorityLevels.forEach { [consumers, providers, buffers] ->
             it += consumers
             it += providers
             it += buffers
@@ -28,7 +28,7 @@ internal class FluidDistributor(
         var transfersLeft = transferAmount
         
         while (true) {
-            val (consumersInScope, providersInScope, buffersInScope) = priorityLevels[priority]
+            val [consumersInScope, providersInScope, buffersInScope] = priorityLevels[priority]
             
             transfersLeft = distributeInScope(
                 transfersLeft,
@@ -77,8 +77,6 @@ internal class FluidDistributor(
                 else providers += buffersInScope
                 
                 availableTransfers -= distributeBetween(availableTransfers, type, consumers, providers)
-                
-                // TODO: balance buffers?
             }
         }
         

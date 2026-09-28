@@ -7,7 +7,6 @@ import org.joml.Vector4dc
 import org.joml.primitives.AABBd
 import org.joml.primitives.AABBdc
 import xyz.xenondevs.nova.resources.builder.model.Model
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
@@ -62,16 +61,6 @@ internal fun Vector3d.round(decimalPlaces: Int): Vector3d {
 
 internal fun max(a: Vector3d, b: Vector3d): Vector3d {
     return Vector3d(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z))
-}
-
-internal fun AtomicInteger.decrementIfGreaterThanZero(): Boolean {
-    while (true) {
-        val current = get()
-        if (current <= 0)
-            return false
-        if (compareAndSet(current, current - 1))
-            return true
-    }
 }
 
 /**

@@ -1,29 +1,31 @@
 package xyz.xenondevs.nova.util
 
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Namespaced
 import org.bukkit.NamespacedKey
-import org.bukkit.plugin.Plugin
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.addon.id
+
+internal fun parseKey(string: String, defaultNamespace: Namespaced): Key {
+    val separatorIndex = string.indexOf(Key.DEFAULT_SEPARATOR)
+    val namespace = if (separatorIndex >= 1) string.substring(0, separatorIndex) else defaultNamespace.namespace()
+    val value = if (separatorIndex >= 0) string.substring(separatorIndex + 1) else string
+    return Key.key(namespace, value)
+}
 
 /**
- * Creates a new [NamespacedKey] using the [addon's][addon] [id][Addon.id] as the namespace and [key].
+ * Creates a new [NamespacedKey] using the [addon's][addon] [namespace][Addon.namespace] as the namespace and [key].
  */
 fun NamespacedKey(addon: Addon, key: String): NamespacedKey =
-    NamespacedKey(addon.id, key)
+    NamespacedKey(addon.namespace(), key)
+
+internal fun novaKey(value: String) = NamespacedKey("nova", value)
 
 /**
- * Creates a new [Key] using the [plugin's][plugin] lowercase [name][Plugin.getName]
- * as the namespace and [value].
+ * Creates a new [Key] using the [addon's][addon] [namespace][Addon.namespace] as the namespace and [value].
  */
-fun Key(plugin: Plugin, value: String): Key =
-    Key.key(plugin.name.lowercase(), value)
-
-/**
- * Creates a new [Key] using the [addon's][addon] [id][Addon.id] as the namespace and [value].
- */
+@Deprecated("Can use built-in Key factory function", ReplaceWith("Key.key(addon, value)", "net.kyori.adventure.key.Key"))
 fun Key(addon: Addon, value: String): Key =
-    Key.key(addon.id, value)
+    Key.key(addon.namespace(), value)
 
 /**
  * Converts this [Key] to a [NamespacedKey].

@@ -2,17 +2,21 @@ package xyz.xenondevs.nova.ui.menu.item
 
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.itemProvider
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
 /**
- * An ui item for visualizing regions via [VisualRegion].
+ * A [UI Item][Item] for visualizing regions via [VisualRegion].
  *
  * @param regionUuid the [UUID] of the region to visualize
  * @param getRegion a function to receive the [Region]
@@ -20,12 +24,25 @@ import java.util.*
 class VisualizeRegionItem(
     private val regionUuid: UUID,
     private val getRegion: () -> Region,
+    private val on: Provider<ItemProvider> = DefaultGuiItems.AREA_BTN_ON.itemProvider,
+    private val off: Provider<ItemProvider> = DefaultGuiItems.AREA_BTN_OFF.itemProvider
 ) : AbstractItem() {
+    
+    constructor(
+        regionUuid: UUID,
+        getRegion: () -> Region,
+        on: ItemProvider,
+        off: ItemProvider
+    ) : this(regionUuid, getRegion, provider(on), provider(off))
+    
+    init {
+        on.observeWeak(this) { thisRef -> thisRef.notifyWindows() }
+        off.observeWeak(this) { thisRef -> thisRef.notifyWindows() }
+    }
     
     override fun getItemProvider(player: Player): ItemProvider {
         val visible = VisualRegion.isVisible(player, regionUuid)
-        return if (visible) DefaultGuiItems.AREA_BTN_ON.clientsideProvider
-        else DefaultGuiItems.AREA_BTN_OFF.clientsideProvider
+        return if (visible) on.get() else off.get()
     }
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) {

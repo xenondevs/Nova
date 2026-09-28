@@ -54,13 +54,6 @@ resource_pack:
     # Possible values: "note_block", "mushroom_block", "leaves", "tripwire_unattached", "tripwire_attached"
     disabled_backing_state_categories: [ ]
 
-# The render distance for fake (packet-based) entities from Nova, in chunks.
-# Note that the render distance is also limited by the entity render distance of the client.
-entity_render_distance:
-  min: 1
-  max: 6
-  default: 4
-
 overlay:
   actionbar:
     # Enable / disable all action bar overlays.
@@ -104,7 +97,7 @@ waila:
   pos_update_interval: 1
   # The interval for updating the overlay, regardless if the player is still looking at the same block.
   # Updating the overlay under these circumstances is still required for displaying the tool matching, energy, etc. properly.
-  data_update_interval: 5
+  data_update_interval: 1
   # A list of namespaced ids representing the blocks that should not be shown in WAILA.
   # Allows wildcard patterns, e.g. "minecraft:*_ore" or "minecraft:*"
   blacklisted_blocks: [ ]
@@ -168,19 +161,23 @@ performance:
 # If metric prefixes should be used to display energy and fluids (e.g. kJ, MJ, GJ or B, kB, MB)
 use_metric_prefixes: false
 
+# Responsible for the messages in the console / chat notifying you about Nova- and addon updates.
 update_reminder:
   # If update reminders should be shown.
   enabled: true
   # The amount of ticks passed between update checks.
   interval: 12000
 
+# Debug settings, intended for development with Nova and problem-solving. Use with caution.
 debug:
   # The chunk reload watcher will print stack traces if repeated chunk loads and unloads are detected.
   watch_chunk_reloads: false
   # If other plugins should be allowed to overwrite the results of Nova recipes.
   allow_craft_result_overwrite: false
   # A list of pack tasks that should be skipped during resource pack generation
-  skip_pack_tasks: []
+  skip_pack_tasks: [ ]
+  # A map of addon id to a directory path on the default file system that should be used to override the asset pack (in-jar asset directory).
+  asset_pack_overrides: { }
   # Debug logging options
   logging:
     # Logs initializer runnable calls

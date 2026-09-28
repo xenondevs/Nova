@@ -2,6 +2,8 @@
 
 package xyz.xenondevs.nova.resources.builder.layout.item
 
+import org.joml.Matrix4f
+import org.joml.Matrix4fc
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -49,6 +51,12 @@ class CompositeItemModelBuilder<S : ModelSelectorScope> internal constructor(
      */
     var models: ItemModelsCollection<S> = ItemModelsCollection(selectAndBuild)
     
-    internal fun build() = ItemModel.Composite(models.models)
+    /**
+     * An additional transformationation matrix that is applied to the composite model on top of the
+     * transformationations defined in the contained [models].
+     */
+    var transformation: Matrix4fc = Matrix4f()
+    
+    internal fun build() = ItemModel.Composite(models.models, transformation)
     
 }

@@ -6,59 +6,41 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerQuitEvent
-import xyz.xenondevs.nova.serialization.persistentdata.get
-import xyz.xenondevs.nova.serialization.persistentdata.set
+import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.registerEvents
 
-private val ADVANCED_TOOLTIPS_KEY = NamespacedKey("nova", "advancedtooltipstype")
+private val ADVANCED_TOOLTIPS_KEY = NamespacedKey("nova", "has_advanced_tooltips")
 
 internal object AdvancedTooltips : Listener {
     
-    private val players = HashMap<Player, Type>()
+    private val players = PlayerMapManager.createConcurrentSet()
     
     init {
         registerEvents()
         Bukkit.getOnlinePlayers().forEach(AdvancedTooltips::loadPlayer)
     }
     
-    fun setType(player: Player, type: Type): Boolean {
-        val dataContainer = player.persistentDataContainer
-        val current = players[player] ?: Type.OFF
-        
-        if (current == type)
-            return false
-        
-        players[player] = type
-        dataContainer.set(ADVANCED_TOOLTIPS_KEY, type)
-        
-        return true
+    operator fun set(player: Player, state: Boolean): Boolean {
+        player.persistentDataContainer[ADVANCED_TOOLTIPS_KEY, PersistentDataType.BOOLEAN] = state
+        return if (state) {
+            players.add(player)
+        } else {
+            players.remove(player)
+        }
     }
     
-    fun hasNovaTooltips(player: Player): Boolean =
-        players[player]?.includesNova == true
-    
-    fun hasVanillaTooltips(player: Player): Boolean =
-        players[player]?.includesVanilla == true
-    
-    private fun loadPlayer(player: Player) {
-        players[player] = player.persistentDataContainer.get(ADVANCED_TOOLTIPS_KEY) ?: Type.OFF
-    }
+    operator fun get(player: Player): Boolean =
+        player in players
     
     @EventHandler
     private fun handleJoin(event: PlayerJoinEvent) {
         loadPlayer(event.player)
     }
     
-    @EventHandler
-    private fun handleQuit(event: PlayerQuitEvent) {
-        players -= event.player
-    }
-    
-    enum class Type(val includesNova: Boolean, val includesVanilla: Boolean) {
-        OFF(false, false),
-        NOVA(true, false),
-        ALL(true, true)
+    private fun loadPlayer(player: Player) {
+        if (player.persistentDataContainer[ADVANCED_TOOLTIPS_KEY, PersistentDataType.BOOLEAN] == true)
+            players += player
     }
     
 }

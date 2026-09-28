@@ -17,7 +17,7 @@ internal fun googleToKotlinxJson(element: com.google.gson.JsonElement): JsonElem
         }
         
         is com.google.gson.JsonArray -> JsonArray(element.map(::googleToKotlinxJson))
-        is com.google.gson.JsonObject -> JsonObject(element.asMap().mapValues { (_, value) -> googleToKotlinxJson(value) })
+        is com.google.gson.JsonObject -> JsonObject(element.asMap().mapValues { [_, value] -> googleToKotlinxJson(value) })
         else -> throw UnsupportedOperationException("Unsupported JsonElement type: ${element.javaClass.name}")
     }
 }
