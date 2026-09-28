@@ -64,7 +64,7 @@ mockbukkit = { module = "org.mockbukkit.mockbukkit:mockbukkit-v26.1.2", version 
 mockk = { group = "io.mockk", name = "mockk", version = "1.14.9" }
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version = "2.0.17" }
-snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version = "3.0.1" }
+snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version = "3.1.1" }
 zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.7-20" }
 
 [bundles]
