@@ -133,7 +133,7 @@ internal object LegacyRegionFileConverter {
         try {
             // process chunk unload now to prevent OOM
             val manager = level.`moonrise$getChunkTaskScheduler`().chunkHolderManager
-            manager.processTicketUpdates()
+            manager.tick() // expire temporary chunk tickets
             var previousRetained = Int.MAX_VALUE
             while (true) {
                 val retained = manager.chunkHolders.count { it.currentChunk != null }
