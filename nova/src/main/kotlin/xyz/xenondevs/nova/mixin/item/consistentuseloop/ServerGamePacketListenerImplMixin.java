@@ -44,6 +44,9 @@ import xyz.xenondevs.nova.util.MixinContext;
 ///
 /// Each of these steps is sent as a separate packet to the server. However, if the client predicts an action
 /// to occur (i.e. InteractionResult.Success or InteractionResult.Fail), it will not send the subsequent packets.
+/// (Minecraft is inconsistent regarding InteractionResult.Fail: it only stops the use-loop for blocks.
+/// Entity and plain item use treats it like InteractionResult.Pass. The consistent-use-loop mirrors this behavior.)
+/// 
 /// This then leads to stuff like PlayerInteractEvent not being fired for the off-hand, even though the main-hand
 /// event was canceled or PlayerInteractEvent being fired for the off-hand even though an action was performed with
 /// the main hand, but the client did not predict it.
@@ -54,8 +57,8 @@ import xyz.xenondevs.nova.util.MixinContext;
 /// This is done the following way:
 ///
 /// Relevant incoming packets are filtered in a "rememberClickInitiationOrSkip" phase.
-/// If it is the first packet of this click loop, it is remembered and processed normally. If the outcome is
-/// InteractionResult.Pass, the next packet is injected in the "maybeContinueClickLoop" phase.
+/// If it is the first packet of this click loop, it is remembered and processed normally. If the outcome allows
+/// the loop to continue according to the rules above, the next packet is injected in the "maybeContinueClickLoop" phase.
 /// All other incoming packets from the client are discarded until the client tick ends, after which the next click
 /// loop packet will be interpreted as the new click loop initiation packet again.
 ///
@@ -106,12 +109,12 @@ abstract class ServerGamePacketListenerImplMixin {
         ServerPlayerGameMode gameMode,
         ServerPlayer player,
         Level level,
-        ItemStack itemInHand,
+        ItemStack itemStack,
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        var result = gameMode.useItemOn(player, level, itemInHand, hand, hitResult);
-        if (!(result instanceof InteractionResult.Pass))
+        var result = gameMode.useItemOn(player, level, itemStack, hand, hitResult);
+        if (result instanceof InteractionResult.Success || result instanceof InteractionResult.Fail)
             nova$stopClickLoop = true;
         return result;
     }
@@ -165,12 +168,12 @@ abstract class ServerGamePacketListenerImplMixin {
         Entity entity,
         InteractionHand hand,
         Vec3 loc,
-        @Local(argsOnly = true) ServerboundInteractPacket packet
+        @Local(argsOnly = true, name = "packet") ServerboundInteractPacket packet
     ) {
         var result = ScopedValue
             .where(MixinContext.IS_USING_SECONDARY_ACTION, packet.usingSecondaryAction())
             .call(() -> player.interactOn(entity, hand, loc));
-        if (!(result instanceof InteractionResult.Pass))
+        if (result instanceof InteractionResult.Success)
             nova$stopClickLoop = true;
         return result;
     }
@@ -239,12 +242,12 @@ abstract class ServerGamePacketListenerImplMixin {
         ServerPlayerGameMode gameMode,
         ServerPlayer player,
         Level level,
-        ItemStack itemInHand,
+        ItemStack itemStack,
         InteractionHand hand
     ) {
-        var result = gameMode.useItem(player, level, itemInHand, hand);
+        var result = gameMode.useItem(player, level, itemStack, hand);
         // since UseItem for off-hand is handled last, only continue the click loop if main-hand returned Pass
-        if (!(result instanceof InteractionResult.Pass) || hand == InteractionHand.OFF_HAND)
+        if (result instanceof InteractionResult.Success || hand == InteractionHand.OFF_HAND)
             nova$stopClickLoop = true;
         return result;
     }
