@@ -1,11 +1,8 @@
 package xyz.xenondevs.nova.util.data
 
-import io.netty.buffer.Unpooled
-import java.io.File
 import java.io.InputStream
 import java.nio.file.Path
 import java.security.MessageDigest
-import java.util.*
 import kotlin.io.path.inputStream
 
 internal fun MessageDigest.update(ins: InputStream, bufferSize: Int = 4096) {
@@ -30,10 +27,6 @@ internal object HashUtils {
         return file.inputStream().use { getHash(it, algorithm) }
     }
     
-    fun getFileHash(file: File, algorithm: String): ByteArray {
-        return file.inputStream().use { getHash(it, algorithm) }
-    }
-    
     fun getHash(inputStream: InputStream, algorithm: String): ByteArray {
         val md = MessageDigest.getInstance(algorithm)
         var len: Int
@@ -48,12 +41,6 @@ internal object HashUtils {
         val md = MessageDigest.getInstance(algorithm)
         md.update(data)
         return md.digest()
-    }
-    
-    fun getUUID(vararg objects: Any): UUID {
-        val buffer = Unpooled.buffer()
-        objects.forEach { buffer.writeInt(it.hashCode()) }
-        return UUID.nameUUIDFromBytes(buffer.toByteArray())
     }
     
 }
