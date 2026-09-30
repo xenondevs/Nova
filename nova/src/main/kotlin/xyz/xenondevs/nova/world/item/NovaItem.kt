@@ -267,7 +267,7 @@ internal class NovaItem(
     val block: BlockType? by block.flatten()
     
     private val craftRemainder: ItemStackTemplate?
-        by craftingRemainingItem.flatten().map { ItemStackTemplate(it.nmsItem) }
+        by craftingRemainingItem.flatten().map { if (it != ItemType.AIR) ItemStackTemplate(it.nmsItem) else null }
     
     override fun getCraftingRemainder() = craftRemainder
     
