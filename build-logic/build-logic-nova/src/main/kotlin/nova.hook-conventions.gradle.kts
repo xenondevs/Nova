@@ -2,6 +2,7 @@ import org.gradle.accessors.dm.LibrariesForLibs
 
 plugins {
     id("nova.kotlin-conventions")
+    id("nova.annotations-conventions")
 }
 
 val libs = the<LibrariesForLibs>()

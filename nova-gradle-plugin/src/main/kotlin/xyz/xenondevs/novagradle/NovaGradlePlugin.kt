@@ -16,6 +16,10 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import xyz.xenondevs.nova.annotations.AnnotationIndex
+import xyz.xenondevs.nova.annotations.gradle.AnnotationIndexExtension
+import xyz.xenondevs.nova.annotations.gradle.AnnotationIndexPlugin
+import xyz.xenondevs.nova.annotations.gradle.GenerateAnnotationIndex
 import xyz.xenondevs.novagradle.task.AddonExtension
 import xyz.xenondevs.novagradle.task.GenerateLanguageFilesTask
 import xyz.xenondevs.novagradle.task.GenerateWailaTexturesExtension
@@ -47,6 +51,16 @@ internal class NovaGradlePlugin : KotlinCompilerPluginSupportPlugin {
         target.pluginManager.apply("org.jetbrains.kotlin.jvm")
         target.pluginManager.apply("java-library")
         target.pluginManager.apply("xyz.xenondevs.origami")
+        target.pluginManager.apply(AnnotationIndexPlugin::class.java)
+        target.extensions.getByType(AnnotationIndexExtension::class.java).apply {
+            classAnnotations.addAll(
+                "xyz.xenondevs.nova.initialize.Init",
+            )
+            methodAnnotations.addAll(
+                "xyz.xenondevs.nova.initialize.InitFun",
+                "xyz.xenondevs.nova.initialize.DisableFun"
+            )
+        }
         val addonExt = target.extensions.create<AddonExtension>("addon")
         val addonJar = createAddonJar(target, addonExt)
         configureOrigami(target, addonExt, addonJar)
@@ -173,8 +187,10 @@ internal class NovaGradlePlugin : KotlinCompilerPluginSupportPlugin {
             destinationDirectory.set(ext.destination)
             with(project.copySpec {
                 with(ext.input.get())
+                exclude(AnnotationIndex.FILE_NAME)
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             })
+            from(project.tasks.named<GenerateAnnotationIndex>("generateAnnotationIndex").flatMap { it.outputFile })
             from(prepAddonJar.map { it.output })
             from(project.tasks.named<PrepareOrigamiMarkerTask>("_oriPrepareMarker").flatMap { it.jsonOutput })
         }

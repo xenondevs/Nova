@@ -2,11 +2,8 @@ package xyz.xenondevs.nova.initialize
 
 import kotlinx.coroutines.CoroutineDispatcher
 import org.jgrapht.Graph
-import kotlin.reflect.KParameter
-import kotlin.reflect.full.callSuspend
-import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.javaMethod
+import xyz.xenondevs.nova.annotations.AnnotationIndex
+import xyz.xenondevs.nova.annotations.AnnotationValue
 
 internal abstract class Initializable(
     val stage: InternalInitStage,
@@ -98,9 +95,8 @@ internal class InitializableClass(
     
     companion object {
         
-        @Suppress("UNCHECKED_CAST")
-        fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass {
-            val stage = (annotation["stage"] as Array<String>?)?.get(1)
+        fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: AnnotationIndex.Annotation): InitializableClass {
+            val stage = (annotation.arguments["stage"] as AnnotationValue.EnumConstant?)?.name
                 ?.let { enumValueOf<InitStage>(it) }
                 ?: throw IllegalStateException("Init annotation on $clazz does not contain a stage!")
             val [dispatcher, runBefore, runAfter] = readAnnotationCommons(annotation)
@@ -114,9 +110,8 @@ internal class InitializableClass(
             )
         }
         
-        @Suppress("UNCHECKED_CAST")
-        fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass {
-            val stage = (annotation["stage"] as Array<String>?)?.get(1)
+        fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: AnnotationIndex.Annotation): InitializableClass {
+            val stage = (annotation.arguments["stage"] as AnnotationValue.EnumConstant?)?.name
                 ?.let { enumValueOf<InternalInitStage>(it) }
                 ?: throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")
             val [dispatcher, runBefore, runAfter] = readAnnotationCommons(annotation)
@@ -134,7 +129,7 @@ internal class InitializableClass(
 
 internal class InitializableFunction(
     override val initClass: InitializableClass,
-    private val methodName: String,
+    private val method: AnnotationIndex.Method,
     dispatcher: CoroutineDispatcher?,
     runBeforeNames: Set<String>,
     runAfterNames: Set<String>
@@ -146,28 +141,20 @@ internal class InitializableFunction(
 ) {
     
     override suspend fun run() {
-        val clazz = initClass.clazz.kotlin
-        val function = clazz.functions.first {
-            it.javaMethod!!.name == methodName &&
-                it.parameters.size == 1 &&
-                it.parameters[0].kind == KParameter.Kind.INSTANCE
-        }
-        function.isAccessible = true
-        function.callSuspend(clazz.objectInstance)
-        
+        callMethod(initClass.clazz, method)
         completion.complete(Unit)
     }
     
     override fun toString(): String {
-        return initClass.className + "::" + methodName
+        return initClass.className + "::" + method.name
     }
     
     companion object {
         
-        fun fromInitAnnotation(clazz: InitializableClass, methodName: String, annotation: Map<String, Any?>): InitializableFunction {
+        fun fromInitAnnotation(clazz: InitializableClass, method: AnnotationIndex.Method, annotation: AnnotationIndex.Annotation): InitializableFunction {
             val [dispatcher, runBefore, runAfter] = readAnnotationCommons(annotation)
             val func = InitializableFunction(
-                clazz, methodName,
+                clazz, method,
                 dispatcher?.dispatcher ?: clazz.dispatcher,
                 runBefore, runAfter
             )

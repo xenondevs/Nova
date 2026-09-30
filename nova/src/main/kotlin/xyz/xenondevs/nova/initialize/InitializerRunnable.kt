@@ -4,6 +4,12 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import org.jgrapht.Graph
 import org.objectweb.asm.Type
+import xyz.xenondevs.nova.annotations.AnnotationIndex
+import xyz.xenondevs.nova.annotations.AnnotationValue
+import java.lang.invoke.MethodType
+import kotlin.reflect.full.callSuspend
+import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.kotlinFunction
 
 internal sealed class InitializerRunnable<S : InitializerRunnable<S>> {
     
@@ -14,23 +20,27 @@ internal sealed class InitializerRunnable<S : InitializerRunnable<S>> {
     
     abstract suspend fun run()
     
+    protected suspend fun callMethod(clazz: Class<*>, method: AnnotationIndex.Method) {
+        val methodType = MethodType.fromMethodDescriptorString(method.descriptor, clazz.classLoader)
+        val function = clazz.getDeclaredMethod(method.name, *methodType.parameterArray()).kotlinFunction!!
+        function.isAccessible = true
+        function.callSuspend(clazz.kotlin.objectInstance)
+    }
+    
     companion object {
         
-        @Suppress("UNCHECKED_CAST")
-        fun readStrings(name: String, annotation: Map<String, Any?>): HashSet<String> {
-            return (annotation[name] as List<Type>?)
-                ?.mapTo(HashSet()) { it.internalName }
+        fun readStrings(name: String, annotation: AnnotationIndex.Annotation): HashSet<String> {
+            return (annotation.arguments[name] as AnnotationValue.ArrayValue?)?.values
+                ?.mapTo(HashSet()) { Type.getType((it as AnnotationValue.ClassLiteral).descriptor).internalName }
                 ?: HashSet()
         }
         
-        @Suppress("UNCHECKED_CAST")
-        fun readDispatcher(annotation: Map<String, Any?>): Dispatcher? {
-            return (annotation["dispatcher"] as Array<String>?)
-                ?.get(1)
+        fun readDispatcher(annotation: AnnotationIndex.Annotation): Dispatcher? {
+            return (annotation.arguments["dispatcher"] as AnnotationValue.EnumConstant?)?.name
                 ?.let { enumValueOf<Dispatcher>(it) }
         }
         
-        fun readAnnotationCommons(annotation: Map<String, Any?>): Triple<Dispatcher?, HashSet<String>, HashSet<String>> {
+        fun readAnnotationCommons(annotation: AnnotationIndex.Annotation): Triple<Dispatcher?, HashSet<String>, HashSet<String>> {
             val dispatcher = readDispatcher(annotation)
             val runBefore = readStrings("runBefore", annotation)
             val runAfter = readStrings("runAfter", annotation)

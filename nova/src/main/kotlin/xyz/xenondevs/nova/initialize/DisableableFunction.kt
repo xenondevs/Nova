@@ -1,17 +1,13 @@
 package xyz.xenondevs.nova.initialize
 
 import kotlinx.coroutines.CoroutineDispatcher
+import xyz.xenondevs.nova.annotations.AnnotationIndex
 import org.jgrapht.Graph
-import kotlin.reflect.KParameter
-import kotlin.reflect.full.callSuspend
-import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.javaMethod
 
 internal class DisableableFunction(
     private val classLoader: ClassLoader,
     private val className: String,
-    private val methodName: String,
+    private val method: AnnotationIndex.Method,
     override val dispatcher: CoroutineDispatcher?,
     private val runBeforeNames: Set<String>,
     private val runAfterNames: Set<String>
@@ -30,31 +26,24 @@ internal class DisableableFunction(
     }
     
     override suspend fun run() {
-        val clazz = Class.forName(className.replace('/', '.'), true, classLoader).kotlin
-        val function = clazz.functions.first {
-            it.javaMethod!!.name == methodName &&
-                it.parameters.size == 1 &&
-                it.parameters[0].kind == KParameter.Kind.INSTANCE
-        }
-        function.isAccessible = true
-        function.callSuspend(clazz.objectInstance)
-        
+        val clazz = Class.forName(className.replace('/', '.'), true, classLoader)
+        callMethod(clazz, method)
         completion.complete(Unit)
     }
     
     override fun toString(): String {
-        return "${className}::${methodName}"
+        return "${className}::${method.name}"
     }
     
     companion object {
         
         fun fromInitAnnotation(
             classLoader: ClassLoader,
-            className: String, methodName: String,
-            annotation: Map<String, Any?>
+            className: String, method: AnnotationIndex.Method,
+            annotation: AnnotationIndex.Annotation
         ) = DisableableFunction(
             classLoader,
-            className, methodName,
+            className, method,
             (readDispatcher(annotation) ?: Dispatcher.SYNC).dispatcher,
             readStrings("runBefore", annotation),
             readStrings("runAfter", annotation)

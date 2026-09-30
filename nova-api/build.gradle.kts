@@ -1,4 +1,5 @@
 plugins {
+    id("nova.annotations-conventions")
     id("nova.java-conventions")
     id("nova.dokka-conventions")
     id("nova.publish-conventions-java")

@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    implementation("xyz.xenondevs.nova.buildlogic:build-logic-core")
+    implementation("xyz.xenondevs.nova:nova-annotations-gradle-plugin")
     implementation(libs.kotlin.plugin)
     implementation(libs.dokka.plugin)
     implementation(origamiLibs.origami.plugin)

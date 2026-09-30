@@ -15,6 +15,7 @@ import org.bstats.charts.DrilldownPie
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.server.ServerLoadEvent
+import org.objectweb.asm.Type
 import org.jgrapht.Graph
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
@@ -78,42 +79,29 @@ internal object Initializer : Listener {
     private fun collectRunnables(file: Path, classLoader: ClassLoader): Pair<List<Initializable>, List<DisableableFunction>> {
         val initializables = ArrayList<Initializable>()
         val disableables = ArrayList<DisableableFunction>()
-        val initializableClasses = HashMap<String, InitializableClass>()
+        val index = JarUtils.getAnnotationIndex(file)
+        val internalInit = Type.getDescriptor(InternalInit::class.java)
+        val init = Type.getDescriptor(Init::class.java)
+        val initFun = Type.getDescriptor(InitFun::class.java)
+        val disableFun = Type.getDescriptor(DisableFun::class.java)
         
-        val result = JarUtils.findAnnotatedClasses(
-            file,
-            listOf(InternalInit::class, Init::class),
-            listOf(InitFun::class, DisableFun::class)
-        )
-        
-        val internalInits = result.classes[InternalInit::class] ?: emptyMap()
-        val inits = result.classes[Init::class] ?: emptyMap()
-        val initFuncs = result.functions[InitFun::class] ?: emptyMap()
-        val disableFuncs = result.functions[DisableFun::class] ?: emptyMap()
-        
-        for ([className, annotations] in internalInits) {
-            val clazz = InitializableClass.fromInternalAnnotation(classLoader, className, annotations.first())
-            initializables += clazz
-            initializableClasses[className] = clazz
-        }
-        for ([className, annotations] in inits) {
-            val clazz = InitializableClass.fromAddonAnnotation(classLoader, className, annotations.first())
-            initializables += clazz
-            initializableClasses[className] = clazz
-        }
-        
-        for ([className, annotatedFuncs] in initFuncs) {
-            val clazz = initializableClasses[className]
-                ?: throw IllegalStateException("Class $className is missing an init annotation!")
-            
-            for ([methodName, annotations] in annotatedFuncs) {
-                initializables += InitializableFunction.fromInitAnnotation(clazz, methodName, annotations.first())
+        for ([className, metadata] in index.classes) {
+            var clazz: InitializableClass? = null
+            metadata.annotations.firstOrNull { it.descriptor == internalInit }?.let {
+                clazz = InitializableClass.fromInternalAnnotation(classLoader, className, it).also(initializables::add)
             }
-        }
-        
-        for ([className, annotatedFuncs] in disableFuncs) {
-            for ([methodName, annotations] in annotatedFuncs) {
-                disableables += DisableableFunction.fromInitAnnotation(classLoader, className, methodName, annotations.first())
+            metadata.annotations.firstOrNull { it.descriptor == init }?.let {
+                clazz = InitializableClass.fromAddonAnnotation(classLoader, className, it).also(initializables::add)
+            }
+            
+            for (method in metadata.methods) {
+                method.annotations.firstOrNull { it.descriptor == initFun }?.let {
+                    val initClass = clazz ?: throw IllegalStateException("Class $className is missing an init annotation!")
+                    initializables += InitializableFunction.fromInitAnnotation(initClass, method, it)
+                }
+                method.annotations.firstOrNull { it.descriptor == disableFun }?.let {
+                    disableables += DisableableFunction.fromInitAnnotation(classLoader, className, method, it)
+                }
             }
         }
         

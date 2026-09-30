@@ -1,4 +1,5 @@
 plugins {
+    id("nova.common-conventions")
     id("org.jetbrains.dokka")
 }
 

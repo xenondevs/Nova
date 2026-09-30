@@ -1,11 +1,18 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.attributes.Usage
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import xyz.xenondevs.nova.annotations.AnnotationIndex
+import xyz.xenondevs.nova.annotations.gradle.MergeAnnotationIndexes
 import java.io.File
 
 class BundlerJarPlugin : Plugin<Project> {
@@ -16,6 +23,26 @@ class BundlerJarPlugin : Plugin<Project> {
         
         val novaLoaderCfg = project.configurations.create("novaLoader").apply { extendsFrom(novaLoaderApiCfg) }
         project.configurations.getByName("implementation").extendsFrom(novaLoaderCfg)
+        
+        val novaMergeCfg = project.configurations.dependencyScope("novaMerge")
+        val novaMergeClasspath = project.configurations.resolvable("novaMergeClasspath") {
+            extendsFrom(novaMergeCfg.get())
+            isTransitive = false
+            attributes {
+                attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
+                attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
+                attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
+            }
+        }
+        val mergedJars = project.files(
+            project.tasks.named<Jar>("origamiJar").flatMap { it.archiveFile },
+            novaMergeClasspath
+        )
+        val mergedAnnotationIndex = project.tasks.register<MergeAnnotationIndexes>("mergeAnnotationIndexes") {
+            description = "Merges annotation indexes for the Nova loader JAR."
+            jars.from(mergedJars)
+            outputFile.set(project.layout.buildDirectory.file("loaderAnnotations/${AnnotationIndex.FILE_NAME}"))
+        }
         
         val runtimeArtifacts = project.configurations
             .getByName("paperweightDevelopmentBundleRuntimeClasspath")
@@ -47,7 +74,10 @@ class BundlerJarPlugin : Plugin<Project> {
             
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             from(prepare.flatMap { it.outputDir })
-            from(ext.merge.elements.map { jars -> jars.map { jar -> project.zipTree(jar) } })
+            from(mergedJars.elements.map { jars -> jars.map { jar -> project.zipTree(jar) } }) {
+                exclude(AnnotationIndex.FILE_NAME)
+            }
+            from(mergedAnnotationIndex.flatMap { it.outputFile })
             
             val customOutDir = project.layout.dir(
                 project.providers.gradleProperty("outDir")

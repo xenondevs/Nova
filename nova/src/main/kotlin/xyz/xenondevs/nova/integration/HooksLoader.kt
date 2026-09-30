@@ -1,11 +1,10 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package xyz.xenondevs.nova.integration
 
 import org.bukkit.Bukkit
 import org.objectweb.asm.Type
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_JAR
+import xyz.xenondevs.nova.annotations.AnnotationValue
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
@@ -28,17 +27,16 @@ internal object HooksLoader {
     
     @InitFun
     private fun loadHooks() {
-        JarUtils.findAnnotatedClasses(
-            NOVA_JAR,
-            listOf(Hook::class), emptyList(),
-            "xyz/xenondevs/nova/hook/impl/"
-        ).classes[Hook::class]?.forEach { [className, annotations] ->
-            val annotation = annotations.first()
+        val hook = Type.getDescriptor(Hook::class.java)
+        for ([className, metadata] in JarUtils.getAnnotationIndex(NOVA_JAR).classes) {
+            val annotation = metadata.annotations.firstOrNull { it.descriptor == hook }
+                ?: continue
+            val arguments = annotation.arguments
             try {
-                val plugins = annotation["plugins"] as? List<String> ?: emptyList()
-                val unless = annotation["unless"] as? List<String> ?: emptyList()
-                val requireAll = annotation["requireAll"] as? Boolean ?: false
-                val loadListener = annotation["loadListener"] as? Type
+                val plugins = (arguments["plugins"] as? AnnotationValue.ArrayValue)?.values?.map { (it as AnnotationValue.String).value } ?: emptyList()
+                val unless = (arguments["unless"] as? AnnotationValue.ArrayValue)?.values?.map { (it as AnnotationValue.String).value } ?: emptyList()
+                val requireAll = (arguments["requireAll"] as? AnnotationValue.Boolean)?.value ?: false
+                val loadListener = (arguments["loadListener"] as? AnnotationValue.ClassLiteral)?.descriptor
                 
                 if (plugins.isEmpty())
                     throw IllegalStateException("Hook annotation on $className does not specify any plugins")
@@ -64,10 +62,11 @@ internal object HooksLoader {
         }
     }
     
-    private fun loadHook(className: String, loadListener: Type?) {
+    @Suppress("UNCHECKED_CAST")
+    private fun loadHook(className: String, loadListener: String?) {
         val loaded: CompletableFuture<Boolean>
         if (loadListener != null) {
-            val obj = (Class.forName(loadListener.className).kotlin as KClass<out LoadListener>).objectInstance
+            val obj = (Class.forName(Type.getType(loadListener).className).kotlin as KClass<out LoadListener>).objectInstance
                 ?: throw IllegalStateException("LoadListener $loadListener is not an object")
             
             loaded = obj.loaded

@@ -6,10 +6,10 @@ plugins {
     kotlin("jvm")
 }
 
-val libs = the<LibrariesForLibs>()
+val libs = providers.provider { the<LibrariesForLibs>() }
 
 dependencies {
-    testImplementation(libs.mockk)
+    testImplementation(libs.flatMap { it.mockk })
 }
 
 sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }

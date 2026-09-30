@@ -1,4 +1,5 @@
 plugins {
+    id("nova.annotations-conventions")
     id("nova.kotlin-conventions")
     id("nova.dokka-conventions")
     id("nova.publish-conventions-java")
@@ -25,7 +26,8 @@ dependencies {
     api(project(":nova-registry"))
     
     // internal dependencies
-    compileOnly(project(":nova-api"))
+    implementation("xyz.xenondevs.nova:nova-annotations-model:$version")
+    implementation(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
     novaLoader(libs.bstats)
@@ -39,13 +41,23 @@ dependencies {
     novaLoader(libs.bundles.jgrapht)
     novaLoader(libs.snakeyaml.engine)
     
+    // merged into the loader jar
+    novaMerge("xyz.xenondevs.nova:nova-annotations-model:$version")
+    novaMerge(project(":nova-api"))
+    novaMerge(project(":nova-config"))
+    novaMerge(project(":nova-interaction"))
+    novaMerge(project(":nova-network"))
+    novaMerge(project(":nova-packet-entity"))
+    novaMerge(project(":nova-registry"))
+    rootProject.project(":nova-hooks").subprojects.forEach { hook ->
+        novaMerge(project(hook.path))
+    }
+    
     // test dependencies
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotlin.test.junit)
     testRuntimeOnly(libs.junit.platformLauncher)
-    
-    compileOnly("xyz.xenondevs.origami:origami:0.5.0")
 }
 
 origami {
@@ -73,6 +85,7 @@ origami {
         // w/o novaLoader on application classpath: record+build: 103s exec: ~8s
     }
 }
+
 val mcVersion = libs.versions.paper.map {
     val versionRegex = Regex("""(\d+\.\d+(?:\.\d+)?(?:-(?:rc|pre|snapshot)-\d+)?).*""")
     versionRegex.matchEntire(it)!!.groupValues[1]
@@ -84,19 +97,6 @@ origami {
 
 loaderJar {
     gameVersion = mcVersion
-    merge.from(tasks.named<Jar>("origamiJar").flatMap { it.archiveFile })
-    val projectJars = listOf(
-        ":nova-api",
-        ":nova-config",
-        ":nova-interaction",
-        ":nova-network",
-        ":nova-packet-entity",
-        ":nova-registry",
-    ).map { projectName -> project(projectName).tasks.withType<Jar>().matching { it.name == "jar" } }
-    val hookJars = rootProject.subprojects
-        .filter { it.name.startsWith("nova-hook-") }
-        .map { hook -> hook.tasks.withType<Jar>().matching { it.name == "jar" } }
-    merge.from(projectJars, hookJars)
 }
 
 val resourceProperties = mapOf(
@@ -137,6 +137,7 @@ pluginPublish {
         incompatibleDependency("z4HZZnLr") // FastAsyncWorldEdit
     }
 }
+
 publishing {
     publications {
         named<MavenPublication>("maven") {

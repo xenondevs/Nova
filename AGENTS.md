@@ -18,7 +18,11 @@ Nova uses [Origami](https://github.com/xenondevs/origami), an access-widener and
 - `nova-gradle-plugin/`: Gradle plugin that addons have to use.
 - `nova-compiler-plugin/`: K2 FIR compiler warnings for common Nova API mistakes.
 - `nova-dokka-plugin/`: Internal dokka plugin for Nova's KDoc.
-- `build-logic/`: Shared Gradle convention plugins and build tasks.
+- `build-logic/build-logic-core/`: Included build with shared Java, Kotlin, and publishing conventions.
+- `build-logic/build-logic-nova/`: Included build with Nova-specific conventions and build tasks, including hooks, annotation indexing, Origami, and loader packaging. Depends on the core conventions and annotation Gradle plugin.
+- `nova-annotations/`: Included build for annotation indexing, with two sibling modules:
+  - `nova-annotations-model/`: Shared kotlinx.serialization model for the root `nova-annotations.json` JAR entry.
+  - `nova-annotations-gradle-plugin/`: Configurable, incremental ASM annotation discovery and index merging. Uses the core build conventions; applied to addons automatically by `nova-gradle-plugin`.
 - `catalog/`: Published Gradle version catalog for addons.
 
 ## Guidelines

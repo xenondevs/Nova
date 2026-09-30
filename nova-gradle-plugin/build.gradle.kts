@@ -7,6 +7,7 @@ plugins {
 }
 
 dependencies {
+    implementation("xyz.xenondevs.nova:nova-annotations-gradle-plugin:$version")
     implementation(libs.kotlin.plugin)
     implementation(libs.bundles.xenondevs.commons)
     implementation(libs.bundles.minecraft.assets)

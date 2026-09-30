@@ -47,13 +47,15 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs")
         create("origamiLibs") {
-            from("xyz.xenondevs.origami:origami-catalog:0.5.2") // !!! also change in build-logic !!!
+            from("xyz.xenondevs.origami:origami-catalog:0.5.2") // !!! also change in build-logic/build-logic-nova !!!
         }
     }
 }
 
 pluginManagement {
-    includeBuild("build-logic")
+    includeBuild("build-logic/build-logic-core")
+    includeBuild("build-logic/build-logic-nova")
+    includeBuild("nova-annotations")
     repositories {
         mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
         mavenCentral()

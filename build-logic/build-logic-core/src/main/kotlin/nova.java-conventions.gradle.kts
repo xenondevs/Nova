@@ -5,21 +5,21 @@ plugins {
     `java-library`
 }
 
-val libs = the<LibrariesForLibs>()
+val libs = providers.provider { the<LibrariesForLibs>() }
 
 repositories {
-    mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") }}
+    mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.xenondevs.xyz/releases")
 }
 
 dependencies {
-    testImplementation(platform(libs.junit.bom))
-    testImplementation(libs.junit.jupiter)
-    testImplementation(libs.junit.platformLauncher)
-    testImplementation(libs.kotlin.test.junit)
-    testImplementation(libs.slf4j.simple)
+    testImplementation(platform(libs.flatMap { it.junit.bom }))
+    testImplementation(libs.flatMap { it.junit.jupiter })
+    testImplementation(libs.flatMap { it.junit.platformLauncher })
+    testImplementation(libs.flatMap { it.kotlin.test.junit })
+    testImplementation(libs.flatMap { it.slf4j.simple })
 }
 
 java {
