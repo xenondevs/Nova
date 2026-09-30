@@ -15,15 +15,20 @@ import org.bukkit.plugin.PluginManager
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.PLUGIN_READY
 
+@Deprecated(DEBLOAT_DEPRECATE, ReplaceWith("this == Action.LEFT_CLICK_BLOCK || this == Action.RIGHT_CLICK_BLOCK", "org.bukkit.event.block.Action"))
 fun Action.isClickBlock() = this == Action.LEFT_CLICK_BLOCK || this == Action.RIGHT_CLICK_BLOCK
 
+@Deprecated(DEBLOAT_DEPRECATE, ReplaceWith("this == Action.LEFT_CLICK_AIR || this == Action.RIGHT_CLICK_AIR", "org.bukkit.event.block.Action"))
 fun Action.isClickAir() = this == Action.LEFT_CLICK_AIR || this == Action.RIGHT_CLICK_AIR
 
+@Deprecated(DEBLOAT_DEPRECATE, ReplaceWith("useInteractedBlock() == Result.DENY && useItemInHand() == Result.DENY", "org.bukkit.event.Event.Result"))
 fun PlayerInteractEvent.isCompletelyDenied() = useInteractedBlock() == Result.DENY && useItemInHand() == Result.DENY
 
+@Deprecated(DEBLOAT_DEPRECATE, ReplaceWith("arrayOf(player.inventory.itemInMainHand, player.inventory.itemInOffHand)"))
 val PlayerInteractEvent.handItems: Array<ItemStack>
     get() = arrayOf(player.inventory.itemInMainHand, player.inventory.itemInOffHand)
 
+@Deprecated(DEBLOAT_DEPRECATE, ReplaceWith("arrayOf(EquipmentSlot.HAND to player.inventory.itemInMainHand, EquipmentSlot.OFF_HAND to player.inventory.itemInOffHand)", "org.bukkit.inventory.EquipmentSlot"))
 val PlayerInteractEvent.hands: Array<Pair<EquipmentSlot, ItemStack>>
     get() = arrayOf(EquipmentSlot.HAND to player.inventory.itemInMainHand, EquipmentSlot.OFF_HAND to player.inventory.itemInOffHand)
 

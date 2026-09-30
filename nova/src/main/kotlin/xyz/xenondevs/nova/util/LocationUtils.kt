@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.util
 
-import xyz.xenondevs.nova.world.*
-
 import com.google.common.base.Preconditions
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
@@ -31,6 +29,8 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
+internal const val DEBLOAT_DEPRECATE = "Pending removal in an effort to debloat Nova"
+
 val CUBE_FACES: Set<BlockFace> = enumSetOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
 val HORIZONTAL_FACES: Set<BlockFace> = enumSetOf(NORTH, EAST, SOUTH, WEST)
 val VERTICAL_FACES: Set<BlockFace> = enumSetOf(UP, DOWN)
@@ -47,6 +47,7 @@ fun Location.removeOrientation() {
     pitch = 0f
 }
 
+@Deprecated("Does not actually center", ReplaceWith("add(0.5, 0.0, 0.5)"))
 fun Location.center(): Location =
     add(0.5, 0.0, 0.5)
 
@@ -84,7 +85,6 @@ fun Location.add(vec: Vector3d): Location {
     y += vec.y
     z += vec.z
     return this
-    
 }
 
 fun Location.subtract(vec: Vector3d): Location {
@@ -194,6 +194,7 @@ fun Vector.toVec3(): Vec3 =
 //</editor-fold>
 
 //<editor-fold desc="surrounding blocks / entities / etc.", defaultstate="collapsed">
+@Deprecated(DEBLOAT_DEPRECATE)
 fun Chunk.getSurroundingChunks(range: Int, includeCurrent: Boolean, ignoreUnloaded: Boolean = false): List<Chunk> {
     val chunks = ArrayList<Chunk>()
     val world = world
@@ -210,6 +211,7 @@ fun Chunk.getSurroundingChunks(range: Int, includeCurrent: Boolean, ignoreUnload
     return chunks
 }
 
+@Deprecated(DEBLOAT_DEPRECATE)
 fun Location.getPlayersNearby(maxDistance: Double, vararg excluded: Player): Sequence<Player> {
     val maxDistanceSquared = maxDistance * maxDistance
     
@@ -219,6 +221,7 @@ fun Location.getPlayersNearby(maxDistance: Double, vararg excluded: Player): Seq
         .filter { distanceSquared(it.location) <= maxDistanceSquared }
 }
 
+@Deprecated(DEBLOAT_DEPRECATE)
 fun Iterable<Player>.filterInRange(location: Location, maxDistance: Double): List<Player> {
     val maxDistanceSquared = maxDistance * maxDistance
     return filter {
@@ -229,6 +232,7 @@ fun Iterable<Player>.filterInRange(location: Location, maxDistance: Double): Lis
 //</editor-fold>
 
 //<editor-fold desc="stepping", defaultstate="collapsed">
+@Deprecated("Use World's rayTraceBlocks instead")
 inline fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
     val vector = direction.multiply(stepSize)
     val location = clone()
@@ -239,9 +243,9 @@ inline fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Locatio
     }
 }
 
+@Deprecated("Use World's rayTraceBlocks instead")
 fun Location.getTargetLocation(stepSize: Double, maxDistance: Double): Location {
     var location = this
-    
     castRay(stepSize, maxDistance) { rayLocation ->
         val block = rayLocation.block
         if (block.type.isTraversable() && !block.boundingBox.contains(rayLocation.x, rayLocation.y, rayLocation.z)) {
@@ -255,6 +259,7 @@ fun Location.getTargetLocation(stepSize: Double, maxDistance: Double): Location 
     return location
 }
 
+@Deprecated(DEBLOAT_DEPRECATE)
 fun Location.untilHeightLimit(includeThis: Boolean, run: (Location) -> Boolean) {
     val heightLimit = world!!.maxHeight
     val location = clone().apply { if (!includeThis) add(0.0, 1.0, 0.0) }
@@ -265,6 +270,7 @@ fun Location.untilHeightLimit(includeThis: Boolean, run: (Location) -> Boolean) 
     }
 }
 
+@Deprecated(DEBLOAT_DEPRECATE)
 fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Location? {
     val location = clone()
     if (!countSelf) location.y -= 1
@@ -279,6 +285,7 @@ fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Loca
 //</editor-fold>
 
 //<editor-fold desc="shapes", defaultstate="collapsed">
+@Deprecated(DEBLOAT_DEPRECATE)
 fun Location.getStraightLine(axis: Axis, to: Int): List<Location> {
     val min = min(getCoordinate(axis).toInt(), to)
     val max = max(getCoordinate(axis).toInt(), to)
@@ -286,6 +293,7 @@ fun Location.getStraightLine(axis: Axis, to: Int): List<Location> {
     return (min..max).map { coordinate -> clone().apply { setCoordinate(axis, coordinate.toDouble()) } }
 }
 
+@Deprecated(DEBLOAT_DEPRECATE)
 fun Location.getRectangle(to: Location, omitCorners: Boolean): Map<Axis, List<Location>> {
     val rectangle = HashMap<Axis, List<Location>>()
     val listX = ArrayList<Location>().also { rectangle[Axis.X] = it }
@@ -317,6 +325,7 @@ fun Location.getRectangle(to: Location, omitCorners: Boolean): Map<Axis, List<Lo
     return rectangle
 }
 
+@Deprecated(DEBLOAT_DEPRECATE)
 inline fun Location.fullCuboidTo(to: Location, run: (Location) -> Boolean) {
     Preconditions.checkArgument(world != null && to.world == world)
     
@@ -331,6 +340,7 @@ inline fun Location.fullCuboidTo(to: Location, run: (Location) -> Boolean) {
     }
 }
 
+@Deprecated(DEBLOAT_DEPRECATE)
 fun Location.getBoxOutline(other: Location, correct: Boolean, stepSize: Double = 0.5): List<Location> {
     val locations = ArrayList<Location>()
     
@@ -374,6 +384,7 @@ fun Location.getBoxOutline(other: Location, correct: Boolean, stepSize: Double =
     return locations
 }
 
+@Deprecated(DEBLOAT_DEPRECATE)
 fun Location.getFullCuboid(other: Location): List<Location> {
     Preconditions.checkArgument(world != null && other.world == world)
     
@@ -392,27 +403,32 @@ fun Location.getFullCuboid(other: Location): List<Location> {
 //</editor-fold>
 
 //<editor-fold desc="items", defaultstate="collapsed">
+@Deprecated(DEBLOAT_DEPRECATE, ReplaceWith("items.forEach { world!!.dropItemNaturally(this, it) }"))
 fun Location.dropItems(items: Iterable<ItemStack>) {
-    val world = world!!
-    items.forEach { world.dropItemNaturally(this, it) }
+    items.forEach { world!!.dropItemNaturally(this, it) }
 }
 
+@Deprecated(DEBLOAT_DEPRECATE, ReplaceWith("world!!.dropItemNaturally(this, item)"))
 fun Location.dropItem(item: ItemStack) {
     world!!.dropItemNaturally(this, item)
 }
 
+@Deprecated(DEBLOAT_DEPRECATE, ReplaceWith("items.forEach { dropItemNaturally(location, it) }"))
 fun World.dropItemsNaturally(location: Location, items: Iterable<ItemStack>) {
     items.forEach { dropItemNaturally(location, it) }
 }
 //</editor-fold>
 
 //<editor-fold desc="particles">
+@Deprecated(DEBLOAT_DEPRECATE, ReplaceWith("ParticleBuilder(ParticleTypes.DUST, this).color(color).build()", "xyz.xenondevs.nova.util.particle.ParticleBuilder", "net.minecraft.core.particles.ParticleTypes", "xyz.xenondevs.nova.util.particle.color"))
 fun Location.createColoredParticle(color: Color): ClientboundLevelParticlesPacket =
     ParticleBuilder(ParticleTypes.DUST, this).color(color).build()
 //</editor-fold>
 
+@Deprecated(DEBLOAT_DEPRECATE)
 object LocationUtils {
     
+    @Deprecated(DEBLOAT_DEPRECATE)
     fun getTopBlockBetween(
         world: World,
         x: Int, z: Int,
@@ -428,9 +444,11 @@ object LocationUtils {
         return null
     }
     
+    @Deprecated(DEBLOAT_DEPRECATE)
     fun getStraightLine(base: Location, axis: Axis, range: IntRange) =
         range.map { base.clone().apply { setCoordinate(axis, it.toDouble()) } }
     
+    @Deprecated(DEBLOAT_DEPRECATE)
     fun sort(first: Location, second: Location): Pair<Location, Location> {
         Preconditions.checkArgument(first.world == second.world)
         

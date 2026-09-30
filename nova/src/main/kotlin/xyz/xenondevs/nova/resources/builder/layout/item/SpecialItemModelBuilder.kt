@@ -23,7 +23,6 @@ import xyz.xenondevs.nova.resources.builder.data.StandingSignAttachment
 import xyz.xenondevs.nova.resources.builder.data.WoodType
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
-import xyz.xenondevs.nova.util.RequiredProperty
 
 @RegistryElementBuilderDsl
 abstract class SpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
@@ -324,5 +323,19 @@ class GenericSpecialItemModelBuilder<S : ModelSelectorScope> internal constructo
 ) : SpecialItemModelBuilder<S>(resourcePackBuilder) {
     
     override fun build() = ItemModel.Special(model, selectAndBuild(base), transformation)
+    
+}
+
+internal class RequiredProperty<V : Any>(private val message: String) {
+    
+    private var value: V? = null
+    
+    operator fun getValue(thisRef: Any?, property: Any?): V {
+        return value ?: throw IllegalStateException(message)
+    }
+    
+    operator fun setValue(thisRef: Any?, property: Any?, value: V) {
+        this.value = value
+    }
     
 }

@@ -6,6 +6,7 @@ import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
+import xyz.xenondevs.nova.util.DEBLOAT_DEPRECATE
 import java.awt.Dimension
 import java.awt.image.BufferedImage
 import java.awt.image.RenderedImage
@@ -22,10 +23,12 @@ import kotlin.io.path.extension
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
+@Deprecated(DEBLOAT_DEPRECATE, ReplaceWith("output.write(this.readNBytes(amount))"))
 fun InputStream.transferTo(output: OutputStream, amount: Int) {
     output.write(this.readNBytes(amount))
 }
 
+@Deprecated(DEBLOAT_DEPRECATE)
 inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {
     try {
         return block()

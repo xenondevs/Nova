@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type.item.channel
 
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.mapToArray
-import xyz.xenondevs.nova.util.RoundRobinCounter
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 import java.util.*
 import kotlin.math.min
@@ -220,6 +219,17 @@ internal class ItemDistributor(
         }
         
         return transfersLeft
+    }
+    
+}
+
+internal class RoundRobinCounter(private val maxExclusive: Int) {
+    
+    private var i = 0
+    
+    fun next(): Int {
+        i = (i + 1) % maxExclusive
+        return i
     }
     
 }
