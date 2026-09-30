@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.block.limits
 
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import net.kyori.adventure.key.Key
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
@@ -11,6 +13,8 @@ import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.UUIDAsStringSerializer
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
@@ -21,12 +25,25 @@ import java.util.*
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object TileEntityTracker {
     
+    private val blocksSerializer = MapSerializer(KeySerializer, Int.serializer())
+    private val counterSerializer = MapSerializer(UUIDAsStringSerializer, blocksSerializer)
+    private val worldCounterSerializer = MapSerializer(UUIDAsStringSerializer, MapSerializer(UUIDAsStringSerializer, blocksSerializer))
+    private val chunkCounterSerializer = MapSerializer(UUIDAsStringSerializer, MapSerializer(ChunkPos.serializer(), blocksSerializer))
+    
     private val BLOCK_COUNTER: HashMap<UUID, HashMap<Key, Int>> =
-        PermanentStorage.retrieve("block_counter") ?: HashMap()
+        PermanentStorage.retrieve("block_counter", counterSerializer)
+            ?.mapValuesTo(HashMap()) { [_, blocks] -> HashMap(blocks) }
+            ?: HashMap()
     private val BLOCK_WORLD_COUNTER: HashMap<UUID, HashMap<UUID, HashMap<Key, Int>>> =
-        PermanentStorage.retrieve("block_world_counter") ?: HashMap()
+        PermanentStorage.retrieve("block_world_counter", worldCounterSerializer)
+            ?.mapValuesTo(HashMap()) { [_, worlds] ->
+                worlds.mapValuesTo(HashMap()) { [_, blocks] -> HashMap(blocks) }
+            } ?: HashMap()
     private val BLOCK_CHUNK_COUNTER: HashMap<UUID, HashMap<ChunkPos, HashMap<Key, Int>>> =
-        PermanentStorage.retrieve("block_chunk_counter") ?: HashMap()
+        PermanentStorage.retrieve("block_chunk_counter", chunkCounterSerializer)
+            ?.mapValuesTo(HashMap()) { [_, chunks] ->
+                chunks.mapValuesTo(HashMap()) { [_, blocks] -> HashMap(blocks) }
+            } ?: HashMap()
     
     @InitFun
     private fun init() {
@@ -35,9 +52,9 @@ internal object TileEntityTracker {
     
     @DisableFun
     private fun saveCounters() {
-        PermanentStorage.store("block_counter", BLOCK_COUNTER)
-        PermanentStorage.store("block_world_counter", BLOCK_WORLD_COUNTER)
-        PermanentStorage.store("block_chunk_counter", BLOCK_CHUNK_COUNTER)
+        PermanentStorage.store("block_counter", counterSerializer, BLOCK_COUNTER)
+        PermanentStorage.store("block_world_counter", worldCounterSerializer, BLOCK_WORLD_COUNTER)
+        PermanentStorage.store("block_chunk_counter", chunkCounterSerializer, BLOCK_CHUNK_COUNTER)
     }
     
     internal fun handlePlace(block: BlockType, ctx: Context<BlockPlace>) {

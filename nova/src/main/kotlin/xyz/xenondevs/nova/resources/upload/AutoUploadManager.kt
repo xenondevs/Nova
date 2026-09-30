@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.resources.upload
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.MapSerializer
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.resource.ResourcePackInfo
 import xyz.xenondevs.nova.LOGGER
@@ -13,6 +14,7 @@ import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.data.HashUtils
 import java.net.URI
 import java.util.*
@@ -39,10 +41,11 @@ private class UploadedPack(
 )
 internal object AutoUploadManager {
     
+    private val uploadedPacksSerializer = MapSerializer(KeySerializer, UploadedPack.serializer())
     private var selectedService: UploadService? = null
     
     private var uploadedPacks: MutableMap<Key, UploadedPack> =
-        ConcurrentHashMap(PermanentStorage.retrieve<Map<Key, UploadedPack>>(PACK_URLS_KEY) ?: emptyMap())
+        ConcurrentHashMap(PermanentStorage.retrieve(PACK_URLS_KEY, uploadedPacksSerializer) ?: emptyMap())
     
     @InitFun
     private suspend fun init() {
@@ -66,7 +69,7 @@ internal object AutoUploadManager {
     
     @DisableFun(dispatcher = Dispatcher.ASYNC)
     private suspend fun disable() {
-        PermanentStorage.store(PACK_URLS_KEY, uploadedPacks)
+        PermanentStorage.store(PACK_URLS_KEY, uploadedPacksSerializer, uploadedPacks)
         selectedService?.disable()
         selectedService = null
     }

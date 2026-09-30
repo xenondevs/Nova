@@ -1,18 +1,25 @@
 package xyz.xenondevs.nova.world.block.tileentity
 
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.SetSerializer
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.serialization.kotlinx.UUIDAsStringSerializer
 import xyz.xenondevs.nova.world.ChunkPos
 import java.util.*
 
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 object ChunkLoadManager {
     
-    private val forceLoadedChunks: HashMap<ChunkPos, HashSet<UUID>> = PermanentStorage.retrieve("forceLoadedChunks") ?: HashMap()
+    private val chunksSerializer = MapSerializer(ChunkPos.serializer(), SetSerializer(UUIDAsStringSerializer))
+    private val forceLoadedChunks: HashMap<ChunkPos, HashSet<UUID>> =
+        PermanentStorage.retrieve("forceLoadedChunks", chunksSerializer)
+            ?.mapValuesTo(HashMap()) { [_, owners] -> HashSet(owners) }
+            ?: HashMap()
     
     @InitFun
     private fun init() {
@@ -23,7 +30,7 @@ object ChunkLoadManager {
     
     @DisableFun
     private fun disable() {
-        PermanentStorage.store("forceLoadedChunks", forceLoadedChunks)
+        PermanentStorage.store("forceLoadedChunks", chunksSerializer, forceLoadedChunks)
     }
     
     fun submitChunkLoadRequest(chunk: ChunkPos, uuid: UUID) {

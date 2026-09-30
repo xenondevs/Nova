@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.format.legacy.world.v2
 
+import kotlinx.serialization.builtins.SetSerializer
 import net.kyori.adventure.key.Key
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -19,6 +20,7 @@ import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.nmsBlockEntity
 import xyz.xenondevs.nova.util.nmsPos
@@ -49,7 +51,8 @@ internal object LegacyRegionFileConverter {
     
     @InitFun
     private fun convert() {
-        val convertedWorlds = PermanentStorage.retrieve<Set<Key>>(CONVERTED_WORLDS_KEY).orEmpty().toMutableSet()
+        val serializer = SetSerializer(KeySerializer)
+        val convertedWorlds = PermanentStorage.retrieve(CONVERTED_WORLDS_KEY, serializer).orEmpty().toMutableSet()
         for (world in Bukkit.getWorlds()) {
             if (world.key in convertedWorlds)
                 continue
@@ -67,7 +70,7 @@ internal object LegacyRegionFileConverter {
             convert(world, regionFiles)
             world.save()
             convertedWorlds += world.key
-            PermanentStorage.store(CONVERTED_WORLDS_KEY, convertedWorlds)
+            PermanentStorage.store(CONVERTED_WORLDS_KEY, serializer, convertedWorlds)
         }
     }
     

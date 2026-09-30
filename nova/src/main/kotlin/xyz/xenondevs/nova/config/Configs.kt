@@ -6,6 +6,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import net.kyori.adventure.key.Key
@@ -21,6 +23,7 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.packetentity.refreshPacketEntities
 import xyz.xenondevs.nova.serialization.kotlinx.NOVA_SERIALIZERS_MODULE
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.BukkitDispatcher
 import xyz.xenondevs.nova.util.data.useZip
@@ -61,13 +64,14 @@ val Configs get() = CONFIGS
 internal object NovaConfigBackend : ConfigBackend {
     
     internal fun extractAllConfigs() {
-        val extractedConfigs = PermanentStorage.retrieve<MutableMap<Key, String>>("stored_configs") ?: HashMap()
+        val serializer = MapSerializer(KeySerializer, String.serializer())
+        val extractedConfigs = PermanentStorage.retrieve("stored_configs", serializer)?.toMutableMap() ?: HashMap()
         val extractor = ConfigExtractor(extractedConfigs)
         extractConfigs(extractor, "nova", NOVA_JAR, DATA_FOLDER)
         for (addon in AddonBootstrapper.addons) {
             extractConfigs(extractor, addon.namespace(), addon.file, addon.dataFolder)
         }
-        PermanentStorage.store("stored_configs", extractedConfigs)
+        PermanentStorage.store("stored_configs", serializer, extractedConfigs)
     }
     
     private fun extractConfigs(extractor: ConfigExtractor, namespace: String, zipFile: Path, dataFolder: Path) {

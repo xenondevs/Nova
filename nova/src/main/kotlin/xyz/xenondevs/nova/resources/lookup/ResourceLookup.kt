@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.resources.lookup
 
+import kotlinx.serialization.KSerializer
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.nova.config.PermanentStorage
-import kotlin.reflect.KType
 
 internal class ResourceLookup<T : Any>(
     val key: String,
-    val type: KType,
+    val serializer: KSerializer<T>,
     val provider: MutableProvider<T>,
     val default: T?
 ) {
@@ -24,14 +24,14 @@ internal class ResourceLookup<T : Any>(
     fun load() {
         if (isLoaded)
             return
-        val value = PermanentStorage.retrieve(key, type)
+        val value = PermanentStorage.retrieve(key, serializer)
             ?: default
             ?: throw IllegalStateException("Resource lookup '$key' is not present and has no default value")
         provider.set(value)
     }
 
     fun store() {
-        PermanentStorage.store(key, type, provider.get())
+        PermanentStorage.store(key, serializer, provider.get())
     }
 
     fun remove() {

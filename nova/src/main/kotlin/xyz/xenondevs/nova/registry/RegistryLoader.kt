@@ -7,6 +7,8 @@ import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
 import io.papermc.paper.tag.TagEntry
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.SetSerializer
 import net.kyori.adventure.key.Key
 import org.bukkit.Keyed
 import org.bukkit.scheduler.BukkitTask
@@ -421,13 +423,19 @@ internal object KnownRegistryEntries {
     
     private const val KNOWN_REGISTRY_ENTRIES_KEY = "known_registry_entries"
     private const val KNOWN_BLOCK_STATES = "known_block_states"
-    val knownRegistryEntries: MutableMap<Key, MutableSet<Key>> = PermanentStorage.retrieve(KNOWN_REGISTRY_ENTRIES_KEY) ?: HashMap()
-    val knownBlockStates: MutableMap<Key, BlockConfiguration> = PermanentStorage.retrieve(KNOWN_BLOCK_STATES) ?: HashMap()
+    private val entriesSerializer = MapSerializer(KeySerializer, SetSerializer(KeySerializer))
+    private val statesSerializer = MapSerializer(KeySerializer, BlockConfiguration.serializer())
+    val knownRegistryEntries: MutableMap<Key, MutableSet<Key>> =
+        PermanentStorage.retrieve(KNOWN_REGISTRY_ENTRIES_KEY, entriesSerializer)
+            ?.mapValuesTo(HashMap()) { [_, keys] -> keys.toMutableSet() }
+            ?: HashMap()
+    val knownBlockStates: MutableMap<Key, BlockConfiguration> =
+        PermanentStorage.retrieve(KNOWN_BLOCK_STATES, statesSerializer)?.toMutableMap() ?: HashMap()
     
     @InitFun
     fun store() {
-        PermanentStorage.store(KNOWN_REGISTRY_ENTRIES_KEY, knownRegistryEntries)
-        PermanentStorage.store(KNOWN_BLOCK_STATES, knownBlockStates)
+        PermanentStorage.store(KNOWN_REGISTRY_ENTRIES_KEY, entriesSerializer, knownRegistryEntries)
+        PermanentStorage.store(KNOWN_BLOCK_STATES, statesSerializer, knownBlockStates)
     }
     
     @Serializable

@@ -7,6 +7,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.gson.*
+import kotlinx.coroutines.runBlocking
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.Bukkit
@@ -19,6 +20,7 @@ import xyz.xenondevs.nova.api.ApiItemRegistry
 import xyz.xenondevs.nova.api.ApiTileEntityManager
 import xyz.xenondevs.nova.api.NovaMaterialRegistry
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
+import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -76,13 +78,18 @@ internal object Nova : JavaPlugin(), INova {
                 LOGGER.error(t.message)
             else LOGGER.error("", t)
             
+            runBlocking { PermanentStorage.shutdownAndWait() }
             (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
             Runtime.getRuntime().halt(-1) // force-quit
         }
     }
     
-    override fun onDisable() {
-        Initializer.disable()
+    override fun onDisable(): Unit = runBlocking {
+        try {
+            Initializer.disable()
+        } finally {
+            PermanentStorage.shutdownAndWait()
+        }
         
         if (ServerUtils.isReload()) {
             LOGGER.error("====================================================")

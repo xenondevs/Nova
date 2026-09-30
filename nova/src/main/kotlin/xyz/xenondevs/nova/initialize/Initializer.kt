@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.initialize
 
+import io.ktor.utils.io.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
@@ -30,7 +31,6 @@ import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.initialize.Initializer.start
 import xyz.xenondevs.nova.ui.menu.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils
@@ -57,7 +57,7 @@ internal object Initializer : Listener {
     /**
      * Stats the initialization process.
      */
-    fun start() = tryInit {
+    suspend fun start() = tryInit {
         collectAndRegisterRunnables(NOVA_JAR, this.javaClass.classLoader)
         for (addon in AddonBootstrapper.addons) {
             collectAndRegisterRunnables(addon.file, addon.javaClass.classLoader)
@@ -189,7 +189,7 @@ internal object Initializer : Listener {
     /**
      * Stats the pre-world initialization process.
      */
-    private fun initPreWorld() = runBlocking {
+    private suspend fun initPreWorld() {
         tryInit {
             coroutineScope {
                 preWorldScope = this
@@ -267,9 +267,11 @@ internal object Initializer : Listener {
      * Wraps [run] in a try-catch block with error logging specific to initialization.
      * Returns whether the initialization was successful, and also shuts down the server if it wasn't.
      */
-    private inline fun tryInit(run: () -> Unit) {
+    private suspend inline fun tryInit(run: () -> Unit) {
         try {
             run()
+        } catch (e: CancellationException) {
+            throw e
         } catch (t: Throwable) {
             val cause = if (t is InvocationTargetException) t.targetException else t
             if (cause is InitializationException) {
@@ -279,6 +281,7 @@ internal object Initializer : Listener {
             }
             
             LOGGER.error("Initialization failure")
+            PermanentStorage.shutdownAndWait()
             (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
             Runtime.getRuntime().halt(-1) // force-quit process to prevent further errors
         }
@@ -287,7 +290,7 @@ internal object Initializer : Listener {
     /**
      * Disables all [Initializables][Initializable] in the reverse order that they were initialized in.
      */
-    fun disable() = runBlocking {
+    suspend fun disable() {
         if (isDone) {
             coroutineScope { launchAll(this, disable) }
         } else {

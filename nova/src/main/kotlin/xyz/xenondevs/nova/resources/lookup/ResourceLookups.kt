@@ -2,6 +2,11 @@
 
 package xyz.xenondevs.nova.resources.lookup
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.PairSerializer
+import kotlinx.serialization.builtins.SetSerializer
+import kotlinx.serialization.serializer
 import net.kyori.adventure.key.Key
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.commons.provider.MutableProvider
@@ -16,11 +21,14 @@ import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.task.FontChar
 import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
+import xyz.xenondevs.nova.serialization.kotlinx.BlockStateSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.EquipmentEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.GuiTextureEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.item.Equipment
-import kotlin.reflect.typeOf
 
 /**
  * Resource lookups store data that is generated during resource pack build, but relevant for the game.
@@ -57,7 +65,7 @@ internal object ResourceLookups {
      * Lookup containing texture and camera overlay locations for every [Equipment].
      */
     val equipmentLookup: MutableProvider<Map<RegistryEntry.Nova<Equipment>, RuntimeEquipmentData>> =
-        resourceLookup("equipment", emptyMap())
+        resourceLookup("equipment", MapSerializer(EquipmentEntrySerializer, RuntimeEquipmentData.serializer()), emptyMap())
     
     /**
      * Map of [Equipment] to the relevant [RuntimeEquipmentData].
@@ -101,7 +109,7 @@ internal object ResourceLookups {
      * Lookup for getting the [FontChar] for every [GuiTexture].
      */
     val guiTextureLookup: MutableProvider<Map<RegistryEntry.Nova<GuiTexture>, GuiTextureData>> =
-        resourceLookup("gui_texture_lookup", emptyMap())
+        resourceLookup("gui_texture_lookup", MapSerializer(GuiTextureEntrySerializer, GuiTextureData.serializer()), emptyMap())
     
     /**
      * Map of [GuiTexture] to the [FontChar].
@@ -113,7 +121,7 @@ internal object ResourceLookups {
      * Lookup for getting the [GuiTexture] by its corresponding [FontChar].
      */
     val guiTextureByFontCharLookup: MutableProvider<Map<FontChar, RegistryEntry.Nova<GuiTexture>>> =
-        resourceLookup("gui_texture_by_font_char_lookup", emptyMap())
+        resourceLookup("gui_texture_by_font_char_lookup", MapSerializer(FontChar.serializer(), GuiTextureEntrySerializer), emptyMap())
     
     /**
      * Map of [FontChar] to the corresponding [GuiTexture].
@@ -137,7 +145,7 @@ internal object ResourceLookups {
      * Lookup for Waila icons.
      */
     val wailaDataLookup: MutableProvider<Map<Key, FontChar>> =
-        resourceLookup("waila_data_lookup", emptyMap())
+        resourceLookup("waila_data_lookup", MapSerializer(KeySerializer, FontChar.serializer()), emptyMap())
     
     /**
      * Map of Waila icon id to [FontChar].
@@ -149,7 +157,7 @@ internal object ResourceLookups {
      * Lookup for texture icons.
      */
     val textureIconLookup: MutableProvider<Map<Key, FontChar>> =
-        resourceLookup("texture_icon_lookup", emptyMap())
+        resourceLookup("texture_icon_lookup", MapSerializer(KeySerializer, FontChar.serializer()), emptyMap())
     
     /**
      * Map of texture icon id to [FontChar].
@@ -161,7 +169,7 @@ internal object ResourceLookups {
      * Lookup containing all block states that are in use by base packs.
      */
     val occupiedBlockStatesLookup: MutableProvider<Set<BlockState>> =
-        resourceLookup("occupied_block_states", emptySet())
+        resourceLookup("occupied_block_states", SetSerializer(BlockStateSerializer), emptySet())
     
     /**
      * Set of all block states that are in use by base packs.
@@ -173,7 +181,7 @@ internal object ResourceLookups {
      * Lookup for entity variant layouts.
      */
     val entityVariantAssetsLookup: MutableProvider<Map<Pair<Key, Key>, EntityVariantLayout>> =
-        resourceLookup("entity_variant_lookup", emptyMap())
+        resourceLookup("entity_variant_lookup", MapSerializer(PairSerializer(KeySerializer, KeySerializer), EntityVariantLayout.serializer()), emptyMap())
     
     /**
      * Entity variant layouts.
@@ -193,11 +201,14 @@ internal object ResourceLookups {
     var soundOverrides: Set<String>
         by soundOverridesLookup
     
-    private inline fun <reified T : Any> resourceLookup(key: String, default: T? = null): MutableProvider<T> {
+    private fun <T : Any> resourceLookup(key: String, serializer: KSerializer<T>, default: T? = null): MutableProvider<T> {
         val provider = mutableProvider<T> { loadAll(key) }
-        lookups[key] = ResourceLookup(key, typeOf<T>(), provider, default)
+        lookups[key] = ResourceLookup(key, serializer, provider, default)
         return provider
     }
+    
+    private inline fun <reified T : Any> resourceLookup(key: String, default: T? = null): MutableProvider<T> =
+        resourceLookup(key, serializer<T>(), default)
     
     /**
      * Loads all resource lookups and returns the value of the lookup under [initiator].

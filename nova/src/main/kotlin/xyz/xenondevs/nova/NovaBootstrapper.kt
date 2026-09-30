@@ -9,6 +9,7 @@ import io.papermc.paper.plugin.entrypoint.LaunchEntryPointHandler
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
 import io.papermc.paper.plugin.provider.type.paper.PaperPluginParent
 import kotlinx.coroutines.debug.DebugProbes
+import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
@@ -20,6 +21,7 @@ import xyz.xenondevs.nova.config.NovaConfigBackend
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.serialization.cbf.CbfSerializers
+import xyz.xenondevs.nova.serialization.kotlinx.VersionSerializer
 import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
@@ -29,7 +31,6 @@ import kotlin.io.path.invariantSeparatorsPathString
 
 private val REQUIRED_SERVER_VERSION: ClosedVersionRange = Version("26.3")..Version("26.3")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
-internal val PREVIOUS_NOVA_VERSION: Version? = PermanentStorage.retrieve<Version>("last_version")
 internal val DATA_FOLDER = Path("plugins", "Nova")
 
 internal lateinit var BOOTSTRAPPER: NovaBootstrapper private set
@@ -71,13 +72,6 @@ internal class NovaBootstrapper : PluginBootstrap {
             """.trimIndent())
         
         
-        // prevent execution if the previously installed version is not compatible with this version
-        if (PREVIOUS_NOVA_VERSION != null && PREVIOUS_NOVA_VERSION < Version("0.9"))
-            error("""
-                This version of Nova is not compatible with the version that was previously installed.
-                Please erase all data related to Nova and try again.
-            """.trimIndent())
-        
         // count addons
         remainingAddons = LaunchEntryPointHandler.INSTANCE.storage.asSequence()
             .flatMap { [_, storage] -> storage.registeredProviders }
@@ -107,9 +101,18 @@ internal class NovaBootstrapper : PluginBootstrap {
                 DebugProbes.enableCreationStackTraces = true
             }
             
-            NovaConfigBackend.extractAllConfigs()
-            CbfSerializers.register()
-            Initializer.start()
+            runBlocking {
+                PermanentStorage.load()
+                val previousNovaVersion = PermanentStorage.retrieve("last_version", VersionSerializer)
+                if (previousNovaVersion != null && previousNovaVersion < Version("0.9"))
+                    error("""
+                        This version of Nova is not compatible with the version that was previously installed.
+                        Please erase all data related to Nova and try again.
+                    """.trimIndent())
+                NovaConfigBackend.extractAllConfigs()
+                CbfSerializers.register()
+                Initializer.start()
+            }
         } catch (t: Throwable) {
             error("", t)
         }
@@ -123,6 +126,7 @@ internal class NovaBootstrapper : PluginBootstrap {
         } else {
             LOGGER.error(msg)
         }
+        runBlocking { PermanentStorage.shutdownAndWait() }
         (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
         Runtime.getRuntime().halt(-1) // force-quit without running shutdown hooks
         

@@ -7,6 +7,8 @@ import net.kyori.adventure.resource.ResourcePackCallback
 import net.kyori.adventure.resource.ResourcePackRequest
 import net.kyori.adventure.resource.ResourcePackStatus
 import net.kyori.adventure.text.Component
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.event.EventHandler
@@ -22,6 +24,8 @@ import xyz.xenondevs.nova.integration.permission.PermissionManager
 import xyz.xenondevs.nova.resources.ResourcePackManager.enablePack
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.upload.AutoUploadManager
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.UUIDAsStringSerializer
 import xyz.xenondevs.nova.util.registerEvents
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -43,8 +47,9 @@ private const val FORCE_BYPASS_PERMISSION = "nova.misc.resourcePack.bypass.force
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 object ResourcePackManager : Listener {
     
+    private val overridesSerializer = MapSerializer(UUIDAsStringSerializer, MapSerializer(KeySerializer, Boolean.serializer()))
     private val packApplyOverrides: MutableMap<UUID, MutableMap<Key, Boolean>> =
-        (PermanentStorage.retrieve<Map<UUID, Map<Key, Boolean>>>(PACK_APPLY_OVERRIDES_KEY) ?: emptyMap())
+        (PermanentStorage.retrieve(PACK_APPLY_OVERRIDES_KEY, overridesSerializer) ?: emptyMap())
             .mapValuesTo(ConcurrentHashMap()) { [_, map] -> ConcurrentHashMap(map) }
     
     private val packStatusFutures = ConcurrentHashMap<UUID, CompletableFuture<Boolean>>()
@@ -56,7 +61,7 @@ object ResourcePackManager : Listener {
     
     @DisableFun
     private fun saveOverrides() {
-        PermanentStorage.store(PACK_APPLY_OVERRIDES_KEY, packApplyOverrides)
+        PermanentStorage.store(PACK_APPLY_OVERRIDES_KEY, overridesSerializer, packApplyOverrides)
     }
     
     @EventHandler
