@@ -26,9 +26,9 @@ import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.ReflectionUtils
 import xyz.xenondevs.nova.util.data.key
 import xyz.xenondevs.nova.util.identifier
-import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.world.item.novaItem
 import net.minecraft.world.item.crafting.Recipe as MojangRecipe
 import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
 import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
@@ -62,7 +62,7 @@ object RecipeManager : Listener, PacketListener {
         field = HashMap<RecipeType<*>, HashMap<Key, NovaRecipe>>()
     
     @InitFun
-    private fun init() {
+    private suspend fun init() {
         registerEvents()
         registerPacketListener()
         loadRecipes()
@@ -102,7 +102,7 @@ object RecipeManager : Listener, PacketListener {
         return novaRecipes[type]?.get(id) as T?
     }
     
-    private fun loadRecipes() {
+    private suspend fun loadRecipes() {
         RecipesLoader.extractAndLoadRecipes().forEach(RecipeManager::loadRecipe)
         hardcodedRecipes.forEach(RecipeManager::loadRecipe)
         MINECRAFT_SERVER.recipeManager.finalizeRecipeLoading()
@@ -137,7 +137,7 @@ object RecipeManager : Listener, PacketListener {
         }
     }
     
-    internal fun reload() {
+    internal suspend fun reload() {
         for (key in customVanillaRecipes.keys) {
             @Suppress("UNCHECKED_CAST")
             key as ResourceKey<MojangRecipe<RecipeInput>>

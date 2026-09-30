@@ -60,7 +60,7 @@ internal object WorldGenFileParser {
     )
     
     @InitFun
-    fun init() {
+    suspend fun init() {
         UpdatableFile.extractIdNamedFromAllAddons("worldgen")
         VANILLA_WORLD_GEN_DIRECTORIES.forEach { loadFiles(it) }
         Registries.BIOME.preFreeze { _, lookup ->

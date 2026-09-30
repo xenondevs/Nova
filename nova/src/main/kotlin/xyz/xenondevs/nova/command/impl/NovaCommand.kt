@@ -17,6 +17,7 @@ import io.papermc.paper.registry.RegistryKey
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
@@ -285,7 +286,7 @@ internal object NovaCommand : Command() {
         }
     }
     
-    private fun reloadRecipes(ctx: CommandContext<CommandSourceStack>) {
+    private fun reloadRecipes(ctx: CommandContext<CommandSourceStack>) = runBlocking {
         try {
             ctx.source.sender.sendMessage(Component.translatable("command.nova.reload_recipes.start", NamedTextColor.GRAY))
             RecipeManager.reload()
@@ -964,7 +965,7 @@ internal object NovaCommand : Command() {
         ctx.source.sender.sendMessage(builder.build())
     }
     
-    private fun resetFiles(ctx: CommandContext<CommandSourceStack>) {
+    private fun resetFiles(ctx: CommandContext<CommandSourceStack>) = runBlocking {
         val path: String = ctx["path"]
         val count = UpdatableFile.reset(path)
         if (count > 0) {

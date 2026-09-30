@@ -1,14 +1,19 @@
 package xyz.xenondevs.nova.util.data
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.withContext
+import xyz.xenondevs.commons.collections.concurrentHashSet
 import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.config.PermanentStorage
-import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.resources.ResourcePath
 import java.nio.file.Path
-import kotlin.io.path.copyTo
-import kotlin.io.path.createDirectories
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+import kotlin.io.path.createParentDirectories
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
@@ -20,31 +25,35 @@ import kotlin.io.path.walk
 import kotlin.io.path.writeBytes
 
 private const val STORAGE_KEY = "updatable_file_hashes"
-private val PLUGINS_DIR = DATA_FOLDER.parent
 
 internal object UpdatableFile {
     
-    private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve(STORAGE_KEY) ?: HashMap()
-    private val extractions = HashSet<String>()
+    private val PLUGINS_DIR = DATA_FOLDER.parent
+    private val fileHashes = ConcurrentHashMap(PermanentStorage.retrieve<Map<String, String>>(STORAGE_KEY) ?: emptyMap())
+    private val extractions = concurrentHashSet<String>()
     
-    @DisableFun
-    private fun disable() {
-        PermanentStorage.store(STORAGE_KEY, fileHashes)
-    }
-    
-    fun extractIdNamedFromAllAddons(dirName: String) {
+    suspend fun extractIdNamedFromAllAddons(
+        dirName: String,
+        filter: (Path) -> Boolean = { true }
+    ): Map<Path, ByteArray> = withContext(Dispatchers.IO) {
         extractions += dirName
-        for (addon in AddonBootstrapper.addons) {
-            addon.file.useZip { zip ->
-                extractAll(
-                    zip.resolve(dirName),
-                    addon.dataFolder.resolve(dirName)
-                ) { ResourcePath.isValidPath(it.name) }
+        val files = AddonBootstrapper.addons.map { addon ->
+            async {
+                addon.file.useZip { zip ->
+                    extractUpdatableFiles(
+                        zip.resolve(dirName),
+                        addon.dataFolder.resolve(dirName),
+                        PLUGINS_DIR,
+                        fileHashes
+                    ) { ResourcePath.isValidPath(it.name) && filter(it) }
+                }
             }
-        }
+        }.awaitAll().flatMap { it.entries }.associate { it.key to it.value }
+        PermanentStorage.store<Map<String, String>>(STORAGE_KEY, fileHashes)
+        files
     }
     
-    fun reset(wildcard: String): Int {
+    suspend fun reset(wildcard: String): Int {
         val regex = WildcardUtils.toRegex(wildcard)
         var count = 0
         fileHashes.removeIf { [path, _] ->
@@ -53,88 +62,89 @@ internal object UpdatableFile {
                 count++
             matches
         }
-        extractions.forEach(::extractIdNamedFromAllAddons)
+        extractions.forEach { extractIdNamedFromAllAddons(it) }
         return count
     }
     
     fun getTrackedFilePaths(): Set<String> = fileHashes.keys
     
-    private fun extractAll(fromDir: Path, toDir: Path, filter: (Path) -> Boolean) {
-        val existingPaths = HashSet<Path>()
-        fromDir.walk()
-            .filter { it.isRegularFile() }
-            .filter(filter)
-            .forEach { from ->
-                val relativePath = from.relativeTo(fromDir).invariantSeparatorsPathString
-                val to = toDir.resolve(relativePath)
-                load(from, to)
-                existingPaths.add(to)
-            }
-        
-        // find unedited files that are no longer default and remove them
-        toDir.walk()
-            .filter { it.isRegularFile() }
-            .filter(filter)
-            .forEach { path ->
-                if (path !in existingPaths
-                    && path.generateMD5Hash().contentEquals(getStoredHash(path))
-                ) {
-                    path.deleteExisting()
-                    removeStoredHash(path)
-                }
-            }
-    }
-    
-    private fun load(from: Path, to: Path) {
-        val storedHash = getStoredHash(to)
-        
-        if (to.exists() && storedHash != null) {
-            val existingFileHash = to.generateMD5Hash()
-            // Is the file on the server unchanged?
-            if (existingFileHash.contentEquals(storedHash)) {
-                val newFileData = from.readBytes()
-                val newFileHash = newFileData.generateMD5Hash()
-                
-                // Does the file need to be updated?
-                if (!existingFileHash.contentEquals(newFileHash)) {
-                    // Replace the file with a newer version
-                    to.writeBytes(newFileData)
-                    storeHash(to, newFileHash)
-                }
-            }
-        } else if (storedHash == null) {
-            // The file is not on the server and/or has never been extracted before
-            to.parent.createDirectories()
-            from.copyTo(to, true)
-            storeHash(to)
-        }
-    }
-    
-    private fun storeHash(file: Path, hash: ByteArray) {
-        fileHashes[file.invariantSeparatorsPathString] = hash.encodeBase64()
-    }
-    
-    private fun storeHash(file: Path) {
-        fileHashes[id(file)] = file.generateMD5Hash().encodeBase64()
-    }
-    
-    private fun getStoredHashString(file: Path): String? =
-        fileHashes[id(file)]
-    
-    private fun getStoredHash(file: Path): ByteArray? =
-        getStoredHashString(file)?.decodeBase64()
-    
-    private fun removeStoredHash(file: Path) {
-        fileHashes -= id(file)
-    }
-    
-    private fun id(file: Path): String =
-        file.relativeTo(PLUGINS_DIR).invariantSeparatorsPathString
-    
-    private fun Path.generateMD5Hash(): ByteArray =
-        HashUtils.getFileHash(this, "MD5")
-    
-    private fun ByteArray.generateMD5Hash(): ByteArray =
-        HashUtils.getHash(this, "MD5")
-    
 }
+
+private suspend fun extractUpdatableFiles(
+    fromDir: Path,
+    toDir: Path,
+    pluginsDir: Path,
+    fileHashes: ConcurrentMap<String, String>,
+    filter: (Path) -> Boolean
+): Map<Path, ByteArray> = withContext(Dispatchers.IO) {
+    val defaults = fromDir.walk()
+        .filter(filter)
+        .map { it.relativeTo(fromDir).invariantSeparatorsPathString }
+        .toSet()
+    val paths = defaults + toDir.walk()
+        .filter(filter)
+        .map { it.relativeTo(toDir).invariantSeparatorsPathString }
+    
+    paths.map { relativePath ->
+        async {
+            val from = fromDir.resolve(relativePath)
+            val to = toDir.resolve(relativePath)
+            val fromExists = from.exists()
+            val toExists = to.exists()
+            if ((fromExists && !from.isRegularFile()) || (toExists && !to.isRegularFile()) || (!fromExists && !toExists))
+                return@async null
+            
+            val id = to.relativeTo(pluginsDir).invariantSeparatorsPathString
+            val storedHash = fileHashes[id]?.decodeBase64()
+            val existingData = if (toExists) to.readBytes() else null
+            val existingHash = existingData?.generateMD5Hash()
+            
+            val data = when {
+                fromExists -> when {
+                    // new or explicitly reset default: write/replace
+                    storedHash == null -> {
+                        val data = from.readBytes()
+                        to.createParentDirectories()
+                        to.writeBytes(data)
+                        fileHashes[id] = data.generateMD5Hash().encodeBase64()
+                        data
+                    }
+                    
+                    // user deleted it: keep as-is
+                    existingData == null -> null
+                    
+                    // user edited it: keep as-is
+                    !existingHash.contentEquals(storedHash) -> existingData
+                    
+                    // unedited: update if needed
+                    else -> {
+                        val data = from.readBytes()
+                        if (!data.contentEquals(existingData))
+                            to.writeBytes(data)
+                        fileHashes[id] = data.generateMD5Hash().encodeBase64()
+                        data
+                    }
+                }
+                
+                else -> when {
+                    // user created it: keep as-is
+                    storedHash == null -> existingData
+                    
+                    // user edited an obsolete default: keep as-is
+                    !existingHash.contentEquals(storedHash) -> existingData
+                    
+                    // obsolete default: remove
+                    else -> {
+                        to.deleteExisting()
+                        fileHashes -= id
+                        null
+                    }
+                }
+            }
+            data?.let { to to it }
+        }
+    }.awaitAll().filterNotNull().toMap()
+}
+
+private fun ByteArray.generateMD5Hash(): ByteArray =
+    HashUtils.getHash(this, "MD5")
