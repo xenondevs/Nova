@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.config
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,6 +32,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.StandardWatchEventKinds
 import java.nio.file.WatchService
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.bufferedReader
 import kotlin.io.path.exists
 import kotlin.io.path.extension
@@ -63,27 +65,33 @@ val Configs get() = CONFIGS
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
 internal object NovaConfigBackend : ConfigBackend {
     
-    internal fun extractAllConfigs() {
+    internal suspend fun extractAllConfigs() {
         val serializer = MapSerializer(KeySerializer, String.serializer())
-        val extractedConfigs = PermanentStorage.retrieve("stored_configs", serializer)?.toMutableMap() ?: HashMap()
+        val extractedConfigs = ConcurrentHashMap(PermanentStorage.retrieve("stored_configs", serializer) ?: emptyMap())
         val extractor = ConfigExtractor(extractedConfigs)
-        extractConfigs(extractor, "nova", NOVA_JAR, DATA_FOLDER)
-        for (addon in AddonBootstrapper.addons) {
-            extractConfigs(extractor, addon.namespace(), addon.file, addon.dataFolder)
+        withContext(Dispatchers.IO) {
+            launch { extractConfigs(extractor, "nova", NOVA_JAR, DATA_FOLDER) }
+            for (addon in AddonBootstrapper.addons) {
+                launch { extractConfigs(extractor, addon.namespace(), addon.file, addon.dataFolder) }
+            }
         }
         PermanentStorage.store("stored_configs", serializer, extractedConfigs)
     }
     
-    private fun extractConfigs(extractor: ConfigExtractor, namespace: String, zipFile: Path, dataFolder: Path) {
+    private suspend fun extractConfigs(extractor: ConfigExtractor, namespace: String, zipFile: Path, dataFolder: Path) {
         zipFile.useZip { zip ->
             val configsDir = zip.resolve("configs/")
-            configsDir.walk()
-                .filter { !it.isDirectory() && it.extension.equals("yml", true) }
-                .forEach { config ->
-                    val relPath = config.relativeTo(configsDir).invariantSeparatorsPathString
-                    val configId = Key.key(namespace, relPath.substringBeforeLast('.'))
-                    extractConfig(extractor, config, dataFolder.resolve("configs").resolve(relPath), configId)
-                }
+            coroutineScope {
+                configsDir.walk()
+                    .filter { !it.isDirectory() && it.extension.equals("yml", true) }
+                    .forEach { config ->
+                        launch {
+                            val relPath = config.relativeTo(configsDir).invariantSeparatorsPathString
+                            val configId = Key.key(namespace, relPath.substringBeforeLast('.'))
+                            extractConfig(extractor, config, dataFolder.resolve("configs").resolve(relPath), configId)
+                        }
+                    }
+            }
         }
     }
     
@@ -156,7 +164,7 @@ internal object ConfigWatcher {
     
     private val watchService: WatchService? =
         if (IS_DEV_SERVER) FileSystems.getDefault().newWatchService() else null
-    private val dirs = HashSet<Path>()
+    private val dirs = ConcurrentHashMap.newKeySet<Path>()
     
     fun watchConfig(config: Path) {
         if (config.exists())
