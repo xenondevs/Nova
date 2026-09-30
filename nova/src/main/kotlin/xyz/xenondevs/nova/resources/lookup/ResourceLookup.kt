@@ -11,6 +11,7 @@ internal class ResourceLookup<T : Any>(
     val default: T?
 ) {
     
+    @Volatile
     private var isLoaded = false
     
     init {
@@ -20,7 +21,7 @@ internal class ResourceLookup<T : Any>(
     fun exists(): Boolean {
         return PermanentStorage.has(key)
     }
-
+    
     fun load() {
         if (isLoaded)
             return
@@ -29,13 +30,13 @@ internal class ResourceLookup<T : Any>(
             ?: throw IllegalStateException("Resource lookup '$key' is not present and has no default value")
         provider.set(value)
     }
-
+    
     fun store() {
         PermanentStorage.store(key, serializer, provider.get())
     }
-
+    
     fun remove() {
         PermanentStorage.remove(key)
     }
-
+    
 }

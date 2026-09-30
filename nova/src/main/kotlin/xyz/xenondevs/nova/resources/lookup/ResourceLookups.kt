@@ -2,6 +2,11 @@
 
 package xyz.xenondevs.nova.resources.lookup
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.PairSerializer
@@ -215,23 +220,23 @@ internal object ResourceLookups {
      */
     @Suppress("UNCHECKED_CAST")
     private fun <T : Any> loadAll(initiator: String): T {
-        loadAll()
+        runBlocking { loadAll() }
         return (lookups[initiator] as ResourceLookup<T>).provider.get()
     }
     
     /**
      * Loads all resource lookups.
      */
-    fun loadAll() {
-        for (lookup in lookups.values) {
-            try {
-                lookup.load()
-            } catch (e: Exception) {
-                // clear invalid lookups and force pack rebuild on the next startup
-                lookups.values.forEach(ResourceLookup<*>::remove)
-                PermanentStorage.remove(ResourceGeneration.RESOURCES_HASH)
-                throw ResourceLookupException(lookup.key, e)
-            }
+    suspend fun loadAll(): Unit = withContext(Dispatchers.Default) {
+        val results = lookups.values.map { lookup ->
+            async { lookup to runCatching { lookup.load() } }
+        }.awaitAll()
+        for ([lookup, result] in results) {
+            val error = result.exceptionOrNull() ?: continue
+            // clear invalid lookups and force pack rebuild on the next startup
+            lookups.values.forEach(ResourceLookup<*>::remove)
+            PermanentStorage.remove(ResourceGeneration.RESOURCES_HASH)
+            throw ResourceLookupException(lookup.key, error)
         }
     }
     
