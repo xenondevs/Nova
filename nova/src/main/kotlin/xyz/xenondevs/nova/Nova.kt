@@ -38,13 +38,15 @@ import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegi
 import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
-internal val HTTP_CLIENT = HttpClient(CIO) {
-    install(ContentNegotiation) { gson() }
-    install(HttpTimeout) {
-        connectTimeoutMillis = 10_000
-        requestTimeoutMillis = Long.MAX_VALUE
+internal val HTTP_CLIENT by lazy {
+    HttpClient(CIO) {
+        install(ContentNegotiation) { gson() }
+        install(HttpTimeout) {
+            connectTimeoutMillis = 10_000
+            requestTimeoutMillis = Long.MAX_VALUE
+        }
+        expectSuccess = false
     }
-    expectSuccess = false
 }
 
 internal var PLUGIN_READY = false
