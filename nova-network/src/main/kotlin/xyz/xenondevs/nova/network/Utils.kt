@@ -12,7 +12,7 @@ import net.minecraft.server.MinecraftServer
 internal val MINECRAFT_SERVER = MinecraftServer.getServer()
 internal val REGISTRY_ACCESS = MINECRAFT_SERVER.registryAccess()
 
-private val CLIENTBOUND_PACKET_IDS: Object2IntMap<PacketType<*>> = run {
+private val CLIENTBOUND_PACKET_IDS: Object2IntMap<PacketType<*>> by lazy {
     @Suppress("UNCHECKED_CAST")
     val codec = GameProtocols.CLIENTBOUND_TEMPLATE.bind(
         RegistryFriendlyByteBuf.decorator(REGISTRY_ACCESS)
@@ -20,7 +20,7 @@ private val CLIENTBOUND_PACKET_IDS: Object2IntMap<PacketType<*>> = run {
     codec.toId
 }
 
-private val SERVERBOUND_PACKET_IDS: Object2IntMap<PacketType<*>> = run {
+private val SERVERBOUND_PACKET_IDS: Object2IntMap<PacketType<*>> by lazy {
     @Suppress("UNCHECKED_CAST")
     val codec = GameProtocols.SERVERBOUND_TEMPLATE.bind(
         RegistryFriendlyByteBuf.decorator(REGISTRY_ACCESS),
