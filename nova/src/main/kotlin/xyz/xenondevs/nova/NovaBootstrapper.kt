@@ -21,7 +21,6 @@ import xyz.xenondevs.nova.config.NovaConfigBackend
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.serialization.cbf.CbfSerializers
-import xyz.xenondevs.nova.serialization.kotlinx.VersionSerializer
 import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
@@ -103,12 +102,6 @@ internal class NovaBootstrapper : PluginBootstrap {
             
             runBlocking {
                 PermanentStorage.load()
-                val previousNovaVersion = PermanentStorage.retrieve("last_version", VersionSerializer)
-                if (previousNovaVersion != null && previousNovaVersion < Version("0.9"))
-                    error("""
-                        This version of Nova is not compatible with the version that was previously installed.
-                        Please erase all data related to Nova and try again.
-                    """.trimIndent())
                 NovaConfigBackend.extractAllConfigs()
                 CbfSerializers.register()
                 Initializer.start()
