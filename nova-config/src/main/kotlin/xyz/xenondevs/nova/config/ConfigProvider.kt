@@ -861,6 +861,8 @@ internal fun Array<out Array<String>>.toLists(): Array<List<String>> =
     map { it.asList() }.toTypedArray()
 //</editor-fold>
 
+private val EMPTY_JSON_PROVIDER = provider(JsonObject(emptyMap()))
+
 @SubclassOptInRequired(UnstableProviderApi::class)
 interface ConfigProvider : Provider<JsonElement> {
     
@@ -949,7 +951,9 @@ interface ConfigProvider : Provider<JsonElement> {
      * An empty [ConfigProvider] that only returns default or empty optional entries.
      * Uses `nova:empty_config_provider` as the config id.
      */
-    object Empty : ConfigProvider, Provider<JsonElement> by provider(JsonObject(emptyMap())) {
+    @OptIn(UnstableProviderApi::class)
+    object Empty : ConfigProvider, Provider<JsonElement> by EMPTY_JSON_PROVIDER {
+        override val delegate: Provider<JsonElement> get() = EMPTY_JSON_PROVIDER
         override val configId = Key.key("nova", "empty_config_provider")
         override fun node(path: List<String>) = Empty
         override fun <S : Any, T : Any> entry(type: KType, default: Provider<S>, transform: (S) -> T, vararg paths: List<String>) = default.map(transform)
