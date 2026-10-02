@@ -371,6 +371,13 @@ internal data class ProtoBlockState(
      */
     fun toBlockData(): BlockData = toBlockState().bukkitBlockData
     
+    override fun toString(): String =
+        properties.entries.joinToString(
+            separator = ", ",
+            prefix = "${entry.key.asString()}[",
+            postfix = "]"
+        ) { (key, value) -> "$key=$value" }
+    
     companion object {
         
         fun createDefaultBlockState(
