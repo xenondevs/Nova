@@ -1,9 +1,10 @@
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
-import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
@@ -13,11 +14,15 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import xyz.xenondevs.nova.annotations.AnnotationIndex
 import xyz.xenondevs.nova.annotations.gradle.MergeAnnotationIndexes
+import xyz.xenondevs.origami.OrigamiPlugin
 import java.io.File
 
 class BundlerJarPlugin : Plugin<Project> {
     
     override fun apply(project: Project) {
+        project.pluginManager.apply(OrigamiPlugin::class.java)
+        val origami = project.plugins.getPlugin(OrigamiPlugin::class.java)
+        
         val novaLoaderApiCfg = project.configurations.create("novaLoaderApi")
         project.configurations.getByName("api").extendsFrom(novaLoaderApiCfg)
         
@@ -44,9 +49,7 @@ class BundlerJarPlugin : Plugin<Project> {
             outputFile.set(project.layout.buildDirectory.file("loaderAnnotations/${AnnotationIndex.FILE_NAME}"))
         }
         
-        val runtimeArtifacts = project.configurations
-            .getByName("paperweightDevelopmentBundleRuntimeClasspath")
-            .incoming.artifacts.resolvedArtifacts
+        val runtimeArtifacts = origami.serverRuntimeClasspath.incoming.artifacts.resolvedArtifacts
         val libraryPaths = novaLoaderCfg.incoming.artifacts.resolvedArtifacts.zip(runtimeArtifacts) { libraries, runtime ->
             val runtimeModules = runtime.mapNotNullTo(HashSet()) { artifact ->
                 (artifact.id.componentIdentifier as? ModuleComponentIdentifier)?.moduleIdentifier

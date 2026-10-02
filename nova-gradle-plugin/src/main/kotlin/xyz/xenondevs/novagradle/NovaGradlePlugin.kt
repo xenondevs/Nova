@@ -1,5 +1,6 @@
 package xyz.xenondevs.novagradle
 
+import addOrigamiJson
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
@@ -31,7 +32,6 @@ import xyz.xenondevs.novagradle.task.PrepareAddonJar
 import xyz.xenondevs.novagradle.task.SyncInjectables
 import xyz.xenondevs.novagradle.util.toClassFilePath
 import xyz.xenondevs.origami.extension.OrigamiExtension
-import xyz.xenondevs.origami.task.packaging.PrepareOrigamiMarkerTask
 
 private const val NOVA_TASK_GROUP = "nova"
 private const val COMPILER_PLUGIN_ID = "xyz.xenondevs.nova.compiler"
@@ -192,7 +192,7 @@ internal class NovaGradlePlugin : KotlinCompilerPluginSupportPlugin {
             })
             from(project.tasks.named<GenerateAnnotationIndex>("generateAnnotationIndex").flatMap { it.outputFile })
             from(prepAddonJar.map { it.output })
-            from(project.tasks.named<PrepareOrigamiMarkerTask>("_oriPrepareMarker").flatMap { it.jsonOutput })
+            addOrigamiJson()
         }
     }
     
