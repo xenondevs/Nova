@@ -13,6 +13,7 @@ internal abstract class SidedBackingStateConfig(
     override val blockType: RegistryEntry.Paper<BlockType>
 ) : BackingStateConfig() {
     
+    abstract override val type: SidedBackingStateConfigType<*>
     override val id = faces.data.toInt()
     override val waterlogged = false
     override val variantMap = CubeFaceSet.ALL.map { it.name.lowercase() to (it in faces).toString() }.toMap()
@@ -25,7 +26,8 @@ internal abstract class SidedBackingStateConfig(
             .setValue(BlockStateProperties.UP, BlockFace.UP in faces)
             .setValue(BlockStateProperties.DOWN, BlockFace.DOWN in faces)
     }
-    override val maskedBlockState: BlockState by blockType.map { it.nmsBlock.defaultBlockState }
+    override val maskedBlockState: BlockState
+        get() = type.defaultStateConfig.vanillaBlockState
     
 }
 

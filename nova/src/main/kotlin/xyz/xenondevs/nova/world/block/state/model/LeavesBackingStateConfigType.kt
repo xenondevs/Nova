@@ -15,6 +15,7 @@ internal abstract class LeavesBackingStateConfig(
     override val waterlogged: Boolean
 ) : BackingStateConfig() {
     
+    abstract override val type: LeavesBackingStateConfigType<*>
     override val id = (distance - 1) shl 1 or persistent.intValue
     override val variantMap = mapOf(
         "distance" to "$distance",
@@ -29,7 +30,8 @@ internal abstract class LeavesBackingStateConfig(
             .setValue(LeavesBlock.WATERLOGGED, waterlogged)
     }
     
-    override val maskedBlockState: BlockState by blockType.map { it.nmsBlock.defaultBlockState }
+    override val maskedBlockState: BlockState
+        get() = type.defaultStateConfig.vanillaBlockState
     
 }
 
@@ -38,8 +40,8 @@ internal abstract class LeavesBackingStateConfigType<T : LeavesBackingStateConfi
     fileName: String,
 ) : DefaultingBackingStateConfigType<T>(13, fileName) {
     
-    override val defaultStateConfig = ctor(7, true, false)
-    override val blockedIds = hashSetOf(13)
+    override val defaultStateConfig = ctor(7, false, false)
+    override val blockedIds = hashSetOf(12)
     override val properties = hashSetOf("distance", "persistent", "waterlogged")
     override val isWaterloggable = true
     open val particleType = "tinted_leaves"
