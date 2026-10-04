@@ -29,7 +29,6 @@ Nova uses [Origami](https://github.com/xenondevs/origami), an access-widener and
 
 ### General Guidelines
 
-* On Windows systems, stale Gradle daemons can prevent origami installation due to open file handles. If you encounter this, verify that the daemon process is not actually doing any work, then kill it and retry the build.
 * Prefer adding an accesswidener entry over using reflection to access server internals.
 * Create transitive access widener entries if and only if the type will be part of a public API consumed by addons.
 * Default to private visibility, then protected or internal. Use public visibility only if it's API intended to be consumed by addons.
@@ -53,8 +52,7 @@ Inspect the tools available to the agent and use JetBrains IDE or IntelliJ index
 
 Prefer IDE-backed capabilities for:
 
-- reading project and library files and searching by text, regex, filename, or symbol;
-    - if no sources for the minecraft server are available, run `gradle _oriInstall` to create them
+- reading project and library files and searching by text, regex, filename, or symbol
 - navigating to declarations and finding usages, implementations, callers, and type hierarchies;
 - inspecting types, documentation, diagnostics, and project structure;
 - editing project files when an IDE-backed edit operation is available;
