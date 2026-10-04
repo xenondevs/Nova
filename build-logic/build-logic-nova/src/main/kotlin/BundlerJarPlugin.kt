@@ -5,23 +5,30 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.bundling.Zip
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import xyz.xenondevs.nova.annotations.AnnotationIndex
+import xyz.xenondevs.nova.annotations.gradle.GenerateAnnotationIndex
 import xyz.xenondevs.nova.annotations.gradle.MergeAnnotationIndexes
 import xyz.xenondevs.origami.OrigamiPlugin
 import java.io.File
+import javax.inject.Inject
 
-class BundlerJarPlugin : Plugin<Project> {
+abstract class BundlerJarPlugin : Plugin<Project> {
+    
+    @get:Inject
+    protected abstract val archives: ArchiveOperations
     
     override fun apply(project: Project) {
         project.pluginManager.apply(OrigamiPlugin::class.java)
         val origami = project.plugins.getPlugin(OrigamiPlugin::class.java)
+        val providers = project.providers
         
         val novaLoaderApiCfg = project.configurations.create("novaLoaderApi")
         project.configurations.getByName("api").extendsFrom(novaLoaderApiCfg)
@@ -39,13 +46,25 @@ class BundlerJarPlugin : Plugin<Project> {
                 attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
             }
         }
-        val mergedJars = project.files(
-            project.tasks.named<Jar>("origamiJar").flatMap { it.archiveFile },
-            novaMergeClasspath
-        )
+        val mergedClasses = novaMergeClasspath.get().incoming.artifactView {
+            attributes.attribute(
+                LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+                project.objects.named(LibraryElements.CLASSES)
+            )
+        }.artifacts
+        val mergedResources = novaMergeClasspath.get().incoming.artifactView {
+            attributes.attribute(
+                LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+                project.objects.named(LibraryElements.RESOURCES)
+            )
+        }.artifacts
+        val mergedTrees = project.files(mergedClasses.artifactFiles, mergedResources.artifactFiles).elements.map { files ->
+            files.map { file -> if (file.asFile.extension == "jar") archives.zipTree(file) else file }
+        }
         val mergedAnnotationIndex = project.tasks.register<MergeAnnotationIndexes>("mergeAnnotationIndexes") {
             description = "Merges annotation indexes for the Nova loader JAR."
-            jars.from(mergedJars)
+            indexes.from(project.tasks.named<GenerateAnnotationIndex>("generateAnnotationIndex").flatMap { it.outputFile })
+            indexes.from(project.files(mergedTrees).asFileTree.matching { include(AnnotationIndex.FILE_NAME) })
             outputFile.set(project.layout.buildDirectory.file("loaderAnnotations/${AnnotationIndex.FILE_NAME}"))
         }
         
@@ -61,34 +80,55 @@ class BundlerJarPlugin : Plugin<Project> {
                     return@mapNotNull null
                 
                 val path = "lib/${id.group.replace('.', '/')}/${id.module}/${id.version}/${artifact.file.name}"
-                artifact.file.absolutePath to path
+                artifact.file to path
             }.sortedBy { it.second }.toMap()
         }
         
         val prepare = project.tasks.register<PrepareNovaLoaderTask>("prepareNovaLoader") {
-            libraries.from(libraryPaths.map { paths -> paths.keys.map(::File) })
-            this.libraryPaths.set(libraryPaths)
-            outputDir.set(project.layout.buildDirectory.dir("novaLoader"))
+            this.libraryPaths.set(libraryPaths.map { it.values.toList() })
+            outputFile.set(project.layout.buildDirectory.file("novaLoader/nova-libraries"))
         }
         
         val ext = project.extensions.create<BuildLoaderJarExtension>("loaderJar")
-        project.tasks.register<Zip>("loaderJar") {
+        project.tasks.register<Jar>("loaderJar") {
+            val origamiJar = project.tasks.getByName<Jar>("origamiJar")
+            
             group = LifecycleBasePlugin.BUILD_GROUP
             
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-            from(prepare.flatMap { it.outputDir })
-            from(mergedJars.elements.map { jars -> jars.map { jar -> project.zipTree(jar) } }) {
+            duplicatesStrategy = DuplicatesStrategy.FAIL
+            manifest.from(origamiJar.manifest)
+            
+            // nova-libraries index file
+            from(prepare.flatMap { it.outputFile })
+            
+            // nova library jars
+            inputs.property("libraryPaths", libraryPaths)
+            from(libraryPaths.map { it.keys }) {
+                eachFile { path = libraryPaths.get().getValue(file) }
+            }
+            
+            // core nova classes + origami, origami libs, origami marker
+            into("") {
+                with(origamiJar)
                 exclude(AnnotationIndex.FILE_NAME)
             }
+            
+            // classes from nova-api, nova-registry, etc.
+            from(mergedTrees) {
+                exclude(AnnotationIndex.FILE_NAME)
+            }
+            
+            // merged nova-annotions.json
             from(mergedAnnotationIndex.flatMap { it.outputFile })
             
             val customOutDir = project.layout.dir(
-                project.providers.gradleProperty("outDir")
-                    .orElse(project.providers.systemProperty("outDir"))
+                providers.gradleProperty("outDir")
+                    .orElse(providers.systemProperty("outDir"))
                     .map(::File)
             )
             val outputDir = customOutDir.orElse(project.layout.buildDirectory)
-            val fileName = ext.gameVersion.map { gameVersion -> "Nova-${project.version}+MC-$gameVersion.jar" }
+            val novaVersion = providers.provider { project.version.toString() }
+            val fileName = novaVersion.zip(ext.gameVersion) { nv, gv -> "Nova-$nv+MC-$gv.jar" }
             
             destinationDirectory.set(outputDir)
             archiveFileName.set(fileName)

@@ -47,7 +47,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs")
         create("origamiLibs") {
-            from("xyz.xenondevs.origami:origami-catalog:0.6.0") // !!! also change in build-logic/build-logic-nova !!!
+            from("xyz.xenondevs.origami:origami-catalog:0.6.1") // !!! also change in build-logic/build-logic-nova !!!
         }
     }
 }

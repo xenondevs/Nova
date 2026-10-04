@@ -1,7 +1,16 @@
 import xyz.xenondevs.nova.annotations.gradle.AnnotationIndexExtension
+import xyz.xenondevs.nova.annotations.gradle.GenerateAnnotationIndex
 
 plugins {
     id("xyz.xenondevs.nova.annotations")
+}
+
+plugins.withId("java") {
+    configurations.named("runtimeElements") {
+        outgoing.variants.named("resources") {
+            artifact(tasks.named<GenerateAnnotationIndex>("generateAnnotationIndex").flatMap { it.outputFile })
+        }
+    }
 }
 
 extensions.configure<AnnotationIndexExtension> {

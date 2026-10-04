@@ -110,6 +110,7 @@ tasks {
         filesMatching("paper-plugin.yml", ExpandPropertiesAction(resourceProperties))
     }
     test {
+        inputs.property("minecraftVersion", mcVersion)
         environment("MINECRAFT_VERSION", mcVersion.get())
     }
 }
