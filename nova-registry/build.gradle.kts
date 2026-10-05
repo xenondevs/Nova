@@ -14,5 +14,6 @@ dependencies {
     api(libs.kotlinx.serialization.json)
     api(libs.cosmicBinaryFormat)
     ksp(project(":nova-ksp:processor:registry"))
+    kspTest(project(":nova-ksp:processor:registry"))
     implementation(libs.commons.collections)
 }
