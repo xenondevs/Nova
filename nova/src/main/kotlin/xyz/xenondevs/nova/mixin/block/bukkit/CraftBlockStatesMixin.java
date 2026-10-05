@@ -20,7 +20,7 @@ import java.util.Objects;
 abstract class CraftBlockStatesMixin {
     
     @Inject(
-        method = "getBlockState(Lorg/bukkit/World;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/BlockEntity;)Lorg/bukkit/craftbukkit/block/CraftBlockState;",
+        method = "getBlockState(Lorg/bukkit/World;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/BlockEntity;Z)Lorg/bukkit/craftbukkit/block/CraftBlockState;",
         at = @At("HEAD"),
         cancellable = true
     )
@@ -29,6 +29,7 @@ abstract class CraftBlockStatesMixin {
         BlockPos pos,
         BlockState state,
         BlockEntity blockEntity,
+        boolean useSnapshot,
         CallbackInfoReturnable<CraftBlockState> cir
     ) {
         if (!(state.getBlock() instanceof NovaTileEntityBlock novaBlock))
@@ -43,7 +44,7 @@ abstract class CraftBlockStatesMixin {
             throw new IllegalStateException("Unexpected block entity for Nova block state: " + blockEntity);
         }
         
-        cir.setReturnValue(new NovaCapturedBlockEntityState(world, proxy));
+        cir.setReturnValue(new NovaCapturedBlockEntityState(world, proxy, useSnapshot));
     }
     
 }

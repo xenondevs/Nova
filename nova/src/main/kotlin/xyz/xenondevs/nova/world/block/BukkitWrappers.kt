@@ -40,7 +40,7 @@ internal class NovaBlockStateImpl internal constructor(state: BlockState) : Craf
 }
 
 internal class NovaCapturedBlockEntityState : CraftBlockEntityState<NovaTileEntityProxy> {
-    constructor(world: World?, blockEntity: NovaTileEntityProxy) : super(world, blockEntity)
+    constructor(world: World?, blockEntity: NovaTileEntityProxy, useSnapshot: Boolean) : super(world, blockEntity, useSnapshot)
     private constructor(state: NovaCapturedBlockEntityState, location: Location?) : super(state, location)
     
     override fun copy() = NovaCapturedBlockEntityState(this, null)

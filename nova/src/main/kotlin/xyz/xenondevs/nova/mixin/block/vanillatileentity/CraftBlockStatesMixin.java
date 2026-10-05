@@ -12,10 +12,10 @@ import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaCauldronBlockEnt
 abstract class CraftBlockStatesMixin {
     
     @ModifyArg(
-        method = "getBlockState(Lorg/bukkit/World;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/BlockEntity;)Lorg/bukkit/craftbukkit/block/CraftBlockState;",
+        method = "getBlockState(Lorg/bukkit/World;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/BlockEntity;Z)Lorg/bukkit/craftbukkit/block/CraftBlockState;",
         at = @At(
             value = "INVOKE",
-            target = "Lorg/bukkit/craftbukkit/block/CraftBlockStates$BlockStateFactory;createBlockState(Lorg/bukkit/World;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/BlockEntity;)Lorg/bukkit/craftbukkit/block/CraftBlockState;"
+            target = "Lorg/bukkit/craftbukkit/block/CraftBlockStates$BlockStateFactory;createBlockState(Lorg/bukkit/World;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/BlockEntity;Z)Lorg/bukkit/craftbukkit/block/CraftBlockState;"
         ),
         index = 3
     )
