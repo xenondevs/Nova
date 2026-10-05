@@ -78,5 +78,5 @@ xenondevs-commons = ["commons-collections", "commons-gson", "commons-guava", "co
 
 [plugins]
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-pluginPublish = { id = "xyz.xenondevs.publish.plugin-publish", version = "1.0.3" }
+pluginPublish = { id = "xyz.xenondevs.publish.plugin-publish", version = "1.0.4" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
