@@ -57,7 +57,6 @@ import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 import xyz.xenondevs.nova.util.Identifier
 import xyz.xenondevs.nova.util.parseKey
-import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.block.TileEntityConstructor
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData

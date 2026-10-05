@@ -30,7 +30,6 @@ import xyz.xenondevs.nova.registry.RegistryLoader.novaBuilders
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.runTask
-import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.util.toResourceKey
 import java.lang.instrument.ClassFileTransformer
 import java.security.ProtectionDomain
@@ -74,7 +73,7 @@ private sealed interface BuilderFactory<E : RegistryEntry<*>, B : RegistryElemen
  * Accepts and queues registrations for both Nova- and Vanilla registries.
  * Responsible for running builders at the correct time during initialization.
  * Unless you're working with a custom [NovaRegistry], prefer registration via [Registrar] (i.e. [Addon]) instead.
- * 
+ *
  * Order of operations:
  * * Addons enqueue entry builders via [enqueueNova] and [enqueueVanilla]. (Most likely implicitly through [Registrar]).
  * * All builders (Nova and Vanilla) are invoked and [prepared][RegistryElementBuilder.prepareBuild],
@@ -178,9 +177,9 @@ object RegistryLoader {
         return registry.getTag(key)
     }
     
-    /**    
+    /**
      * Registers a [builder factory][makeBuilder] and [builder configuration][runBuilder] for unknown elements of [registry],
-     * which will be invoked for all keys that were registered during a previous iteration but are missing now. 
+     * which will be invoked for all keys that were registered during a previous iteration but are missing now.
      * If no unknown builder factory is registered for a registry, missing keys will be ignored.
      */
     fun <API : Keyed, NMS : Any, B : RegistryElementBuilder.Vanilla<API, NMS>> registerVanillaUnknown(

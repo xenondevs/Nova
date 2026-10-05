@@ -6,11 +6,12 @@ import net.minecraft.resources.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import xyz.xenondevs.nova.registry.RegistryEventManager;
+import xyz.xenondevs.nova.registry.RegistryWriter;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Mixin(ResourceManagerRegistryLoadTask.class)
 abstract class ResourceManagerRegistryLoadTaskMixin<T> extends RegistryLoadTask<T> {
@@ -31,20 +32,22 @@ abstract class ResourceManagerRegistryLoadTaskMixin<T> extends RegistryLoadTask<
         return super.freezeRegistry(loadingErrors);
     }
     
-    @Inject(
+    @ModifyArg(
         method = "lambda$load$3",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/resources/ResourceManagerRegistryLoadTask;registerElements(Ljava/util/stream/Stream;Lio/papermc/paper/registry/data/util/Conversions;)V"
-        )
+        ),
+        index = 0
     )
-    private void preFreeze(
-        Conversions conversions,
-        Map<?, ?> loadedEntries,
-        CallbackInfo ci
+    private Stream<PendingRegistration<T>> preFreeze(
+        Stream<PendingRegistration<T>> loadedEntries,
+        Conversions conversions
     ) {
         nova$lookup = conversions.lookup();
-        RegistryEventManager.handlePreFreeze(registry, conversions.lookup());
+        var entries = new RegistryWriter.Deferred<>(registry.key());
+        RegistryEventManager.handlePreFreeze(entries, conversions.lookup());
+        return Stream.concat(entries.stream(), loadedEntries);
     }
     
 }

@@ -83,6 +83,8 @@ accessible method net/minecraft/world/item/trading/MerchantOffer <init> (Lnet/mi
 accessible method net/minecraft/world/item/ItemStack applyAfterUseComponentSideEffects (Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;
 accessible class net/minecraft/server/network/ServerGamePacketListenerImpl$EntityInteraction
 accessible field net/minecraft/resources/RegistryLoadTask registry Lnet/minecraft/core/WritableRegistry;
+accessible class net/minecraft/resources/RegistryLoadTask$PendingRegistration
+accessible method net/minecraft/resources/RegistryLoadTask$PendingRegistration <init> (Lnet/minecraft/resources/ResourceKey;Lcom/mojang/datafixers/util/Either;Lnet/minecraft/core/RegistrationInfo;)V
 accessible class io/papermc/paper/world/migration/WorldMigrationSupport
 accessible field io/papermc/paper/world/migration/WorldMigrationSupport DIMENSION_DIRECTORIES Ljava/util/List;
 accessible method net/minecraft/tags/TagNetworkSerialization$NetworkPayload <init> (Ljava/util/Map;)V

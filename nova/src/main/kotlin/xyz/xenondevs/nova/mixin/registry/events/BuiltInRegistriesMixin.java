@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import xyz.xenondevs.nova.registry.RegistryEventManager;
+import xyz.xenondevs.nova.registry.RegistryWriter;
 
 @Mixin(BuiltInRegistries.class)
 abstract class BuiltInRegistriesMixin {
@@ -22,7 +23,8 @@ abstract class BuiltInRegistriesMixin {
     )
     private static <T> Registry<T> freeze(Registry<T> registry) {
         var lookup = new RegistryOps.HolderLookupAdapter(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY));
-        RegistryEventManager.handlePreFreeze((WritableRegistry<T>) registry, lookup);
+        var entries = new RegistryWriter.Direct<>((WritableRegistry<T>) registry);
+        RegistryEventManager.handlePreFreeze(entries, lookup);
         var frozen = registry.freeze();
         RegistryEventManager.handlePostFreeze(frozen, lookup);
         return frozen;

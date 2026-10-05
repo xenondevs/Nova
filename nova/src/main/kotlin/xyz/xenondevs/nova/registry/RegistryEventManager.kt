@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.registry
 import net.kyori.adventure.key.Key
 import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
-import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
@@ -11,13 +10,12 @@ import xyz.xenondevs.commons.collections.concurrentHashSet
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.util.toIdentifier
 import java.util.concurrent.ConcurrentHashMap
 
 private val LOG_REGISTRY_FREEZE by MAIN_CONFIG.entry<Boolean>("debug", "logging", "registry_freeze")
 
-private typealias PreFreezeListener<T> = (registry: WritableRegistry<T>, lookup: RegistryOps.RegistryInfoLookup) -> Unit
+private typealias PreFreezeListener<T> = (registry: RegistryWriter<T>, lookup: RegistryOps.RegistryInfoLookup) -> Unit
 private typealias PostFreezeListener<T> = (registry: Registry<T>, lookup: RegistryOps.RegistryInfoLookup) -> Unit
 
 internal object RegistryEventManager {
@@ -27,8 +25,8 @@ internal object RegistryEventManager {
     private val frozen = concurrentHashSet<ResourceKey<out Registry<*>>>()
     
     @JvmStatic
-    fun handlePreFreeze(registry: WritableRegistry<*>, lookup: RegistryOps.RegistryInfoLookup) {
-        val key = registry.key()
+    fun handlePreFreeze(registry: RegistryWriter<*>, lookup: RegistryOps.RegistryInfoLookup) {
+        val key = registry.key
         frozen += key
         try {
             preFreezeListeners.remove(key)?.forEach { it(registry, lookup) }

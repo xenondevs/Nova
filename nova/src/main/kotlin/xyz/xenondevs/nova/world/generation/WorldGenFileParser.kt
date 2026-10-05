@@ -30,7 +30,6 @@ import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.util.data.UpdatableFile
 import xyz.xenondevs.nova.util.data.decodeJsonFile
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
-import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjector
 import kotlin.io.path.extension
