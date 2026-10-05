@@ -42,6 +42,7 @@ jobs:
 
   docs:
     name: Publish API documentation
+    needs: publish
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
