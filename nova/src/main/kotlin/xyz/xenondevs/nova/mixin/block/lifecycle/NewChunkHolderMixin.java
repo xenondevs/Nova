@@ -39,14 +39,8 @@ abstract class NewChunkHolderMixin {
     ) {
         nova$coroutineSupervisor = SupervisorKt.SupervisorJob(AsyncExecutor.SUPERVISOR);
         for (var be : chunk.blockEntities.values()) {
-            if (be instanceof NovaTileEntityProxy p && p.getTileEntity() instanceof TileEntity te) {
-                te.setCoroutineSupervisor$nova(SupervisorKt.SupervisorJob(nova$coroutineSupervisor));
-                te.setTicking$nova(true);
-                try {
-                    te.handleEnableTicking();
-                } catch (Throwable t) {
-                    NovaBootstrapperKt.getLOGGER().error("Failed to enable ticking for {}", te, t);
-                }
+            if (be instanceof NovaTileEntityProxy proxy) {
+                proxy.enableTicking(nova$coroutineSupervisor);
             }
         }
     }

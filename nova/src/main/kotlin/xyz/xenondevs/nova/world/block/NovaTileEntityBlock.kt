@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.world.block
 
 import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.core.BlockPos
@@ -12,10 +13,15 @@ import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityTicker
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.chunk.LevelChunk
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
+import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.cbf.Cbf
@@ -31,6 +37,7 @@ import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockSelectorScope
 import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.getOrNull
+import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.toBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
@@ -185,6 +192,35 @@ internal class NovaTileEntityProxy(
         }
     }
     
+    fun enable(chunk: LevelChunk) {
+        val tileEntity = tileEntity ?: return
+        if (isRemoved)
+            return
+        
+        if (!tileEntity.isEnabled) {
+            tileEntity.isEnabled = true
+            runSafely("enable tile entity") {
+                tileEntity.handleEnable()
+            }
+        }
+        
+        val supervisor = chunk.`moonrise$getChunkHolder`().coroutineSupervisor
+        if (supervisor != null)
+            enableTicking(supervisor)
+    }
+    
+    fun enableTicking(parent: Job) {
+        val tileEntity = tileEntity ?: return
+        if (isRemoved || !tileEntity.isEnabled || tileEntity.isTicking)
+            return
+        
+        tileEntity.coroutineSupervisor = SupervisorJob(parent)
+        tileEntity.isTicking = true
+        runSafely("enable tile entity ticking") {
+            tileEntity.handleEnableTicking()
+        }
+    }
+    
     override fun setRemoved() {
         super.setRemoved()
         
@@ -252,6 +288,19 @@ internal class NovaTileEntityProxy(
                 tileEntity?.handleTick()
             }
         }
+    }
+    
+    companion object : Listener {
+        
+        @EventHandler(priority = EventPriority.LOWEST)
+        private fun handleChunkLoad(event: ChunkLoadEvent) {
+            val chunk = event.chunk.levelChunk
+            val tileEntities = chunk.blockEntities.values.filterIsInstance<NovaTileEntityProxy>()
+            for (tileEntity in tileEntities) {
+                tileEntity.enable(chunk)
+            }
+        }
+        
     }
     
 }

@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.registry.NovaRegistryContext
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.world.block.NovaTileEntityProxy
 import xyz.xenondevs.nova.api.Nova as INova
 import xyz.xenondevs.nova.api.block.BlockManager as IBlockManager
 import xyz.xenondevs.nova.api.block.NovaBlockRegistry as INovaBlockRegistry
@@ -74,6 +75,7 @@ internal object Nova : JavaPlugin(), INova {
             Languages.getInstance().enableServerSideTranslations(false)
             installPacketHandler(this)
             initPacketEntityManager(this)
+            context(NovaTileEntityProxy) { registerEvents() }
             context(Initializer) { registerEvents() }
         } catch (t: Throwable) {
             if (t is InitializationException)
