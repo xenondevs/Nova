@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.initialize
 
 import io.ktor.utils.io.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -15,12 +14,12 @@ import org.bstats.charts.DrilldownPie
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.server.ServerLoadEvent
-import org.objectweb.asm.Type
 import org.jgrapht.Graph
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
 import org.jgrapht.nio.DefaultAttribute
 import org.jgrapht.nio.dot.DOTExporter
+import org.objectweb.asm.Type
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_JAR
@@ -50,7 +49,6 @@ internal object Initializer : Listener {
     private val initPostWorld = DirectedAcyclicGraph<Initializable, DefaultEdge>(DefaultEdge::class.java)
     private val disable = DirectedAcyclicGraph<DisableableFunction, DefaultEdge>(DefaultEdge::class.java)
     
-    private lateinit var preWorldScope: CoroutineScope
     private var preWorldInitialized = false
     var isDone = false
         private set
@@ -110,8 +108,6 @@ internal object Initializer : Listener {
     
     /**
      * Adds the given [Initializables][Initializable] and [DisableableFunctions][DisableableFunction] to the initialization process.
-     *
-     * This method can only be invoked during the pre-world initialization phase or before the [start] method is called.
      */
     private fun addRunnables(initializables: List<Initializable>, disableables: List<DisableableFunction>) {
         check(!preWorldInitialized) { "Cannot add additional callables after pre-world initialization!" }
@@ -138,16 +134,6 @@ internal object Initializer : Listener {
         }
         for (disableable in disableables) {
             disableable.loadDependencies(this.disableables, disable)
-        }
-        
-        // launch initialization it if already started
-        if (::preWorldScope.isInitialized) {
-            for (initializable in initializables) {
-                if (initializable.stage != InternalInitStage.PRE_WORLD)
-                    continue
-                
-                launch(preWorldScope, initializable, initPreWorld)
-            }
         }
         
         if (IS_DEV_SERVER)
@@ -180,7 +166,6 @@ internal object Initializer : Listener {
     private suspend fun initPreWorld() {
         tryInit {
             coroutineScope {
-                preWorldScope = this
                 launchAll(this, initPreWorld)
             }
         }
@@ -226,20 +211,10 @@ internal object Initializer : Listener {
         graph: Graph<T, DefaultEdge>
     ) {
         scope.launch {
-            // await dependencies, which may increase during wait
-            var prevDepsSize = 0
-            var deps: List<Deferred<*>> = emptyList()
-            
-            fun findDependencies(): List<Deferred<*>> {
-                deps = graph.incomingEdgesOf(runnable)
-                    .map { graph.getEdgeSource(it).completion }
-                return deps
-            }
-            
-            while (prevDepsSize != findDependencies().size) {
-                prevDepsSize = deps.size
-                deps.awaitAll()
-            }
+            // await dependencies
+            graph.incomingEdgesOf(runnable)
+                .map { graph.getEdgeSource(it).completion }
+                .awaitAll()
             
             // run in preferred context
             withContext(runnable.dispatcher ?: scope.coroutineContext) {
