@@ -3,6 +3,8 @@ name: CI
 on:
   push:
     branches: [ '**' ]
+  schedule:
+    - cron: '0 * * * *'
 
 jobs:
   build:
@@ -25,7 +27,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Build & Test
-        run: ./gradlew test _oriMixin loaderJar -Prelease --build-cache
+        run: ./gradlew test _oriMixin loaderJar -Prelease --build-cache --refresh-dependencies
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v7
