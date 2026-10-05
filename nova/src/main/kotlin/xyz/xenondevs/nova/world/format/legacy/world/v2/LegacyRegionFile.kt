@@ -8,5 +8,7 @@ private const val MAGIC = 0x004E5652 // .NVR
 private const val VERSION = 2.toByte()
 
 internal class LegacyRegionFile(chunks: Array<LegacyRegionChunk>) : RegionizedFile<LegacyRegionChunk>(MAGIC, VERSION, chunks) {
-    companion object : RegionizedFileReader<LegacyRegionChunk, LegacyRegionFile>(MAGIC, VERSION, ::Array, ::LegacyRegionFile, LegacyRegionChunk)
+    class Reader(blockStateIdResolver: LegacyBlockStateIdResolver) : RegionizedFileReader<LegacyRegionChunk, LegacyRegionFile>(
+        MAGIC, VERSION, ::Array, ::LegacyRegionFile, LegacyRegionChunk.Reader(blockStateIdResolver)
+    )
 }

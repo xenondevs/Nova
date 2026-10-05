@@ -11,15 +11,26 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.SetSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.serializer
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.registry.KnownRegistryEntries.BlockConfiguration
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.ResourceKeySerializer
 import xyz.xenondevs.nova.util.AsyncExecutor
+import xyz.xenondevs.nova.util.toKey
+import xyz.xenondevs.nova.world.format.legacy.world.v2.LegacyBlockStateIdResolver
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -95,6 +106,65 @@ internal object PermanentStorage {
             .awaitAll()
             .filterNotNull()
             .forEach { [key, element] -> files[key] = element }
+        
+        migrateLegacy()
+    }
+    
+    private fun migrateLegacy() {
+        if (!has("block_state_id_map") && !has("custom_enchantment_ids") && !has("custom_entity_variant_keys"))
+            return
+        
+        LOGGER.info("Performing PermanentStorage legacy migration...")
+        
+        val entriesSerializer = MapSerializer(KeySerializer, SetSerializer(KeySerializer))
+        val statesSerializer = MapSerializer(KeySerializer, BlockConfiguration.serializer())
+        
+        val legacyVanillaBlocks = setOf(
+            "nova:note_block", "nova:tripwire",
+            "nova:oak_leaves", "nova:spruce_leaves", "nova:birch_leaves", "nova:jungle_leaves",
+            "nova:acacia_leaves", "nova:dark_oak_leaves", "nova:mangrove_leaves", "nova:cherry_leaves",
+            "nova:azalea_leaves", "nova:flowering_azalea_leaves", "nova:pale_oak_leaves"
+        )
+        
+        val entries = retrieve("known_registry_entries", entriesSerializer)
+            ?.mapValuesTo(HashMap()) { [_, keys] -> keys.toMutableSet() }
+            ?: HashMap()
+        val states = retrieve("known_block_states", statesSerializer)
+            ?.toMutableMap()
+            ?: HashMap()
+        
+        files["block_state_id_map"]?.let { element ->
+            val legacyStates = Json.decodeFromJsonElement<Map<Int, JsonObject>>(element)
+            for ([blockId, blockStates] in legacyStates.values.groupBy { it.getValue("block").jsonPrimitive.content }) {
+                if (blockId in legacyVanillaBlocks)
+                    continue
+                
+                val blockKey = Key.key(blockId)
+                entries.getOrPut(Key.key("minecraft:block"), ::HashSet) += blockKey
+                if (blockKey in states)
+                    continue
+                
+                states[blockKey] = BlockConfiguration(
+                    isTileEntity = true, // not known, so default to true
+                    properties = LegacyBlockStateIdResolver.convertProperties(blockStates).values.toList()
+                )
+            }
+        }
+        
+        files["custom_enchantment_ids"]?.let { element ->
+            val ids = Json.decodeFromJsonElement(SetSerializer(KeySerializer), element)
+            entries.getOrPut(Key.key("minecraft:enchantment"), ::HashSet) += ids
+        }
+        files["custom_entity_variant_keys"]?.let { element ->
+            for (key in Json.decodeFromJsonElement(SetSerializer(ResourceKeySerializer), element)) {
+                entries.getOrPut(key.registry().toKey(), ::HashSet) += key.identifier().toKey()
+            }
+        }
+        
+        queueStore("known_registry_entries", Json.encodeToJsonElement(entriesSerializer, entries))
+        queueStore("known_block_states", Json.encodeToJsonElement(statesSerializer, states))
+        remove("custom_enchantment_ids")
+        remove("custom_entity_variant_keys")
     }
     
     fun has(key: String): Boolean = files.containsKey(key)

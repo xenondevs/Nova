@@ -87,11 +87,13 @@ class LegacyBlockStateIdResolverTest {
         }
     }
     
-    private fun resolve(block: String, vararg properties: Pair<String, String>): BlockState =
-        LegacyBlockStateIdResolver.resolve(JsonObject(mapOf(
+    private fun resolve(block: String, vararg properties: Pair<String, String>): BlockState {
+        val state = JsonObject(mapOf(
             "block" to JsonPrimitive(block),
             "properties" to JsonObject(properties.associate { [key, value] -> key to JsonPrimitive(value) })
-        )))
+        ))
+        return requireNotNull(LegacyBlockStateIdResolver(mapOf(1 to state)).fromId(1))
+    }
     
     private fun assertProperties(state: BlockState, vararg expected: Pair<String, String>) {
         for ([propertyName, value] in expected) {

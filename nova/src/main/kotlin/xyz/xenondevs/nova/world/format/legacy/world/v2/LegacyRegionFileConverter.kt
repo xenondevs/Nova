@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.world.format.legacy.world.v2
 
 import kotlinx.serialization.builtins.SetSerializer
+import kotlinx.serialization.json.JsonObject
 import net.kyori.adventure.key.Key
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -39,6 +40,7 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readBytes
 
+private const val ID_MAP_KEY = "block_state_id_map"
 private const val CONVERTED_WORLDS_KEY = "legacy_region_converted_worlds"
 private const val CHUNKS_PER_UNLOAD = 64
 private val REGION_FILE_NAME = Regex("""r\.(-?\d+)\.(-?\d+)\.nvr""")
@@ -51,6 +53,11 @@ internal object LegacyRegionFileConverter {
     
     @InitFun
     private fun convert() {
+        val reader by lazy {
+            val states = PermanentStorage.retrieve<Map<Int, JsonObject>>(ID_MAP_KEY)
+                ?: throw IllegalStateException("Legacy region files exist, but the legacy block-state id map is missing")
+            LegacyRegionFile.Reader(LegacyBlockStateIdResolver(states))
+        }
         val serializer = SetSerializer(KeySerializer)
         val convertedWorlds = PermanentStorage.retrieve(CONVERTED_WORLDS_KEY, serializer).orEmpty().toMutableSet()
         for (world in Bukkit.getWorlds()) {
@@ -67,14 +74,15 @@ internal object LegacyRegionFileConverter {
                 .takeUnlessEmpty()
                 ?: continue
             
-            convert(world, regionFiles)
+            convert(world, regionFiles, reader)
             world.save()
             convertedWorlds += world.key
             PermanentStorage.store(CONVERTED_WORLDS_KEY, serializer, convertedWorlds)
         }
+        PermanentStorage.remove(ID_MAP_KEY)
     }
     
-    private fun convert(world: World, regionFiles: Map<Path, Pair<Int, Int>>) {
+    private fun convert(world: World, regionFiles: Map<Path, Pair<Int, Int>>, reader: LegacyRegionFile.Reader) {
         LOGGER.info("Converting ${regionFiles.size} legacy Nova region files in ${world.name}")
         var blockCount = 0
         var teCount = 0
@@ -84,7 +92,7 @@ internal object LegacyRegionFileConverter {
         try {
             for ([file, coords] in regionFiles) {
                 val [rx, rz] = coords
-                val region = LegacyRegionFile.read(ByteReader.fromByteArray(file.readBytes()), world, rx, rz)
+                val region = reader.read(ByteReader.fromByteArray(file.readBytes()), world, rx, rz)
                 
                 for (chunk in region.chunks) {
                     if (chunk.isEmpty)

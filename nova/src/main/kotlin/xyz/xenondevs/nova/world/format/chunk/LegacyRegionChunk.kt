@@ -39,7 +39,7 @@ internal class LegacyRegionChunk private constructor(
     override fun write(writer: ByteWriter): Boolean =
         throw UnsupportedOperationException("Legacy region chunks are read-only")
     
-    companion object : RegionizedChunkReader<LegacyRegionChunk>() {
+    class Reader(private val blockStateIdResolver: LegacyBlockStateIdResolver) : RegionizedChunkReader<LegacyRegionChunk>() {
         
         override fun read(pos: ChunkPos, reader: ByteReader): LegacyRegionChunk {
             val minSection = reader.readInt()
@@ -48,8 +48,8 @@ internal class LegacyRegionChunk private constructor(
             val sectionBitmask = BitSet.valueOf(reader.readBytes(sectionCount.ceilDiv(8)))
             val sections = Array(sectionCount) { sectionIndex ->
                 if (sectionBitmask.get(sectionIndex))
-                    RegionChunkSection.read(LegacyBlockStateIdResolver, reader)
-                else RegionChunkSection(LegacyBlockStateIdResolver)
+                    RegionChunkSection.read(blockStateIdResolver, reader)
+                else RegionChunkSection(blockStateIdResolver)
             }
             
             return LegacyRegionChunk(

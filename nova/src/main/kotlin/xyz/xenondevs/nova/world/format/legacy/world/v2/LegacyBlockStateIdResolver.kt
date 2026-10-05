@@ -1,139 +1,129 @@
 package xyz.xenondevs.nova.world.format.legacy.world.v2
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import net.kyori.adventure.key.Key
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
-import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
-import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.registry.KnownRegistryEntries.BlockConfiguration
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.format.IdResolver
-import java.util.*
 
-private const val ID_MAP_KEY = "block_state_id_map"
+private val LEGACY_VANILLA_BLOCKS by lazy {
+    mapOf(
+        "nova:note_block" to Blocks.NOTE_BLOCK,
+        "nova:tripwire" to Blocks.TRIPWIRE,
+        "nova:oak_leaves" to Blocks.OAK_LEAVES,
+        "nova:spruce_leaves" to Blocks.SPRUCE_LEAVES,
+        "nova:birch_leaves" to Blocks.BIRCH_LEAVES,
+        "nova:jungle_leaves" to Blocks.JUNGLE_LEAVES,
+        "nova:acacia_leaves" to Blocks.ACACIA_LEAVES,
+        "nova:dark_oak_leaves" to Blocks.DARK_OAK_LEAVES,
+        "nova:mangrove_leaves" to Blocks.MANGROVE_LEAVES,
+        "nova:cherry_leaves" to Blocks.CHERRY_LEAVES,
+        "nova:azalea_leaves" to Blocks.AZALEA_LEAVES,
+        "nova:flowering_azalea_leaves" to Blocks.FLOWERING_AZALEA_LEAVES,
+        "nova:pale_oak_leaves" to Blocks.PALE_OAK_LEAVES
+    )
+}
 
-private val LEGACY_VANILLA_BLOCKS = mapOf(
-    "nova:note_block" to Blocks.NOTE_BLOCK,
-    "nova:tripwire" to Blocks.TRIPWIRE,
-    "nova:oak_leaves" to Blocks.OAK_LEAVES,
-    "nova:spruce_leaves" to Blocks.SPRUCE_LEAVES,
-    "nova:birch_leaves" to Blocks.BIRCH_LEAVES,
-    "nova:jungle_leaves" to Blocks.JUNGLE_LEAVES,
-    "nova:acacia_leaves" to Blocks.ACACIA_LEAVES,
-    "nova:dark_oak_leaves" to Blocks.DARK_OAK_LEAVES,
-    "nova:mangrove_leaves" to Blocks.MANGROVE_LEAVES,
-    "nova:cherry_leaves" to Blocks.CHERRY_LEAVES,
-    "nova:azalea_leaves" to Blocks.AZALEA_LEAVES,
-    "nova:flowering_azalea_leaves" to Blocks.FLOWERING_AZALEA_LEAVES,
-    "nova:pale_oak_leaves" to Blocks.PALE_OAK_LEAVES
+private val HORIZONTAL_FACING_VALUES = setOf("north", "east", "south", "west")
+private val CARTESIAN_FACING_VALUES = HORIZONTAL_FACING_VALUES + setOf("up", "down")
+private val ROTATION_VALUES = listOf(
+    "south", "south_south_west", "south_west", "west_south_west",
+    "west", "west_north_west", "north_west", "north_north_west",
+    "north", "north_north_east", "north_east", "east_north_east",
+    "east", "east_south_east", "south_east", "south_south_east"
 )
+private val ROTATION_VALUE_SET = ROTATION_VALUES.toSet()
+private val PROPERTY_NAME_SANITIZER = Regex("""[:_\-./]""")
 
-private val LEGACY_PROPERTY_ALIASES = mapOf(
-    "nova:facing" to setOf("nova:facing", "minecraft:facing", "minecraft:horizontal_facing", "minecraft:rotation"),
-    "nova:axis" to setOf("minecraft:axis", "minecraft:horizontal_axis"),
-    "nova:waterlogged" to setOf("minecraft:waterlogged"),
-    "nova:powered" to setOf("minecraft:powered")
-)
-
-internal object LegacyBlockStateIdResolver : IdResolver<BlockState> {
+internal class LegacyBlockStateIdResolver(
+    private val serializedStates: Map<Int, JsonObject>
+) : IdResolver<BlockState> {
     
-    private val serializedStates: Map<Int, JsonObject> by lazy {
-        PermanentStorage.retrieve(ID_MAP_KEY)
-            ?: throw IllegalStateException("Legacy region files exist, but the legacy block-state id map is missing")
-    }
-    private val resolvedStates = HashMap<Int, BlockState>()
+    private val convertedProperties = serializedStates.values
+        .groupBy { it.getValue("block").jsonPrimitive.content }
+        .mapValues { [_, states] -> convertProperties(states) }
+    private val resolvedStates = Int2ObjectOpenHashMap<BlockState>()
     
     override val size: Int
         get() = serializedStates.size
-    
-    override fun toId(value: BlockState?): Int =
-        throw UnsupportedOperationException("Legacy block states are read-only")
     
     override fun fromId(id: Int): BlockState? {
         val serializedState = serializedStates[id] ?: return null
         return resolvedStates.getOrPut(id) { resolve(serializedState) }
     }
     
-    internal fun resolve(serializedState: JsonObject): BlockState {
+    private fun resolve(serializedState: JsonObject): BlockState {
         val blockId = serializedState.getValue("block").jsonPrimitive.content
-        val properties = serializedState["properties"]?.jsonObject ?: JsonObject(emptyMap())
-        
         val vanillaBlock = LEGACY_VANILLA_BLOCKS[blockId]
-        if (vanillaBlock != null)
-            return resolveVanillaState(vanillaBlock, properties)
-        
-        val block = BuiltInRegistries.BLOCK.getValue(Identifier.parse(blockId)) as? NovaBlock
+        val block = vanillaBlock
+            ?: BuiltInRegistries.BLOCK.getValue(Identifier.parse(blockId)) as? NovaBlock
             ?: throw IllegalArgumentException("Nova block $blockId is no longer registered")
+        val definitions = if (vanillaBlock == null) convertedProperties.getValue(blockId) else null
         
         var state = block.defaultBlockState()
-        for ([propertyId, propertyValue] in properties) {
-            val value = propertyValue.jsonPrimitive.content
-            val property = findProperty(block, propertyId, value)
-                ?: throw IllegalArgumentException(
-                    "Nova block $blockId no longer has a property compatible with $propertyId=$value"
-                )
-            state = setProperty(state, propertyId, property, value)
+        for ([propertyId, propertyValue] in serializedState["properties"]?.jsonObject.orEmpty()) {
+            val name = definitions?.getValue(propertyId)?.nmsName ?: propertyId.substringAfter(':')
+            val property = block.stateDefinition.getProperty(name)
+                ?: throw IllegalArgumentException("Block $blockId has no property $name")
+            val value = convertPropertyValue(propertyId, name, propertyValue.jsonPrimitive.content)
+            state = setProperty(state, property, value)
         }
         return state
     }
     
-    private fun resolveVanillaState(block: Block, properties: JsonObject): BlockState {
-        var state = block.defaultBlockState()
-        for ([propertyId, propertyValue] in properties) {
-            val propertyName = propertyId.substringAfter(':')
-            val property = block.stateDefinition.getProperty(propertyName)
-                ?: throw IllegalArgumentException("Vanilla block $block has no property $propertyName")
-            state = setVanillaProperty(state, property, propertyValue.jsonPrimitive.content)
+    private fun <T : Comparable<T>> setProperty(state: BlockState, property: Property<T>, value: String): BlockState {
+        val typedValue = property.getValue(value).orElseThrow {
+            IllegalArgumentException("Value $value is not valid for property ${property.name}")
         }
-        return state
+        return state.setValue(property, typedValue)
     }
     
-    private fun findProperty(block: NovaBlock, legacyId: String, legacyValue: String): BlockStateProperty<*>? {
-        val acceptedIds = LEGACY_PROPERTY_ALIASES[legacyId] ?: setOf(legacyId)
-        return block.stateProperties.firstOrNull { property ->
-            property.key.asString() in acceptedIds && canReadLegacyValue(legacyId, property, legacyValue)
-        }
-    }
+    override fun toId(value: BlockState?) = throw UnsupportedOperationException()
     
-    private fun canReadLegacyValue(
-        legacyId: String,
-        property: BlockStateProperty<*>,
-        value: String
-    ): Boolean {
-        if (legacyId == "nova:facing" && property.key.asString() == "minecraft:rotation")
-            return runCatching { BlockFace.valueOf(value.uppercase(Locale.ROOT)) }.isSuccess
-        return property.isValidString(value)
-    }
-    
-    @Suppress("UNCHECKED_CAST")
-    private fun setProperty(
-        state: BlockState,
-        legacyId: String,
-        property: BlockStateProperty<*>,
-        value: String
-    ): BlockState {
-        val typedProperty = property as BlockStateProperty<Comparable<Any>>
-        val typedValue = if (legacyId == "nova:facing" && property.key.asString() == "minecraft:rotation") {
-            BlockFace.valueOf(value.uppercase(Locale.ROOT))
-        } else {
-            typedProperty.stringToValue(value)
+    companion object {
+        
+        fun convertProperties(states: Collection<JsonObject>): Map<String, BlockConfiguration.Property> {
+            val properties = LinkedHashMap<String, MutableSet<String>>()
+            for (state in states) {
+                for ([id, value] in state["properties"]?.jsonObject.orEmpty()) {
+                    properties.getOrPut(id, ::LinkedHashSet) += value.jsonPrimitive.content
+                }
+            }
+            return properties.mapValues { [id, values] -> convertProperty(id, values) }
         }
-        return typedProperty.set(state, typedValue as Comparable<Any>)
-    }
-    
-    @Suppress("UNCHECKED_CAST")
-    private fun setVanillaProperty(state: BlockState, property: Property<*>, value: String): BlockState {
-        val typedProperty = property as Property<Comparable<Any>>
-        val typedValue = typedProperty.getValue(value).orElseThrow {
-            IllegalArgumentException("Value $value is not valid for vanilla property " + property.name)
+        
+        private fun convertProperty(id: String, values: Set<String>): BlockConfiguration.Property {
+            val vanillaName = when (id) {
+                "nova:axis" -> "axis"
+                "nova:waterlogged" -> "waterlogged"
+                "nova:powered" -> "powered"
+                "nova:facing" -> when (values) {
+                    HORIZONTAL_FACING_VALUES, CARTESIAN_FACING_VALUES -> "facing"
+                    ROTATION_VALUE_SET -> "rotation"
+                    else -> null
+                }
+                
+                else -> null
+            }
+            val name = vanillaName ?: id.replace(PROPERTY_NAME_SANITIZER, "_")
+            return BlockConfiguration.Property(
+                if (vanillaName != null) Key.key("minecraft", vanillaName) else Key.key(id),
+                name,
+                values.map { convertPropertyValue(id, name, it) }
+            )
         }
-        return state.setValue(typedProperty, typedValue)
+        
+        private fun convertPropertyValue(id: String, name: String, value: String): String =
+            if (id == "nova:facing" && name == "rotation") ROTATION_VALUES.indexOf(value).toString() else value
+        
     }
     
 }
