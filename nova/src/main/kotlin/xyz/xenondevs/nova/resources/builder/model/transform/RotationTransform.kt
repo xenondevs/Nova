@@ -44,13 +44,13 @@ internal data class RotationTransform(
         if (rescale) // TODO: this can be implemented
             throw UnsupportedOperationException("Rescale is not supported in matrix transformations")
         
-        matrix.translateLocal(-(8 - pivot.x()) / 16, -(8 - pivot.y()) / 16, -(8 - pivot.z()) / 16)
+        matrix.translateLocal((8 - pivot.x()) / 16, (8 - pivot.y()) / 16, (8 - pivot.z()) / 16)
         when (axis) {
             Axis.X -> matrix.rotateLocalX(Math.toRadians(rot))
             Axis.Y -> matrix.rotateLocalY(Math.toRadians(rot))
             Axis.Z -> matrix.rotateLocalZ(Math.toRadians(rot))
         }
-        matrix.translateLocal((8 - pivot.x()) / 16, (8 - pivot.y()) / 16, (8 - pivot.z()) / 16)
+        matrix.translateLocal((pivot.x() - 8) / 16, (pivot.y() - 8) / 16, (pivot.z() - 8) / 16)
     }
     
     override fun apply(model: Model): Model {
@@ -283,13 +283,13 @@ private fun sort(a: Vector3dc, b: Vector3dc): Pair<Vector3dc, Vector3dc> {
         min(a.y(), b.y()),
         min(a.z(), b.z())
     )
-
+    
     val max = Vector3d(
         max(a.x(), b.x()),
         max(a.y(), b.y()),
         max(a.z(), b.z())
     )
-
+    
     return min to max
 }
 

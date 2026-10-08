@@ -23,7 +23,7 @@ internal data class TranslationTransform(val v: Vector3dc) : NonContextualModelB
     }
     
     override fun apply(matrix: Matrix4d) {
-        matrix.translateLocal(v)
+        matrix.translateLocal(v.x() / 16, v.y() / 16, v.z() / 16)
     }
     
 }
