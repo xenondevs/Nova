@@ -30,6 +30,9 @@ enum class WoodType {
     @SerialName("pale_oak")
     PALE_OAK,
     
+    @SerialName("poplar")
+    POPLAR,
+    
     @SerialName("mangrove")
     MANGROVE,
     
