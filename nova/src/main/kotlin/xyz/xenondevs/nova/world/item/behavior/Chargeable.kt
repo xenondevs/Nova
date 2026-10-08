@@ -13,7 +13,9 @@ import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.retrieveData
 import xyz.xenondevs.nova.util.item.storeData
+import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.DefaultItemTags
+import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 private val ENERGY_KEY = Key.key("nova", "energy")
@@ -72,6 +74,10 @@ interface Chargeable : ItemBehavior {
     ) : ItemBehavior, Chargeable {
         
         override val tags = provider(setOf(DefaultItemTags.CHARGEABLE))
+        
+        override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider {
+            this[DataComponentTypes.MAX_STACK_SIZE] = 1
+        }
         
         override val maxEnergy by maxEnergy
         private val affectsItemDurability by affectsItemDurability
