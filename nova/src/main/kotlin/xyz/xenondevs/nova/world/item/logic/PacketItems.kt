@@ -206,6 +206,7 @@ internal object PacketItems : PacketListener {
         private val EXECUTABLE_COMMAND = Command<CommandSourceStack> { 0 }
         private val RESTRICTED_REQUIREMENT = object : Predicate<CommandSourceStack>, Commands.RestrictedMarker {
             override fun test(source: CommandSourceStack) = true
+            override fun restricted() = true
         }
         
         override fun createLiteral(id: String): ArgumentBuilder<CommandSourceStack, *> =
