@@ -1,48 +1,46 @@
 package xyz.xenondevs.nova.util
 
+import net.minecraft.SharedConstants
+import net.minecraft.server.Bootstrap
+import net.minecraft.util.ZeroBitStorage
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.GlobalPalette
-import net.minecraft.world.level.chunk.HashMapPalette
-import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.PalettedContainer
-import net.minecraft.world.level.chunk.SingleValuePalette
 import net.minecraft.world.level.chunk.Strategy
-import net.minecraft.server.Bootstrap
-import net.minecraft.SharedConstants
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
-class ChunkSectionMatcherTest {
+class BlockStateMatcherTest {
     
     @Test
-    fun testSingleValuePalette() {
+    fun testZeroBitStorage() {
         val container = createContainer()
-        assertIs<SingleValuePalette<*>>(container.data.palette())
+        assertIs<ZeroBitStorage>(container.data.storage())
         
         assertSliceMatches(container, setOf(Blocks.AIR.defaultBlockState()))
         assertSliceMatches(container, emptySet())
     }
     
     @Test
-    fun testLinearPalette() {
+    fun testFourBitStorage() {
         val container = createContainer()
         container[3, 4, 5] = Blocks.STONE.defaultBlockState()
         container[9, 8, 7] = Blocks.DIRT.defaultBlockState()
-        assertIs<LinearPalette<*>>(container.data.palette())
+        assertEquals(4, container.data.storage().bits)
         
         assertSliceMatches(container, setOf(Blocks.STONE.defaultBlockState(), Blocks.DIRT.defaultBlockState()))
     }
     
     @Test
-    fun testHashMapPalette() {
+    fun testFiveBitStorage() {
         val container = createContainer()
         val states = distinctStates(32)
         setStates(container, states)
-        assertIs<HashMapPalette<*>>(container.data.palette())
+        assertEquals(5, container.data.storage().bits)
         
         assertSliceMatches(container, states.filterIndexedTo(HashSet()) { index, _ -> index % 3 == 0 })
     }

@@ -6,12 +6,9 @@ import net.minecraft.util.ZeroBitStorage
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.GlobalPalette
-import net.minecraft.world.level.chunk.HashMapPalette
 import net.minecraft.world.level.chunk.LevelChunk
-import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.Palette
 import net.minecraft.world.level.chunk.PalettedContainer
-import net.minecraft.world.level.chunk.SingleValuePalette
 import org.bukkit.World
 import org.bukkit.block.data.BlockData
 import xyz.xenondevs.commons.collections.identityHashSet
@@ -166,42 +163,18 @@ class BlockStateMatcher(accepted: Collection<BlockData>) {
         if (acceptedBlockStates.isEmpty())
             return PaletteMatches.NONE
         
-        return when (palette) {
-            is SingleValuePalette -> {
-                val matches = acceptedBlockStates.contains(palette.valueFor(0))
-                PaletteMatches(booleanArrayOf(matches), matches, matches)
-            }
-            
-            is LinearPalette -> createLinearPaletteMatches(palette)
-            is HashMapPalette -> createLocalPaletteMatches(palette.size) { palette.values.byId(it)!! }
-            is GlobalPalette -> PaletteMatches(globalMatches, any = true, all = false)
-            else -> createLocalPaletteMatches(palette.size, palette::valueFor)
-        }
-    }
-    
-    private fun createLinearPaletteMatches(palette: LinearPalette<*>): PaletteMatches {
-        val values = palette.values
+        if (palette is GlobalPalette)
+            return PaletteMatches(globalMatches, any = true, all = false)
+        
         val matches = BooleanArray(palette.size)
         var matchCount = 0
-        for (id in 0..<palette.size) {
-            if (acceptedBlockStates.contains(values[id])) {
+        for (id in matches.indices) {
+            if (acceptedBlockStates.contains(palette.valueFor(id))) {
                 matches[id] = true
                 matchCount++
             }
         }
         return PaletteMatches(matches, matchCount > 0, matchCount == matches.size)
-    }
-    
-    private inline fun createLocalPaletteMatches(size: Int, valueFor: (Int) -> BlockState): PaletteMatches {
-        val matches = BooleanArray(size)
-        var matchCount = 0
-        for (id in 0..<size) {
-            if (acceptedBlockStates.contains(valueFor(id))) {
-                matches[id] = true
-                matchCount++
-            }
-        }
-        return PaletteMatches(matches, matchCount > 0, matchCount == size)
     }
     
     private fun copySimpleBitStorage(
