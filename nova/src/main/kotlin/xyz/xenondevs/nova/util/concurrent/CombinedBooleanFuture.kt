@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture
 internal class CombinedBooleanFuture(private val futures: List<CompletableFuture<Boolean>>) : CompletableFuture<Boolean>() {
     
     init {
-        futures.forEach { it.thenRun(::handleFutureArrival) }
+        futures.forEach { it.whenComplete { _, _ -> handleFutureArrival() } }
     }
     
     private fun handleFutureArrival() {
