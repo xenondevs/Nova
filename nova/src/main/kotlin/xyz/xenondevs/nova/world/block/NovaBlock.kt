@@ -52,9 +52,7 @@ import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.context.intention.ImplicitIntentions
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.network.currentPacketSourcePlayer
 import xyz.xenondevs.nova.registry.FlammableSettings
@@ -220,7 +218,7 @@ private fun <T : Comparable<T>> NmsBlockState.setValue(property: BlockStatePrope
     property.set(this, value as T)
 
 /**
- * Shortcut for `bootstrapFlatMap { it.config }` 
+ * Shortcut for `bootstrapFlatMap { it.config }`
  */
 val Provider<BlockType>.config: Provider<ConfigProvider>
     get() = bootstrapFlatMap { it.config }
@@ -798,14 +796,13 @@ internal open class NovaBlock(
     
     override fun toString(): String = key.asString()
     
-    @InternalInit(stage = InternalInitStage.POST_WORLD)
     companion object {
         
         // hack to make properties available in createBlockStateDefinition 
         // (called from super constructor, where a field wouldn't be initialized yet)
         val STATE_PROPERTIES: ScopedValue<List<BlockStateProperty<*>>> = ScopedValue.newInstance()
         
-        @InitFun
+        @InternalInit(stage = PRE_WORLD)
         private fun initCaches() {
             val remainingStates = ArrayList<NmsBlockState>()
             

@@ -12,10 +12,7 @@ import net.kyori.adventure.text.format.TextDecoration
 import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.component.adventure.StyledElement
 import xyz.xenondevs.nova.util.component.adventure.elements
 import java.io.BufferedInputStream
@@ -91,11 +88,6 @@ data class ComponentSize(
 /**
  * Provides generated glyph metrics and calculates logical and visual component dimensions.
  */
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dispatcher = Dispatcher.ASYNC,
-    runAfter = [ResourceGeneration.PostWorld::class]
-)
 object CharSizes {
     
     private val CHAR_SIZES_DIR = DATA_FOLDER.resolve(".internal_data/char_sizes/")
@@ -272,7 +264,11 @@ object CharSizes {
         return ComponentSize(width, xRange, yRange)
     }
     
-    @InitFun
+    @InternalInit(
+        stage = POST_WORLD,
+        dispatcher = ASYNC,
+        runAfter = [ResourceGeneration.PostWorld::class]
+    )
     private fun init() {
         if (LOAD_CHAR_SIZES_ON_STARTUP) {
             val service = Executors.newCachedThreadPool()

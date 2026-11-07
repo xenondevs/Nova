@@ -17,10 +17,7 @@ import org.bukkit.event.player.PlayerLocaleChangeEvent
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
@@ -38,22 +35,22 @@ import kotlin.io.path.name
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.walk
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    runAfter = [ResourceGeneration.PostWorld::class]
-)
 object LocaleManager : Listener {
     
     private val RENDERER = TranslatableComponentRenderer.usingTranslationSource(NovaTranslator)
     private val playerLocales: MutableMap<Player, MutableProvider<Locale>> = PlayerMapManager.createMap()
     private var vanillaTranslations: Map<String, Map<String, String>> = emptyMap()
     
-    @InitFun(dispatcher = Dispatcher.SYNC)
+    @InternalInit(stage = PRE_WORLD)
     private fun registerListener() {
         registerEvents()
     }
     
-    @InitFun(dispatcher = Dispatcher.ASYNC)
+    @InternalInit(
+        stage = POST_WORLD,
+        dispatcher = ASYNC,
+        runAfter = [ResourceGeneration.PostWorld::class]
+    )
     private suspend fun loadLanguages() = withContext(Dispatchers.IO) {
         vanillaTranslations = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/lang/").walk()
             .filter { !it.isDirectory() && it.extension.equals("json", true) }

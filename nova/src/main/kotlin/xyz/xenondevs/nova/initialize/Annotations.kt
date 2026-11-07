@@ -3,24 +3,19 @@ package xyz.xenondevs.nova.initialize
 import kotlin.reflect.KClass
 
 /**
- * Marks a class to be initialized by the [Initializer].
+ * Marks a class or function to be initialized by the [Initializer].
  * This annotation is specifically for internal use.
  *
- * Classes marked with this annotation will be loaded during initialization.
- * If there are methods annotated with the [InitFun] annotation in the class, they will be called.
- * On disable, the methods annotated with the [DisableFun] annotation will be called.
+ * Can be used on classes to run their static initializers or on (suspending) functions of singleton objects to run them during initialization.
+ * If both the containing class and a function are annotated, function initialization additionally awaits class initialization.
  *
- * @param stage The [InternalInitStage] at which the class should be initialized.
- * @param dispatcher Defines how the initialization is dispatched.
- * @param runAfter The classes (and init functions) which should be initialized before this class.
- * (This class is initialized **after** them.)
- * Those classes must be annotated with [Init] or [InternalInit].
- * @param runBefore The classes (and init functions) which should be initialized after this class.
- * (This class is initialized **before** them.)
- * Those classes must be annotated with [Init] or [InternalInit].
+ * @param stage The [InternalInitStage] at which the class is initialized or the function is called.
+ * @param dispatcher Defines how this task is dispatched.
+ * @param runAfter The classes and their initialization functions that must finish before this task.
+ * @param runBefore The classes and their initialization functions that must run after this task.
  */
 @Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.CLASS)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 internal annotation class InternalInit(
     val stage: InternalInitStage,
     val dispatcher: Dispatcher = Dispatcher.SYNC,
@@ -29,44 +24,31 @@ internal annotation class InternalInit(
 )
 
 /**
- * Marks an addon class to be initialized at startup.
+ * Marks a class or function to be initialized at startup.
  *
- * Classes marked with this annotation will be loaded during initialization.
- * If there are methods annotated with the [InitFun] annotation in the class, they will be called.
- * On disable, the methods annotated with the [DisableFun] annotation will be called.
+ * Can be used on classes to run their static initializers or on (suspending) functions of singleton objects to run them during initialization.
+ * If both the containing class and a function are annotated, function initialization additionally awaits class initialization.
  *
- * @param stage The [InternalInitStage] at which the class should be initialized.
- * @param dispatcher Defines how the initialization is dispatched.
- * @param runAfter The classes (and init functions) which should be initialized before this class.
- * (This class is initialized **after** them.)
- * Those classes must be annotated with [Init] or [InternalInit].
- * @param runBefore The classes (and init functions) which should be initialized after this class.
- * (This class is initialized **before** them.)
- * Those classes must be annotated with [Init] or [InternalInit].
+ * @param stage The [InitStage] at which the class is initialized or the function is called. Defaults to [InitStage.BOOTSTRAP].
+ * @param dispatcher Defines how this task is dispatched. Defaults to [Dispatcher.SYNC].
+ * @param runAfter The classes and their initialization functions that must finish before this task.
+ * @param runBefore The classes and their initialization functions that must run after this task.
  */
 @Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.CLASS)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 annotation class Init(
-    val stage: InitStage,
+    val stage: InitStage = InitStage.BOOTSTRAP,
     val dispatcher: Dispatcher = Dispatcher.SYNC,
     val runAfter: Array<KClass<*>> = [],
     val runBefore: Array<KClass<*>> = [],
 )
 
 /**
- * Marks a function to be called during initialization.
- * This requires the class to be annotated with [Init] or [InternalInit],
- * and automatically has a dependency on the initialization of the class.
- *
- * @param dispatcher Defines how the initialization is dispatched.
- * Falls back to the dispatcher of the class if not specified.
- * @param runAfter The classes (and their init functions) which should be initialized before this function is called.
- * (This function is called **after** them.)
- * Those classes must be annotated with [Init] or [InternalInit].
- * @param runAfter The classes (and their init functions) which should be initialized after this function is called.
- * (This function is called **before** them.)
- * Those classes must be annotated with [Init] or [InternalInit].
+ * Marks a function to be called during initialization using its containing class's stage.
+ * The containing class must be annotated with [Init] or [InternalInit].
+ * An omitted dispatcher inherits the class's dispatcher.
  */
+@Deprecated("Use @Init instead.")
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
 annotation class InitFun(
@@ -81,7 +63,7 @@ annotation class InitFun(
  * @param dispatcher Defines how the function is dispatched.
  * @param runAfter The classes whose disable functions should be called before this function.
  * (This function is called **after** them.)
- * @param runAfter The classes whose disable functions should be called after this function.
+ * @param runBefore The classes whose disable functions should be called after this function.
  * (This function is called **before** them.)
  */
 @Retention(AnnotationRetention.RUNTIME)

@@ -28,7 +28,8 @@ kotlin {
         
         freeCompilerArgs.addAll(
             "-Xname-based-destructuring=complete",
-            "-Xcollection-literals"
+            "-Xcollection-literals",
+            "-Xcontext-sensitive-resolution"
         )
         
         if (!providers.gradleProperty("release").isPresent) {

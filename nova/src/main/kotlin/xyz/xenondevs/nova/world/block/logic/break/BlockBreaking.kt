@@ -5,7 +5,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket.AttributeSnapshot
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
-import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.*
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ai.attributes.Attributes
 import org.bukkit.GameMode
@@ -24,9 +23,7 @@ import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
@@ -52,17 +49,16 @@ import kotlin.math.max
 
 private val BREAK_COOLDOWN by MAIN_CONFIG.entry<Int>("world", "block_breaking", "break_cooldown")
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    runAfter = [WorldDataManager::class]
-)
 internal object BlockBreaking : Listener, PacketListener {
     
     private val breakCooldowns = ConcurrentHashMap<Player, Int>()
     private val playerBreakers = ConcurrentHashMap<Player, BlockBreaker>()
     private val internalBreakers = HashMap<Int, VisibleBreakMethod>()
     
-    @InitFun
+    @InternalInit(
+        stage = PRE_WORLD,
+        runAfter = [WorldDataManager::class]
+    )
     private fun init() {
         registerEvents()
         registerPacketListener()

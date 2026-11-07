@@ -8,10 +8,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.World
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import java.time.Duration
@@ -30,11 +27,6 @@ private data class PermissionArgs(val world: World, val player: OfflinePlayer, v
  *
  * [OfflinePlayer] permissions will be cached for 30 minutes after the last access and commonly accessed permissions will be refreshed every minute.
  */
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dispatcher = Dispatcher.ASYNC,
-    runAfter = [HooksLoader::class]
-)
 object PermissionManager {
     
     internal val integrations = CopyOnWriteArrayList<PermissionIntegration>()
@@ -42,7 +34,11 @@ object PermissionManager {
     private lateinit var executor: ExecutorService
     private lateinit var offlinePermissionCache: LoadingCache<PermissionArgs, Boolean>
     
-    @InitFun
+    @InternalInit(
+        stage = POST_WORLD,
+        dispatcher = ASYNC,
+        runAfter = [HooksLoader::class]
+    )
     private fun init() {
         executor = ThreadPoolExecutor(
             10, 10,

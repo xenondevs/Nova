@@ -17,9 +17,7 @@ import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.permission.PermissionManager
 import xyz.xenondevs.nova.resources.ResourcePackManager.enablePack
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
@@ -44,7 +42,6 @@ private const val FORCE_BYPASS_PERMISSION = "nova.misc.resourcePack.bypass.force
 /**
  * Controls which players receive which resource packs.
  */
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 object ResourcePackManager : Listener {
     
     private val overridesSerializer = MapSerializer(UUIDAsStringSerializer, MapSerializer(KeySerializer, Boolean.serializer()))
@@ -54,7 +51,7 @@ object ResourcePackManager : Listener {
     
     private val packStatusFutures = ConcurrentHashMap<UUID, CompletableFuture<Boolean>>()
     
-    @InitFun
+    @InternalInit(stage = PRE_WORLD)
     private fun init() {
         registerEvents()
     }

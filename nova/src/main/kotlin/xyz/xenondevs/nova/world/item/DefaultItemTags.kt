@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.registry.registryEntrySetOf
 import xyz.xenondevs.nova.world.item.behavior.Chargeable
 
 @InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
+    stage = InternalInitStage.BOOTSTRAP,
     runBefore = [RegistryLoader::class]
 )
 object DefaultItemTags {
@@ -42,8 +42,8 @@ object DefaultItemTags {
     
     init {
         // minecraft:shears tag for legacy tool behavior with "tool_category: shears"
-        itemTag(registryEntrySetOf(TagKey.create(RegistryKey.ITEM, Key.key("minecraft", "shears")))) { 
-            add(ItemTypeEntries.SHEARS) 
+        itemTag(registryEntrySetOf(TagKey.create(RegistryKey.ITEM, Key.key("minecraft", "shears")))) {
+            add(ItemTypeEntries.SHEARS)
         }
     }
     

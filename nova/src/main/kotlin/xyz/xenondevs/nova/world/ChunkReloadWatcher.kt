@@ -7,16 +7,9 @@ import org.bukkit.event.world.ChunkLoadEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.strongEntry
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.registerEvents
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dispatcher = Dispatcher.ASYNC
-)
 internal object ChunkReloadWatcher : Listener {
     
     private const val RELOAD_TIME_LIMIT = 500
@@ -24,7 +17,10 @@ internal object ChunkReloadWatcher : Listener {
     
     private val CHUNK_LOADS = HashMap<ChunkPos, Pair<Long, Int>>()
     
-    @InitFun
+    @InternalInit(
+        stage = PRE_WORLD,
+        dispatcher = ASYNC
+    )
     private fun init() {
         val enabled = MAIN_CONFIG.strongEntry<Boolean>("debug", "watch_chunk_reloads")
         enabled.subscribe(::reload)

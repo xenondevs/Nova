@@ -11,9 +11,7 @@ import net.minecraft.world.level.Level
 import org.bukkit.Sound
 import org.bukkit.craftbukkit.CraftSound
 import org.bukkit.event.Listener
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundEntityPacketEvent
@@ -26,13 +24,12 @@ import xyz.xenondevs.nova.util.take
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import kotlin.random.Random
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    runAfter = [WorldDataManager::class]
-)
 internal object SoundEngine : Listener, PacketListener {
     
-    @InitFun
+    @InternalInit(
+        stage = PRE_WORLD,
+        runAfter = [WorldDataManager::class]
+    )
     private fun init() {
         registerEvents()
         registerPacketListener()

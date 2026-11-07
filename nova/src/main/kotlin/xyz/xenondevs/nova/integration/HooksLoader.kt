@@ -6,10 +6,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_JAR
 import xyz.xenondevs.nova.annotations.AnnotationValue
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.permission.PermissionIntegration
@@ -19,13 +16,12 @@ import xyz.xenondevs.nova.util.data.JarUtils
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dispatcher = Dispatcher.ASYNC
-)
 internal object HooksLoader {
     
-    @InitFun
+    @InternalInit(
+        stage = POST_WORLD,
+        dispatcher = ASYNC
+    )
     private fun loadHooks() {
         val hook = Type.getDescriptor(Hook::class.java)
         for ([className, metadata] in JarUtils.getAnnotationIndex(NOVA_JAR).classes) {

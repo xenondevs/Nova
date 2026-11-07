@@ -4,20 +4,17 @@ import io.papermc.paper.registry.RegistryKey
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.commons.collections.mapToArray
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.world.block.behavior.UnknownBlockBehavior
 import xyz.xenondevs.nova.world.block.state.property.UnknownProperty
 import xyz.xenondevs.nova.world.block.tileentity.UnknownTileEntity
 
-@InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
-    runBefore = [RegistryLoader::class]
-)
 internal object UnknownElements {
     
-    @InitFun
+    @InternalInit(
+        stage = BOOTSTRAP,
+        runBefore = [RegistryLoader::class]
+    )
     private fun registerUnknownBuilderFactories() {
         RegistryLoader.registerVanillaUnknown(RegistryKey.ITEM, ::NovaItemBuilderImpl) {
             name(Component.translatable("item.nova.unknown", Component.text(entry.key.asString())))

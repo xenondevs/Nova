@@ -10,10 +10,7 @@ import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.strongEntry
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.data.HashUtils
 import java.net.URI
@@ -35,10 +32,6 @@ private class UploadedPack(
     
 }
 
-@InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
-    dispatcher = Dispatcher.ASYNC,
-)
 internal object AutoUploadManager {
     
     private val uploadedPacksSerializer = MapSerializer(KeySerializer, UploadedPack.serializer())
@@ -47,7 +40,10 @@ internal object AutoUploadManager {
     private var uploadedPacks: MutableMap<Key, UploadedPack> =
         ConcurrentHashMap(PermanentStorage.retrieve(PACK_URLS_KEY, uploadedPacksSerializer) ?: emptyMap())
     
-    @InitFun
+    @InternalInit(
+        stage = BOOTSTRAP,
+        dispatcher = ASYNC
+    )
     private suspend fun init() {
         val cfg = MAIN_CONFIG.strongEntry<UploadServiceConfig>("resource_pack", "auto_upload")
         cfg.subscribe { runBlocking { disable(); enable(it) } }
@@ -67,7 +63,7 @@ internal object AutoUploadManager {
         }
     }
     
-    @DisableFun(dispatcher = Dispatcher.ASYNC)
+    @DisableFun(dispatcher = ASYNC)
     private suspend fun disable() {
         PermanentStorage.store(PACK_URLS_KEY, uploadedPacksSerializer, uploadedPacks)
         selectedService?.disable()

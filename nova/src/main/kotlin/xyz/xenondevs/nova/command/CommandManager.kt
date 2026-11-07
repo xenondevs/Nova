@@ -5,15 +5,12 @@ import xyz.xenondevs.nova.BOOTSTRAP_LIFECYCLE
 import xyz.xenondevs.nova.command.impl.NovaCommand
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
 internal object CommandManager {
     
     @Suppress("UnstableApiUsage")
-    @InitFun
+    @InternalInit(stage = BOOTSTRAP)
     private fun registerCommands() {
         BOOTSTRAP_LIFECYCLE.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
             val commands = event.registrar()

@@ -6,22 +6,19 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.commons.collections.concurrentHashSet
 import xyz.xenondevs.commons.guava.concurrentWeakIdentitySet
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Utility for creating maps with player keys that are automatically cleaned up
  * when the player leaves the server.
  */
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 object PlayerMapManager : Listener {
     
     private val activeMaps = concurrentWeakIdentitySet<MutableMap<Player, *>>()
     private val activeSets = concurrentWeakIdentitySet<MutableSet<Player>>()
     
-    @InitFun
+    @InternalInit(stage = PRE_WORLD)
     private fun init() {
         registerEvents()
     }

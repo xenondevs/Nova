@@ -6,23 +6,19 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.world.LootGenerateEvent
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.registerEvents
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dispatcher = Dispatcher.ASYNC,
-    runAfter = [LootConfigHandler::class]
-)
 internal object LootGeneration : Listener {
     
     private val entityKeys by lazy { EntityType.entries.associateWith { NamespacedKey.minecraft("entities/${it.name.lowercase()}") } }
     private val lootTables = ArrayList<LootTable>()
     
-    @InitFun
+    @InternalInit(
+        stage = POST_WORLD,
+        dispatcher = ASYNC,
+        runAfter = [LootConfigHandler::class]
+    )
     private fun init() {
         registerEvents()
     }

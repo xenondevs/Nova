@@ -9,9 +9,7 @@ import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.event.EventPriority
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundAddEntityPacketEvent
@@ -25,10 +23,6 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import java.util.IdentityHashMap
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    runAfter = [ResourceGeneration.PreWorld::class]
-)
 internal object PacketBlocks : PacketListener {
     
     private val clientSideBlockStateBitWidth: Int by lazy {
@@ -48,7 +42,10 @@ internal object PacketBlocks : PacketListener {
             map
         }
     
-    @InitFun
+    @InternalInit(
+        stage = PRE_WORLD,
+        runAfter = [ResourceGeneration.PreWorld::class]
+    )
     private fun init() {
         registerPacketListener()
     }

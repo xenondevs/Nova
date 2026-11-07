@@ -44,7 +44,7 @@ fun callEvent(event: Event) {
  */
 context(listener: Listener)
 fun registerEvents() {
-    check(PLUGIN_READY) { "Events cannot be registered this early! Use a post-world initialization stage for this." }
+    check(PLUGIN_READY) { "Events cannot be registered this early! Use PRE_WORLD_LOAD or a later initialization stage for this." }
     Bukkit.getPluginManager().registerEvents(listener, Nova)
 }
 

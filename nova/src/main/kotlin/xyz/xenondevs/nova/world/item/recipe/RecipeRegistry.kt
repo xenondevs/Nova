@@ -2,21 +2,13 @@ package xyz.xenondevs.nova.world.item.recipe
 
 import org.bukkit.Bukkit
 import org.bukkit.inventory.Recipe
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.world.item.itemType
 import kotlin.reflect.full.isSuperclassOf
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dispatcher = Dispatcher.ASYNC,
-    runAfter = [RecipeManager::class]
-)
 object RecipeRegistry {
     
     private var BUKKIT_RECIPES: List<Recipe> = ArrayList()
@@ -50,7 +42,11 @@ object RecipeRegistry {
         usageInfo += info
     }
     
-    @InitFun
+    @InternalInit(
+        stage = POST_WORLD,
+        dispatcher = ASYNC,
+        runAfter = [RecipeManager::class]
+    )
     internal fun indexRecipes() {
         BUKKIT_RECIPES = loadBukkitRecipes()
         CREATION_RECIPES = loadCreationRecipes()

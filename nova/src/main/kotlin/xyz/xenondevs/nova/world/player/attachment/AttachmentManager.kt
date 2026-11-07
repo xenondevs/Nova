@@ -15,9 +15,7 @@ import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetPassengersPacketEvent
@@ -31,13 +29,12 @@ import xyz.xenondevs.nova.util.runTaskTimer
 
 private val ATTACHMENTS_KEY = NamespacedKey("nova", "attachments1")
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 object AttachmentManager : Listener, PacketListener {
     
     private val activeAttachments = HashMap<Player, HashMap<AttachmentType<*>, Attachment>>()
     private val inactiveAttachments = HashMap<Player, HashSet<Key>>()
     
-    @InitFun
+    @InternalInit(stage = PRE_WORLD)
     private fun init() {
         registerEvents()
         registerPacketListener()

@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureAlignment
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture.TitlePosition.Alignment
 
 @InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
+    stage = InternalInitStage.BOOTSTRAP,
     runBefore = [RegistryLoader::class]
 )
 object DefaultGuiTextures {

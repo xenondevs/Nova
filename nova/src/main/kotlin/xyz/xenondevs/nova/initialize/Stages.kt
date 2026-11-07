@@ -1,26 +1,33 @@
 package xyz.xenondevs.nova.initialize
 
+import org.bukkit.event.server.ServerLoadEvent
+import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
-import xyz.xenondevs.nova.config.NovaConfigBackend
 import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import kotlin.reflect.KClass
 
 /**
  * Defines the stage at which something should be initialized.
+ * Entries are declared in lifecycle order.
  */
-internal enum class InternalInitStage(val isPreWorld: Boolean) {
+internal enum class InternalInitStage {
     
     /**
-     * Before the world is loaded.
+     * During the server's bootstrap phase.
      */
-    PRE_WORLD(true),
+    BOOTSTRAP,
     
     /**
-     * After the world is loaded.
+     * During Nova's plugin enable, before worlds are loaded.
      */
-    POST_WORLD(false),
+    PRE_WORLD,
+    
+    /**
+     * During [ServerLoadEvent].
+     */
+    POST_WORLD,
     
 }
 
@@ -37,33 +44,33 @@ enum class InitStage(
     runBefore: Set<KClass<*>> = emptySet(),
 ) {
     
-    /**
-     * Before configs are initialized.
-     * Can be used to register custom config serializers via [xyz.xenondevs.nova.config.ConfigStorage.setSerializers].
-     */
-    PRE_CONFIG(
-        internalStage = InternalInitStage.PRE_WORLD,
-        runBefore = setOf(
-            NovaConfigBackend::class
-        )
-    ),
+    @Deprecated(
+        "Renamed to BOOTSTRAP.",
+        ReplaceWith("InitStage.BOOTSTRAP", "xyz.xenondevs.nova.initialize.InitStage")
+    )
+    PRE_CONFIG(internalStage = InternalInitStage.BOOTSTRAP),
+    
+    @Deprecated(
+        "Renamed to BOOTSTRAP.",
+        ReplaceWith("InitStage.BOOTSTRAP", "xyz.xenondevs.nova.initialize.InitStage")
+    )
+    PRE_WORLD(internalStage = InternalInitStage.BOOTSTRAP),
     
     /**
-     * Before the world is loaded.
+     * During the server's bootstrap phase.
      */
-    PRE_WORLD(
-        internalStage = InternalInitStage.PRE_WORLD,
-        runAfter = setOf(NovaConfigBackend::class)
-    ),
+    BOOTSTRAP(internalStage = InternalInitStage.BOOTSTRAP),
+    
+    /**
+     * Before worlds are loaded, during Nova's [JavaPlugin.onEnable].
+     */
+    PRE_WORLD_LOAD(internalStage = InternalInitStage.PRE_WORLD),
     
     /**
      * Before the resource pack generation starts.
      */
     PRE_PACK(
-        internalStage = InternalInitStage.PRE_WORLD,
-        runAfter = setOf(
-            NovaConfigBackend::class
-        ),
+        internalStage = InternalInitStage.BOOTSTRAP,
         runBefore = setOf(
             RegistryLoader::class,
             ResourceGeneration.PreWorld::class
@@ -74,9 +81,8 @@ enum class InitStage(
      * After the first stage of resource pack generation ("pre-world") has finished. Lookup registries are now loaded.
      */
     POST_PACK_PRE_WORLD(
-        internalStage = InternalInitStage.PRE_WORLD,
+        internalStage = InternalInitStage.BOOTSTRAP,
         runAfter = setOf(
-            NovaConfigBackend::class,
             RegistryLoader::class,
             ResourceGeneration.PreWorld::class
         )
@@ -85,9 +91,7 @@ enum class InitStage(
     /**
      * After the world has been loaded.
      */
-    POST_WORLD(
-        internalStage = InternalInitStage.POST_WORLD
-    ),
+    POST_WORLD(internalStage = InternalInitStage.POST_WORLD),
     
     /**
      * After the second (and last) stage of resource pack generation ("post-world") has finished.

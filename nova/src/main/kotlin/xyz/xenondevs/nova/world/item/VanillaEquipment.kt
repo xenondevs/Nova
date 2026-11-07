@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.registry.RegistryEntry
 
 @InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
+    stage = InternalInitStage.BOOTSTRAP,
     runBefore = [RegistryLoader::class]
 )
 object VanillaEquipment {

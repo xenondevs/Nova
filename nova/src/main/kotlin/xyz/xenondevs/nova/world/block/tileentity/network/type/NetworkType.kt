@@ -60,7 +60,7 @@ class NetworkType<T : Network<T>> internal constructor(
     val createGroup: (NetworkGroupData<T>) -> NetworkGroup<T>,
     /**
      * A function that checks whether a local network can be created between two end points.
-     * 
+     *
      * A local network will only be created it this validator returns `true` and at least one of the
      * end points [requests][NetworkEndPoint.requestsLocalNetwork] a local network.
      */
@@ -87,7 +87,7 @@ class NetworkType<T : Network<T>> internal constructor(
  * The default network types provided by Nova.
  */
 @InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
+    stage = InternalInitStage.BOOTSTRAP,
     runBefore = [RegistryLoader::class]
 )
 object DefaultNetworkTypes {

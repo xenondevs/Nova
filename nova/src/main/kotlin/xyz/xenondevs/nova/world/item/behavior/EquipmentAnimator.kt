@@ -16,9 +16,7 @@ import org.bukkit.entity.Zombie
 import xyz.xenondevs.commons.collections.concurrentHashSet
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.network.packet.ClientboundSetEquipmentPacket
 import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.util.nmsEntity
@@ -29,7 +27,6 @@ import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
 import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object EquipmentAnimator {
     
     private val ARMOR_EQUIPMENT_SLOTS = listOf(
@@ -45,7 +42,7 @@ internal object EquipmentAnimator {
     
     val animatedBehaviors: MutableSet<ItemBehavior> = concurrentHashSet()
     
-    @InitFun
+    @InternalInit(stage = PRE_WORLD)
     private fun startAnimationTask() {
         runTaskTimer(0, 1, ::handleTick)
     }

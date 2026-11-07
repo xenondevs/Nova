@@ -13,10 +13,7 @@ import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldUnloadEvent
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
@@ -43,10 +40,6 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 import java.util.concurrent.ConcurrentHashMap
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    runAfter = [DefaultNetworkTypes::class, ProtectionManager::class]
-)
 object NetworkManager : Listener {
     
     private val nodeProviders = mutableListOf(NovaNetworkNodeProvider, VanillaNetworkNodeProvider)
@@ -67,7 +60,14 @@ object NetworkManager : Listener {
     
     internal val SUPERVISOR = SupervisorJob()
     
-    @InitFun(runAfter = [WorldDataManager::class])
+    @InternalInit(
+        stage = POST_WORLD,
+        runAfter = [
+            DefaultNetworkTypes::class,
+            ProtectionManager::class,
+            WorldDataManager::class,
+        ]
+    )
     private fun runConfigurators() {
         for (world in Bukkit.getWorlds()) {
             for (chunk in world.loadedChunks) {
@@ -79,7 +79,7 @@ object NetworkManager : Listener {
         registerEvents()
     }
     
-    @DisableFun(dispatcher = Dispatcher.ASYNC)
+    @DisableFun(dispatcher = ASYNC)
     private suspend fun disable() {
         for ([_, configurator] in configurators) {
             configurator.awaitShutdown()

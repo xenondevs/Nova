@@ -25,9 +25,7 @@ import org.bukkit.event.world.WorldUnloadEvent
 import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.packetentity.PacketBlockDisplay
 import xyz.xenondevs.nova.packetentity.PacketInteraction
 import xyz.xenondevs.nova.packetentity.PacketItemDisplay
@@ -196,7 +194,6 @@ internal class DisplayEntityModelProviderManager private constructor(private val
     }
     
     
-    @InternalInit(stage = InternalInitStage.POST_WORLD, runAfter = [ResourceGeneration.PostWorld::class])
     companion object : Listener {
         
         private val managers = ConcurrentHashMap<World, DisplayEntityModelProviderManager>()
@@ -216,7 +213,10 @@ internal class DisplayEntityModelProviderManager private constructor(private val
                 managers.values.forEach { it.setColliderOutlines(value) }
             }
         
-        @InitFun
+        @InternalInit(
+            stage = POST_WORLD,
+            runAfter = [ResourceGeneration.PostWorld::class]
+        )
         private fun init() {
             ready = true
             registerEvents()

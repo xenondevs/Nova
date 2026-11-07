@@ -18,9 +18,7 @@ import xyz.xenondevs.commons.collections.associateWithNotNull
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.PermanentStorage
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.nmsBlockEntity
@@ -29,10 +27,10 @@ import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.toNamespacedKey
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
+import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.VanillaFluidHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.VanillaItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaCauldronBlockEntity
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.isRegularFile
@@ -45,13 +43,12 @@ private const val CONVERTED_WORLDS_KEY = "legacy_region_converted_worlds"
 private const val CHUNKS_PER_UNLOAD = 64
 private val REGION_FILE_NAME = Regex("""r\.(-?\d+)\.(-?\d+)\.nvr""")
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    runBefore = [WorldDataManager::class]
-)
 internal object LegacyRegionFileConverter {
     
-    @InitFun
+    @InternalInit(
+        stage = POST_WORLD,
+        runBefore = [NetworkManager::class] // migrate legacy tile entities before loading their networks
+    )
     private fun convert() {
         val reader by lazy {
             val states = PermanentStorage.retrieve<Map<Int, JsonObject>>(ID_MAP_KEY)

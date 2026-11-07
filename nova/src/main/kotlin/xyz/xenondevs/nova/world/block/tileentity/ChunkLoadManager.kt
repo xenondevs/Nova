@@ -5,14 +5,11 @@ import kotlinx.serialization.builtins.SetSerializer
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.serialization.kotlinx.UUIDAsStringSerializer
 import xyz.xenondevs.nova.world.ChunkPos
 import java.util.*
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 object ChunkLoadManager {
     
     private val chunksSerializer = MapSerializer(ChunkPos.serializer(), SetSerializer(UUIDAsStringSerializer))
@@ -21,7 +18,7 @@ object ChunkLoadManager {
             ?.mapValuesTo(HashMap()) { [_, owners] -> HashSet(owners) }
             ?: HashMap()
     
-    @InitFun
+    @InternalInit(stage = POST_WORLD)
     private fun init() {
         for (chunk in forceLoadedChunks.keys) {
             chunk.world?.addPluginChunkTicket(chunk.x, chunk.z, Nova)

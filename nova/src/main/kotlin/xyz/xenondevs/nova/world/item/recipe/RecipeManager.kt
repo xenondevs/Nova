@@ -15,9 +15,7 @@ import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.registerPacketListener
@@ -48,10 +46,6 @@ private val ALLOWED_RECIPES = setOf(NamespacedKey("minecraft", "repair_item"), N
 
 private val PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD = ReflectionUtils.getField(PrepareItemCraftEvent::class, true, "matrix")
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    runAfter = [HooksLoader::class, VanillaRecipeTypes::class]
-)
 object RecipeManager : Listener, PacketListener {
     
     private val registeredVanillaRecipes = HashMap<ResourceKey<MojangRecipe<*>>, RecipeHolder<*>>()
@@ -61,7 +55,13 @@ object RecipeManager : Listener, PacketListener {
     val novaRecipes: Map<RecipeType<*>, Map<Key, NovaRecipe>>
         field = HashMap<RecipeType<*>, HashMap<Key, NovaRecipe>>()
     
-    @InitFun
+    @InternalInit(
+        stage = POST_WORLD,
+        runAfter = [
+            HooksLoader::class,
+            VanillaRecipeTypes::class,
+        ]
+    )
     private suspend fun init() {
         registerEvents()
         registerPacketListener()

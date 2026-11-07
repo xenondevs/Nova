@@ -4,9 +4,7 @@ import net.kyori.adventure.text.Component
 import net.minecraft.world.inventory.MenuType
 import org.joml.Vector2ic
 import xyz.xenondevs.nova.i18n.LocaleManager
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundOpenScreenPacketEvent
@@ -29,7 +27,6 @@ import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 /**
  * Adds the vanilla gui textures back to all screens that don't use a custom gui texture.
  */
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object VanillaGuiTextureInjector : PacketListener {
     
     val requiredVerticalOffsets: Set<Int>
@@ -58,7 +55,7 @@ internal object VanillaGuiTextureInjector : PacketListener {
             GuiTextureAlignment.STONECUTTER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y()
         )
     
-    @InitFun
+    @InternalInit(stage = PRE_WORLD)
     private fun init() {
         registerPacketListener()
     }

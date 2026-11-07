@@ -68,7 +68,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.Defa
 import kotlin.math.roundToInt
 
 @InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
+    stage = InternalInitStage.BOOTSTRAP,
     runBefore = [RegistryLoader::class]
 )
 object DefaultWailaInfoProviders {

@@ -19,12 +19,10 @@ import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_JAR
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.packetentity.refreshPacketEntities
-import xyz.xenondevs.nova.serialization.kotlinx.NOVA_SERIALIZERS_MODULE
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.NOVA_SERIALIZERS_MODULE
 import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.BukkitDispatcher
 import xyz.xenondevs.nova.util.data.useZip
@@ -45,7 +43,7 @@ import kotlin.io.path.walk
 /**
  * The [ConfigStorage] used for Nova and its addons.
  * Use [ConfigStorage.get] to get a [ConfigProvider] for a specific config.
- * 
+ *
  * Usage:
  * ```
  * // plugins/example_addon/configs/config.yml with e.g. `some_value: 123`
@@ -62,7 +60,6 @@ val MAIN_CONFIG: ConfigProvider by lazy { CONFIGS["nova:config"] }
 @Deprecated("Use CONFIGS instead", ReplaceWith("CONFIGS"))
 val Configs get() = CONFIGS
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
 internal object NovaConfigBackend : ConfigBackend {
     
     internal suspend fun extractAllConfigs() {
@@ -149,17 +146,15 @@ internal object NovaConfigBackend : ConfigBackend {
     
 }
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object ConfigValidator {
     
-    @InitFun
+    @InternalInit(stage = POST_WORLD)
     private fun validate() {
         CONFIGS.resolveEntries()
     }
     
 }
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object ConfigWatcher {
     
     private val watchService: WatchService? =
@@ -171,7 +166,7 @@ internal object ConfigWatcher {
             dirs.add(config.parent)
     }
     
-    @InitFun
+    @InternalInit(stage = POST_WORLD)
     private fun startWatching() {
         if (watchService == null)
             return

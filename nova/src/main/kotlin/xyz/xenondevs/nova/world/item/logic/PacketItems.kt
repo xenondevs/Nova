@@ -114,9 +114,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockEntityDataPacketEvent
@@ -177,10 +175,6 @@ import kotlin.jvm.optionals.getOrNull
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    runAfter = [ResourceGeneration.PreWorld::class]
-)
 internal object PacketItems : PacketListener {
     
     val SCROLLABLE_ITEM_HOLDER = BuiltInRegistries.ITEM.wrapAsHolder(Items.STRUCTURE_VOID)
@@ -193,7 +187,10 @@ internal object PacketItems : PacketListener {
         it != DataComponents.BUNDLE_CONTENTS && it != DataComponents.LORE
     }
     
-    @InitFun
+    @InternalInit(
+        stage = PRE_WORLD,
+        runAfter = [ResourceGeneration.PreWorld::class]
+    )
     private fun init() {
         registerPacketListener()
     }

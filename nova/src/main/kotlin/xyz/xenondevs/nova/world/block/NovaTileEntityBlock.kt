@@ -32,12 +32,14 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.context.intention.ImplicitIntentions
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.FlammableSettings
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockSelectorScope
 import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.getOrNull
 import xyz.xenondevs.nova.util.levelChunk
+import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.toBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
@@ -291,6 +293,11 @@ internal class NovaTileEntityProxy(
     }
     
     companion object : Listener {
+        
+        @InternalInit(stage = PRE_WORLD)
+        private fun registerListener() {
+            registerEvents()
+        }
         
         @EventHandler(priority = EventPriority.LOWEST)
         private fun handleChunkLoad(event: ChunkLoadEvent) {

@@ -2,164 +2,115 @@ package xyz.xenondevs.nova.initialize
 
 import kotlinx.coroutines.CoroutineDispatcher
 import org.jgrapht.Graph
+import org.objectweb.asm.Type
 import xyz.xenondevs.nova.annotations.AnnotationIndex
 import xyz.xenondevs.nova.annotations.AnnotationValue
 
-internal abstract class Initializable(
+internal class Initializable private constructor(
+    private val classLoader: ClassLoader,
+    private val className: String,
+    private val method: AnnotationIndex.Method?,
     val stage: InternalInitStage,
     override val dispatcher: CoroutineDispatcher?,
     private val runBeforeNames: Set<String>,
     private val runAfterNames: Set<String>
 ) : InitializerRunnable<Initializable>() {
     
-    abstract val initClass: InitializableClass
-    
     override fun loadDependencies(all: Set<Initializable>, graph: Graph<Initializable, *>) {
-        // this runBefore that
-        for (runBeforeName in runBeforeNames) {
-            val runBefore = all
-                .filterIsInstance<InitializableClass>()
-                .firstOrNull { candidate -> candidate.initClass.className == runBeforeName }
-                ?: throw IllegalArgumentException("Could not find initializable class '$runBeforeName', which is a runBefore of '$this'")
-            if (!stage.isPreWorld && runBefore.stage.isPreWorld)
-                throw IllegalArgumentException("Incompatible stages: '$this' (post-world) is configured to be initialized before '$runBeforeName' (pre-world)")
-            
-            if (runBefore.completion.isCompleted)
-                throw IllegalArgumentException("'$this' is configured to be initialized before '$runBeforeName', but '$runBeforeName' is already initialized")
-            
-            // stages are compatible, and execution order is already specified through those 
-            if (stage != runBefore.stage)
-                continue
-            
-            try {
-                graph.addEdge(this, runBefore)
-            } catch (e: IllegalArgumentException) {
-                throw IllegalArgumentException("Failed to add edge from '$this' to '$runBeforeName'", e)
+        // A function always waits for its containing class's explicit initialization task.
+        if (method != null) {
+            all.firstOrNull { it.className == className && it.method == null }
+                ?.let { addDependency(graph, it, this) }
+        }
+        
+        for (name in runBeforeNames) {
+            val targets = findTargets(all, name)
+            // Waiting for class initialization also orders all of that class's functions.
+            val clazz = targets.firstOrNull { it.method == null }
+            for (target in if (clazz != null) listOf(clazz) else targets) {
+                addDependency(graph, this, target)
             }
         }
         
-        // this runAfter that
-        for (runAfterName in runAfterNames) {
-            val runAfters = HashSet<Initializable>()
-            val runAfterClass = all
-                .filterIsInstance<InitializableClass>()
-                .firstOrNull { candidate -> candidate.initClass.className == runAfterName }
-                ?: throw IllegalArgumentException("Could not find initializable class '$runAfterName', which is a runAfter of '$this'")
-            runAfters += runAfterClass
-            if (runAfterClass != initClass)
-                runAfters += runAfterClass.initFunctions
-            
-            for (runAfter in runAfters) {
-                if (stage.isPreWorld && !runAfter.stage.isPreWorld)
-                    throw IllegalArgumentException("Incompatible stages: '$this' (pre-world) is configured to be initialized after '$runAfterName' (post-world)")
-                
-                // stages are compatible, and execution order is already specified through those 
-                if (stage != runAfter.stage)
-                    continue
-                
-                try {
-                    graph.addEdge(runAfter, this)
-                } catch (e: IllegalArgumentException) {
-                    throw IllegalArgumentException("Failed to add edge from '$runAfter' to '$this'", e)
-                }
+        for (name in runAfterNames) {
+            for (target in findTargets(all, name)) {
+                addDependency(graph, target, this)
             }
         }
     }
     
-}
-
-internal class InitializableClass(
-    val classLoader: ClassLoader,
-    val className: String,
-    stage: InternalInitStage,
-    dispatcher: CoroutineDispatcher?,
-    runBeforeNames: Set<String>,
-    runAfterNames: Set<String>
-) : Initializable(stage, dispatcher, runBeforeNames, runAfterNames) {
+    private fun findTargets(all: Set<Initializable>, name: String): List<Initializable> {
+        val targets = all.filter { it.className == name }
+        require(targets.isNotEmpty()) { "Could not find initialization tasks for '$name', referenced by '$this'" }
+        return targets
+    }
     
-    override val initClass = this
-    
-    lateinit var clazz: Class<*>
-        private set
-    
-    val initFunctions = ArrayList<InitializableFunction>()
+    private fun addDependency(graph: Graph<Initializable, *>, before: Initializable, after: Initializable) {
+        require(before.stage <= after.stage) {
+            "Incompatible stages: '$before' (${before.stage}) is configured to be initialized before '$after' (${after.stage})"
+        }
+        if (before.stage != after.stage)
+            return
+        
+        try {
+            graph.addEdge(before, after)
+        } catch (e: IllegalArgumentException) {
+            throw IllegalArgumentException("Failed to add initialization dependency from '$before' to '$after'", e)
+        }
+    }
     
     override suspend fun run() {
-        clazz = Class.forName(className.replace('/', '.'), true, classLoader)
+        val clazz = Class.forName(className.replace('/', '.'), true, classLoader)
+        if (method != null)
+            callMethod(clazz, method)
         completion.complete(Unit)
     }
     
     override fun toString(): String {
-        return className
+        return if (method == null) className else "$className::${method.name}"
     }
     
     companion object {
         
-        fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: AnnotationIndex.Annotation): InitializableClass {
-            val stage = (annotation.arguments["stage"] as AnnotationValue.EnumConstant?)?.name
-                ?.let { enumValueOf<InitStage>(it) }
-                ?: throw IllegalStateException("Init annotation on $clazz does not contain a stage!")
+        fun fromLegacyAnnotation(
+            clazz: Initializable,
+            method: AnnotationIndex.Method,
+            annotation: AnnotationIndex.Annotation
+        ): Initializable {
             val [dispatcher, runBefore, runAfter] = readAnnotationCommons(annotation)
-            runBefore += stage.runBefore
-            runAfter += stage.runAfter
-            
-            return InitializableClass(
-                classLoader, clazz,
-                stage.internalStage, (dispatcher ?: Dispatcher.SYNC).dispatcher,
+            // The containing class dependency is added separately, without waiting for sibling functions.
+            runAfter -= clazz.className
+            return Initializable(
+                clazz.classLoader, clazz.className, method,
+                clazz.stage, dispatcher?.dispatcher ?: clazz.dispatcher,
                 runBefore, runAfter
             )
         }
         
-        fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: AnnotationIndex.Annotation): InitializableClass {
-            val stage = (annotation.arguments["stage"] as AnnotationValue.EnumConstant?)?.name
-                ?.let { enumValueOf<InternalInitStage>(it) }
-                ?: throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")
+        fun fromAnnotation(
+            classLoader: ClassLoader,
+            className: String,
+            method: AnnotationIndex.Method?,
+            annotation: AnnotationIndex.Annotation
+        ): Initializable {
             val [dispatcher, runBefore, runAfter] = readAnnotationCommons(annotation)
+            val stageName = (annotation.arguments["stage"] as AnnotationValue.EnumConstant?)?.name
+            val stage = if (annotation.descriptor == Type.getDescriptor(Init::class.java)) {
+                val addonStage = stageName?.let { enumValueOf<InitStage>(it) } ?: InitStage.BOOTSTRAP
+                runBefore += addonStage.runBefore
+                runAfter += addonStage.runAfter
+                addonStage.internalStage
+            } else {
+                require(annotation.descriptor == Type.getDescriptor(InternalInit::class.java))
+                requireNotNull(stageName) { "InternalInit on $className does not contain a stage!" }
+                enumValueOf<InternalInitStage>(stageName)
+            }
             
-            return InitializableClass(
-                classLoader, clazz,
+            return Initializable(
+                classLoader, className, method,
                 stage, (dispatcher ?: Dispatcher.SYNC).dispatcher,
                 runBefore, runAfter
             )
-        }
-        
-    }
-    
-}
-
-internal class InitializableFunction(
-    override val initClass: InitializableClass,
-    private val method: AnnotationIndex.Method,
-    dispatcher: CoroutineDispatcher?,
-    runBeforeNames: Set<String>,
-    runAfterNames: Set<String>
-) : Initializable(
-    initClass.stage,
-    dispatcher,
-    runBeforeNames,
-    runAfterNames + initClass.className
-) {
-    
-    override suspend fun run() {
-        callMethod(initClass.clazz, method)
-        completion.complete(Unit)
-    }
-    
-    override fun toString(): String {
-        return initClass.className + "::" + method.name
-    }
-    
-    companion object {
-        
-        fun fromInitAnnotation(clazz: InitializableClass, method: AnnotationIndex.Method, annotation: AnnotationIndex.Annotation): InitializableFunction {
-            val [dispatcher, runBefore, runAfter] = readAnnotationCommons(annotation)
-            val func = InitializableFunction(
-                clazz, method,
-                dispatcher?.dispatcher ?: clazz.dispatcher,
-                runBefore, runAfter
-            )
-            clazz.initFunctions += func
-            return func
         }
         
     }

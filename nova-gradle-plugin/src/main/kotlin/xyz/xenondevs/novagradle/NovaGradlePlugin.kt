@@ -57,6 +57,7 @@ internal class NovaGradlePlugin : KotlinCompilerPluginSupportPlugin {
                 "xyz.xenondevs.nova.initialize.Init",
             )
             methodAnnotations.addAll(
+                "xyz.xenondevs.nova.initialize.Init",
                 "xyz.xenondevs.nova.initialize.InitFun",
                 "xyz.xenondevs.nova.initialize.DisableFun"
             )

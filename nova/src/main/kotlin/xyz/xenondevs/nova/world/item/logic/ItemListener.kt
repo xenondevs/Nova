@@ -14,10 +14,7 @@ import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
@@ -34,13 +31,9 @@ private val PLAYER_EQUIPMENT_SLOTS = listOf(
     EquipmentSlot.HEAD
 )
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dispatcher = Dispatcher.SYNC
-)
 internal object ItemListener : Listener, PacketListener {
     
-    @InitFun
+    @InternalInit(stage = PRE_WORLD)
     private fun init() {
         registerEvents()
         runTaskTimer(0, 1, ::handleTick)
@@ -135,4 +128,3 @@ internal object ItemListener : Listener, PacketListener {
     }
     
 }
-

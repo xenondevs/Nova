@@ -11,9 +11,7 @@ import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.serialization.persistentdata.get
 import xyz.xenondevs.nova.serialization.persistentdata.set
@@ -31,10 +29,6 @@ private val Player.isWailaEnabled: Boolean
 private val Player.isWailaBackgroundEnabled: Boolean
     get() = persistentDataContainer.get<Boolean>(WAILA_BACKGROUND_ENABLED_KEY) != false
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    runAfter = [ResourceGeneration.PostWorld::class]
-)
 internal object WailaManager : Listener, IWailaManager {
     
     private val ENABLED_PROVIDER = MAIN_CONFIG.entry<Boolean>("waila", "enabled")
@@ -49,7 +43,10 @@ internal object WailaManager : Listener, IWailaManager {
     override fun setState(player: Player, enabled: Boolean): Boolean = if (toggle(player, enabled)) enabled else !enabled
     //</editor-fold>
     
-    @InitFun
+    @InternalInit(
+        stage = POST_WORLD,
+        runAfter = [ResourceGeneration.PostWorld::class]
+    )
     private fun init() {
         ENABLED_PROVIDER.subscribe(::reload)
         reload(ENABLED)

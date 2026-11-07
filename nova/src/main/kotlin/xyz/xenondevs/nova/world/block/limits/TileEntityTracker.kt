@@ -10,9 +10,7 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.UUIDAsStringSerializer
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -22,7 +20,6 @@ import xyz.xenondevs.nova.world.chunkPos
 import java.lang.Integer.max
 import java.util.*
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object TileEntityTracker {
     
     private val blocksSerializer = MapSerializer(KeySerializer, Int.serializer())
@@ -45,7 +42,7 @@ internal object TileEntityTracker {
                 chunks.mapValuesTo(HashMap()) { [_, blocks] -> HashMap(blocks) }
             } ?: HashMap()
     
-    @InitFun
+    @InternalInit(stage = PRE_WORLD)
     private fun init() {
         runTaskTimer(20 * 60, 20 * 60, ::saveCounters)
     }

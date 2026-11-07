@@ -23,10 +23,7 @@ import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.config.strongEntry
 import xyz.xenondevs.nova.config.strongNode
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.unregisterEvents
@@ -43,17 +40,16 @@ private data class UpdateReminderSettings(
     val interval: Long
 )
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dispatcher = Dispatcher.ASYNC
-)
 internal object UpdateReminder : Listener {
     
     private var job: Job? = null
     private val needsUpdate = HashMap<Addon?, String>()
     private val alreadyNotified = ArrayList<Addon?>()
     
-    @InitFun
+    @InternalInit(
+        stage = PRE_WORLD,
+        dispatcher = ASYNC
+    )
     private fun init() {
         MAIN_CONFIG.strongEntry<UpdateReminderSettings>("update_reminder")
             .subscribe(::reload)

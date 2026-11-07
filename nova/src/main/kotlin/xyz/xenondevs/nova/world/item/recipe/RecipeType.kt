@@ -64,7 +64,7 @@ class RecipeType<T : Any> internal constructor(
 }
 
 @InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
+    stage = InternalInitStage.BOOTSTRAP,
     runBefore = [RegistryLoader::class]
 )
 object VanillaRecipeTypes {

@@ -23,10 +23,7 @@ import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.integration.permission.PermissionManager
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
@@ -86,11 +83,6 @@ private data class CanHurtEntityTileArgs(override val tileEntity: TileEntity, va
  * If all protection integrations [can be called asynchronously][ExecutionMode], commonly used protection checks will be refreshed
  * every 30s.
  */
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dispatcher = Dispatcher.ASYNC,
-    runAfter = [HooksLoader::class, PermissionManager::class]
-)
 object ProtectionManager {
     
     internal val integrations = CopyOnWriteArrayList<ProtectionIntegration>()
@@ -109,7 +101,14 @@ object ProtectionManager {
     private lateinit var cacheCanHurtEntityUser: LoadingCache<CanHurtEntityUserArgs, CompletableFuture<Boolean>>
     private lateinit var cacheCanHurtEntityTile: LoadingCache<CanHurtEntityTileArgs, CompletableFuture<Boolean>>
     
-    @InitFun
+    @InternalInit(
+        stage = POST_WORLD,
+        dispatcher = ASYNC,
+        runAfter = [
+            HooksLoader::class,
+            PermissionManager::class,
+        ]
+    )
     private fun init() {
         executor = ThreadPoolExecutor(
             10, 10,

@@ -22,7 +22,7 @@ import java.awt.Color
 import java.awt.image.BufferedImage
 
 @InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
+    stage = InternalInitStage.BOOTSTRAP,
     runBefore = [RegistryLoader::class]
 )
 object DefaultGuiItems {
@@ -232,7 +232,7 @@ object DefaultGuiItems {
     
     /**
      * The default vertical scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
-     * 
+     *
      * - `customModelData.floats[0]` defines the movement of the scroller, in pixels
      * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
      * - Height: 15px
@@ -245,7 +245,7 @@ object DefaultGuiItems {
     
     /**
      * The default vertical disabled scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
-     * 
+     *
      * - `customModelData.floats[0]` defines whether the scroller is visible (1) or not (any other integer value)
      * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
      * - Height: 15px
@@ -258,7 +258,7 @@ object DefaultGuiItems {
     
     /**
      * The default horizontal scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
-     * 
+     *
      * - `customModelData.floats[0]` defines the movement of the scroller, in pixels
      * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
      * - Width: 15px
@@ -271,7 +271,7 @@ object DefaultGuiItems {
     
     /**
      * The default horizontal disabled scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
-     * 
+     *
      * - `customModelData.floats[0]` defines whether the scroller is visible (1) or not (any other integer value)
      * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
      * - Width: 15px
@@ -286,7 +286,7 @@ object DefaultGuiItems {
 }
 
 @InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
+    stage = InternalInitStage.BOOTSTRAP,
     runBefore = [RegistryLoader::class]
 )
 object DefaultBlockOverlays {

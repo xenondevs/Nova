@@ -17,9 +17,7 @@ import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.config.node
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBossEventPacketEvent
@@ -42,7 +40,6 @@ import xyz.xenondevs.nova.util.unregisterEvents
 import java.util.*
 import kotlin.math.max
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 object BossBarOverlayManager : Listener, PacketListener {
     
     private val BOSSBAR_CONFIG = MAIN_CONFIG.node("overlay", "bossbar")
@@ -61,7 +58,7 @@ object BossBarOverlayManager : Listener, PacketListener {
     private val trackedBars = HashMap<Player, LinkedHashMap<UUID, BossBar>>()
     private val vanillaBarOverlays = HashMap<BossBar, VanillaBossBarOverlayCompound>()
     
-    @InitFun
+    @InternalInit(stage = PRE_WORLD)
     private fun init() {
         BOSSBAR_CONFIG.subscribe { reload() }
         reload()

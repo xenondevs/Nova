@@ -22,9 +22,7 @@ import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType
 import net.minecraft.world.level.levelgen.synth.NormalNoise
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.preFreeze
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.util.data.UpdatableFile
@@ -38,7 +36,6 @@ import kotlin.io.path.name
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.walk
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
 internal object WorldGenFileParser {
     
     private val VANILLA_WORLD_GEN_DIRECTORIES = listOf(
@@ -58,7 +55,7 @@ internal object WorldGenFileParser {
         VanillaWorldGenDir("processor_list", StructureProcessorType.DIRECT_CODEC, Registries.PROCESSOR_LIST)
     )
     
-    @InitFun
+    @InternalInit(stage = BOOTSTRAP)
     suspend fun init() {
         UpdatableFile.extractIdNamedFromAllAddons("worldgen")
         VANILLA_WORLD_GEN_DIRECTORIES.forEach { loadFiles(it) }

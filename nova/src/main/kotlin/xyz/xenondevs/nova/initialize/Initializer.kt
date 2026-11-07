@@ -27,6 +27,7 @@ import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.name
 import xyz.xenondevs.nova.addon.version
+import xyz.xenondevs.nova.annotations.AnnotationIndex
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
@@ -34,6 +35,7 @@ import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.ui.menu.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils
+import xyz.xenondevs.nova.util.registerEvents
 import java.io.File
 import java.lang.reflect.InvocationTargetException
 import java.nio.file.Path
@@ -45,59 +47,62 @@ internal object Initializer : Listener {
     private val initializables = HashSet<Initializable>()
     private val disableables = HashSet<DisableableFunction>()
     
-    private val initPreWorld = DirectedAcyclicGraph<Initializable, DefaultEdge>(DefaultEdge::class.java)
-    private val initPostWorld = DirectedAcyclicGraph<Initializable, DefaultEdge>(DefaultEdge::class.java)
+    private val init = InternalInitStage.entries.associateWith { DirectedAcyclicGraph<Initializable, DefaultEdge>(DefaultEdge::class.java) }
     private val disable = DirectedAcyclicGraph<DisableableFunction, DefaultEdge>(DefaultEdge::class.java)
     
+    private var bootstrapInitialized = false
     private var preWorldInitialized = false
     var isDone = false
         private set
     
     /**
-     * Stats the initialization process.
+     * Collects all initialization tasks and runs the bootstrap phase.
      */
-    suspend fun start() = tryInit {
-        collectAndRegisterRunnables(NOVA_JAR, this.javaClass.classLoader)
-        for (addon in AddonBootstrapper.addons) {
-            collectAndRegisterRunnables(addon.file, addon.javaClass.classLoader)
+    suspend fun start() {
+        tryInit {
+            collectAndRegisterRunnables(NOVA_JAR, this.javaClass.classLoader)
+            for (addon in AddonBootstrapper.addons) {
+                collectAndRegisterRunnables(addon.file, addon.javaClass.classLoader)
+            }
         }
         
-        initPreWorld()
+        initBootstrap()
     }
     
     private fun collectAndRegisterRunnables(file: Path, classLoader: ClassLoader) {
-        val [initializables, disableables] = collectRunnables(file, classLoader)
+        val [initializables, disableables] = collectRunnables(JarUtils.getAnnotationIndex(file), classLoader)
         addRunnables(initializables, disableables)
     }
     
-    /**
-     * Searches [file] and collects classes annotated by [InternalInit] and [Init] and functions
-     * annotated by [InitFun] and [DisableFun] as [Initializables][Initializable] and [DisableableFunctions][DisableableFunction].
-     */
-    private fun collectRunnables(file: Path, classLoader: ClassLoader): Pair<List<Initializable>, List<DisableableFunction>> {
+    private fun collectRunnables(
+        index: AnnotationIndex,
+        classLoader: ClassLoader
+    ): Pair<List<Initializable>, List<DisableableFunction>> {
         val initializables = ArrayList<Initializable>()
         val disableables = ArrayList<DisableableFunction>()
-        val index = JarUtils.getAnnotationIndex(file)
-        val internalInit = Type.getDescriptor(InternalInit::class.java)
-        val init = Type.getDescriptor(Init::class.java)
-        val initFun = Type.getDescriptor(InitFun::class.java)
-        val disableFun = Type.getDescriptor(DisableFun::class.java)
+        val initDescriptors = setOf(Type.getDescriptor(Init::class.java), Type.getDescriptor(InternalInit::class.java))
+        val disableDescriptor = Type.getDescriptor(DisableFun::class.java)
+        @Suppress("DEPRECATION")
+        val legacyInitDescriptor = Type.getDescriptor(InitFun::class.java)
+        
+        fun collectInit(className: String, method: AnnotationIndex.Method?, annotations: List<AnnotationIndex.Annotation>): Initializable? {
+            val initAnnotations = annotations.filter { it.descriptor in initDescriptors }
+            require(initAnnotations.size <= 1) { "Multiple initialization annotations on $className${method?.let { "::${it.name}" } ?: ""}" }
+            return initAnnotations.singleOrNull()?.let {
+                Initializable.fromAnnotation(classLoader, className, method, it).also(initializables::add)
+            }
+        }
         
         for ([className, metadata] in index.classes) {
-            var clazz: InitializableClass? = null
-            metadata.annotations.firstOrNull { it.descriptor == internalInit }?.let {
-                clazz = InitializableClass.fromInternalAnnotation(classLoader, className, it).also(initializables::add)
-            }
-            metadata.annotations.firstOrNull { it.descriptor == init }?.let {
-                clazz = InitializableClass.fromAddonAnnotation(classLoader, className, it).also(initializables::add)
-            }
-            
+            val clazz = collectInit(className, null, metadata.annotations)
             for (method in metadata.methods) {
-                method.annotations.firstOrNull { it.descriptor == initFun }?.let {
-                    val initClass = clazz ?: throw IllegalStateException("Class $className is missing an init annotation!")
-                    initializables += InitializableFunction.fromInitAnnotation(initClass, method, it)
+                val function = collectInit(className, method, method.annotations)
+                method.annotations.firstOrNull { it.descriptor == legacyInitDescriptor }?.let {
+                    require(function == null) { "Multiple initialization annotations on $className::${method.name}" }
+                    val initClass = requireNotNull(clazz) { "Class $className is missing an init annotation required by @InitFun!" }
+                    initializables += Initializable.fromLegacyAnnotation(initClass, method, it)
                 }
-                method.annotations.firstOrNull { it.descriptor == disableFun }?.let {
+                method.annotations.firstOrNull { it.descriptor == disableDescriptor }?.let {
                     disableables += DisableableFunction.fromInitAnnotation(classLoader, className, method, it)
                 }
             }
@@ -110,15 +115,12 @@ internal object Initializer : Listener {
      * Adds the given [Initializables][Initializable] and [DisableableFunctions][DisableableFunction] to the initialization process.
      */
     private fun addRunnables(initializables: List<Initializable>, disableables: List<DisableableFunction>) {
-        check(!preWorldInitialized) { "Cannot add additional callables after pre-world initialization!" }
+        check(!bootstrapInitialized) { "Cannot add additional callables after bootstrap initialization!" }
         
         // add vertices
         for (initializable in initializables) {
             this.initializables += initializable
-            when (initializable.stage) {
-                InternalInitStage.PRE_WORLD -> initPreWorld.addVertex(initializable)
-                else -> initPostWorld.addVertex(initializable)
-            }
+            init.getValue(initializable.stage).addVertex(initializable)
         }
         for (disableable in disableables) {
             this.disableables += disableable
@@ -127,10 +129,7 @@ internal object Initializer : Listener {
         
         // add edges
         for (initializable in initializables) {
-            initializable.loadDependencies(
-                this.initializables,
-                if (initializable.stage == InternalInitStage.PRE_WORLD) initPreWorld else initPostWorld
-            )
+            initializable.loadDependencies(this.initializables, init.getValue(initializable.stage))
         }
         for (disableable in disableables) {
             disableable.loadDependencies(this.disableables, disable)
@@ -143,8 +142,6 @@ internal object Initializer : Listener {
     @Suppress("UNCHECKED_CAST")
     private fun dumpGraphs() {
         val dir = File("debug/nova/")
-        val preWorldFile = File(dir, "pre_world.dot")
-        val postWorldFile = File(dir, "post_world.dot")
         val disableFile = File(dir, "disable.dot")
         dir.mkdirs()
         
@@ -155,18 +152,40 @@ internal object Initializer : Listener {
                 "color" to DefaultAttribute.createAttribute(if (vertex.dispatcher != null) "aqua" else "black")
             )
         }
-        exporter.exportGraph(initPreWorld as Graph<InitializerRunnable<*>, DefaultEdge>, preWorldFile)
-        exporter.exportGraph(initPostWorld as Graph<InitializerRunnable<*>, DefaultEdge>, postWorldFile)
+        for ((key, value) in init) {
+            exporter.exportGraph(value as Graph<InitializerRunnable<*>, DefaultEdge>, File(dir, "${key.name.lowercase()}.dot"))
+        }
         exporter.exportGraph(disable as Graph<InitializerRunnable<*>, DefaultEdge>, disableFile)
     }
     
     /**
-     * Stats the pre-world initialization process.
+     * Runs the bootstrap phase after collecting all initialization tasks.
      */
-    private suspend fun initPreWorld() {
+    private suspend fun initBootstrap() {
         tryInit {
+            check(!bootstrapInitialized) { "Bootstrap initialization has already completed!" }
             coroutineScope {
-                launchAll(this, initPreWorld)
+                launchAll(this, init.getValue(InternalInitStage.BOOTSTRAP))
+            }
+        }
+        
+        bootstrapInitialized = true
+    }
+    
+    @InternalInit(stage = PRE_WORLD)
+    private fun registerListener() {
+        registerEvents()
+    }
+    
+    /**
+     * Runs the pre-world phase during Nova's plugin enable.
+     */
+    suspend fun initPreWorld() {
+        tryInit {
+            check(bootstrapInitialized) { "Cannot start pre-world initialization before bootstrap initialization!" }
+            check(!preWorldInitialized) { "Pre-world initialization has already completed!" }
+            coroutineScope {
+                launchAll(this, init.getValue(InternalInitStage.PRE_WORLD))
             }
         }
         
@@ -179,7 +198,7 @@ internal object Initializer : Listener {
     private fun initPostWorld() = runBlocking {
         tryInit {
             coroutineScope {
-                launchAll(this, initPostWorld)
+                launchAll(this, init.getValue(InternalInitStage.POST_WORLD))
             }
         }
         
@@ -228,7 +247,7 @@ internal object Initializer : Listener {
     
     /**
      * Wraps [run] in a try-catch block with error logging specific to initialization.
-     * Returns whether the initialization was successful, and also shuts down the server if it wasn't.
+     * Shuts down the server if initialization fails.
      */
     private suspend inline fun tryInit(run: () -> Unit) {
         try {

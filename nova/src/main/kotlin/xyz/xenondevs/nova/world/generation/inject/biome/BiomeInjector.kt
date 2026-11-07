@@ -11,15 +11,12 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.postFreeze
 
 private val LOG_INJECTIONS by MAIN_CONFIG.entry<Boolean>("debug", "logging", "biome_injections")
 private val GENERATION_STEPS = GenerationStep.Decoration.entries.size
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
 internal object BiomeInjector {
     
     private val injections = LinkedHashMap<Key, BiomeInjection>()
@@ -29,7 +26,7 @@ internal object BiomeInjector {
         injections[key] = injection
     }
     
-    @InitFun
+    @InternalInit(stage = BOOTSTRAP)
     fun prepareInjections() {
         Registries.BIOME.postFreeze { biomeRegistry, _ ->
             val toInject = LinkedHashMap<Biome, Array<LinkedHashSet<Holder<PlacedFeature>>>>()

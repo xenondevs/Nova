@@ -21,9 +21,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.config.NovaConfigBackend
 import xyz.xenondevs.nova.config.PermanentStorage
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.KnownRegistryEntries.knownRegistryEntries
 import xyz.xenondevs.nova.registry.RegistryLoader.novaBuilderFactories
 import xyz.xenondevs.nova.registry.RegistryLoader.novaBuilders
@@ -85,7 +83,6 @@ private sealed interface BuilderFactory<E : RegistryEntry<*>, B : RegistryElemen
  * * Vanilla registry entries are built and injected immediately before Vanilla registries are frozen.
  * * (post-world initializables, including post-world resource pack generation)
  */
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
 object RegistryLoader {
     
     private val novaBuilderFactories: MutableMap<MutableNovaRegistry<*>, MutableMap<Key, BuilderFactory.Nova<*, *>>> = HashMap()
@@ -194,7 +191,10 @@ object RegistryLoader {
     //</editor-fold>
     
     //<editor-fold desc="lifecycle">
-    @InitFun(runBefore = [ResourceGeneration.PreWorld::class])
+    @InternalInit(
+        stage = BOOTSTRAP,
+        runBefore = [ResourceGeneration.PreWorld::class]
+    )
     private fun prepareBuilders() {
         // prepare nova builders by creating and configuring them
         for ([_, registry] in NovaRegistries.registries) {
@@ -208,7 +208,10 @@ object RegistryLoader {
         }
     }
     
-    @InitFun(runAfter = [ResourceGeneration.PreWorld::class])
+    @InternalInit(
+        stage = BOOTSTRAP,
+        runAfter = [ResourceGeneration.PreWorld::class]
+    )
     private fun runBuilders() {
         for ([_, registry] in NovaRegistries.registries) {
             runNovaBuilders(registry)
@@ -217,7 +220,7 @@ object RegistryLoader {
         NovaRegistries.freeze()
     }
     
-    @InitFun
+    @InternalInit(stage = BOOTSTRAP)
     private fun setupReloadAgent() {
         if (!IS_DEV_SERVER)
             return
@@ -417,7 +420,6 @@ object RegistryLoader {
     
 }
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object KnownRegistryEntries {
     
     private const val KNOWN_REGISTRY_ENTRIES_KEY = "known_registry_entries"
@@ -431,7 +433,7 @@ internal object KnownRegistryEntries {
     val knownBlockStates: MutableMap<Key, BlockConfiguration> =
         PermanentStorage.retrieve(KNOWN_BLOCK_STATES, statesSerializer)?.toMutableMap() ?: HashMap()
     
-    @InitFun
+    @InternalInit(stage = POST_WORLD)
     fun store() {
         PermanentStorage.store(KNOWN_REGISTRY_ENTRIES_KEY, entriesSerializer, knownRegistryEntries)
         PermanentStorage.store(KNOWN_BLOCK_STATES, statesSerializer, knownBlockStates)

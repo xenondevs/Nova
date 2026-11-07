@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.world.item.behavior.UnknownItemFilterBehavior
 
 @InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
+    stage = InternalInitStage.BOOTSTRAP,
     runBefore = [RegistryLoader::class]
 )
 internal object DefaultItems {

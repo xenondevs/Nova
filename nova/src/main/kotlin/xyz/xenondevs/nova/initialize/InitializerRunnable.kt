@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.annotations.AnnotationIndex
 import xyz.xenondevs.nova.annotations.AnnotationValue
 import java.lang.invoke.MethodType
 import kotlin.reflect.full.callSuspend
+import kotlin.reflect.full.instanceParameter
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.kotlinFunction
 
@@ -24,10 +25,31 @@ internal sealed class InitializerRunnable<S : InitializerRunnable<S>> {
         val methodType = MethodType.fromMethodDescriptorString(method.descriptor, clazz.classLoader)
         val function = clazz.getDeclaredMethod(method.name, *methodType.parameterArray()).kotlinFunction!!
         function.isAccessible = true
-        function.callSuspend(clazz.kotlin.objectInstance)
+        if (function.instanceParameter == null) {
+            require(function.parameters.isEmpty()) { "Initializer function $function must not have parameters" }
+            function.callSuspend()
+        } else {
+            require(function.parameters.size == 1) { "Initializer function $function must not have parameters" }
+            val instance = requireNotNull(getObjectInstance(clazz)) { "Initializer function $function must belong to an object or companion object" }
+            function.callSuspend(instance)
+        }
     }
     
     companion object {
+        
+        private fun getObjectInstance(clazz: Class<*>): Any? {
+            return try {
+                clazz.kotlin.objectInstance
+            } catch (_: IllegalAccessException) {
+                // Kotlin reflection does not make the instance field of private objects accessible.
+                val field = if (clazz.kotlin.isCompanion)
+                    clazz.enclosingClass.getDeclaredField(clazz.simpleName)
+                else
+                    clazz.getDeclaredField("INSTANCE")
+                field.isAccessible = true
+                field.get(null)
+            }
+        }
         
         fun readStrings(name: String, annotation: AnnotationIndex.Annotation): HashSet<String> {
             return (annotation.arguments[name] as AnnotationValue.ArrayValue?)?.values

@@ -11,9 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.set
 import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
@@ -113,14 +111,13 @@ internal class VanillaCauldronTileEntity internal constructor(
         }
     }
     
-    @InternalInit(stage = InternalInitStage.PRE_WORLD)
     companion object {
         
         @JvmStatic
         lateinit var type: BlockEntityType<VanillaCauldronBlockEntity>
             private set
         
-        @InitFun
+        @InternalInit(stage = BOOTSTRAP)
         private fun register() {
             type = BlockEntityType(
                 ::VanillaCauldronBlockEntity,

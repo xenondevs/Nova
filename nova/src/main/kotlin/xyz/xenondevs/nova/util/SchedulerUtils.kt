@@ -59,7 +59,7 @@ fun runAsyncTaskTimer(delay: Long, period: Long, run: () -> Unit): BukkitTask {
 }
 
 private fun checkSchedulerAvailability() {
-    check(PLUGIN_READY) { "Scheduler cannot be used this early! Use a post-world initialization stage for this." }
+    check(PLUGIN_READY) { "Scheduler cannot be used this early! Use PRE_WORLD_LOAD or a later initialization stage for this." }
 }
 
 internal object AsyncExecutor {

@@ -21,6 +21,8 @@ extensions.configure<AnnotationIndexExtension> {
     )
     methodAnnotations.addAll(
         "xyz.xenondevs.nova.initialize.InitFun",
+        "xyz.xenondevs.nova.initialize.Init",
+        "xyz.xenondevs.nova.initialize.InternalInit",
         "xyz.xenondevs.nova.initialize.DisableFun"
     )
 }

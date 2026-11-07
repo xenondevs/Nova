@@ -13,10 +13,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.packetentity.packetEntityRenderDistance
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTask
@@ -32,10 +29,6 @@ var Player.fakeEntityRenderDistance: Int
         packetEntityRenderDistance = value
     }
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dispatcher = Dispatcher.ASYNC
-)
 @Deprecated(FAKE_ENTITY_DEPRECATION)
 internal object FakeEntityManager : Listener {
     
@@ -44,7 +37,10 @@ internal object FakeEntityManager : Listener {
     private val chunkViewers = HashMap<ChunkPos, CopyOnWriteArrayList<Player>>()
     private val chunkEntities = HashMap<ChunkPos, MutableList<FakeEntity<*>>>()
     
-    @InitFun
+    @InternalInit(
+        stage = PRE_WORLD,
+        dispatcher = ASYNC
+    )
     private fun init() {
         registerEvents()
         

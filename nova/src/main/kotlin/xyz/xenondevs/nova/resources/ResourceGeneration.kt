@@ -9,10 +9,7 @@ import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.version
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
-import xyz.xenondevs.nova.initialize.Dispatcher
-import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
@@ -38,20 +35,19 @@ internal object ResourceGeneration {
     private lateinit var resourcesHash: String
     private val activeBuilders = ArrayList<ResourcePackBuilder>()
     
-    @InternalInit(
-        stage = InternalInitStage.PRE_WORLD,
-        dispatcher = Dispatcher.ASYNC,
-        runAfter = [
-            DefaultItems::class,
-            DefaultGuiItems::class,
-            DefaultBlocks::class,
-            DefaultBlockOverlays::class,
-            DefaultGuiTextures::class,
-        ]
-    )
     object PreWorld {
         
-        @InitFun
+        @InternalInit(
+            stage = BOOTSTRAP,
+            dispatcher = ASYNC,
+            runAfter = [
+                DefaultItems::class,
+                DefaultGuiItems::class,
+                DefaultBlocks::class,
+                DefaultBlockOverlays::class,
+                DefaultGuiTextures::class,
+            ]
+        )
         private suspend fun preWorld() {
             resourcesHash = calculateResourcesHash()
             if (System.getProperty(FORCE_REBUILD_FLAG) != null
@@ -73,14 +69,13 @@ internal object ResourceGeneration {
         
     }
     
-    @InternalInit(
-        stage = InternalInitStage.POST_WORLD,
-        dispatcher = Dispatcher.ASYNC,
-        runAfter = [HooksLoader::class]
-    )
     object PostWorld {
         
-        @InitFun
+        @InternalInit(
+            stage = POST_WORLD,
+            dispatcher = ASYNC,
+            runAfter = [HooksLoader::class]
+        )
         private suspend fun postWorld() {
             if (activeBuilders.isNotEmpty()) {
                 LOGGER.info("Continuing to build resource pack(s)")
