@@ -39,6 +39,7 @@
     "fakeplayer.LivingEntityMixin",
     "item.basedatacomponents.HolderReferenceMixin",
     "item.bukkit.CraftMagicNumbersMixin",
+    "item.bukkit.ItemTypeRecipeChoiceImplMixin",
     "item.cache.ItemMixin",
     "item.consistentuseloop.ServerGamePacketListenerImplMixin",
     "item.correspondingblock.CraftItemTypeMixin",
