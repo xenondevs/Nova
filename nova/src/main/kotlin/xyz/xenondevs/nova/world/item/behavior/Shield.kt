@@ -8,6 +8,7 @@ import io.papermc.paper.datacomponent.item.blocksattacks.DamageReduction
 import io.papermc.paper.datacomponent.item.blocksattacks.ItemDamageFunction
 import io.papermc.paper.registry.set.RegistryKeySet
 import net.kyori.adventure.key.Key
+import net.minecraft.core.component.DataComponents
 import org.bukkit.Registry
 import org.bukkit.Sound
 import org.bukkit.damage.DamageType
@@ -17,8 +18,12 @@ import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.config.optionalEntry
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.ItemUse
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
+import net.minecraft.world.InteractionResult as NmsInteractionResult
 
 /**
  * Creates a factory for [Shield] behaviors using the given values, if not specified otherwise in the item's config.
@@ -33,14 +38,14 @@ import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
  *
  * @param damageReductions A list of [DamageReductions][DamageReduction] of how much damage should be blocked on attack.
  * Defaults to none.
- * Used when `damage_reductions` is not specified in the config. 
+ * Used when `damage_reductions` is not specified in the config.
  * In configuration `damage_reductions` is a list of maps with  keys `base` (float), `factor` (float), `horizontal_blocking_angle` (float),
  * `type` (damage type tag/key/list of keys).
- * 
+ *
  * @param itemDamage Specifies how much damage is applied to the item when it blocks an attack.
  * Used when `item_damage` is not specified in the config.
  * In configuration `item_damage` is a map with keys `threshold` (float), `base` (float), `factor` (float).
- * 
+ *
  * @param bypassedBy A damage type tag containing the damage types that bypass the shield. Can be `null` if no damage types bypass the shield.
  * Defaults to `null`.
  * Used when `bypassed_by` is not specified in the config.
@@ -75,7 +80,7 @@ fun Shield(
 
 /**
  * Makes items act like shields.
- * 
+ *
  * @param blockDelay The number of ticks that right-click must be held before successfully blocking attacks.
  * @param disableCooldownScale A multiplier that is applied to the number of ticks that the item will be on cooldown for when attacked by a disabling attack.
  * @param damageReductions A list of [DamageReductions][DamageReduction] of how much damage should be blocked on attack.
@@ -154,6 +159,20 @@ class Shield(
                 .blockSound(blockSound)
                 .disableSound(disableSound)
                 .build()
+        }
+    }
+    
+    override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {
+        val player = ctx[ItemUse.SOURCE_PLAYER]
+            ?: return InteractionResult.Pass
+        val hand = ctx[ItemUse.HELD_HAND]
+            ?: return InteractionResult.Pass
+        
+        return useVanilla(player, hand, itemStack) { serverPlayer, nmsHand ->
+            if (serverPlayer.getItemInHand(nmsHand).has(DataComponents.BLOCKS_ATTACKS)) {
+                serverPlayer.startUsingItem(nmsHand)
+                NmsInteractionResult.CONSUME
+            } else NmsInteractionResult.PASS
         }
     }
     

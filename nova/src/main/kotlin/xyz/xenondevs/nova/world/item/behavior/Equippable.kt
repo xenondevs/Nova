@@ -8,13 +8,16 @@ import io.papermc.paper.datacomponent.item.ItemAttributeModifiers.itemAttributes
 import io.papermc.paper.registry.keys.SoundEventKeys
 import io.papermc.paper.registry.set.RegistryKeySet
 import net.kyori.adventure.key.Key
+import net.minecraft.core.component.DataComponents
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.Sound
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.attribute.AttributeModifier.Operation
+import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemStack
@@ -28,12 +31,19 @@ import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.config.optionalEntry
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.EntityInteract
+import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
+import xyz.xenondevs.nova.util.nmsEntity
+import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.Equipment
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
+import net.minecraft.world.InteractionResult as NmsInteractionResult
 
 /**
  * Creates a factory for [Equippable] behaviors using the given values, if not specified in the item's configuration.
@@ -311,6 +321,38 @@ class Equippable(
                 .damageOnHurt(damageOnHurt)
                 .equipOnInteract(equipOnInteract)
                 .build()
+        }
+    }
+    
+    override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {
+        val player = ctx[ItemUse.SOURCE_PLAYER]
+            ?: return InteractionResult.Pass
+        val hand = ctx[ItemUse.HELD_HAND]
+            ?: return InteractionResult.Pass
+        
+        return useVanilla(player, hand, itemStack) { serverPlayer, nmsHand ->
+            val heldItem = serverPlayer.getItemInHand(nmsHand)
+            heldItem.get(DataComponents.EQUIPPABLE)
+                ?.takeIf { it.swappable() }
+                ?.swapWithEquipmentSlot(heldItem, serverPlayer)
+                ?: NmsInteractionResult.PASS
+        }
+    }
+    
+    override fun useOnEntity(itemStack: ItemStack, entity: Entity, ctx: Context<EntityInteract>): InteractionResult {
+        if (entity !is LivingEntity)
+            return InteractionResult.Pass
+        val player = ctx[EntityInteract.SOURCE_PLAYER]
+            ?: return InteractionResult.Pass
+        val hand = ctx[EntityInteract.HELD_HAND]
+            ?: return InteractionResult.Pass
+        
+        return useVanilla(player, hand, itemStack) { serverPlayer, _ ->
+            val nmsItemStack = itemStack.unwrap()
+            nmsItemStack.get(DataComponents.EQUIPPABLE)
+                ?.takeIf { it.equipOnInteract() }
+                ?.equipOnTarget(serverPlayer, entity.nmsEntity, nmsItemStack)
+                ?: NmsInteractionResult.PASS
         }
     }
     

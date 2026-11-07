@@ -17,6 +17,7 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.craftbukkit.inventory.CraftItemType
 import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -50,6 +51,7 @@ import xyz.xenondevs.nova.util.blockFace
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.nmsItem
 import xyz.xenondevs.nova.util.toBlock
@@ -59,6 +61,8 @@ import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.world.item.behavior.useVanilla
+import xyz.xenondevs.nova.world.item.behavior.useVanillaOnBlock
 import xyz.xenondevs.nova.world.item.logic.PacketItems
 import xyz.xenondevs.nova.world.toNms
 import java.lang.invoke.MethodHandles
@@ -195,14 +199,14 @@ inline fun <reified T : Any> ItemType.getBehaviorOrThrow(): T =
 
 /**
  * Creates an [ItemStack] for the [ItemType] of the [RegistryEntry].
- * 
+ *
  * Cannot be called during bootstrap (pre-registry-freeze).
  */
 fun Provider<ItemType>.createItemStack(amount: Int = 1): ItemStack =
     get().createItemStack(amount)
 
 /**
- * Shortcut for `bootstrapFlatMap { it.config }` 
+ * Shortcut for `bootstrapFlatMap { it.config }`
  */
 val Provider<ItemType>.config: Provider<ConfigProvider>
     get() = bootstrapFlatMap { it.config }
@@ -233,7 +237,7 @@ val ItemType.itemProvider: Provider<ItemProvider>
 
 /**
  * An [ItemProvider] provider of an [ItemStack] with size 1 of this [ItemType], intended for usage in InvUI DSLs.
- * 
+ *
  * The only difference to [itemProvider] is that this one does not have advanced tooltips (`/nova advancedTooltips`).
  */
 val ItemType.guiItemProvider: Provider<ItemProvider>
@@ -365,16 +369,26 @@ internal class NovaItem(
     
     /**
      * Handles using this [NovaItem] in the given [ctx].
+     *
+     * If all behaviors pass, the default data component functionality (consumable, equippable, etc.) is run.
      */
     fun use(
         ctx: Context<ItemUse>
     ): InteractionResult = runSafely("handle use", InteractionResult.Fail) {
+        val itemStack = ctx[ItemUse.HELD_ITEM_STACK]
         for (behavior in behaviors) {
-            val result = behavior.use(ctx[ItemUse.HELD_ITEM_STACK], ctx)
+            val result = behavior.use(itemStack, ctx)
             if (result !is InteractionResult.Pass)
                 return result
         }
-        return InteractionResult.Pass
+        
+        val player = ctx[ItemUse.SOURCE_PLAYER]
+            ?: return InteractionResult.Pass
+        val hand = ctx[ItemUse.HELD_HAND]
+            ?: return InteractionResult.Pass
+        return useVanilla(player, hand, itemStack) { serverPlayer, nmsHand ->
+            use(serverPlayer.level(), serverPlayer, nmsHand)
+        }
     }
     
     internal fun useOnBlockNms(
@@ -410,16 +424,27 @@ internal class NovaItem(
     
     /**
      * Handles using this [NovaItem] on a block in the given [ctx].
+     *
+     * If all behaviors pass, the default data component functionality (block transformers, etc.) is run.
      */
     fun useOnBlock(
         ctx: Context<BlockInteract>
     ): InteractionResult = runSafely("handle use on", InteractionResult.Fail) {
+        val itemStack = ctx[BlockInteract.HELD_ITEM_STACK]
+        val block = ctx[BlockInteract.BLOCK]
         for (behavior in behaviors) {
-            val result = behavior.useOnBlock(ctx[BlockInteract.HELD_ITEM_STACK], ctx[BlockInteract.BLOCK], ctx)
+            val result = behavior.useOnBlock(itemStack, block, ctx)
             if (result !is InteractionResult.Pass)
                 return result
         }
-        return InteractionResult.Pass
+        
+        val player = ctx[BlockInteract.SOURCE_PLAYER]
+            ?: return InteractionResult.Pass
+        val hand = ctx[BlockInteract.HELD_HAND]
+            ?: return InteractionResult.Pass
+        val face = ctx[BlockInteract.CLICKED_BLOCK_FACE]
+            ?: return InteractionResult.Pass
+        return useVanillaOnBlock(player, hand, itemStack, block, face, ::useOn)
     }
     
     internal fun useOnEntityNms(
@@ -458,16 +483,29 @@ internal class NovaItem(
     
     /**
      * Handles using this [NovaItem] on an entity in the given [ctx].
+     *
+     * If all behaviors pass, the default data component functionality (equippable, etc.) is run.
      */
     fun useOnEntity(
         ctx: Context<EntityInteract>
     ): InteractionResult = runSafely("handle use on living entity", InteractionResult.Fail) {
+        val itemStack = ctx[EntityInteract.HELD_ITEM_STACK]
+        val target = ctx[EntityInteract.TARGET_ENTITY]
         for (behavior in behaviors) {
-            val result = behavior.useOnEntity(ctx[EntityInteract.HELD_ITEM_STACK], ctx[EntityInteract.TARGET_ENTITY], ctx)
+            val result = behavior.useOnEntity(itemStack, target, ctx)
             if (result !is InteractionResult.Pass)
                 return result
         }
-        return InteractionResult.Pass
+        
+        if (target !is LivingEntity)
+            return InteractionResult.Pass
+        val player = ctx[EntityInteract.SOURCE_PLAYER]
+            ?: return InteractionResult.Pass
+        val hand = ctx[EntityInteract.HELD_HAND]
+            ?: return InteractionResult.Pass
+        return useVanilla(player, hand, itemStack) { serverPlayer, nmsHand ->
+            itemStack.unwrap().interactLivingEntity(serverPlayer, target.nmsEntity, nmsHand)
+        }
     }
     
     /**

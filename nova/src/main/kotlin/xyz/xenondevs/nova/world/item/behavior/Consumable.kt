@@ -13,6 +13,7 @@ import kotlinx.serialization.SealedClassSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
+import net.minecraft.core.component.DataComponents
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
@@ -24,6 +25,8 @@ import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.commons.provider.orElseBy
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.config.optionalEntry
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.alias.PotionEffectTypeEntry
 import xyz.xenondevs.nova.registry.alias.PotionEffectTypeEntrySet
@@ -31,6 +34,7 @@ import xyz.xenondevs.nova.registry.entry
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.NamespacedPolymorphicSerializer
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.behavior.Consumable.ConsumeEffect.ApplyStatusEffects
 import xyz.xenondevs.nova.world.item.behavior.Consumable.ConsumeEffect.ApplyStatusEffects.Effect
@@ -40,6 +44,7 @@ import xyz.xenondevs.nova.world.item.behavior.Consumable.ConsumeEffect.RemoveSta
 import xyz.xenondevs.nova.world.item.behavior.Consumable.ConsumeEffect.TeleportRandomly
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 import io.papermc.paper.datacomponent.item.consumable.ConsumeEffect as PaperConsumeEffect
+import net.minecraft.world.InteractionResult as NmsInteractionResult
 import org.bukkit.potion.PotionEffect as BukkitPotionEffect
 
 /**
@@ -234,6 +239,20 @@ class Consumable(
         this[DataComponentTypes.USE_REMAINDER] = remains
             .map { it?.takeUnlessEmpty() }
             .mapNonNull { useRemainder(it) }
+    }
+    
+    override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {
+        val player = ctx[ItemUse.SOURCE_PLAYER]
+            ?: return InteractionResult.Pass
+        val hand = ctx[ItemUse.HELD_HAND]
+            ?: return InteractionResult.Pass
+        
+        return useVanilla(player, hand, itemStack) { serverPlayer, nmsHand ->
+            val heldItem = serverPlayer.getItemInHand(nmsHand)
+            heldItem.get(DataComponents.CONSUMABLE)
+                ?.startConsuming(serverPlayer, heldItem, nmsHand)
+                ?: NmsInteractionResult.PASS
+        }
     }
     
     override fun toString(itemStack: ItemStack): String {
