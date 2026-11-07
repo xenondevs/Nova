@@ -17,8 +17,8 @@ internal object EquipmentSlotGroupSerializer : KSerializer<EquipmentSlotGroup> {
     }
     
     override fun deserialize(decoder: Decoder): EquipmentSlotGroup {
-        return EquipmentSlotGroup.getByName(decoder.decodeString())
-            ?: throw SerializationException("Not an EquipmentSlotGroup: ${decoder.decodeString()}")
+        val group = EquipmentSlotGroup.getByName(decoder.decodeString())
+        return requireNotNull(group) { "Not an EquipmentSlotGroup: ${decoder.decodeString()}" }
     }
     
 }

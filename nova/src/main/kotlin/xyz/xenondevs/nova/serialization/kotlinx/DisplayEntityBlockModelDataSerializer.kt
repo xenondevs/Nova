@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -62,9 +61,9 @@ internal object DisplayEntityBlockModelDataSerializer : KSerializer<DisplayEntit
             }
             
             DisplayEntityBlockModelData(
-                waterlogged ?: throw SerializationException("Missing 'waterlogged' field"),
-                models ?: throw SerializationException("Missing 'models' field"),
-                collider?.let { provider(it.bukkitBlockData) } ?: throw SerializationException("Missing 'collider' field"),
+                requireNotNull(waterlogged) { "Missing 'waterlogged' field" },
+                requireNotNull(models) { "Missing 'models' field" },
+                provider(requireNotNull(collider) { "Missing 'collider' field" }.bukkitBlockData),
                 extraColliders,
                 extraHitboxes ?: extraColliders.map(HitboxCuboid::fromCollider)
             )

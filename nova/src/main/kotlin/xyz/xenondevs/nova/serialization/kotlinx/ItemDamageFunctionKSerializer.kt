@@ -32,7 +32,7 @@ internal object ItemDamageFunctionKSerializer : KSerializer<ItemDamageFunction> 
                 1 -> base = composite.decodeFloatElement(descriptor, 1)
                 2 -> factor = composite.decodeFloatElement(descriptor, 2)
                 CompositeDecoder.DECODE_DONE -> break
-                else -> throw SerializationException("Unknown index $index")
+                else -> throw IllegalArgumentException("Unknown index $index")
             }
         }
         composite.endStructure(descriptor)

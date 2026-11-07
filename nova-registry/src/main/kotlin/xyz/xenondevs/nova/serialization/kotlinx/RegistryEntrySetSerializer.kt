@@ -5,7 +5,6 @@ import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -15,10 +14,10 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.JsonTransformingSerializer
+import net.kyori.adventure.key.Key.key
 import org.bukkit.Keyed
 import xyz.xenondevs.nova.registry.NovaRegistry
 import xyz.xenondevs.nova.registry.NovaRegistryElement
-import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.registryEntrySetOf
 
@@ -26,7 +25,7 @@ import xyz.xenondevs.nova.registry.registryEntrySetOf
  * Open base class for specialized [RegistryEntrySet.Nova] serializers.
  * Serializes [RegistryEntrySet.Nova.Tag] to `#namespace:value` and [RegistryEntrySet.Nova.Direct]
  * to `["namespace:value1", "namespace:value2"]` (or just `"namespace:value"` if there's only one entry).
- * 
+ *
  * This is a [JsonTransformingSerializer] as it needs to support both arrays and primitive values,
  * so it can only be used for JSON.
  */
@@ -43,13 +42,13 @@ open class NovaRegistryEntrySetSerializer<T : NovaRegistryElement<T>>(
         return when (element) {
             is JsonArray -> element
             is JsonPrimitive -> JsonArray(listOf(element))
-            else -> throw SerializationException("Expected JsonArray or JsonPrimitive, but got ${element::class}")
+            else -> throw IllegalArgumentException("Expected JsonArray or JsonPrimitive, but got ${element::class}")
         }
     }
     
     final override fun transformSerialize(element: JsonElement): JsonElement {
         if (element !is JsonArray)
-            throw SerializationException("Expected JsonArray, but got ${element::class}")
+            throw IllegalArgumentException("Expected JsonArray, but got ${element::class}")
         return if (element.size == 1) element[0] else element
     }
     
@@ -72,21 +71,11 @@ private class BackingNovaRegistryElementSerializer<T : NovaRegistryElement<T>>(
     override fun deserialize(decoder: Decoder): RegistryEntrySet.Nova<T> {
         val elements = delegate.deserialize(decoder)
         if (elements.size == 1 && elements[0].startsWith("#")) {
-            try {
-                return registry.getTag(KeySerializer.parseKey(elements[0].substring(1)))
-            } catch (e: IllegalArgumentException) {
-                throw SerializationException(e.message, e)
-            }
+            return registry.getTag(key(elements[0].substring(1)))
         } else {
             if (elements.any { it.startsWith("#") })
-                throw SerializationException("Cannot have multiple tags or values mixed with tags (got $elements)")
-            return registryEntrySetOf(elements.map {
-                try {
-                    registry[KeySerializer.parseKey(it)]
-                } catch (e: IllegalArgumentException) {
-                    throw SerializationException(e.message, e)
-                }
-            })
+                throw IllegalArgumentException("Cannot have multiple tags or values mixed with tags (got $elements)")
+            return registryEntrySetOf(elements.map { registry[key(it)] })
         }
     }
     
@@ -96,7 +85,7 @@ private class BackingNovaRegistryElementSerializer<T : NovaRegistryElement<T>>(
  * Abstract base class for specialized [RegistryEntrySet.Paper] serializers.
  * Serializes [RegistryEntrySet.Paper.Tag] to `#namespace:value` and [RegistryEntrySet.Paper.Direct]
  * to `["namespace:value1", "namespace:value2"]` (or just `"namespace:value"` if there's only one entry).
- * 
+ *
  * This is a [JsonTransformingSerializer] as it needs to support both arrays and primitive values,
  * so it can only be used for JSON.
  */
@@ -117,13 +106,13 @@ open class PaperRegistryEntrySetSerializer<T : Keyed>(
         return when (element) {
             is JsonArray -> element
             is JsonPrimitive -> JsonArray(listOf(element))
-            else -> throw SerializationException("Expected JsonArray or JsonPrimitive, but got ${element::class}")
+            else -> throw IllegalArgumentException("Expected JsonArray or JsonPrimitive, but got ${element::class}")
         }
     }
     
     final override fun transformSerialize(element: JsonElement): JsonElement {
         if (element !is JsonArray)
-            throw SerializationException("Expected JsonArray, but got ${element::class}")
+            throw IllegalArgumentException("Expected JsonArray, but got ${element::class}")
         return if (element.size == 1) element[0] else element
     }
     
@@ -146,16 +135,12 @@ private class BackingPaperRegistryElementSerializer<T : Keyed>(
     
     override fun deserialize(decoder: Decoder): RegistryEntrySet.Paper<T> {
         val elements = delegate.deserialize(decoder)
-        try {
-            if (elements.size == 1 && elements[0].startsWith("#")) {
-                return registryEntrySetOf(TagKey.create(registry, KeySerializer.parseKey(elements[0].substring(1))), registryAccess)
-            } else {
-                if (elements.any { it.startsWith("#") })
-                    throw SerializationException("Cannot have multiple tags or values mixed with tags (got $elements)")
-                return registryEntrySetOf(elements.map { TypedKey.create(registry, KeySerializer.parseKey(it)) }, registryAccess)
-            }
-        } catch (e: NoSuchElementException) {
-            throw SerializationException(e.message, e)
+        if (elements.size == 1 && elements[0].startsWith("#")) {
+            return registryEntrySetOf(TagKey.create(registry, key(elements[0].substring(1))), registryAccess)
+        } else {
+            if (elements.any { it.startsWith("#") })
+                throw IllegalArgumentException("Cannot have multiple tags or values mixed with tags (got $elements)")
+            return registryEntrySetOf(elements.map { TypedKey.create(registry, key(it)) }, registryAccess)
         }
     }
     

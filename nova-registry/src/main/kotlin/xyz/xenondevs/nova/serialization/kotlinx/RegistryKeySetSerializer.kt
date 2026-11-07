@@ -8,7 +8,6 @@ import io.papermc.paper.registry.set.RegistrySet
 import io.papermc.paper.registry.tag.Tag
 import io.papermc.paper.registry.tag.TagKey
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -18,6 +17,7 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.JsonTransformingSerializer
+import net.kyori.adventure.key.Key.key
 import org.bukkit.Keyed
 
 /**
@@ -45,13 +45,13 @@ open class RegistryKeySetSerializer<T : Keyed>(
         return when (element) {
             is JsonArray -> element
             is JsonPrimitive -> JsonArray(listOf(element))
-            else -> throw SerializationException("Expected JsonArray or JsonPrimitive, but got ${element::class}")
+            else -> throw IllegalArgumentException("Expected JsonArray or JsonPrimitive, but got ${element::class}")
         }
     }
     
     final override fun transformSerialize(element: JsonElement): JsonElement {
         if (element !is JsonArray)
-            throw SerializationException("Expected JsonArray, but got ${element::class}")
+            throw IllegalArgumentException("Expected JsonArray, but got ${element::class}")
         return if (element.size == 1) element[0] else element
     }
     
@@ -77,16 +77,12 @@ private class BackingRegistryKeySetSerializer<T : Keyed>(
     override fun deserialize(decoder: Decoder): RegistryKeySet<T> {
         val elements = delegate.deserialize(decoder)
         if (elements.size == 1 && elements[0].startsWith("#")) {
-            val tagKey = TagKey.create(registryKey, KeySerializer.parseKey(elements[0].substring(1)))
-            try {
-                return registry.getTag(tagKey)
-            } catch (e: NoSuchElementException) {
-                throw SerializationException(e.message, e)
-            }
+            val tagKey = TagKey.create(registryKey, key(elements[0].substring(1)))
+            return registry.getTag(tagKey)
         } else {
             if (elements.any { it.startsWith("#") })
-                throw SerializationException("Cannot have multiple tags or values mixed with tags (got $elements)")
-            return RegistrySet.keySet(registryKey, elements.map { TypedKey.create(registryKey, KeySerializer.parseKey(it)) })
+                throw IllegalArgumentException("Cannot have multiple tags or values mixed with tags (got $elements)")
+            return RegistrySet.keySet(registryKey, elements.map { TypedKey.create(registryKey, key(it)) })
         }
     }
     

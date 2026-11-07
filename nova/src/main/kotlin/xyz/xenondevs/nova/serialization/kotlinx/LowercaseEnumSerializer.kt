@@ -16,7 +16,7 @@ internal abstract class LowercaseEnumSerializer<E : Enum<E>>(enumClass: Class<E>
     
     override fun deserialize(decoder: Decoder): E {
         val str = decoder.decodeString()
-        return lookup[str] ?: throw IllegalArgumentException("Unknown lowercase enum value: $str")
+        return requireNotNull(lookup[str]) {"Unknown lowercase enum value: $str"}
     }
     
     override fun serialize(encoder: Encoder, value: E) {

@@ -15,8 +15,7 @@ internal object ModelTextureMultiFormatSerializer : JsonTransformingSerializer<M
     override fun transformDeserialize(element: JsonElement): JsonElement {
         if (element is JsonPrimitive)
             return JsonObject(mapOf("sprite" to element))
-        return element as? JsonObject
-            ?: throw SerializationException("Expected JsonObject or JsonPrimitive, got ${element::class.java}")
+        return requireNotNull(element as? JsonObject) { "Expected JsonObject or JsonPrimitive, got ${element::class.java}" }
     }
     
 }

@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -31,15 +30,13 @@ internal abstract class NmsRegistryEntrySerializer<T : Any>(val registry: Regist
     override val descriptor = PrimitiveSerialDescriptor("xyz.xenondevs.nova.NmsRegistryEntrySerializer", PrimitiveKind.STRING)
     
     override fun serialize(encoder: Encoder, value: T) {
-        val id = registry.getKey(value)
-            ?: throw SerializationException("Value $value is not registered in $registry")
+        val id = requireNotNull(registry.getKey(value)) { "Value $value is not registered in $registry" }
         encoder.encodeString(id.toString())
     }
     
     override fun deserialize(decoder: Decoder): T {
         val id = decoder.decodeString()
-        return registry.getValue(id)
-            ?: throw SerializationException("No entry under $id in $registry")
+        return requireNotNull(registry.getValue(id)) { "No entry under $id in $registry" }
     }
     
 }

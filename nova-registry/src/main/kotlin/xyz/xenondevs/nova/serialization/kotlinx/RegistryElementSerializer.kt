@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.serialization.kotlinx
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -35,8 +34,7 @@ open class NovaRegistryElementSerializer<T : NovaRegistryElement<T>>(
     
     final override fun deserialize(decoder: Decoder): T {
         val key = KeySerializer.deserialize(decoder)
-        return registry.getValue(key)
-            ?: throw SerializationException("No element under ${key.asString()} in registry ${registry.key.asString()}")
+        return requireNotNull(registry.getValue(key)) { "No element under ${key.asString()} in registry ${registry.key.asString()}" }
     }
     
 }
@@ -69,8 +67,7 @@ open class PaperRegistryElementSerializer<T : Keyed>(
     
     final override fun deserialize(decoder: Decoder): T {
         val key = KeySerializer.deserialize(decoder)
-        return registry.get(key)
-            ?: throw SerializationException("No element under ${key.asString()} in registry ${registryKey.key().asString()}")
+        return requireNotNull(registry.get(key)) { "No element under ${key.asString()} in registry ${registryKey.key().asString()}" }
     }
     
 }

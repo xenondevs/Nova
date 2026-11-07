@@ -117,18 +117,18 @@ internal object Matrix4fcAsSingularValueDecompositionMultiFormatSerializer : KSe
                     2 -> leftRotation = decodeSerializableElement(descriptor, 2, QuaternionfMultiFormatSerializer)
                     3 -> translation = decodeSerializableElement(descriptor, 3, Vector3fcAsArraySerializer)
                     CompositeDecoder.DECODE_DONE -> break
-                    else -> throw SerializationException("Unexpected index: $index")
+                    else -> throw IllegalArgumentException("Unexpected index: $index")
                 }
             }
             
             if (leftRotation == null)
-                throw SerializationException("Transformation is missing 'left_rotation'")
+                throw IllegalArgumentException("Transformation is missing 'left_rotation'")
             if (rightRotation == null)
-                throw SerializationException("Transformation is missing 'right_rotation'")
+                throw IllegalArgumentException("Transformation is missing 'right_rotation'")
             if (scale == null)
-                throw SerializationException("Transformation is missing 'scale'")
+                throw IllegalArgumentException("Transformation is missing 'scale'")
             if (translation == null)
-                throw SerializationException("Transformation is missing 'translation'")
+                throw IllegalArgumentException("Transformation is missing 'translation'")
             
             Matrix4f().apply {
                 translate(translation)

@@ -32,8 +32,7 @@ internal open class AliasedEnumSerializer<E : Enum<E>>(
     
     override fun deserialize(decoder: Decoder): E {
         val str = decoder.decodeString()
-        return byName[str.lowercase()]
-            ?: throw SerializationException("Unknown value: $str. Possible values: [$possibleValues]")
+        return requireNotNull(byName[str.lowercase()]) { "Unknown value: $str. Possible values: [$possibleValues]" }
     }
     
     override fun serialize(encoder: Encoder, value: E) {

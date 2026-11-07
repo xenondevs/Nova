@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.serialization.kotlinx
 
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -18,17 +17,15 @@ internal object ResourceFilterSerializer : JsonTransformingSerializer<ResourceFi
     
     override fun transformDeserialize(element: JsonElement): JsonElement {
         element as JsonObject
-        val patternType = element["pattern_type"]?.jsonPrimitive?.contentOrNull
-            ?: throw SerializationException("Missing 'pattern_type'")
+        val patternType = requireNotNull(element["pattern_type"]?.jsonPrimitive?.contentOrNull) { "Missing 'pattern_type'" }
         if (patternType == "regex") {
-            return JsonObject(buildMap { 
+            return JsonObject(buildMap {
                 putAll(element)
                 remove("pattern_type")
             })
         } else {
-            val regex = element["filter"]?.jsonPrimitive?.contentOrNull?.let(WildcardUtils::toRegexString)
-                ?: throw SerializationException("Missing 'filter'")
-            return JsonObject(buildMap { 
+            val regex = requireNotNull(element["filter"]?.jsonPrimitive?.contentOrNull?.let(WildcardUtils::toRegexString)) { "Missing 'filter'" }
+            return JsonObject(buildMap {
                 putAll(element)
                 remove("pattern_type")
                 put("filter", JsonPrimitive(regex))
@@ -37,7 +34,7 @@ internal object ResourceFilterSerializer : JsonTransformingSerializer<ResourceFi
     }
     
     override fun transformSerialize(element: JsonElement): JsonElement {
-        return JsonObject(buildMap { 
+        return JsonObject(buildMap {
             putAll(element as JsonObject)
             put("pattern_type", JsonPrimitive("regex"))
         })

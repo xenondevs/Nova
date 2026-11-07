@@ -4,7 +4,6 @@ import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -34,12 +33,7 @@ open class NovaRegistryEntrySerializer<T : NovaRegistryElement<T>>(
     }
     
     final override fun deserialize(decoder: Decoder): RegistryEntry.Nova<T> {
-        val key = KeySerializer.deserialize(decoder)
-        try {
-            return registry[key]
-        } catch (e: IllegalArgumentException) {
-            throw SerializationException(e.message, e)
-        }
+        return registry[KeySerializer.deserialize(decoder)]
     }
     
 }
@@ -69,11 +63,7 @@ open class PaperRegistryEntrySerializer<T : Keyed>(
     
     final override fun deserialize(decoder: Decoder): RegistryEntry.Paper<T> {
         val key = KeySerializer.deserialize(decoder)
-        try {
-            return RegistryEntry.paper(TypedKey.create(registryKey, key), registryAccess)
-        } catch (e: NoSuchElementException) {
-            throw SerializationException(e.message, e)
-        }
+        return RegistryEntry.paper(TypedKey.create(registryKey, key), registryAccess)
     }
     
 }

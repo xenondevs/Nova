@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -20,11 +19,7 @@ internal object RecipeChoiceSerializer : KSerializer<RecipeChoice> {
     
     override fun deserialize(decoder: Decoder): RecipeChoice {
         val list = delegate.deserialize(decoder)
-        try {
-            return RecipeDeserializer.parseRecipeChoice(list)
-        } catch (e: IllegalArgumentException) {
-            throw SerializationException(e.message, e)
-        }
+        return RecipeDeserializer.parseRecipeChoice(list)
     }
     
     override fun serialize(encoder: Encoder, value: RecipeChoice) {

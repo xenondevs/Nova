@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -25,9 +24,7 @@ internal object BarOriginSerializer : KSerializer<BarOrigin> {
         if (str == "minecraft")
             return BarOrigin.Minecraft
         
-        val plugin = Bukkit.getPluginManager().getPlugin(str)
-            ?: throw SerializationException("Unknown plugin: $str")
-        
+        val plugin = requireNotNull(Bukkit.getPluginManager().getPlugin(str)) { "Unknown plugin: $str" }
         return BarOrigin.Plugin(plugin)
     }
     
@@ -42,7 +39,7 @@ internal object BarOriginSerializer : KSerializer<BarOrigin> {
         override fun deserialize(decoder: Decoder): BarOrigin.Minecraft {
             val str = decoder.decodeString()
             if (str != "minecraft")
-                throw SerializationException("Expected 'minecraft', got '$str'")
+                throw IllegalArgumentException("Expected 'minecraft', got '$str'")
             return BarOrigin.Minecraft
         }
         
@@ -58,8 +55,7 @@ internal object BarOriginSerializer : KSerializer<BarOrigin> {
         
         override fun deserialize(decoder: Decoder): BarOrigin.Plugin {
             val name = decoder.decodeString()
-            val plugin = Bukkit.getPluginManager().getPlugin(name)
-                ?: throw IllegalArgumentException("Unknown plugin: $name")
+            val plugin = requireNotNull(Bukkit.getPluginManager().getPlugin(name)) { "Unknown plugin: $name"}
             return BarOrigin.Plugin(plugin)
         }
         

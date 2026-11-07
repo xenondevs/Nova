@@ -30,7 +30,7 @@ internal object PackVersionSerializer : KSerializer<PackMcMeta.PackFormatConstra
         return when (val size = arr.size) {
             1 -> PackMcMeta.PackFormatConstraint(arr[0], null)
             2 -> PackMcMeta.PackFormatConstraint(arr[0], arr[1])
-            else -> throw SerializationException("Expected array size of 1 or 2, got $size")
+            else -> throw IllegalArgumentException("Expected array size of 1 or 2, got $size")
         }
     }
     
@@ -48,7 +48,7 @@ internal object PackVersionMultiFormatSerializer : JsonTransformingSerializer<Pa
         when (element) {
             is JsonArray -> element
             is JsonPrimitive -> JsonArray(listOf(element))
-            else -> throw SerializationException("Unexpected JSON element: $element")
+            else -> throw IllegalArgumentException("Unexpected JSON element: $element")
         }
     
 } 

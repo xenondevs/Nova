@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -54,7 +53,7 @@ internal object BlockStateSerializer : KSerializer<BlockState> {
             }
             
             if (block == null)
-                throw SerializationException("Missing property 'block'")
+                throw IllegalArgumentException("Missing property 'block'")
             
             val allPropertiesByName = block.defaultBlockState().properties.associateBy { it.name }
             return@decodeStructure properties.entries.fold(block.defaultBlockState()) { blockState, [name, value] ->
@@ -68,10 +67,8 @@ internal object BlockStateSerializer : KSerializer<BlockState> {
         propertyName: String,
         valueName: String
     ): BlockState {
-        val property = properties[propertyName] as? Property<T>
-            ?: throw SerializationException("$this does not have property named $propertyName")
-        val value = property.getValue(valueName).getOrNull() as? V
-            ?: throw SerializationException("BlockState $this property $propertyName does not have value named $valueName")
+        val property = requireNotNull(properties[propertyName] as? Property<T>) { "$this does not have property named $propertyName" }
+        val value = requireNotNull(property.getValue(valueName).getOrNull() as? V) { "BlockState $this property $propertyName does not have value named $valueName" }
         
         return setValue(property, value)
     }

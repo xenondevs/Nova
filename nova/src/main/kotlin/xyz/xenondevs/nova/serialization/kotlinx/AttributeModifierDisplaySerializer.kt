@@ -30,7 +30,7 @@ internal object AttributeModifierDisplaySerializer : KSerializer<AttributeModifi
             is AttributeModifierDisplay.Default -> "default"
             is AttributeModifierDisplay.Hidden -> "hidden"
             is AttributeModifierDisplay.OverrideText -> MiniMessage.miniMessage().serialize(value.text())
-            else -> throw SerializationException("Unknown AttributeModifierDisplay type: ${value::class}")
+            else -> throw IllegalArgumentException("Unknown AttributeModifierDisplay type: ${value::class}")
         }
         encoder.encodeString(str)
     }

@@ -45,7 +45,7 @@ internal object UploadServiceConfigSerializer : JsonContentPolymorphicSerializer
             "self_host", "selfhost" -> SelfHostConfig.serializer()
             "s3", "amazon_s3" -> S3Config.serializer()
             "custom_multi_part", "custommultipart" -> CustomMultiPartConfig.serializer()
-            else -> throw SerializationException("Unknown upload service: $service. Available services: self_host, s3, custom_multi_part")
+            else -> throw IllegalArgumentException("Unknown upload service: $service. Available services: self_host, s3, custom_multi_part")
         }
     }
     

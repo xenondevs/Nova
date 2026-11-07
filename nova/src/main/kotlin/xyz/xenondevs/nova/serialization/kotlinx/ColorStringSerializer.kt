@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.serialization.kotlinx
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -17,12 +16,7 @@ internal object ColorStringSerializer : KSerializer<Color> {
     override val descriptor = PrimitiveSerialDescriptor("xyz.xenondevs.nova.Color", PrimitiveKind.STRING)
     
     override fun deserialize(decoder: Decoder): Color {
-        val str = decoder.decodeString()
-        try {
-            return Color.decode(str)
-        } catch (e: NumberFormatException) {
-            throw SerializationException("Invalid color: $str", e)
-        }
+        return Color.decode(decoder.decodeString())
     }
     
     override fun serialize(encoder: Encoder, value: Color) {

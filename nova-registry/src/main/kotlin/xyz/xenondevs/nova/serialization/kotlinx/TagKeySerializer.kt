@@ -3,11 +3,11 @@ package xyz.xenondevs.nova.serialization.kotlinx
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.tag.TagKey
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import net.kyori.adventure.key.Key.key
 import org.bukkit.Keyed
 
 /**
@@ -33,8 +33,8 @@ open class TagKeySerializer<T : Keyed>(
     final override fun deserialize(decoder: Decoder): TagKey<T> {
         val str = decoder.decodeString()
         if (!str.startsWith("#"))
-            throw SerializationException("TagKey must be prefixed with '#': $str")
-        val key = KeySerializer.parseKey(str.substring(1))
+            throw IllegalArgumentException("TagKey must be prefixed with '#': $str")
+        val key = key(str.substring(1))
         return TagKey.create(registryKey, key)
     }
     

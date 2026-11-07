@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.serialization.kotlinx
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encoding.Decoder
@@ -10,7 +9,6 @@ internal fun <T : Any> KSerializer<T>.nullOnFailure(): KSerializer<T?> {
     return NullableSerializerWrapper(this)
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 private class NullableSerializerWrapper<T : Any>(
     private val delegate: KSerializer<T>
 ) : KSerializer<T?> {

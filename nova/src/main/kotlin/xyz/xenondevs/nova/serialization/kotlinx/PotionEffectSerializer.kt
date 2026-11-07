@@ -51,9 +51,9 @@ internal object PotionEffectSerializer : KSerializer<PotionEffect> {
         composite.endStructure(descriptor)
         
         return PotionEffect(
-            type ?: throw SerializationException("Missing 'type'"),
-            duration ?: throw SerializationException("Missing 'duration'"),
-            amplifier ?: throw SerializationException("Missing 'amplifier'"),
+            requireNotNull(type) { "Missing 'type'" },
+            requireNotNull(duration) { "Missing 'duration'" },
+            requireNotNull(amplifier) { "Missing 'amplifier'" },
             ambient, particles, icon
         )
     }

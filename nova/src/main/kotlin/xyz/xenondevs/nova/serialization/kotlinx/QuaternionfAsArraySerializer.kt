@@ -47,7 +47,7 @@ internal object QuaternionfAsArraySerializer : KSerializer<Quaternionf> {
     override fun deserialize(decoder: Decoder): Quaternionf {
         val arr = delegate.deserialize(decoder)
         if (arr.size != 4) 
-            throw SerializationException("Expected array of size 4 for Quaternionf, but got ${arr.size}")
+            throw IllegalArgumentException("Expected array of size 4 for Quaternionf, but got ${arr.size}")
         return Quaternionf(arr[0], arr[1], arr[2], arr[3])
     }
     
@@ -88,11 +88,11 @@ internal object QuaternionfAsAxisAngleSerializer : KSerializer<Quaternionf> {
         }
         
         if (angle == null) 
-            throw SerializationException("Missing angle for Quaternionf")
+            throw IllegalArgumentException("Missing angle for Quaternionf")
         if (axis == null) 
-            throw SerializationException("Missing axis for Quaternionf")
+            throw IllegalArgumentException("Missing axis for Quaternionf")
         if (axis.size != 3) 
-            throw SerializationException("Expected axis array of size 3, but got ${axis.size}")
+            throw IllegalArgumentException("Expected axis array of size 3, but got ${axis.size}")
         
         val aa = AxisAngle4f(axis[0], axis[1], axis[2], angle)
         return Quaternionf(aa)

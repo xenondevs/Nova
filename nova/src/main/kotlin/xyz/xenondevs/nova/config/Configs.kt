@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.JsonDecodingException
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import net.kyori.adventure.key.Key
@@ -130,7 +131,31 @@ internal object NovaConfigBackend : ConfigBackend {
     }
     
     override fun onError(id: Key, path: List<String>, exception: SerializationException) {
-        LOGGER.error("Failed to read '${path.joinToString(" > ")}' in config '${id.asString()}': ${exception.message}")
+        LOGGER.error(buildString {
+            append("Failed to read '")
+            path.joinTo(this, " > ")
+            append("' in config '")
+            append(id.asString())
+            append("'")
+            
+            if (exception is JsonDecodingException && exception.cause != null) {
+                val path = exception.path
+                if (path != null) {
+                    append(" at path ")
+                    append(path)
+                    append(": ")
+                } else {
+                    append(": ")
+                }
+                append(exception.cause?.message)
+                appendLine()
+                append("Input: ")
+                append(exception.input)
+            } else {
+                append(": ")
+                append(exception.message)
+            }
+        })
     }
     
     override fun postReload() {
