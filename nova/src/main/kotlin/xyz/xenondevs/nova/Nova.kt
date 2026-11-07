@@ -109,7 +109,7 @@ internal object Nova : JavaPlugin(), INova {
     override fun getWailaManager(): IWailaManager = WailaManager
     
     override fun registerProtectionIntegration(integration: ProtectionIntegration) {
-        ProtectionManager.integrations.add(integration)
+        ProtectionManager.registerIntegration(integration)
     }
     //</editor-fold>
     

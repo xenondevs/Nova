@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.objectweb.asm.Type
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_JAR
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.annotations.AnnotationValue
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -11,7 +12,6 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.permission.PermissionIntegration
 import xyz.xenondevs.nova.integration.permission.PermissionManager
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.data.JarUtils
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
@@ -85,7 +85,7 @@ internal object HooksLoader {
         }
         
         if (hook is ProtectionIntegration) {
-            ProtectionManager.integrations += hook
+            Nova.registerProtectionIntegration(hook)
         }
         
         if (hook is CustomItemService) {
