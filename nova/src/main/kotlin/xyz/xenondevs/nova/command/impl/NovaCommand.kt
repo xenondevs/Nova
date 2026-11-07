@@ -63,6 +63,7 @@ import xyz.xenondevs.nova.registry.MutableNovaRegistry
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.registry.RegistryLoader
+import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
 import xyz.xenondevs.nova.ui.menu.explorer.blockTagExplorer
@@ -992,6 +993,9 @@ internal object NovaCommand : Command() {
             }
         }
         KnownRegistryEntries.store()
+        
+        // forgotten blocks/items need to be cleared from the resource pack and resource lookups
+        ResourceGeneration.invalidateResourcesHash()
         
         if (count > 0) {
             ctx.source.sender.sendMessage(Component.translatable(

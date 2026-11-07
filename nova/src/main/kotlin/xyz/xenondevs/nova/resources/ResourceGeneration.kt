@@ -101,6 +101,13 @@ internal object ResourceGeneration {
     }
     
     /**
+     * Invalidates the stored resources hash, forcing a pack-rebuild on the next server start.
+     */
+    fun invalidateResourcesHash() {
+        PermanentStorage.remove(RESOURCES_HASH)
+    }
+    
+    /**
      * Calculates a hash based on the version and name of Nova and all addons
      * and the resource_pack config section.
      */
