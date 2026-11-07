@@ -11,6 +11,7 @@ import net.kyori.adventure.key.Key.key
 import org.bukkit.inventory.ItemType
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.mockbukkit.mockbukkit.MockBukkit
 import kotlin.test.assertEquals
@@ -91,6 +92,7 @@ class RegistryKeySetSerializerTest {
         )
     }
     
+    @Disabled // Not implemented by MockBukkit
     @Test
     fun `deserialize RegistryKeySet Tag`() {
         val json = """"#minecraft:wool""""
