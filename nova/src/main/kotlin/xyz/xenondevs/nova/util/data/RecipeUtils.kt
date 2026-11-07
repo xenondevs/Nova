@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.util.data
 
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.crafting.Ingredient
 import org.bukkit.Keyed
 import org.bukkit.NamespacedKey
+import org.bukkit.Registry
 import org.bukkit.inventory.CookingRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
@@ -13,6 +15,7 @@ import org.bukkit.inventory.SmithingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import org.bukkit.inventory.recipe.CookingBookCategory
 import org.bukkit.inventory.recipe.CraftingBookCategory
+import xyz.xenondevs.nova.util.toHolderSet
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.recipe.CustomRecipeChoice
 import java.util.*
@@ -24,18 +27,17 @@ val Recipe.key: NamespacedKey
 
 fun Recipe.getInputStacks(): List<ItemStack> =
     when (this) {
-        
         is ShapedRecipe -> choiceMap.values.mapNotNull { choice -> choice?.getInputStacks() }.flatten()
-        is ShapelessRecipe -> choiceList.map { it.getInputStacks() }.flatten()
+        is ShapelessRecipe -> choiceList.flatMap { it.getInputStacks() }
         is CookingRecipe<*> -> inputChoice.getInputStacks()
         is StonecuttingRecipe -> inputChoice.getInputStacks()
         is SmithingRecipe -> base.getInputStacks() + addition.getInputStacks()
-        
         else -> throw UnsupportedOperationException("Unsupported Recipe type: ${javaClass.name}")
     }
 
 fun RecipeChoice.getInputStacks(): List<ItemStack> =
     when (this) {
+        is RecipeChoice.ItemTypeChoice -> itemTypes().map { Registry.ITEM.getOrThrow(it).createItemStack() }
         is RecipeChoice.MaterialChoice -> choices.map(::ItemStack)
         is RecipeChoice.ExactChoice -> choices
         is CustomRecipeChoice -> itemStacks
@@ -47,6 +49,7 @@ internal fun RecipeChoice?.toNmsIngredient(): Optional<Ingredient> =
 
 internal fun RecipeChoice.toNmsIngredient(): Ingredient =
     when (this) {
+        is RecipeChoice.ItemTypeChoice -> Ingredient.of(itemTypes().toHolderSet(BuiltInRegistries.ITEM))
         is RecipeChoice.MaterialChoice -> Ingredient.ofStacks(choices.map { ItemStack(it).unwrap().copy() })
         is RecipeChoice.ExactChoice -> Ingredient.ofStacks(choices.map { it.unwrap().copy() })
         is CustomRecipeChoice -> Ingredient.ofStacks(itemStacks.map { it.unwrap().copy() })
