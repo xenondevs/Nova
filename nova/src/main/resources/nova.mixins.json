@@ -30,6 +30,7 @@
     "block.vanillatileentity.BlockEntityMixin",
     "block.vanillatileentity.BlockItemMixin",
     "block.vanillatileentity.CraftBlockStatesMixin",
+    "block.vanillatileentity.CraftItemMetasMixin",
     "bossbar.tracking.ClientboundBossEventPacketMixin",
     "clientsiderewrite.ClientboundLevelChunkPacketDataMixin",
     "clientsiderewrite.IdMapperMixin",
