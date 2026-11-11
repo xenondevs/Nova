@@ -164,6 +164,7 @@ object AttachmentManager : Listener, PacketListener {
     
     private fun saveAndRemoveAttachments(player: Player) {
         saveAttachments(player)
+        inactiveAttachments.remove(player)
         activeAttachments.remove(player)
             ?.forEach { it.value.despawn() }
     }
