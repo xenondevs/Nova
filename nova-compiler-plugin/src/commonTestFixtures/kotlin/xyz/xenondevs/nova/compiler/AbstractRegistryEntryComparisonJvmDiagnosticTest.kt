@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.compiler
 
-import org.jetbrains.kotlin.test.TargetBackend
-import org.jetbrains.kotlin.test.preprocessors.BackendDependentSourceFilePreprocessor
+import org.jetbrains.kotlin.test.model.TestFile
+import org.jetbrains.kotlin.test.services.ReversibleSourceFilePreprocessor
 import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.utils.ReplacingSourceTransformer
 import org.jetbrains.kotlin.utils.bind
@@ -105,10 +105,13 @@ abstract class AbstractRegistryEntryComparisonJvmDiagnosticTest : AbstractNovaJv
         private fun List<String>.withNullableTypes(): List<String> = flatMap { listOf(it, "$it?") }
     }
 
-    class ParameterPreprocessor(testServices: TestServices, val from: String, val to: String) :
-        BackendDependentSourceFilePreprocessor(testServices) {
-        override fun selectTransformer(targetBackend: TargetBackend): ReplacingSourceTransformer =
-            ReplacingSourceTransformer(from, to)
+    // Adapted from https://github.com/JetBrains/kotlin/blob/e12dc36e784c4c65886009eb622504b3db65b699/compiler/tests-common-new/testFixtures/org/jetbrains/kotlin/test/preprocessors/BackendDependentSourceFilePreprocessor.kt
+    class ParameterPreprocessor(testServices: TestServices, from: String, to: String) :
+        ReversibleSourceFilePreprocessor(testServices) {
+        val transformer = ReplacingSourceTransformer(from, to)
+        override fun process(file: TestFile, content: String): String = transformer.invokeForTestFile(content)
+
+        override fun revert(file: TestFile, actualContent: String): String = transformer.revertForFile(actualContent)
     }
 }
 

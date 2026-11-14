@@ -16,6 +16,9 @@ kotlin {
 }
 
 pluginDevKit {
+    cliVersions("2.3.0")
+    ideaVersions("253")
+
     pluginPackage = "xyz.xenondevs.nova.compiler"
     testDataLibraries {
         register("paperApi") { jvm(libs.paper.api) }
