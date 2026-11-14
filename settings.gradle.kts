@@ -1,3 +1,18 @@
+pluginManagement {
+    includeBuild("build-logic/build-logic-core")
+    includeBuild("build-logic/build-logic-nova")
+    includeBuild("nova-annotations")
+    repositories {
+        mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
+        mavenCentral()
+        gradlePluginPortal()
+        maven("https://repo.xenondevs.xyz/releases/")
+        maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap")
+    }
+}
+
+plugins { kotlin("compiler.plugin.devkit") version "0.0.4-dev-392" }
+
 rootProject.name = "nova"
 
 // core
@@ -41,7 +56,9 @@ dependencyResolutionManagement {
     repositories {
         mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
         mavenCentral()
+        maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.xenondevs.xyz/releases/")
+        maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap")
     }
     
     versionCatalogs {
@@ -49,17 +66,5 @@ dependencyResolutionManagement {
         create("origamiLibs") {
             from("xyz.xenondevs.origami:origami-catalog:0.6.2") // !!! also change in build-logic/build-logic-nova !!!
         }
-    }
-}
-
-pluginManagement {
-    includeBuild("build-logic/build-logic-core")
-    includeBuild("build-logic/build-logic-nova")
-    includeBuild("nova-annotations")
-    repositories {
-        mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
-        mavenCentral()
-        gradlePluginPortal()
-        maven("https://repo.xenondevs.xyz/releases/")
     }
 }

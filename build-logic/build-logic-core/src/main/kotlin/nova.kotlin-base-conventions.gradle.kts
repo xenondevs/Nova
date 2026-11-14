@@ -18,25 +18,7 @@ kotlin {
     compilerOptions {
         jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
         moduleName = project.name
-        
-        optIn.addAll(
-            "kotlin.io.path.ExperimentalPathApi",
-            "kotlin.time.ExperimentalTime",
-            "kotlin.experimental.ExperimentalTypeInference",
-            "kotlin.contracts.ExperimentalContracts"
-        )
-        
-        freeCompilerArgs.addAll(
-            "-Xname-based-destructuring=complete",
-            "-Xcollection-literals",
-            "-Xcontext-sensitive-resolution"
-        )
-        
-        if (!providers.gradleProperty("release").isPresent) {
-            freeCompilerArgs.addAll(
-                "-Xdebug" // https://kotlinlang.org/docs/debug-coroutines-with-idea.html#optimized-out-variables
-            )
-        }
+        novaCompilerOptions(providers.gradleProperty("release").isPresent)
     }
 }
 
