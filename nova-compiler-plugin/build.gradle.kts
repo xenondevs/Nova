@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.compiler.plugin.devkit.BetaAndRc
+
 plugins {
     id("nova.publish-conventions")
     pluginDevKit("compiler-plugin")
@@ -16,8 +18,11 @@ kotlin {
 }
 
 pluginDevKit {
-    cliVersions("2.3.0")
-    ideaVersions("253")
+    // Nova enforces its Kotlin version for addons, so only that CLI compiler is needed
+    val kotlinVersion = libs.versions.kotlin.get()
+    cliVersions(kotlinVersion, kotlinVersion, BetaAndRc.NONE)
+    // 2026.3+ is required for IDEA-254862 fix, so there's no need to build the compiler plugin for older versions of IDEA
+    ideaVersions("263")
 
     pluginPackage = "xyz.xenondevs.nova.compiler"
     testDataLibraries {
