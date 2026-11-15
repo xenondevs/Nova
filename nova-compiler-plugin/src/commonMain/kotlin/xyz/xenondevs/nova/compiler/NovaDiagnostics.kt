@@ -23,6 +23,7 @@ internal object NovaDiagnostics : KtDiagnosticsContainer() {
     )
     
     override fun getRendererFactory(): BaseDiagnosticRendererFactory = NovaDiagnosticMessages
+    
 }
 
 private object NovaDiagnosticMessages : BaseDiagnosticRendererFactory() {
@@ -45,4 +46,5 @@ private object NovaDiagnosticMessages : BaseDiagnosticRendererFactory() {
             "Nova: Do not use TypedKey as Key. Use key() instead."
         )
     }
+    
 }

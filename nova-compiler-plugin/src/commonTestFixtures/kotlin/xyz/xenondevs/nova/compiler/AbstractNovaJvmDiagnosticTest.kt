@@ -42,15 +42,16 @@ abstract class AbstractNovaJvmDiagnosticTest : DevKitJvmDiagnosticTest({
 
 class NovaHelpersProvider(testServices: TestServices, private val helpers: List<Helper>) :
     AdditionalSourceProvider(testServices) {
+    
     companion object {
         const val DIAGNOSTICS_HELPERS = "diagnostics/helpers"
     }
-
+    
     enum class Helper(val path: String) {
         NovaItem("$DIAGNOSTICS_HELPERS/NovaItem.kt"),
         Material("$DIAGNOSTICS_HELPERS/Material.kt"),
     }
-
+    
     override fun produceAdditionalFiles(
         globalDirectives: RegisteredDirectives,
         module: TestModule,

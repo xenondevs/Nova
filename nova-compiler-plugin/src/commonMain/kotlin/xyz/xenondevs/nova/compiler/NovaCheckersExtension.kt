@@ -24,4 +24,5 @@ internal class NovaCheckersExtension(session: FirSession) : FirAdditionalChecker
     override val typeCheckers = object : TypeCheckers() {
         override val resolvedTypeRefCheckers = setOf(MaterialTypeChecker)
     }
+    
 }

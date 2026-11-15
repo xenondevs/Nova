@@ -38,6 +38,7 @@ internal object TypedKeyConversionChecker : FirBasicExpressionChecker(MppChecker
             reporter.reportOn(expression.source, NovaDiagnostics.TYPED_KEY_AS_KEY)
         }
     }
+    
 }
 
 internal object TypedKeyMemberAccessChecker : FirQualifiedAccessExpressionChecker(MppCheckerKind.Common) {
@@ -51,6 +52,7 @@ internal object TypedKeyMemberAccessChecker : FirQualifiedAccessExpressionChecke
         if (receiver?.resolvedType?.isClassOrSubclassOf(TYPED_KEY_CLASS_ID) == true)
             reporter.reportOn(receiver.source, NovaDiagnostics.TYPED_KEY_AS_KEY)
     }
+    
 }
 
 internal object TypedKeyPropertyChecker : FirPropertyChecker(MppCheckerKind.Common) {
@@ -62,6 +64,7 @@ internal object TypedKeyPropertyChecker : FirPropertyChecker(MppCheckerKind.Comm
             reporter.reportOn(declaration.returnTypeRef.source ?: declaration.source, NovaDiagnostics.TYPED_KEY_AS_KEY)
         }
     }
+    
 }
 
 context(context: CheckerContext)

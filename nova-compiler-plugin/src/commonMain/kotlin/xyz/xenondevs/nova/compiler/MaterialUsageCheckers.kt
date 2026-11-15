@@ -28,6 +28,7 @@ internal object MaterialExpressionChecker : FirQualifiedAccessExpressionChecker(
         if (expression.resolvedType.containsMaterial())
             reporter.reportOn(expression.source, NovaDiagnostics.MATERIAL_USAGE)
     }
+    
 }
 
 internal object MaterialClassLiteralChecker : FirGetClassCallChecker(MppCheckerKind.Common) {
@@ -37,6 +38,7 @@ internal object MaterialClassLiteralChecker : FirGetClassCallChecker(MppCheckerK
         if (expression.resolvedType.containsMaterial())
             reporter.reportOn(expression.source, NovaDiagnostics.MATERIAL_USAGE)
     }
+    
 }
 
 internal object MaterialTypeChecker : FirResolvedTypeRefChecker(MppCheckerKind.Common) {
@@ -47,6 +49,7 @@ internal object MaterialTypeChecker : FirResolvedTypeRefChecker(MppCheckerKind.C
         if (typeRef.source?.kind !is KtFakeSourceElementKind && typeRef.coneType.containsMaterial())
             reporter.reportOn(typeRef.source, NovaDiagnostics.MATERIAL_USAGE)
     }
+    
 }
 
 private fun ConeKotlinType.containsMaterial(): Boolean {

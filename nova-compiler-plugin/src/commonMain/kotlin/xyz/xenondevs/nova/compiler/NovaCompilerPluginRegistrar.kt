@@ -7,9 +7,11 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
 class NovaCompilerPluginRegistrar : DevKitComponentRegistrar {
+    
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
         FirExtensionRegistrarAdapter.registerExtension(NovaFirExtensionRegistrar())
     }
+    
 }
 
 private class NovaFirExtensionRegistrar : FirExtensionRegistrar() {
@@ -18,4 +20,5 @@ private class NovaFirExtensionRegistrar : FirExtensionRegistrar() {
         registerDiagnosticContainers(NovaDiagnostics)
         +::NovaCheckersExtension
     }
+    
 }

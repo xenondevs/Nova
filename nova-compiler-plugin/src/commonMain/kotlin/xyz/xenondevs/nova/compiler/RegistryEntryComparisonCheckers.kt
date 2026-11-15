@@ -32,6 +32,7 @@ internal object RegistryEntryEqualityChecker : FirEqualityOperatorCallChecker(Mp
         if (arguments.size == 2 && isRegistryEntryValueComparison(arguments[0].resolvedType, arguments[1].resolvedType))
             reporter.reportOn(expression.source, NovaDiagnostics.REGISTRY_ENTRY_COMPARISON)
     }
+    
 }
 
 internal object RegistryEntryEqualsCallChecker : FirFunctionCallChecker(MppCheckerKind.Common) {
@@ -47,6 +48,7 @@ internal object RegistryEntryEqualsCallChecker : FirFunctionCallChecker(MppCheck
         if (isRegistryEntryValueComparison(receiver.resolvedType, argument.resolvedType))
             reporter.reportOn(expression.source, NovaDiagnostics.REGISTRY_ENTRY_COMPARISON)
     }
+    
 }
 
 context(context: CheckerContext)

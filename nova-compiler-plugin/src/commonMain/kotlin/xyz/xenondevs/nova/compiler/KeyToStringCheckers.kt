@@ -28,6 +28,7 @@ internal object KeyToStringCallChecker : FirFunctionCallChecker(MppCheckerKind.C
         if (receiver?.resolvedType?.needsExplicitKeyStringConversion() == true)
             reporter.reportOn(expression.calleeReference.source, NovaDiagnostics.KEY_TO_STRING)
     }
+    
 }
 
 internal object KeyStringInterpolationChecker : FirStringConcatenationCallChecker(MppCheckerKind.Common) {
@@ -39,6 +40,7 @@ internal object KeyStringInterpolationChecker : FirStringConcatenationCallChecke
                 reporter.reportOn(argument.source, NovaDiagnostics.KEY_TO_STRING)
         }
     }
+    
 }
 
 context(context: CheckerContext)

@@ -14,14 +14,15 @@ import org.junit.jupiter.params.provider.MethodSource
 @ParameterizedClass
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractRegistryEntryComparisonJvmDiagnosticTest : AbstractNovaJvmDiagnosticTest() {
+    
     open val bound: String? get() = null
-
+    
     init {
         configure {
             bound?.let { useSourcePreprocessor(::ParameterPreprocessor.bind(BOUND, it)) }
         }
     }
-
+    
     companion object {
         const val BOUND = "BOUND"
         private val novaEntries = listOf("RegistryEntry<NovaItem>", "RegistryEntry.Nova<NovaItem>").withNullableTypes()
@@ -31,45 +32,45 @@ abstract class AbstractRegistryEntryComparisonJvmDiagnosticTest : AbstractNovaJv
         private val genericNovaEntries = listOf("RegistryEntry<T>", "RegistryEntry.Nova<T>").withNullableTypes()
         private val genericPaperEntries = listOf("RegistryEntry<T>", "RegistryEntry.Paper<T>").withNullableTypes()
         private val genericValues = listOf("T").withNullableTypes()
-
+        
         @JvmStatic
         private fun badConcreteComparisons() =
             comparisons(novaEntries, novaValues, swapped = true) +
-                    comparisons(paperEntries, paperValues, swapped = true)
-
+                comparisons(paperEntries, paperValues, swapped = true)
+        
         @JvmStatic
         private fun badConcreteWhenComparisons() =
             whenComparisons(novaEntries, novaValues, swapped = true) +
-                    whenComparisons(paperEntries, paperValues, swapped = true)
-
+                whenComparisons(paperEntries, paperValues, swapped = true)
+        
         @JvmStatic
         private fun badGenericComparisons() =
             comparisons(genericNovaEntries, genericValues, swapped = true, "NovaRegistryElement<T>") +
-                    comparisons(genericPaperEntries, genericValues, swapped = true, "Keyed")
-
+                comparisons(genericPaperEntries, genericValues, swapped = true, "Keyed")
+        
         @JvmStatic
         private fun badGenericWhenComparisons() =
             whenComparisons(genericNovaEntries, genericValues, swapped = true, "NovaRegistryElement<T>") +
-                    whenComparisons(genericPaperEntries, genericValues, swapped = true, "Keyed")
-
+                whenComparisons(genericPaperEntries, genericValues, swapped = true, "Keyed")
+        
         @JvmStatic
         private fun goodConcreteComparisons() =
             comparisons(novaEntries, novaEntries) + comparisons(paperEntries, paperEntries)
-
+        
         @JvmStatic
         private fun goodConcreteWhenComparisons() =
             whenComparisons(novaEntries, novaEntries) + whenComparisons(paperEntries, paperEntries)
-
+        
         @JvmStatic
         private fun goodGenericComparisons() =
             comparisons(genericNovaEntries, genericNovaEntries, suffix = arrayOf("NovaRegistryElement<T>")) +
-                    comparisons(genericPaperEntries, genericPaperEntries, suffix = arrayOf("Keyed"))
-
+                comparisons(genericPaperEntries, genericPaperEntries, suffix = arrayOf("Keyed"))
+        
         @JvmStatic
         private fun goodGenericWhenComparisons() =
             whenComparisons(genericNovaEntries, genericNovaEntries, suffix = arrayOf("NovaRegistryElement<T>")) +
-                    whenComparisons(genericPaperEntries, genericPaperEntries, suffix = arrayOf("Keyed"))
-
+                whenComparisons(genericPaperEntries, genericPaperEntries, suffix = arrayOf("Keyed"))
+        
         private fun comparisons(
             leftTypes: List<String>,
             rightTypes: List<String>,
@@ -86,7 +87,7 @@ abstract class AbstractRegistryEntryComparisonJvmDiagnosticTest : AbstractNovaJv
                 }
             }
         }
-
+        
         private fun whenComparisons(
             subjectTypes: List<String>,
             branchTypes: List<String>,
@@ -101,30 +102,33 @@ abstract class AbstractRegistryEntryComparisonJvmDiagnosticTest : AbstractNovaJv
                 }
             }
         }
-
+        
         private fun List<String>.withNullableTypes(): List<String> = flatMap { listOf(it, "$it?") }
     }
-
+    
     // Adapted from https://github.com/JetBrains/kotlin/blob/e12dc36e784c4c65886009eb622504b3db65b699/compiler/tests-common-new/testFixtures/org/jetbrains/kotlin/test/preprocessors/BackendDependentSourceFilePreprocessor.kt
     class ParameterPreprocessor(testServices: TestServices, from: String, to: String) :
         ReversibleSourceFilePreprocessor(testServices) {
+        
         val transformer = ReplacingSourceTransformer(from, to)
+        
         override fun process(file: TestFile, content: String): String = transformer.invokeForTestFile(content)
-
+        
         override fun revert(file: TestFile, actualContent: String): String = transformer.revertForFile(actualContent)
     }
 }
 
 abstract class AbstractComparisonsJvmDiagnosticTest : AbstractRegistryEntryComparisonJvmDiagnosticTest() {
+    
     @Parameter(0)
     lateinit var left: String
-
+    
     @Parameter(1)
     lateinit var operation: String
-
+    
     @Parameter(2)
     lateinit var right: String
-
+    
     init {
         configure {
             useSourcePreprocessor(::ParameterPreprocessor.bind(LEFT, left))
@@ -133,7 +137,7 @@ abstract class AbstractComparisonsJvmDiagnosticTest : AbstractRegistryEntryCompa
             bound?.let { useSourcePreprocessor(::ParameterPreprocessor.bind(BOUND, it)) }
         }
     }
-
+    
     companion object {
         const val LEFT = "LEFT"
         const val OPERATION = "OPERATION"
@@ -142,12 +146,13 @@ abstract class AbstractComparisonsJvmDiagnosticTest : AbstractRegistryEntryCompa
 }
 
 abstract class AbstractWhenComparisonsJvmDiagnosticTest : AbstractRegistryEntryComparisonJvmDiagnosticTest() {
+    
     @Parameter(0)
     lateinit var subject: String
-
+    
     @Parameter(1)
     lateinit var branch: String
-
+    
     init {
         configure {
             useSourcePreprocessor(::ParameterPreprocessor.bind(SUBJECT, subject))
@@ -155,7 +160,7 @@ abstract class AbstractWhenComparisonsJvmDiagnosticTest : AbstractRegistryEntryC
             bound?.let { useSourcePreprocessor(::ParameterPreprocessor.bind(BOUND, it)) }
         }
     }
-
+    
     companion object {
         const val SUBJECT = "SUBJECT"
         const val BRANCH = "BRANCH"
