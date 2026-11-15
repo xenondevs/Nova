@@ -1,12 +1,21 @@
 import org.jetbrains.kotlin.compiler.plugin.devkit.BetaAndRc
 
 plugins {
+    id("nova.kotlin-multiplatform-conventions")
     id("nova.publish-conventions")
     pluginDevKit("compiler-plugin")
 }
 
+repositories {
+    maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap")
+    // Kotlin compiler builds bundled with IntelliJ IDEA, used by the compiler plugin's IDE variants
+    exclusiveContent {
+        forRepository { maven("https://redirector.kotlinlang.org/maven/intellij-dependencies/") }
+        filter { includeVersionByRegex("""org\.jetbrains\.kotlin""", ".*", """.*-ij\d+-\d+""") }
+    }
+}
+
 kotlin {
-    compilerOptions { novaCompilerOptions(providers.gradleProperty("release").isPresent) }
     sourceSets {
         commonTestFixtures.dependencies {
             implementation(dependencies.platform(libs.junit.bom))

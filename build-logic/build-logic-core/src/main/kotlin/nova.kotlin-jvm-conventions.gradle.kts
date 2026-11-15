@@ -1,8 +1,8 @@
 import org.gradle.accessors.dm.LibrariesForLibs
-import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 
 plugins {
     id("nova.java-conventions")
+    id("nova.kotlin-compiler-conventions")
     kotlin("jvm")
 }
 
@@ -15,11 +15,7 @@ dependencies {
 sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
 
 kotlin {
-    compilerOptions {
-        jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
-        moduleName = project.name
-        novaCompilerOptions(providers.gradleProperty("release").isPresent)
-    }
+    compilerOptions.moduleName = project.name
 }
 
 tasks.named { it == "kotlinSourcesJar" }.configureEach { enabled = false }

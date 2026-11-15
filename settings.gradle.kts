@@ -56,9 +56,7 @@ dependencyResolutionManagement {
     repositories {
         mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
         mavenCentral()
-        maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.xenondevs.xyz/releases/")
-        maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap")
     }
     
     versionCatalogs {
