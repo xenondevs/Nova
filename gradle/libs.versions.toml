@@ -4,6 +4,7 @@ format.version = "1.1"
 [versions]
 bytebase = "0.4.8"
 commons-provider = "2.0.0-alpha.11"
+devkit = "0.0.4-dev-392"
 dokka = "2.2.0"
 jgrapht = "1.5.3"
 kotlin = "2.4.21"
@@ -80,3 +81,5 @@ xenondevs-commons = ["commons-collections", "commons-gson", "commons-guava", "co
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 pluginPublish = { id = "xyz.xenondevs.publish.plugin-publish", version = "1.0.4" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+devkit-compilerPlugin = { id = "org.jetbrains.kotlin.compiler.plugin.devkit.compiler-plugin", version.ref = "devkit" }
+devkit-functionalTestPublishing = { id = "org.jetbrains.kotlin.compiler.plugin.devkit.functional-test-publishing", version.ref = "devkit" }

@@ -11,8 +11,6 @@ pluginManagement {
     }
 }
 
-plugins { kotlin("compiler.plugin.devkit") version "0.0.4-dev-392" }
-
 rootProject.name = "nova"
 
 // core

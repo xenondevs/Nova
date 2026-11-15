@@ -14,7 +14,7 @@ dependencies {
 }
 
 for (taskName in listOf("publish", "publishToMavenLocal")) {
-    tasks.named(taskName) {
+    tasks.register(taskName) {
         group = "publishing"
         description = "Publishes all Nova modules, including the annotation tooling."
         dependsOn(subprojects.map { subproject -> subproject.tasks.matching { it.name == taskName } })

@@ -3,7 +3,8 @@ import org.jetbrains.kotlin.compiler.plugin.devkit.BetaAndRc
 plugins {
     id("nova.kotlin-multiplatform-conventions")
     id("nova.publish-conventions")
-    pluginDevKit("compiler-plugin")
+    alias(libs.plugins.devkit.functionalTestPublishing) // required by devkit.compilerPlugin
+    alias(libs.plugins.devkit.compilerPlugin)
 }
 
 repositories {
