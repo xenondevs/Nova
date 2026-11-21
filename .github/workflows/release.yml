@@ -27,7 +27,7 @@ jobs:
           cache-disabled: true
 
       - name: Build & Test
-        run: ./gradlew test _oriMixin loaderJar -Prelease --no-build-cache
+        run: ./gradlew check _oriMixin loaderJar -Prelease --no-build-cache
 
       - name: Publish
         run: ./gradlew publish pluginPublish -Prelease --no-build-cache --githubReleaseId ${{ github.event.release.id }}
