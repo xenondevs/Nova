@@ -90,7 +90,7 @@ class DataComponentMap internal constructor(
         private fun <T : Any, NMS : Any> set(type: PaperDataComponentType.ValuedImpl<T, NMS>, value: T) {
             builder.set(
                 PaperDataComponentType.bukkitToMinecraft(type),
-                type.adapter.toVanilla(value, type.holder)
+                type.converter.toVanilla(value)
             )
         }
         
@@ -129,7 +129,7 @@ class DataComponentMap internal constructor(
         private fun <T : Any, NMS : Any> createTypedDataComponent(type: PaperDataComponentType.ValuedImpl<T, NMS>, value: T) =
             TypedDataComponent<NMS>(
                 PaperDataComponentType.bukkitToMinecraft(type),
-                type.adapter.toVanilla(value, type.holder)
+                type.converter.toVanilla(value)
             )
         
         /**
