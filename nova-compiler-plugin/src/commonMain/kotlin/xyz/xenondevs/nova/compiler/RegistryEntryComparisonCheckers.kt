@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirOperation
 import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.isNothingOrNullableNothing
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.types.type
 import org.jetbrains.kotlin.fir.types.typeContext
@@ -58,9 +59,13 @@ private fun isRegistryEntryValueComparison(left: ConeKotlinType, right: ConeKotl
 context(context: CheckerContext)
 private fun isRegistryEntryValuePair(entry: ConeKotlinType, value: ConeKotlinType): Boolean {
     val entryValueType = entry.findSupertype(REGISTRY_ENTRY_CLASS_ID)?.typeArguments?.firstOrNull()?.type ?: return false
-    return AbstractTypeChecker.equalTypes(
+    // null literals and other bottom-typed expressions are subtypes of everything
+    if (value.isNothingOrNullableNothing)
+        return false
+    // values are often typed more specifically than the entry, e.g. ItemType.DIAMOND is an ItemType.Typed<ItemMeta>
+    return AbstractTypeChecker.isSubtypeOf(
         context.session.typeContext,
-        entryValueType.withNullability(false, context.session.typeContext),
-        value.withNullability(false, context.session.typeContext)
+        value.withNullability(false, context.session.typeContext),
+        entryValueType.withNullability(false, context.session.typeContext)
     )
 }
