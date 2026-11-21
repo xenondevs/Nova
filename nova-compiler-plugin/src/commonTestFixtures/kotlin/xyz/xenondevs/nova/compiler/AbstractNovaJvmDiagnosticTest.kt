@@ -23,20 +23,13 @@ abstract class AbstractNovaJvmDiagnosticTest : DevKitJvmDiagnosticTest({
         RUN_PIPELINE_TILL with backendTestPhase
     }
     configurePlugin(NovaCompilerPluginRegistrar())
-    forTestsMatching("*/typedKeyAsKey/*") {
-        configureTestDataLibrary(TestDataLibraries.paperApi) { true }
-    }
+    configureTestDataLibrary(TestDataLibraries.paperApi) { true }
     forTestsMatching("*/registryEntryComparison/*") {
-        configureTestDataLibrary(TestDataLibraries.paperApi) { true }
         configureTestDataLibrary(TestDataLibraries.novaRegistry) { true }
         useAdditionalSourceProviders(::NovaHelpersProvider.bind(listOf(Helper.NovaItem)))
     }
     forTestsMatching("*/materialUsage/*") {
-        configureTestDataLibrary(TestDataLibraries.paperApi) { true }
         useAdditionalSourceProviders(::NovaHelpersProvider.bind(listOf(Helper.Material)))
-    }
-    forTestsMatching("*/keyToString/*") {
-        configureTestDataLibrary(TestDataLibraries.paperApi) { true }
     }
 })
 
