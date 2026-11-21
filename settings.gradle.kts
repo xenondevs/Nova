@@ -7,7 +7,9 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven("https://repo.xenondevs.xyz/releases/")
-        maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap")
+        maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap") {
+            content { includeGroupAndSubgroups("org.jetbrains.kotlin.compiler.plugin.devkit") }
+        }
     }
 }
 
