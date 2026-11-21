@@ -6,7 +6,7 @@ The inspections are reported as compiler warnings during normal Kotlin compilati
 
 ## Inspections
 
-- `NOVA_REGISTRY_ENTRY_COMPARISON`: Comparing a `RegistryEntry<T>` with `T`.
+- `NOVA_REGISTRY_ENTRY_COMPARISON`: Comparing a `RegistryEntry<T>` with `T` or a subtype of `T`.
 - `NOVA_MATERIAL_USAGE`: Using Bukkit's legacy `Material` API instead of `ItemType` or `BlockType`.
 - `NOVA_KEY_TO_STRING`: Calling `Key.toString()` explicitly or through string interpolation instead of `asString()`.
   `NamespacedKey` is excluded because its string representation is defined.

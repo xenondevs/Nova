@@ -27,7 +27,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Build & Test
-        run: ./gradlew test _oriMixin loaderJar -Prelease --build-cache --refresh-dependencies
+        run: ./gradlew check _oriMixin loaderJar -Prelease --build-cache --refresh-dependencies
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

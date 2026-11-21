@@ -2,17 +2,11 @@ import org.gradle.accessors.dm.LibrariesForLibs
 
 plugins {
     id("nova.common-conventions")
+    id("nova.repository-conventions")
     `java-library`
 }
 
 val libs = providers.provider { the<LibrariesForLibs>() }
-
-repositories {
-    mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
-    mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://repo.xenondevs.xyz/releases")
-}
 
 dependencies {
     testImplementation(platform(libs.flatMap { it.junit.bom }))
