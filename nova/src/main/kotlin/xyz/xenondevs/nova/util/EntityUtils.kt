@@ -5,6 +5,7 @@ import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.Tool
 import io.papermc.paper.datacomponent.item.Weapon
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.NbtIo
@@ -17,10 +18,12 @@ import net.minecraft.util.ProblemReporter
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntitySpawnRequest
+import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.storage.TagValueOutput
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Registry
 import org.bukkit.block.Block
 import org.bukkit.craftbukkit.entity.CraftEntity
 import org.bukkit.entity.EntityType
@@ -30,6 +33,7 @@ import org.joml.Vector3d
 import org.joml.Vector3dc
 import org.joml.primitives.AABBdc
 import org.joml.primitives.Rayd
+import xyz.xenondevs.commons.collections.mapToSet
 import xyz.xenondevs.commons.math.insecureRandomUuid
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
@@ -105,10 +109,8 @@ val BukkitEntity.eyeInWater: Boolean
 object EntityUtils {
     
     internal val DUMMY_PLAYER = createFakePlayer(Location(Bukkit.getWorlds()[0], 0.0, 0.0, 0.0), insecureRandomUuid(), "Nova Dummy Player")
-    private val DEFAULT_DESERIALIZATION_DISALLOWED_ENTITY_TYPES: Set<EntityType> = buildSet {
-        add(EntityType.COMMAND_BLOCK_MINECART)
-        add(EntityType.FALLING_BLOCK) // command block falling block (for good measure, command doesn't seem to be there after landing)
-    }
+    private val DEFAULT_DESERIALIZATION_DISALLOWED_ENTITY_TYPES = EntityTypes.OP_ONLY_CUSTOM_DATA
+        .mapToSet { Registry.ENTITY_TYPE.getOrThrow(BuiltInRegistries.ENTITY_TYPE.getKey(it).toKey()) }
     
     /**
      * Gets a list of all passengers of this [BukkitEntity], including passengers of passengers.

@@ -96,3 +96,4 @@ extendable method net/minecraft/world/item/Item getCraftingRemainder ()Lnet/mine
 accessible field org/bukkit/craftbukkit/block/CraftBlockState block Lnet/minecraft/world/level/block/state/BlockState;
 accessible field net/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase lightEmission I
 mutable field net/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase lightEmission I
+accessible field net/minecraft/world/entity/EntityTypes OP_ONLY_CUSTOM_DATA Ljava/util/Set;
