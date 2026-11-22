@@ -13,11 +13,11 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.compiler.plugin.devkit.DevKitSupportPlugin
-import xyz.xenondevs.nova.compiler.PluginInfo
 import xyz.xenondevs.nova.annotations.AnnotationIndex
 import xyz.xenondevs.nova.annotations.gradle.AnnotationIndexExtension
 import xyz.xenondevs.nova.annotations.gradle.AnnotationIndexPlugin
 import xyz.xenondevs.nova.annotations.gradle.GenerateAnnotationIndex
+import xyz.xenondevs.nova.compiler.PluginInfo
 import xyz.xenondevs.novagradle.task.AddonExtension
 import xyz.xenondevs.novagradle.task.GenerateLanguageFilesTask
 import xyz.xenondevs.novagradle.task.PluginDependency
@@ -59,7 +59,7 @@ internal class NovaGradlePlugin : DevKitSupportPlugin(PluginInfo.PLUGIN_INFO) {
         configureOrigami(target, addonExt, addonJar)
         createGenLangFiles(target)
     }
-
+    
     private fun configureOrigami(project: Project, ext: AddonExtension, addonJar: TaskProvider<Jar>) {
         val nova = project.configurations.detachedConfiguration(
             project.dependencyFactory.create("xyz.xenondevs.nova:nova:${Versions.NOVA}")

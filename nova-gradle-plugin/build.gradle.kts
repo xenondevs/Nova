@@ -26,7 +26,7 @@ gradlePlugin {
 }
 
 buildConfig {
-    forClass("xyz.xenondevs.novagradle","Versions") {
+    forClass("xyz.xenondevs.novagradle", "Versions") {
         val novaVersion = "$version"
         val paperVersion = libs.versions.paper
         buildConfigField("NOVA", novaVersion)
