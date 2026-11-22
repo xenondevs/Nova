@@ -2,7 +2,8 @@ plugins {
     id("nova.kotlin-conventions")
     id("nova.publish-conventions")
     id("nova.dokka-conventions")
-    `java-gradle-plugin`
+    alias(libs.plugins.devkit.functionalTestPublishing)
+    alias(libs.plugins.devkit.gradlePlugin)
     `kotlin-dsl`
 }
 
@@ -36,4 +37,9 @@ kotlin {
             kotlin.srcDir(generateVersionsClass)
         }
     }
+}
+
+pluginDevKit {
+    pluginPackage = "xyz.xenondevs.nova.compiler"
+    compilerPlugin(project(":nova-compiler-plugin"))
 }

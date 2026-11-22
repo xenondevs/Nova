@@ -6,17 +6,14 @@ import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.RegularFile
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
-import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
-import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import org.jetbrains.kotlin.compiler.plugin.devkit.DevKitSupportPlugin
+import xyz.xenondevs.nova.compiler.PluginInfo
 import xyz.xenondevs.nova.annotations.AnnotationIndex
 import xyz.xenondevs.nova.annotations.gradle.AnnotationIndexExtension
 import xyz.xenondevs.nova.annotations.gradle.AnnotationIndexPlugin
@@ -32,9 +29,6 @@ import xyz.xenondevs.novagradle.util.toClassFilePath
 import xyz.xenondevs.origami.extension.OrigamiExtension
 
 private const val NOVA_TASK_GROUP = "nova"
-private const val COMPILER_PLUGIN_ID = "xyz.xenondevs.nova.compiler"
-private const val COMPILER_PLUGIN_GROUP = "xyz.xenondevs.nova"
-private const val COMPILER_PLUGIN_ARTIFACT = "nova-compiler-plugin"
 
 private val MAVEN_CENTRAL_URLS = setOf(
     "https://repo1.maven.org/maven2",
@@ -43,7 +37,7 @@ private val MAVEN_CENTRAL_URLS = setOf(
     "http://repo.maven.apache.org/maven2"
 )
 
-internal class NovaGradlePlugin : KotlinCompilerPluginSupportPlugin {
+internal class NovaGradlePlugin : DevKitSupportPlugin(PluginInfo.PLUGIN_INFO) {
     
     override fun apply(target: Project) {
         target.pluginManager.apply("org.jetbrains.kotlin.jvm")
@@ -65,19 +59,7 @@ internal class NovaGradlePlugin : KotlinCompilerPluginSupportPlugin {
         configureOrigami(target, addonExt, addonJar)
         createGenLangFiles(target)
     }
-    
-    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
-    
-    override fun getCompilerPluginId(): String = COMPILER_PLUGIN_ID
-    
-    override fun getPluginArtifact(): SubpluginArtifact =
-        SubpluginArtifact(COMPILER_PLUGIN_GROUP, COMPILER_PLUGIN_ARTIFACT, Versions.NOVA)
-    
-    override fun applyToCompilation(
-        kotlinCompilation: KotlinCompilation<*>
-    ): Provider<List<SubpluginOption>> =
-        kotlinCompilation.target.project.providers.provider { emptyList() }
-    
+
     private fun configureOrigami(project: Project, ext: AddonExtension, addonJar: TaskProvider<Jar>) {
         val nova = project.configurations.detachedConfiguration(
             project.dependencyFactory.create("xyz.xenondevs.nova:nova:${Versions.NOVA}")
