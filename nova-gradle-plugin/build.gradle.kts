@@ -25,17 +25,14 @@ gradlePlugin {
     }
 }
 
-val generateVersionsClass = tasks.register<GenerateVersionsClassTask>("generateVersionsClass") {
-    novaVersion.set(version.toString())
-    paperVersion.set(libs.versions.paper)
-    outputDirectory.set(layout.buildDirectory.dir("generatedSrc"))
-}
-
-kotlin {
-    sourceSets {
-        main {
-            kotlin.srcDir(generateVersionsClass)
-        }
+buildConfig {
+    forClass("xyz.xenondevs.novagradle","Versions") {
+        val novaVersion = "$version"
+        val paperVersion = libs.versions.paper
+        buildConfigField("NOVA", novaVersion)
+        buildConfigField("NOVA_RELEASE", Regex("""^(\d+.\d+).*$""").matchEntire(novaVersion)!!.groupValues[1])
+        buildConfigField("PAPER", paperVersion)
+        buildConfigField("PAPER_API_VERSION", paperVersion.map { it.substring(0, 4) })
     }
 }
 
