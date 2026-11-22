@@ -3,8 +3,9 @@ package xyz.xenondevs.nova.registry
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
-import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
-import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
+import xyz.xenondevs.nova.ui.waila.WailaIconProvider
+import xyz.xenondevs.nova.ui.waila.WailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.WailaToolIconProvider
 import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterType
@@ -33,6 +34,7 @@ object NovaRegistries {
     internal val INTERNAL_GUI_TEXTURE = createRegistry<GuiTexture>(novaKey("gui_texture"))
     internal val INTERNAL_WAILA_INFO_PROVIDER = createRegistry<WailaInfoProvider<*>>(novaKey("waila_info_provider"))
     internal val INTERNAL_WAILA_TOOL_ICON_PROVIDER = createRegistry<WailaToolIconProvider>(novaKey("waila_tool_icon_provider"))
+    internal val INTERNAL_WAILA_ICON_PROVIDER = createRegistry<WailaIconProvider<*>>(novaKey("waila_icon_provider"))
     internal val INTERNAL_ITEM_FILTER_TYPE = createRegistry<ItemFilterType<*>>(novaKey("item_filter_type"))
     internal val INTERNAL_TOOLTIP_STYLE = createRegistry<TooltipStyle>(novaKey("tooltip_style"))
     
@@ -83,6 +85,12 @@ object NovaRegistries {
      */
     @JvmField
     val WAILA_TOOL_ICON_PROVIDER: NovaRegistry<WailaToolIconProvider> = INTERNAL_WAILA_TOOL_ICON_PROVIDER.unmodifiableView
+    
+    /**
+     * Registry for all [WailaIconProviders][WailaIconProvider].
+     */
+    @JvmField
+    val WAILA_ICON_PROVIDER: NovaRegistry<WailaIconProvider<*>> = INTERNAL_WAILA_ICON_PROVIDER.unmodifiableView
     
     /**
      * Registry for all [ItemFilterTypes][ItemFilterType].

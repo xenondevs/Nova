@@ -12,8 +12,7 @@ import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
-import xyz.xenondevs.nova.resources.ResourcePath
-import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.ui.waila.WailaIcon
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 import kotlin.random.Random
 
@@ -106,7 +105,7 @@ internal object NexoItemsService : CustomItemService {
         return breakable?.drop?.canDrop(tool)
     }
     
-    override fun getBlockItemModelPaths(): Map<Key, ResourcePath<ResourceType.Model>> {
+    override fun getWailaIcons(): Map<Key, WailaIcon> {
         // Missing API
         return emptyMap()
     }

@@ -5,8 +5,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.resources.ResourcePath
-import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.ui.waila.WailaIcon
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -62,10 +61,8 @@ object CustomItemServiceManager {
         return services.firstNotNullOfOrNull { it.canBreakBlock(block, tool) }
     }
     
-    fun getBlockItemModelPaths(): Map<Key, ResourcePath<ResourceType.Model>> {
-        val map = HashMap<Key, ResourcePath<ResourceType.Model>>()
-        services.forEach { map += it.getBlockItemModelPaths() }
-        return map
+    fun getWailaIcons(): Map<Key, WailaIcon> {
+        return buildMap { services.forEach { putAll(it.getWailaIcons()) } }
     }
     
 }

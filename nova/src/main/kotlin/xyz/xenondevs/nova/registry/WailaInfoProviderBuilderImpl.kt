@@ -7,8 +7,8 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.nova.ui.waila.info.WailaInfo
-import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.WailaInfo
+import xyz.xenondevs.nova.ui.waila.WailaInfoProvider
 
 internal class WailaInfoProviderBuilderImpl<S : BlockData>(
     override val entry: RegistryEntry.Nova<WailaInfoProvider<S>>,
@@ -17,7 +17,7 @@ internal class WailaInfoProviderBuilderImpl<S : BlockData>(
     override val tags: Provider<Set<RegistryEntrySet.Nova.Tag<WailaInfoProvider<S>>>>
         field = mutableProvider(emptySet())
     
-    override var blocks: RegistryEntrySet.Paper<BlockType> = emptyRegistryEntrySet(RegistryKey.BLOCK)
+    override var blocks: Provider<Set<BlockType>> = emptyRegistryEntrySet(RegistryKey.BLOCK)
     override var priority = 0
     
     private var infoGetter: (Player, Block, S) -> WailaInfo = { _, _, _ -> throw NotImplementedError() }

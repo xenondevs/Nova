@@ -14,6 +14,7 @@ import kotlinx.serialization.builtins.SetSerializer
 import kotlinx.serialization.serializer
 import net.kyori.adventure.key.Key
 import net.minecraft.world.level.block.state.BlockState
+import org.bukkit.block.data.BlockData
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.config.PermanentStorage
@@ -26,6 +27,7 @@ import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.task.FontChar
 import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
+import xyz.xenondevs.nova.serialization.kotlinx.BlockDataSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.BlockStateSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.EquipmentEntrySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.GuiTextureEntrySerializer
@@ -96,7 +98,7 @@ internal object ResourceLookups {
     
     /**
      * Lookup of generated moved font to origin and offset.
-     * 
+     *
      * Format: `Map<Moved Font, Pair<Source Font, Offset>>`
      */
     val movedFontsLookup: MutableProvider<Map<ResourcePath<ResourceType.Font>, Pair<ResourcePath<ResourceType.Font>, Int>>> =
@@ -104,7 +106,7 @@ internal object ResourceLookups {
     
     /**
      * Map of generated moved font to origin and offset.
-     * 
+     *
      * Format: `Map<Moved Font, Pair<Source Font, Offset>>`
      */
     var movedFonts: Map<ResourcePath<ResourceType.Font>, Pair<ResourcePath<ResourceType.Font>, Int>>
@@ -149,14 +151,26 @@ internal object ResourceLookups {
     /**
      * Lookup for Waila icons.
      */
-    val wailaDataLookup: MutableProvider<Map<Key, FontChar>> =
-        resourceLookup("waila_data_lookup", MapSerializer(KeySerializer, FontChar.serializer()), emptyMap())
+    val wailaIconLookup: MutableProvider<Map<BlockData, FontChar>> =
+        resourceLookup("waila_lookup", MapSerializer(BlockDataSerializer, FontChar.serializer()), emptyMap())
     
     /**
      * Map of Waila icon id to [FontChar].
      */
-    var wailaData: Map<Key, FontChar>
-        by wailaDataLookup
+    var wailaIcon: Map<BlockData, FontChar>
+        by wailaIconLookup
+    
+    /**
+     * Lookup for Waila icons of custom item service blocks.
+     */
+    val customItemServiceWailaIconLookup: MutableProvider<Map<Key, FontChar>> =
+        resourceLookup("custom_item_service_waila_lookup", MapSerializer(KeySerializer, FontChar.serializer()), emptyMap())
+    
+    /**
+     * Map of custom item service block id to [FontChar].
+     */
+    var customItemServiceWailaIcon: Map<Key, FontChar>
+        by customItemServiceWailaIconLookup
     
     /**
      * Lookup for texture icons.

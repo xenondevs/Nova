@@ -44,11 +44,6 @@ class AssetPack(val namespace: String, val assetsDir: Path) {
     val soundsFile: Path? = assetsDir.resolve("sounds.json").takeIf(Path::exists)
     
     /**
-     * The `textures/waila/` textures directory, or `null` if it doesn't exist.
-     */
-    val wailaTexturesDir: Path? = assetsDir.resolve("textures/waila/").takeIf(Path::exists)
-    
-    /**
      * The `atlases/` directory, or `null` if it doesn't exist.
      */
     val atlasesDir: Path? = assetsDir.resolve("atlases/").takeIf(Path::exists)

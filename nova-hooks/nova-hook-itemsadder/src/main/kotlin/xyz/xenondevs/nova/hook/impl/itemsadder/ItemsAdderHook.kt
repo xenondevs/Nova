@@ -5,18 +5,21 @@ import dev.lone.itemsadder.api.CustomCrop
 import dev.lone.itemsadder.api.CustomStack
 import dev.lone.itemsadder.api.ItemsAdder
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.associateNotNull
 import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.ui.waila.WailaIcon
 import xyz.xenondevs.nova.util.broadcastBreakEvent
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.world.block.blockType
@@ -131,13 +134,13 @@ internal object ItemsAdderHook : CustomItemService {
         return null
     }
     
-    override fun getBlockItemModelPaths(): Map<Key, ResourcePath<ResourceType.Model>> {
+    override fun getWailaIcons(): Map<Key, WailaIcon> {
         return ItemsAdder.getAllItems()
             .filter { it.isBlock || CustomCrop.isSeed(it.itemStack) }
             .map(CustomStack::getNamespacedID)
-            .associateTo(HashMap()) {
-                val path = ItemsAdder.Advanced.getItemModelResourceLocation(it)!!.substringBeforeLast('.')
-                Key.key(it) to ResourcePath.of(ResourceType.Model, path)
+            .associateNotNull { id ->
+                ItemsAdder.Advanced.getItemModelResourceLocation(id)?.substringBeforeLast('.')
+                    ?.let { key(id) to WailaIcon.Model(ResourcePath.of(ResourceType.Model, it)) }
             }
     }
     

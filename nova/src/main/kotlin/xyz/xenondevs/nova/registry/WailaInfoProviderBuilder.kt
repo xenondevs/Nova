@@ -4,8 +4,9 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.ui.waila.info.WailaInfo
-import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.nova.ui.waila.WailaInfo
+import xyz.xenondevs.nova.ui.waila.WailaInfoProvider
 
 /**
  * A builder for [WailaInfoProvider].
@@ -15,7 +16,7 @@ sealed interface WailaInfoProviderBuilder<S : BlockData> : RegistryEntryBuilder.
     
     /**
      * The priority of this waila info provider.
-     * 
+     *
      * If multiple providers that can provide info for the same block exist,
      * the one with the highest priority will be chosen.
      */
@@ -24,7 +25,7 @@ sealed interface WailaInfoProviderBuilder<S : BlockData> : RegistryEntryBuilder.
     /**
      * The blocks that this waila info provider applies to.
      */
-    var blocks: RegistryEntrySet.Paper<BlockType>
+    var blocks: Provider<Set<BlockType>>
     
     /**
      * Sets the actual functionality of the info provider.

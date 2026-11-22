@@ -5,8 +5,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.resources.ResourcePath
-import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.ui.waila.WailaIcon
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 
 enum class CustomBlockType { NORMAL, CROP }
@@ -84,10 +83,8 @@ interface CustomItemService {
     fun canBreakBlock(block: Block, tool: ItemStack?): Boolean?
     
     /**
-     * Gets the paths of all item models that are blocks.
-     *
-     * example: [minecraft:dirt -> minecraft:item/dirt]
+     * Gets all [WailaIcons][WailaIcon] to render, by block [Key].
      */
-    fun getBlockItemModelPaths(): Map<Key, ResourcePath<ResourceType.Model>>
+    fun getWailaIcons(): Map<Key, WailaIcon>
     
 }

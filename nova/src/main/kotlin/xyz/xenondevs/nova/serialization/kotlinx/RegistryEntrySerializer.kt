@@ -12,8 +12,9 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
-import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
-import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
+import xyz.xenondevs.nova.ui.waila.WailaIconProvider
+import xyz.xenondevs.nova.ui.waila.WailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.WailaToolIconProvider
 import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterType
@@ -78,6 +79,11 @@ object GuiTextureSerializer : NovaRegistryElementSerializer<GuiTexture>(NovaRegi
 object WailaInfoProviderSerializer : NovaRegistryElementSerializer<WailaInfoProvider<*>>(NovaRegistries.WAILA_INFO_PROVIDER)
 
 /**
+ * Serializer for [WailaIconProvider], serializes by [WailaIconProvider.key] in the format of `namespace:value`.
+ */
+object WailaIconProviderSerializer : NovaRegistryElementSerializer<WailaIconProvider<*>>(NovaRegistries.WAILA_ICON_PROVIDER)
+
+/**
  * Serializer for [WailaToolIconProvider], serializes by [WailaToolIconProvider.key] in the format of `namespace:value`.
  */
 object WailaToolIconProviderSerializer : NovaRegistryElementSerializer<WailaToolIconProvider>(NovaRegistries.WAILA_TOOL_ICON_PROVIDER)
@@ -130,6 +136,11 @@ object GuiTextureEntrySerializer : NovaRegistryEntrySerializer<GuiTexture>(NovaR
 object WailaInfoProviderEntrySerializer : NovaRegistryEntrySerializer<WailaInfoProvider<*>>(NovaRegistries.WAILA_INFO_PROVIDER)
 
 /**
+ * Serializer for [RegistryEntry.Nova] of [WailaIconProvider], serialized by [RegistryEntry.key] in the format of `namespace:value`.
+ */
+object WailaIconProviderEntrySerializer : NovaRegistryEntrySerializer<WailaIconProvider<*>>(NovaRegistries.WAILA_ICON_PROVIDER)
+
+/**
  * Serializer for [RegistryEntry.Nova] of [WailaToolIconProvider], serialized by [RegistryEntry.key] in the format of `namespace:value`.
  */
 object WailaToolIconProviderEntrySerializer : NovaRegistryEntrySerializer<WailaToolIconProvider>(NovaRegistries.WAILA_TOOL_ICON_PROVIDER)
@@ -180,6 +191,11 @@ object GuiTextureEntrySetSerializer : NovaRegistryEntrySetSerializer<GuiTexture>
  * Serializer for [RegistryEntrySet.Nova] of [WailaInfoProvider].
  */
 object WailaInfoProviderEntrySetSerializer : NovaRegistryEntrySetSerializer<WailaInfoProvider<*>>(NovaRegistries.WAILA_INFO_PROVIDER)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [WailaIconProvider].
+ */
+object WailaIconProviderEntrySetSerializer : NovaRegistryEntrySetSerializer<WailaIconProvider<*>>(NovaRegistries.WAILA_ICON_PROVIDER)
 
 /**
  * Serializer for [RegistryEntrySet.Nova] of [WailaToolIconProvider].

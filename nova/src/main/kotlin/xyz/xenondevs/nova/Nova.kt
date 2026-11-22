@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.network.installPacketHandler
 import xyz.xenondevs.nova.packetentity.initPacketEntityManager
 import xyz.xenondevs.nova.registry.NovaRegistryContext
-import xyz.xenondevs.nova.ui.waila.WailaManager
+import xyz.xenondevs.nova.ui.waila.overlay.WailaManager
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.api.Nova as INova
 import xyz.xenondevs.nova.api.block.BlockManager as IBlockManager

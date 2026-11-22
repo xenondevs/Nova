@@ -53,8 +53,9 @@ import xyz.xenondevs.nova.resources.builder.task.TooltipStyleTask
 import xyz.xenondevs.nova.serialization.json.serializer.RecipeDeserializer
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
-import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
-import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
+import xyz.xenondevs.nova.ui.waila.WailaIconProvider
+import xyz.xenondevs.nova.ui.waila.WailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.WailaToolIconProvider
 import xyz.xenondevs.nova.util.Identifier
 import xyz.xenondevs.nova.util.parseKey
 import xyz.xenondevs.nova.world.block.TileEntityConstructor
@@ -350,7 +351,6 @@ abstract class Registrar internal constructor() : Namespaced {
     /**
      * Registers a new [WailaInfoProvider] for vanilla blocks with the specified [name] after configuring it with [wailaInfoProvider].
      */
-    @JvmName("wailaInfoProviderVanilla")
     fun <S : BlockData> wailaInfoProvider(
         name: String,
         wailaInfoProvider: WailaInfoProviderBuilder<S>.() -> Unit
@@ -377,6 +377,21 @@ abstract class Registrar internal constructor() : Namespaced {
     
     fun wailaToolIconProviderTag(tag: RegistryEntrySet.Nova.Tag<WailaToolIconProvider>, configure: TagBuilder.Nova<WailaToolIconProvider>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaToolIconProvider> =
         RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_WAILA_TOOL_ICON_PROVIDER, tag.tagKey, configure)
+    
+    /**
+     * Registers a new [WailaIconProvider] for vanilla blocks with the specified [name] after configuring it with [wailaIconProvider].
+     */
+    fun <S : BlockData> wailaIconProvider(
+        name: String,
+        wailaIconProvider: WailaIconProviderBuilder<S>.() -> Unit
+    ): RegistryEntry.Nova<WailaIconProvider<S>> =
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_WAILA_ICON_PROVIDER, parseKey(name, this), ::WailaIconProviderBuilderImpl, wailaIconProvider)
+    
+    fun wailaIconProviderTag(name: String, configure: TagBuilder.Nova<WailaIconProvider<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaIconProvider<*>> =
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_WAILA_ICON_PROVIDER, parseKey(name, this), configure)
+    
+    fun wailaIconProviderTag(tag: RegistryEntrySet.Nova.Tag<WailaIconProvider<*>>, configure: TagBuilder.Nova<WailaIconProvider<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<WailaIconProvider<*>> =
+        RegistryLoader.enqueueNovaTag(NovaRegistries.INTERNAL_WAILA_ICON_PROVIDER, tag.tagKey, configure)
     //</editor-fold>
     
     //<editor-fold desc="worldgen">

@@ -4,7 +4,7 @@ import net.kyori.adventure.key.Key
 import org.bukkit.block.BlockType
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
+import xyz.xenondevs.nova.ui.waila.WailaToolIconProvider
 
 internal class WailaToolIconProviderBuilderImpl(
     override val entry: RegistryEntry.Nova<WailaToolIconProvider>

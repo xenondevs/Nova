@@ -23,8 +23,6 @@ import xyz.xenondevs.nova.annotations.gradle.AnnotationIndexPlugin
 import xyz.xenondevs.nova.annotations.gradle.GenerateAnnotationIndex
 import xyz.xenondevs.novagradle.task.AddonExtension
 import xyz.xenondevs.novagradle.task.GenerateLanguageFilesTask
-import xyz.xenondevs.novagradle.task.GenerateWailaTexturesExtension
-import xyz.xenondevs.novagradle.task.GenerateWailaTexturesTask
 import xyz.xenondevs.novagradle.task.PluginDependency
 import xyz.xenondevs.novagradle.task.PluginDependency.Load
 import xyz.xenondevs.novagradle.task.PluginDependency.Stage
@@ -65,7 +63,6 @@ internal class NovaGradlePlugin : KotlinCompilerPluginSupportPlugin {
         val addonExt = target.extensions.create<AddonExtension>("addon")
         val addonJar = createAddonJar(target, addonExt)
         configureOrigami(target, addonExt, addonJar)
-        createGenWailaTextures(target, addonExt)
         createGenLangFiles(target)
     }
     
@@ -194,24 +191,6 @@ internal class NovaGradlePlugin : KotlinCompilerPluginSupportPlugin {
             from(project.tasks.named<GenerateAnnotationIndex>("generateAnnotationIndex").flatMap { it.outputFile })
             from(prepAddonJar.map { it.output })
             addOrigamiJson()
-        }
-    }
-    
-    private fun createGenWailaTextures(project: Project, addonExt: AddonExtension) {
-        val wailaExt = project.extensions.create<GenerateWailaTexturesExtension>("generateWailaTextures")
-        val novaArtifact = project.configurations.detachedConfiguration(
-            project.dependencyFactory.create("xyz.xenondevs.nova:nova:${Versions.NOVA}")
-        ).apply {
-            isTransitive = false
-        }
-        
-        project.tasks.register<GenerateWailaTexturesTask>("generateWailaTextures") {
-            group = NOVA_TASK_GROUP
-            resourcesDir.set(wailaExt.resourcesDir.orElse(project.layout.projectDirectory.dir("src/main/resources/")))
-            addonId.set(addonExt.name.map { it.lowercase() })
-            filter.set(wailaExt.filter.orElse(".*"))
-            this.novaArtifact.from(novaArtifact)
-            mcAssetsDir.set(project.layout.buildDirectory.dir("mcassets"))
         }
     }
     

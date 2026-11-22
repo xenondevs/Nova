@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.Font
 import xyz.xenondevs.nova.resources.builder.font.provider.bitmap.BitmapProvider
-import xyz.xenondevs.nova.ui.waila.WailaManager
+import xyz.xenondevs.nova.ui.waila.overlay.WailaManager
 import java.awt.Color
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage

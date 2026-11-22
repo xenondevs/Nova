@@ -79,6 +79,9 @@ overlay:
 waila:
   # Enable / disable the WAILA overlay.
   enabled: true
+  # The GUI scale at which WAILA textures should be rendered.
+  # Higher values create higher resolution textures, but also increase the size of the resource pack.
+  render_scale: 4
   # Settings affecting the position of the WAILA overlay.
   positioning:
     # The minimum distance from the overlay above, in pixels (affected by gui scale).

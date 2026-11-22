@@ -68,7 +68,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
 import xyz.xenondevs.nova.ui.menu.explorer.blockTagExplorer
 import xyz.xenondevs.nova.ui.menu.explorer.itemTagExplorer
-import xyz.xenondevs.nova.ui.waila.WailaManager
+import xyz.xenondevs.nova.ui.waila.overlay.WailaManager
 import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.asBukkitMirror

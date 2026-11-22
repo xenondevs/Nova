@@ -6,7 +6,6 @@ import net.Indyuce.mmoitems.api.Type
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
-import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.inventory.ItemStack
@@ -14,8 +13,7 @@ import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
-import xyz.xenondevs.nova.resources.ResourcePath
-import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.ui.waila.WailaIcon
 import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 import net.Indyuce.mmoitems.MMOItems as MMOItemsPlugin
@@ -100,7 +98,7 @@ internal object MMOItemsHook : CustomItemService {
         return null
     }
     
-    override fun getBlockItemModelPaths(): Map<Key, ResourcePath<ResourceType.Model>> {
+    override fun getWailaIcons(): Map<Key, WailaIcon> {
         return emptyMap()
     }
     

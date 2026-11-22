@@ -7,13 +7,13 @@ import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.resources.ComponentSize
-import xyz.xenondevs.nova.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.resources.builder.task.FontChar
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayCompound
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatcher
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
-import xyz.xenondevs.nova.ui.waila.info.WailaLine
+import xyz.xenondevs.nova.ui.waila.WailaLine
 
 private val BAR_MATCH_INFO = BarMatchInfo.fromAddon(Key.key("nova", "waila"))
 
@@ -37,7 +37,7 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
     private val lineOverlays = Array(10, ::WailaLineOverlay)
     
     @Suppress("DEPRECATION")
-    fun update(icon: Key, lines: List<WailaLine>, backgroundEnabled: Boolean) {
+    fun update(icon: FontChar?, lines: List<WailaLine>, backgroundEnabled: Boolean) {
         require(lines.size <= 10) { "Waila text can't be longer than 10 lines" }
         
         // reset line overlays
@@ -45,9 +45,8 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
         overlays += imageOverlay
         
         val lineSizes = lines.map { CharSizes.calculateComponentSize(it.text, player.locale, true) }
-        val iconChar = ResourceLookups.wailaData[icon]
         val [beginX, centerX] = imageOverlay.update(
-            iconChar,
+            icon,
             lines.size,
             lineSizes.maxOf { it.xRange.endInclusive - it.xRange.start },
             backgroundEnabled
