@@ -4,7 +4,7 @@ format.version = "1.1"
 [versions]
 bytebase = "0.4.8"
 commons-provider = "2.0.0-alpha.11"
-devkit = "0.0.4-dev-405"
+devkit = "0.1.0"
 dokka = "2.3.0"
 jgrapht = "1.5.3"
 kotlin = "2.4.21"
