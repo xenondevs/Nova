@@ -152,6 +152,7 @@ private object NovaTileEntityTicker : BlockEntityTicker<NovaTileEntityProxy> {
     
     override fun tick(level: Level, pos: BlockPos, state: BlockState, entity: NovaTileEntityProxy) {
         entity.tick(level, pos, state, entity)
+        entity.setChanged()
     }
     
 }
