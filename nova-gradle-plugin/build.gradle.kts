@@ -2,7 +2,8 @@ plugins {
     id("nova.kotlin-conventions")
     id("nova.publish-conventions")
     id("nova.dokka-conventions")
-    `java-gradle-plugin`
+    alias(libs.plugins.devkit.functionalTestPublishing)
+    alias(libs.plugins.devkit.gradlePlugin)
     `kotlin-dsl`
 }
 
@@ -24,16 +25,18 @@ gradlePlugin {
     }
 }
 
-val generateVersionsClass = tasks.register<GenerateVersionsClassTask>("generateVersionsClass") {
-    novaVersion.set(version.toString())
-    paperVersion.set(libs.versions.paper)
-    outputDirectory.set(layout.buildDirectory.dir("generatedSrc"))
+buildConfig {
+    forClass("xyz.xenondevs.novagradle", "Versions") {
+        val novaVersion = "$version"
+        val paperVersion = libs.versions.paper
+        buildConfigField("NOVA", novaVersion)
+        buildConfigField("NOVA_RELEASE", Regex("""^(\d+.\d+).*$""").matchEntire(novaVersion)!!.groupValues[1])
+        buildConfigField("PAPER", paperVersion)
+        buildConfigField("PAPER_API_VERSION", paperVersion.map { it.substring(0, 4) })
+    }
 }
 
-kotlin {
-    sourceSets {
-        main {
-            kotlin.srcDir(generateVersionsClass)
-        }
-    }
+pluginDevKit {
+    pluginPackage = "xyz.xenondevs.nova.compiler"
+    compilerPlugin(project(":nova-compiler-plugin"))
 }

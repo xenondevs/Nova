@@ -4,7 +4,7 @@ format.version = "1.1"
 [versions]
 bytebase = "0.4.8"
 commons-provider = "2.0.0-alpha.11"
-devkit = "0.0.4-dev-405"
+devkit = "0.1.0"
 dokka = "2.3.0"
 jgrapht = "1.5.3"
 kotlin = "2.4.21"
@@ -81,4 +81,5 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 pluginPublish = { id = "xyz.xenondevs.publish.plugin-publish", version = "1.0.4" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 devkit-compilerPlugin = { id = "org.jetbrains.kotlin.compiler.plugin.devkit.compiler-plugin", version.ref = "devkit" }
+devkit-gradlePlugin = { id = "org.jetbrains.kotlin.compiler.plugin.devkit.gradle-plugin", version.ref = "devkit" }
 devkit-functionalTestPublishing = { id = "org.jetbrains.kotlin.compiler.plugin.devkit.functional-test-publishing", version.ref = "devkit" }

@@ -8,9 +8,6 @@ plugins {
 }
 
 repositories {
-    maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap") {
-        content { includeGroupAndSubgroups("org.jetbrains.kotlin.compiler.plugin.devkit") }
-    }
     // Kotlin compiler builds bundled with IntelliJ IDEA, used by the compiler plugin's IDE variants
     exclusiveContent {
         forRepository { maven("https://redirector.kotlinlang.org/maven/intellij-dependencies/") }
