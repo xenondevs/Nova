@@ -103,7 +103,11 @@ class WailaTask(
         
         val blockIcons = resolveBlockIcons()
         val customItemServiceIcons = CustomItemServiceManager.getWailaIcons()
-        val chars = renderIcons(blockIcons.values.toHashSet() + customItemServiceIcons.values)
+        val chars:  Map<WailaIcon, FontChar>
+        val time = measureTime { 
+            chars = renderIcons(blockIcons.values.toHashSet() + customItemServiceIcons.values) 
+        }
+        builder.logger.info("Rendered ${chars.size} WAILA icons in $time")
         
         ResourceLookups.wailaIcon = blockIcons.toChars(chars)
         ResourceLookups.customItemServiceWailaIcon = customItemServiceIcons.toChars(chars)
@@ -155,9 +159,7 @@ class WailaTask(
         }
         
         val requests = renderRequests.keys.toList()
-        val results: List<RenderResult>
-        val time = measureTime { results = renderer.render(requests) }
-        builder.logger.info("Rendered ${results.size} WAILA textures in $time")
+        val results = renderer.render(requests)
         
         for ([request, result] in requests.zip(results)) {
             val char = when (result) {
